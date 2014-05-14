@@ -14,7 +14,7 @@ import org.apache.commons.cli.HelpFormatter;
  * service.
  *
  */
-public class DataAnonymizer 
+public class Anonymizer 
 {
     public static void main( String[] args )
     throws Exception {
