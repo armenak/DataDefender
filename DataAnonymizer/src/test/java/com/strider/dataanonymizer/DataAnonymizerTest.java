@@ -7,7 +7,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class AnonymizerTest 
+public class DataAnonymizerTest 
     extends TestCase
 {
     /**
@@ -15,7 +15,7 @@ public class AnonymizerTest
      *
      * @param testName name of the test case
      */
-    public AnonymizerTest( String testName )
+    public DataAnonymizerTest( String testName )
     {
         super( testName );
     }
@@ -25,7 +25,7 @@ public class AnonymizerTest
      */
     public static Test suite()
     {
-        return new TestSuite( AnonymizerTest.class );
+        return new TestSuite( DataAnonymizerTest.class );
     }
 
     /**
