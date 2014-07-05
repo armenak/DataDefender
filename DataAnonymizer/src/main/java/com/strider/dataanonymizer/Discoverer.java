@@ -24,10 +24,12 @@ public class Discoverer {
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
         if (line.hasOption("help")) {
-            help(options);
+            help(options); 
             return;
         } else {
-            //
+            if (line.hasOption("f")) {
+                System.out.println("fieldssss");
+            }
         }          
    }
    
