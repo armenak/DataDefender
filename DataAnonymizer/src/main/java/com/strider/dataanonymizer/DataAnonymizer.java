@@ -13,8 +13,6 @@ import org.apache.commons.cli.HelpFormatter;
 
 import com.strider.dataanonymizer.utils.AppProperties;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.database.MySQLDBConnection;
 
 /**
  * Entry point to Data DataAnonymizer. 

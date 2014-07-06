@@ -7,17 +7,25 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 
+import org.apache.log4j.Logger;
+
+import com.strider.dataanonymizer.IDiscoverer;
+import com.strider.dataanonymizer.ColumnDiscoverer;
+
 /**
- * Entry point to Discoverer utility. 
+ * Entry point to Data Discoverer utility. 
  * @author Armenak Grigoryan
  */
 public class Discoverer {
-   public static void main( String[] args )
+    
+    static Logger log = Logger.getLogger(Discoverer.class);
+    
+    public static void main( String[] args )
     throws Exception {
 
         if (args.length == 0 ) {
-            System.out.println("To display usage info please type");
-            System.out.println("    java -jar DataAnonymizer.jar com.strider.Discoverer help");
+            log.info("To display usage info please type");
+            log.info("    java -jar DataAnonymizer.jar com.strider.Discoverer help");
             return;
         }        
 
@@ -26,11 +34,17 @@ public class Discoverer {
         if (line.hasOption("help")) {
             help(options); 
             return;
-        } else {
-            if (line.hasOption("f")) {
-                System.out.println("fieldssss");
-            }
-        }          
+        } else if (line.hasOption("c")) {
+                log.info("Column discovery in process");
+                String databasePropertyFile = "db.properties";
+                if (line.hasOption("p")) {
+                    databasePropertyFile = line.getOptionValue("p");
+                } 
+                IDiscoverer discoverer = new ColumnDiscoverer();
+                discoverer.discover(databasePropertyFile);
+        } else if (line.hasOption("d")) {
+                log.info("Data discovery in process");
+        }
    }
    
   private static CommandLine getCommandLine(final Options options, final String[] args)
@@ -52,9 +66,9 @@ public class Discoverer {
     private static Options createOptions() {
         final Options options = new Options();
         options.addOption("help", false, "Display help");
-        options.addOption( "f", "fields", false, "discover candidate columns names for anonymization based on semantic algorithm" );
-        options.addOption( "s", "semantic", false, "discover candidate columns for anonymization based on semantic algorithm" );
-        options.addOption( "D", "property", true, "define property file" );
+        options.addOption( "c", "columns", false, "discover candidate column names for anonymization based on provided patterns" );
+        options.addOption( "d", "data", false, "discover candidate column for anonymization based on semantic algorithms" );
+        options.addOption( "p", "property", true, "define property file" );
         return options;
     }
  

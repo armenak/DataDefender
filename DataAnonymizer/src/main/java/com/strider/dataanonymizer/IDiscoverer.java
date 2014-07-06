@@ -12,5 +12,5 @@ public interface IDiscoverer {
      * Discovers data or data containers with data which can be be the subject 
      * for data anonymization.
      */
-    public void discover(Connection conn);
+    public void discover(String propertyFile);
 }
