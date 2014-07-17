@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Requirement>
+    <Client>Integrated Science</Client>
+    <Version>1.0</Version>
+    <Tables>
+        <Table name="First">
+            <ParentID>Adams</ParentID>
+            <Columns>
+                <Column>Child1</Column>
+                <Column>Child2</Column>
+            </Columns>
+        </Table>
+        <Table name="Second">
+            <ParentID>Adams</ParentID>
+            <Columns>
+                <Column>Child3</Column>
+                <Column>Child4</Column>
+            </Columns>
+        </Table>
+    </Tables>
+</Requirement>
