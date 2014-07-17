@@ -36,16 +36,12 @@ public class Anonymizer
             return;
         } 
         
-        String propertyFile = "";
+        String propertyFile = "db.properties";
         Properties props = null;
         if (line.hasOption("D")) {
             propertyFile = line.getOptionValues("D")[0];
             props = AppProperties.loadPropertiesFromClassPath(propertyFile);
-        } else {
-            System.out.println("Option -D is mandatory. To display usage info please type");
-            System.out.println("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer help"); 
-            return;
-        }
+        } 
         
         if (line.hasOption("a")) {
             IAnonymizer anonymizer = new DatabaseAnonymizer();

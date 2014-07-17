@@ -73,36 +73,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.error(e);
         }
         
+        // Now we collect data from the requirement
+        
+        
+        
         log.info(map.toString());
         
         
-        // Get the list of "suspicios" field names from property file
-        // Reading configuration file
-        Configuration columnsConfiguration = null;
-        try {
-            columnsConfiguration = new PropertiesConfiguration("columns.properties");
-        } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
-        }        
-        Iterator<String> iterator = columnsConfiguration.getKeys();
-        List<String> suspList = IteratorUtils.toList(iterator);          
-        
-        
-        ArrayList<String> matches = new ArrayList<String>();
-        for(String s: suspList) {
-            Pattern p = Pattern.compile(s);
-            // Find out if database columns contain any of of the "suspicios" fields
-            for(Pair pair: map) {
-                String tableName = pair.getTableName();
-                String columnName = pair.getColumnName();
-                if (p.matcher(columnName).matches()) {
-                    matches.add(tableName + "->" + columnName);
-                }                            
-            }            
-        }
-        
-        // Report column names
-        log.info(matches.toString());
     }
     
     private class Pair {

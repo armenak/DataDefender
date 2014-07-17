@@ -1,12 +1,17 @@
 package com.strider.dataanonymizer.requirement;
 
+import java.util.Collections;
 import java.util.List;   
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Column {
 
-    @XmlElement(name="Name")
+    @XmlAttribute(name="Name")
     private String name;
 
     @XmlElement(name="Function")
@@ -14,7 +19,7 @@ public class Column {
     
     @XmlElementWrapper(name="Parameters")
     @XmlElement(name="Parameter")
-    private List<String> parameterList;
+    private List<Parameter> paramters;
     
     public String getName() {
         return this.name;
@@ -24,8 +29,8 @@ public class Column {
         return this.function;
     }    
     
-    public List getParameterList() {
-        return this.parameterList;
+    public List<Parameter> getParameters() {
+        return Collections.unmodifiableList(this.paramters);
     }    
 
 }
