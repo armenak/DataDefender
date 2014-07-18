@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -76,8 +76,7 @@ public class Functions {
         return random.nextInt(max - min + 1) + min;
     }
     
-    public static String generateRandomString(int num, int length) 
-    {
+    public static String generateRandomString(int num, int length) {
         List<Integer> randomNumbers = new ArrayList<>();
         Random random = new Random();
 
@@ -93,12 +92,39 @@ public class Functions {
         }
         
         int stringLength = length;
-        if (randomString.length() <= length)
-        {
+        if (randomString.length() <= length) {
             stringLength = randomString.length();
         }
         
         return randomString.toString().substring(0, stringLength);
+    }    
+    
+    public static String randomDescription(String range) {
+        List<String> rangeList = null;
+                
+        if (range.contains(",")) {
+            rangeList = Arrays.asList(range.split(","));
+            // Checking that the list contains two Strings representing Integers
+            if (rangeList.size() == 2) {
+                if (!rangeList.get(0).isEmpty() && !rangeList.get(1).isEmpty() ) {
+                    if (isInteger(rangeList.get(0)) && isInteger(rangeList.get(1))) {
+                        StringBuilder desc = new StringBuilder();
+                        desc.append(generateRandomString(Integer.parseInt(rangeList.get(0).toString()),
+                                Integer.parseInt(rangeList.get(1).toString())).trim());
+                        return desc.toString();
+                    }
+                }
+            }            
+        }
+        return "";
+    }    
+ 
+    /**
+     * Generates random 9-digit student number 
+     * @return String
+     */
+    public static String randomStudentNumber()  {
+        return String.valueOf(Math.round(Math.random()*100000000));
     }    
     
    private static void addWordsIntoArray() throws Exception
@@ -110,4 +136,16 @@ public class Functions {
             }
         }
     }    
+   
+    private static boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException nfe) {
+            log.error(nfe.toString());
+        }
+        
+        return false;
+    }   
+   
 }

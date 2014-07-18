@@ -37,7 +37,10 @@ public class Column {
     }    
     
     public List<Parameter> getParameters() {
-        return Collections.unmodifiableList(this.paramters);
+        if (this.paramters != null) {
+            return Collections.unmodifiableList(this.paramters);
+        }
+        return null;
     }    
 
 }

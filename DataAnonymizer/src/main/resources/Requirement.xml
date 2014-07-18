@@ -23,6 +23,15 @@
                         <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
                     </Parameters>
                 </Column>                
+                <Column Name="description" ReturnType="String">
+                    <Function>randomDescription</Function>
+                    <Parameters>
+                        <Parameter Name="range" Value="1,100" Type="Range"/>
+                    </Parameters>
+                </Column>
+                <Column Name="stud_no" ReturnType="String">
+                    <Function>randomStudentNumber</Function>
+                </Column>                
             </Columns>
         </Table>
     </Tables>

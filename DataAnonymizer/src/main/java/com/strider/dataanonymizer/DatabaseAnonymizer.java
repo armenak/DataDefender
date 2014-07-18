@@ -123,9 +123,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             log.warn("    Function is not defined for column [" + column + "]. Moving to the next column.");
                         } else {
                             try {
-                                if (column.getParameters().isEmpty()) {
+                                if (column.getParameters() == null) {
                                     log.info("    Function [" + function + "] has no defined parameters.");
-                                    pstmt.setString(++index, Functions.class.getMethod(function, String.class).invoke(null).toString());
+                                    pstmt.setString(++index, Functions.class.getMethod(function, null).invoke(null).toString());
                                 } else {
                                     log.info("    Function [" + function + "] accepts following parameter(s):");
                                     for(Parameter parameter : column.getParameters()) {
