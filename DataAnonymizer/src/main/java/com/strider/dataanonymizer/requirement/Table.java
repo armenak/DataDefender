@@ -11,8 +11,11 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Table {
 
-    @XmlAttribute(name="name")
+    @XmlAttribute(name="Name")
     private String name;
+    
+    @XmlAttribute(name="PKey")
+    private String pkey;    
     
     @XmlElementWrapper(name="Columns")
     @XmlElement(name="Column")
@@ -21,6 +24,10 @@ public class Table {
     public String getName()  {
         return this.name;
     }
+    
+    public String getPKey()  {
+        return this.pkey;
+    }    
     
     public List<Column> getColumns() {
         return Collections.unmodifiableList(this.columns);

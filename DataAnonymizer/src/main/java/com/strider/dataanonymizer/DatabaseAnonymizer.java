@@ -77,6 +77,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         } catch (JAXBException je) {
             log.error(je.toString());
         }
+
+        // Initializing static data in Functions
+        Functions.init();
         
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
@@ -101,7 +104,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 sql.setLength(sql.length() - 1);
             }
             
-            sql.append(" WHERE id = ?");
+            sql.append(" WHERE ").append(table.getPKey()).append(" = ?");
             String updateString = sql.toString();
             
             try {
@@ -145,6 +148,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     pstmt.setInt(++index, id);
                     pstmt.addBatch();
                     batchCounter++;
+                    // @todo Get rid of this hardcoding
                     if (batchCounter == 1000) {
                         pstmt.executeBatch();
                         connection.commit();

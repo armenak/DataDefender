@@ -3,7 +3,7 @@
     <Client>Integrated Science</Client>
     <Version>1.0</Version>
     <Tables>
-        <Table name="test">
+        <Table Name="test" PKey="id">
             <Columns>
                 <Column Name="first" ReturnType="String">
                     <Function>randomFirstName</Function>
@@ -15,8 +15,14 @@
                     <Function>randomLastName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="/Users/strider/RandomLastNames.txt" Type="String"/>
-                    </Parameters>                    
+                    </Parameters>
                 </Column>
+                <Column Name="email" ReturnType="String">
+                    <Function>randomEmail</Function>
+                    <Parameters>
+                        <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
+                    </Parameters>
+                </Column>                
             </Columns>
         </Table>
     </Tables>
