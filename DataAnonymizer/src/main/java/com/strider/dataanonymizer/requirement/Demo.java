@@ -23,6 +23,8 @@ public class Demo {
                 for(Parameter parameter : column.getParameters()) {
                     System.out.println("    " + parameter.getName());
                     System.out.println("    " + parameter.getValue());
+                    
+                    
                 }                
             }
         }        

@@ -17,6 +17,9 @@ public class Column {
     @XmlElement(name="Function")
     private String function;    
     
+    @XmlElement(name="ReturnType")
+    private String returnType;        
+    
     @XmlElementWrapper(name="Parameters")
     @XmlElement(name="Parameter")
     private List<Parameter> paramters;
@@ -27,6 +30,10 @@ public class Column {
     
     public String getFunction() {
         return this.function;
+    }    
+    
+    public String getReturnType() {
+        return this.returnType;
     }    
     
     public List<Parameter> getParameters() {

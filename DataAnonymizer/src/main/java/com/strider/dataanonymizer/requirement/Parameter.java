@@ -17,6 +17,8 @@ public class Parameter {
     @XmlAttribute(name="Value")
     private String value;    
     
+    @XmlAttribute(name="Type")
+    private String type;        
     
     public String getName() {
         return this.name;
@@ -24,5 +26,9 @@ public class Parameter {
     
     public String getValue() {
         return this.value;
-    }        
+    }
+    
+    public String getType() {
+        return this.type;
+    }    
 }

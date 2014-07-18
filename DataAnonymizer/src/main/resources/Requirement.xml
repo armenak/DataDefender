@@ -3,40 +3,20 @@
     <Client>Integrated Science</Client>
     <Version>1.0</Version>
     <Tables>
-        <Table name="students">
+        <Table name="test">
             <Columns>
-                <Column Name="fname">
+                <Column Name="first" ReturnType="String">
                     <Function>randomFirstName</Function>
                     <Parameters>
-                        <Parameter Name="param1" Value="value1"/>
-                        <Parameter Name="file" Value="/usr/local/RandomFirstNames"/>
+                        <Parameter Name="file" Value="/Users/strider/RandomFirstNames.txt" Type="String"/>
                     </Parameters>
                 </Column>
-                <Column Name="lname">
+                <Column Name="last" ReturnType="String">
                     <Function>randomLastName</Function>
                     <Parameters>
-                        <Parameter Name="param2" Value="value2"/>
-                        <Parameter Name="file" Value="/usr/local/RandomLastNames"/>
+                        <Parameter Name="file" Value="/Users/strider/RandomLastNames.txt" Type="String"/>
                     </Parameters>                    
                 </Column>
-            </Columns>
-        </Table>
-        <Table name="faculty">
-            <Columns>
-                <Column Name="phone">
-                    <Function>randomPhoneNumber</Function>
-                    <Parameters>
-                        <Parameter Name="param3" Value="value3"/>
-                        <Parameter Name="file" Value="/usr/local/RandomPhoneNumbers"/>
-                    </Parameters>                                        
-                </Column>
-                <Column Name="city">
-                    <Function>randomCity</Function>
-                    <Parameters>
-                        <Parameter Name="param4" Value="value4"/>
-                        <Parameter Name="file" Value="/usr/local/RandomCities"/>
-                    </Parameters>                                        
-                </Column>                
             </Columns>
         </Table>
     </Tables>
