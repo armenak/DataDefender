@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * JAXB class that defines elements of XML file
+ * JAXB class that defines elements in Requirement.xml file
  * 
  * @author Armenak Grigoryan
  */
@@ -28,16 +28,31 @@ public class Requirement {
     @XmlElement(name="Table")
     private List<Table> tables;
     
+    /**
+     * Getter method for client attribute
+     * @return String
+     */
     public String getClient() 
     { 
         return this.client; 
     }
     
+    /**
+     * Getter method for version attribute
+     * @return String
+     */
     public String getVersion() {
         return this.version;
     }
     
+    /**
+     * Getter method for tables attribute
+     * @return List
+     */
     public List<Table> getTables() {
-        return Collections.unmodifiableList(this.tables);
+        if (this.tables != null) {
+            return Collections.unmodifiableList(this.tables);
+        }
+        return null;
     }
 }

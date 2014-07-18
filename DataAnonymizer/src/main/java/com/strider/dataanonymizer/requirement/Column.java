@@ -8,6 +8,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+/**
+ * JAXB class that defines column elements in Requirement.xml file
+ * 
+ * @author Armenak Grigoryan
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Column {
 
@@ -24,18 +29,34 @@ public class Column {
     @XmlElement(name="Parameter")
     private List<Parameter> paramters;
     
+    /**
+     * Getter method for name attribute
+     * @return String
+     */
     public String getName() {
         return this.name;
     }
     
+    /**
+     * Getter method for function attribute
+     * @return String
+     */
     public String getFunction() {
         return this.function;
     }    
     
+    /**
+     * Getter method for returnType attribute
+     * @return String
+     */
     public String getReturnType() {
         return this.returnType;
     }    
     
+    /**
+     * Getter method for Parameters attribute
+     * @return List
+     */
     public List<Parameter> getParameters() {
         if (this.paramters != null) {
             return Collections.unmodifiableList(this.paramters);
