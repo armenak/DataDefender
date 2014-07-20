@@ -6,6 +6,7 @@ import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.AppProperties;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -67,12 +69,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             throw new DatabaseAnonymizerException(ine.toString());
         }       
                 
+        Properties props = AppProperties.loadPropertiesFromClassPath("anonymizer.properties");
+        if (props == null) {
+            throw new DatabaseAnonymizerException("ERROR: anonymizer.properties file is not defined.");
+        }
+        String requirementFile = props.getProperty("requirement");
+        int batchSize = Integer.parseInt(props.getProperty("batch_size").toString());
+        
+        
         // Now we collect data from the requirement
         Requirement requirement = null;
         try {
             JAXBContext jc = JAXBContext.newInstance(Requirement.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-            requirement = (Requirement) unmarshaller.unmarshal(new File("src/main/resources/Requirement.xml"));        
+            requirement = (Requirement) unmarshaller.unmarshal(new File(requirementFile));
         } catch (JAXBException je) {
             log.error(je.toString());
             throw new DatabaseAnonymizerException(je.toString());
@@ -149,7 +159,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     pstmt.addBatch();
                     batchCounter++;
                     // @todo Get rid of this hardcoding
-                    if (batchCounter == 1000) {
+                    if (batchCounter == batchSize) {
                         pstmt.executeBatch();
                         connection.commit();
                         batchCounter = 0;
