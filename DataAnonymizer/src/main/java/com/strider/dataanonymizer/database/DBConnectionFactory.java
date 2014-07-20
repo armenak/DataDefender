@@ -4,6 +4,8 @@ import java.util.Properties;
 import java.sql.Connection;
 
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
 
 /**
  *
@@ -11,7 +13,7 @@ import org.apache.log4j.Logger;
  */
 public class DBConnectionFactory {
     
-    private static final Logger log = Logger.getLogger(DBConnectionFactory.class);
+    private static final Logger log = getLogger(DBConnectionFactory.class);
     
     public static Connection createDBConnection(final Properties props) 
     throws DatabaseAnonymizerException {
