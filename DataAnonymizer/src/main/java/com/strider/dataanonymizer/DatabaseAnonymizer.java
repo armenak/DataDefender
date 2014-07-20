@@ -1,5 +1,6 @@
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.functions.Functions;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
@@ -9,45 +10,42 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.apache.commons.collections.IteratorUtils;
-
-import org.apache.commons.configuration.*;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
-
 /**
- *
- * @author strider
+ * Entry point for RDBMS data anonymizer
+ * 
+ * @author Armenak Grigoryan
  */
 public class DatabaseAnonymizer implements IAnonymizer { 
     
-    static Logger log = Logger.getLogger(DatabaseAnonymizer.class);
+    private static Logger log = Logger.getLogger(DatabaseAnonymizer.class);
 
     @Override
-    public void anonymize(String propertyFile) {
+    public void anonymize(String propertyFile) throws DatabaseAnonymizerException{
 
         // Reading configuration file
         Configuration configuration = null;
         try {
             configuration = new PropertiesConfiguration(propertyFile);
         } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
+            log.error(ex.toString());
+            throw new DatabaseAnonymizerException(ex.toString());
         }
         
+        // Establishing connection to database
         String driver = configuration.getString("driver");
         String database = configuration.getString("database");
         String url = configuration.getString("url");
@@ -64,9 +62,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             Class.forName(driver).newInstance();
             connection = DriverManager.getConnection(url,userName,password);
             connection.setAutoCommit(false);
-        } catch (Exception e) {
-            log.error("Problem connecting to database.\n" + e.toString(), e);
-        }        
+        } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | SQLException ine) {
+            log.error(ine.toString());
+            throw new DatabaseAnonymizerException(ine.toString());
+        }       
                 
         // Now we collect data from the requirement
         Requirement requirement = null;
@@ -76,6 +75,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             requirement = (Requirement) unmarshaller.unmarshal(new File("src/main/resources/Requirement.xml"));        
         } catch (JAXBException je) {
             log.error(je.toString());
+            throw new DatabaseAnonymizerException(je.toString());
         }
 
         // Initializing static data in Functions
@@ -97,7 +97,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             // First iteration over columns to build the UPDATE statement
             for(Column column : table.getColumns()) {
-                sql.append(column.getName() + " = ?,");
+                sql.append(column.getName()).append(" = ?,");
             }
             // remove training ","
             if (sql.length() > 0) {

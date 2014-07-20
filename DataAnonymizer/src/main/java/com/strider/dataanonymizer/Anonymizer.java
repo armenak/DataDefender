@@ -11,6 +11,8 @@ import org.apache.commons.cli.HelpFormatter;
 
 import com.strider.dataanonymizer.utils.AppProperties;
 
+import org.apache.log4j.Logger;
+
 /**
  * Entry point to Data Anonymizer. 
  *  
@@ -18,14 +20,16 @@ import com.strider.dataanonymizer.utils.AppProperties;
  * service.
  *
  */
-public class Anonymizer 
-{
+public class Anonymizer  {
+ 
+    private static final Logger log = Logger.getLogger(Anonymizer.class);
+
     public static void main( String[] args )
     throws Exception {
 
         if (args.length == 0 ) {
-            System.out.println("To display usage info please type");
-            System.out.println("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer help");
+            log.info("To display usage info please type");
+            log.info("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer help");
             return;
         }        
 
@@ -41,7 +45,10 @@ public class Anonymizer
         if (line.hasOption("D")) {
             propertyFile = line.getOptionValues("D")[0];
             props = AppProperties.loadPropertiesFromClassPath(propertyFile);
-        } 
+        }
+        if (props == null) {
+            throw new AnonymizerException("ERROR: Database property file is not defined.");
+        }
         
         if (line.hasOption("a")) {
             IAnonymizer anonymizer = new DatabaseAnonymizer();
@@ -49,21 +56,33 @@ public class Anonymizer
         }
     }
     
-    private static CommandLine getCommandLine(final Options options, final String[] args)
-    throws Exception {
+    /**
+     * Parses command line arguments
+     * @param options
+     * @param args
+     * @return CommandLine
+     * @throws AnonymizerException 
+     */
+    private static CommandLine getCommandLine(final Options options, final String[] args) 
+    throws AnonymizerException {
         final CommandLineParser parser = new GnuParser();
-        final CommandLine line;
+        CommandLine line = null;
  
         try {
             line = parser.parse(options, args);
         } catch (ParseException e) {
             help(options);
-            throw new Exception("Unable to process command line arguments");
+            throw new AnonymizerException("Unable to process command line arguments");
         }
  
         return line;
     }    
     
+    /**
+     * Creates options for the command line
+     * 
+     * @return Options
+     */
     @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
@@ -73,6 +92,11 @@ public class Anonymizer
         return options;
     }
  
+    /**
+     * Displays help
+     * 
+     * @param Options 
+     */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("DataAnonymizer", options);

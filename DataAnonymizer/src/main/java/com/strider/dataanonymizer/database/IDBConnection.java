@@ -8,5 +8,6 @@ import java.util.Properties;
  * @author Armenak Grigoryan
  */
 public interface IDBConnection {
-    public Connection connect(final Properties props);
+    public Connection connect(final Properties props) throws DatabaseAnonymizerException;
+    public void disconnect(final Connection conn) throws DatabaseAnonymizerException;    
 }
