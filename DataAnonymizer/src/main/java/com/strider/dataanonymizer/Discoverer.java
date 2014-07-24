@@ -9,8 +9,6 @@ import org.apache.commons.cli.HelpFormatter;
 
 import org.apache.log4j.Logger;
 
-import com.strider.dataanonymizer.IDiscoverer;
-import com.strider.dataanonymizer.ColumnDiscoverer;
 import com.strider.dataanonymizer.utils.AppProperties;
 import java.util.Properties;
 
@@ -35,7 +33,6 @@ public class Discoverer {
         final CommandLine line = getCommandLine(options, args);
         if (line.hasOption("help")) {
             help(options); 
-            return;
         } else if (line.hasOption("c")) {
             log.info("Column discovery in process");
             String databasePropertyFile = "db.properties";
@@ -57,12 +54,24 @@ public class Discoverer {
             if (columnProperties == null) {
                 throw new AnonymizerException("ERROR: Column property file is not defined.");
             }                
-                                    
             
             IDiscoverer discoverer = new ColumnDiscoverer();
             discoverer.discover(databasePropertyFile, columnPropertyFile);
         } else if (line.hasOption("d")) {
-                log.info("Data discovery in process");
+            log.info("Data discovery in process");
+            
+            String databasePropertyFile = "db.properties";
+            if (line.hasOption("D")) {
+                databasePropertyFile = line.getOptionValue("D");
+            } 
+            Properties dbProperties = null;
+            dbProperties = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
+            if (dbProperties == null) {
+                throw new AnonymizerException("ERROR: Database property file is not defined.");
+            }            
+            
+            IDiscoverer discoverer = new DataDiscoverer();
+            discoverer.discover(databasePropertyFile);            
         }
    }
    

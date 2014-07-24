@@ -56,7 +56,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         }        
         
         // Get the metadata from the the database
-        List<Pair> map = new ArrayList<>();
+        List<ColumnMetaData> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
@@ -66,7 +66,8 @@ public class ColumnDiscoverer implements IDiscoverer {
                 ResultSet resultSet = md.getColumns(null, null, tableName, null);        
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
-                    map.add(new Pair(tableName, columnName));
+                    String columnType = resultSet.getString("DATA_TYPE");
+                    map.add(new ColumnMetaData(tableName, columnName, columnType));
                 }
             }
         } catch (SQLException e) {
@@ -89,7 +90,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         for(String s: suspList) {
             Pattern p = Pattern.compile(s);
             // Find out if database columns contain any of of the "suspicios" fields
-            for(Pair pair: map) {
+            for(ColumnMetaData pair: map) {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();
                 if (p.matcher(columnName).matches()) {
@@ -107,26 +108,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         }
     }
     
-    private class Pair {
-        private String tableName;
-        private String columnName;
-
-        Pair(String tableName, String columnName) {
-            this.tableName = tableName;
-            this.columnName = columnName;
-        }
-        
-        public String getTableName() {
-            return this.tableName;
-        }
-        
-        public String getColumnName() {
-            return this.columnName;
-        }
-        
-        @Override
-        public String toString() {
-            return this.tableName + "." + this.columnName;
-        }
+    public void discover(String databasePropertyFile) {
+        discover("column.properties");
     }
 }
