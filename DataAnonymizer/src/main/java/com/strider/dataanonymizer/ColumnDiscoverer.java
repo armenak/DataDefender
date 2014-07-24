@@ -8,15 +8,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
+
 import org.apache.commons.collections.IteratorUtils;
-
-import org.apache.commons.configuration.*;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
-
 
 /**
  *
@@ -27,12 +25,12 @@ public class ColumnDiscoverer implements IDiscoverer {
     static Logger log = Logger.getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(String propertyFile) {
+    public void discover(String databasePropertyFile, String columnPropertyFile) {
 
         // Reading configuration file
         Configuration configuration = null;
         try {
-            configuration = new PropertiesConfiguration(propertyFile);
+            configuration = new PropertiesConfiguration(databasePropertyFile);
         } catch (ConfigurationException ex) {
             log.error(ColumnDiscoverer.class);
         }
@@ -53,12 +51,12 @@ public class ColumnDiscoverer implements IDiscoverer {
             Class.forName(driver).newInstance();
             connection = DriverManager.getConnection(url,userName,password);
             connection.setAutoCommit(false);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
             log.error("Problem connecting to database.\n" + e.toString(), e);
         }        
         
         // Get the metadata from the the database
-        List<Pair> map = new ArrayList<Pair>();
+        List<Pair> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
@@ -69,16 +67,12 @@ public class ColumnDiscoverer implements IDiscoverer {
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
                     map.add(new Pair(tableName, columnName));
-                    System.out.println("table:"+tableName+" column:"+columnName);
                 }
             }
         } catch (SQLException e) {
             log.error(e);
         }
-        
-        log.info(map.toString());
-        
-        
+                
         // Get the list of "suspicios" field names from property file
         // Reading configuration file
         Configuration columnsConfiguration = null;
@@ -91,7 +85,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         List<String> suspList = IteratorUtils.toList(iterator);          
         
         
-        ArrayList<String> matches = new ArrayList<String>();
+        ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
             Pattern p = Pattern.compile(s);
             // Find out if database columns contain any of of the "suspicios" fields
@@ -99,13 +93,18 @@ public class ColumnDiscoverer implements IDiscoverer {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();
                 if (p.matcher(columnName).matches()) {
-                    matches.add(tableName + "->" + columnName);
+                    matches.add(tableName + "." + columnName);
                 }                            
             }            
         }
         
         // Report column names
-        log.info(matches.toString());
+        log.info("-----------------");        
+        log.info("List of suspects:");
+        log.info("-----------------");
+        for (String entry: matches) {
+            log.info(entry);
+        }
     }
     
     private class Pair {
@@ -125,8 +124,9 @@ public class ColumnDiscoverer implements IDiscoverer {
             return this.columnName;
         }
         
+        @Override
         public String toString() {
-            return this.tableName + "->" + this.columnName;
+            return this.tableName + "." + this.columnName;
         }
     }
 }

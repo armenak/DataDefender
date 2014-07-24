@@ -8,7 +8,7 @@ import java.sql.Connection;
  */
 public class DataDiscoverer implements IDiscoverer {
     @Override
-    public void discover(String propertyFile) {
+    public void discover(String databasePropertyFile, String columnPropertyFile) {
         
     }
 }

@@ -209,7 +209,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         public String toString() {
-            return this.tableName + "->" + this.columnName;
+            return this.tableName + "." + this.columnName;
         }
     }
 }

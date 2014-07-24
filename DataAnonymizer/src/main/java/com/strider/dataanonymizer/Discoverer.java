@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.IDiscoverer;
 import com.strider.dataanonymizer.ColumnDiscoverer;
+import com.strider.dataanonymizer.utils.AppProperties;
+import java.util.Properties;
 
 /**
  * Entry point to Data Discoverer utility. 
@@ -35,13 +37,30 @@ public class Discoverer {
             help(options); 
             return;
         } else if (line.hasOption("c")) {
-                log.info("Column discovery in process");
-                String databasePropertyFile = "db.properties";
-                if (line.hasOption("p")) {
-                    databasePropertyFile = line.getOptionValue("p");
-                } 
-                IDiscoverer discoverer = new ColumnDiscoverer();
-                discoverer.discover(databasePropertyFile);
+            log.info("Column discovery in process");
+            String databasePropertyFile = "db.properties";
+            if (line.hasOption("D")) {
+                databasePropertyFile = line.getOptionValue("D");
+            } 
+            Properties dbProperties = null;
+            dbProperties = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
+            if (dbProperties == null) {
+                throw new AnonymizerException("ERROR: Database property file is not defined.");
+            }            
+
+            String columnPropertyFile = "columns.properties";
+            if (line.hasOption("C")) {
+                columnPropertyFile = line.getOptionValue("C");
+            }
+            Properties columnProperties = null;
+            columnProperties = AppProperties.loadPropertiesFromClassPath(columnPropertyFile);
+            if (columnProperties == null) {
+                throw new AnonymizerException("ERROR: Column property file is not defined.");
+            }                
+                                    
+            
+            IDiscoverer discoverer = new ColumnDiscoverer();
+            discoverer.discover(databasePropertyFile, columnPropertyFile);
         } else if (line.hasOption("d")) {
                 log.info("Data discovery in process");
         }
@@ -68,7 +87,8 @@ public class Discoverer {
         options.addOption("help", false, "Display help");
         options.addOption( "c", "columns", false, "discover candidate column names for anonymization based on provided patterns" );
         options.addOption( "d", "data", false, "discover candidate column for anonymization based on semantic algorithms" );
-        options.addOption( "p", "property", true, "define property file" );
+        options.addOption( "D", "database properties", true, "define database property file" );
+        options.addOption( "C", "column properties", true, "define column property file" );        
         return options;
     }
  
