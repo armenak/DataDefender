@@ -40,19 +40,31 @@ public class Anonymizer  {
             return;
         } 
         
-        String propertyFile = "db.properties";
+        String databasePropertyFile = "db.properties";
         Properties props = null;
         if (line.hasOption("D")) {
-            propertyFile = line.getOptionValues("D")[0];
-            props = AppProperties.loadPropertiesFromClassPath(propertyFile);
+            databasePropertyFile = line.getOptionValues("D")[0];
+            //props = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
+            props = AppProperties.loadProperties(databasePropertyFile);            
         }
         if (props == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
         }
         
+        String anonymizePropertyFile = "anonymize.properties";
+        if (line.hasOption("A")) {
+            anonymizePropertyFile = line.getOptionValue("A");
+        } 
+        // Properties anonymizerProperties = AppProperties.loadPropertiesFromClassPath(anonymizePropertyFile);
+        Properties anonymizerProperties = AppProperties.loadProperties(anonymizePropertyFile);
+        if (anonymizerProperties == null) {
+            throw new AnonymizerException("ERROR: Database property file is not defined.");
+        }                    
+        
+        
         if (line.hasOption("a")) {
             IAnonymizer anonymizer = new DatabaseAnonymizer();
-            anonymizer.anonymize(propertyFile);
+            anonymizer.anonymize(databasePropertyFile, anonymizePropertyFile);
         }
     }
     
@@ -88,7 +100,9 @@ public class Anonymizer  {
         final Options options = new Options();
         options.addOption("help", false, "Display help");
         options.addOption( "a", "anonymize", false, "anonymize database" );
-        options.addOption( "D", "property", true, "define property file" );
+        options.addOption( "D", "database properties", true, "define database property file" );
+        options.addOption( "A", "anonymizer properties", true, "define anonymizer property file" );
+        
         return options;
     }
  

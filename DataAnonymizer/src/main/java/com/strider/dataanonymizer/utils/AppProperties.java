@@ -1,9 +1,12 @@
 package com.strider.dataanonymizer.utils;
 
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
@@ -16,7 +19,7 @@ public final class AppProperties {
 
     /**
      * Load property file
-     * @param String fileName
+     * @param fileName
      * @return Properties
      */
     public static Properties loadPropertiesFromClassPath(String fileName) {
@@ -44,5 +47,23 @@ public final class AppProperties {
         }
  
         return props;
+    }
+ 
+    public static Properties loadProperties(String fileName) 
+    throws FileNotFoundException, UnsupportedEncodingException, IOException {
+        
+        Properties properties = new Properties();
+        InputStreamReader in = null;
+        try {
+            in = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
+            properties.load(in);
+        } finally {
+            if (null != in) {
+                try {
+                    in.close();
+                } catch (IOException ex) {}
+            }
+        }
+        return properties;
     }
 }

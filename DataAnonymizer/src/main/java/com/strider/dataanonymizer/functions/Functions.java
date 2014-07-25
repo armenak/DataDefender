@@ -3,6 +3,7 @@ package com.strider.dataanonymizer.functions;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,8 @@ public class Functions {
     
     private static final List<String> firstNameList  = new ArrayList<>();
     private static final List<String> lastNameList   = new ArrayList<>();
+    private static final List<String> middleNameList = new ArrayList<>();
+    
     private static final List<String> words          = new ArrayList<String>();
 
     public static void init() {        
@@ -63,6 +66,20 @@ public class Functions {
         int rand = nextIntInRange(0,lastNameList.size()-1);
         return lastNameList.get(rand);
     }    
+    
+    public static String randomMiddleName(String fileName) throws IOException {
+        
+        if (middleNameList.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    middleNameList.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,middleNameList.size()-1);
+        return lastNameList.get(rand);
+    }        
     
     public static String randomEmail(String domainName) 
     {
@@ -126,6 +143,20 @@ public class Functions {
     public static String randomStudentNumber()  {
         return String.valueOf(Math.round(Math.random()*100000000));
     }    
+    
+    public static String randomPhoneNumber() {
+        Random rand = new Random();
+        int num1 = (rand.nextInt(7) + 1) * 100 + (rand.nextInt(8) * 10) + rand.nextInt(8);
+        int num2 = rand.nextInt(743);
+        int num3 = rand.nextInt(10000);
+
+        DecimalFormat df3 = new DecimalFormat("000"); // 3 zeros
+        DecimalFormat df4 = new DecimalFormat("0000"); // 4 zeros
+
+        String phoneNumber = df3.format(num1) + "-" + df3.format(num2) + "-" + df4.format(num3);
+
+        return phoneNumber;        
+    }
     
    private static void addWordsIntoArray() throws Exception
     {

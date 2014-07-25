@@ -8,6 +8,8 @@ import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
 import com.strider.dataanonymizer.utils.AppProperties;
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -36,12 +38,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private static Logger log = Logger.getLogger(DatabaseAnonymizer.class);
 
     @Override
-    public void anonymize(String propertyFile) throws DatabaseAnonymizerException{
+    public void anonymize(String databasePropertyFile, String anonymizerPropertyFile) 
+    throws DatabaseAnonymizerException{
 
         // Reading configuration file
         Configuration configuration = null;
         try {
-            configuration = new PropertiesConfiguration(propertyFile);
+            configuration = new PropertiesConfiguration(databasePropertyFile);
         } catch (ConfigurationException ex) {
             log.error(ex.toString());
             throw new DatabaseAnonymizerException(ex.toString());
@@ -69,12 +72,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             throw new DatabaseAnonymizerException(ine.toString());
         }       
                 
-        Properties props = AppProperties.loadPropertiesFromClassPath("anonymizer.properties");
+        //Properties props = AppProperties.loadPropertiesFromClassPath(anonymizerPropertyFile);
+        Properties props = null;        
+        try {
+            props = AppProperties.loadProperties(anonymizerPropertyFile);
+        } catch (UnsupportedEncodingException ex) {
+            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (props == null) {
             throw new DatabaseAnonymizerException("ERROR: anonymizer.properties file is not defined.");
         }
         String requirementFile = props.getProperty("requirement");
-        int batchSize = Integer.parseInt(props.getProperty("batch_size").toString());
+        int batchSize = Integer.parseInt(props.getProperty("batch_size"));
         
         
         // Now we collect data from the requirement
@@ -123,33 +134,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 pstmt = connection.prepareStatement(updateString);
                 while (rs.next()) {
                     int id = rs.getInt("id");
-                    // Second iteration over columns
                     int index = 0;
 
                     for(Column column : table.getColumns()) {
-                        log.info("    Taking care of column [" + column.getName() + "]");
                         String function = column.getFunction();
                         if (function == null || function.equals("")) {
                             log.warn("    Function is not defined for column [" + column + "]. Moving to the next column.");
                         } else {
                             try {
+                                Class clazz = Functions.class;
                                 if (column.getParameters() == null) {
-                                    log.info("    Function [" + function + "] has no defined parameters.");
-                                    pstmt.setString(++index, Functions.class.getMethod(function, null).invoke(null).toString());
+                                    Method method = clazz.getMethod(function,null);
+                                    pstmt.setString(++index, method.invoke(null).toString());
                                 } else {
-                                    log.info("    Function [" + function + "] accepts following parameter(s):");
                                     for(Parameter parameter : column.getParameters()) {
-                                        log.info("        " + parameter.getName());
-                                        log.info("        " + parameter.getValue());
-                                        Class clazz = Functions.class;
                                         Method method = clazz.getMethod(function, String.class);
                                         String result = method.invoke(null, parameter.getValue()).toString();
-                                        log.info(result);
                                         pstmt.setString(++index, result);
                                     }
                                 }
-                                //Method method = Functions.class.getMethod(function, String.class);
-                                //Object o = method.invoke(null, "whatever");
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
                             }
