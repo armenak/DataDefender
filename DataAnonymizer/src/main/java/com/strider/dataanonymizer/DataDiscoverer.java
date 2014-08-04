@@ -1,22 +1,21 @@
 package com.strider.dataanonymizer;
 
-import static com.strider.dataanonymizer.ColumnDiscoverer.log;
-import com.strider.dataanonymizer.utils.AppProperties;
+import static java.lang.Double.parseDouble;
+import static java.lang.Class.forName;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static java.sql.DriverManager.getConnection;
+
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
@@ -27,6 +26,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import static com.strider.dataanonymizer.ColumnDiscoverer.log;
+import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
+
 /**
  *
  * @author Armenak Grigoryan
@@ -35,7 +37,7 @@ public class DataDiscoverer implements IDiscoverer {
     @Override
     public void discover(String databasePropertyFile) {
         // Reading anonymizer.properties file
-        Properties anonymizerProperties = AppProperties.loadPropertiesFromClassPath("anonymizer.properties");
+        Properties anonymizerProperties = loadPropertiesFromClassPath("anonymizer.properties");
         if (anonymizerProperties == null) {
             try {
                 throw new AnonymizerException("ERROR: Column property file is not defined.");
@@ -43,7 +45,7 @@ public class DataDiscoverer implements IDiscoverer {
                 log.error(ex.toString());
             }
         }
-        double probabilityThreshold = Double.parseDouble(anonymizerProperties.getProperty("probability_threshold"));
+        double probabilityThreshold = parseDouble(anonymizerProperties.getProperty("probability_threshold"));
         
         // Reading database configuration file
         Configuration configuration = null;
@@ -66,8 +68,8 @@ public class DataDiscoverer implements IDiscoverer {
         log.info("Connecting to database");
         Connection connection = null;
         try {
-            Class.forName(driver).newInstance();
-            connection = DriverManager.getConnection(url,userName,password);
+            forName(driver).newInstance();
+            connection = getConnection(url,userName,password);
             connection.setAutoCommit(false);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
             log.error("Problem connecting to database.\n" + e.toString(), e);
@@ -115,7 +117,7 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (FileNotFoundException ex) {
             log.error(ex.toString());
         } catch (IOException ex) {
-            Logger.getLogger(DataDiscoverer.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex.toString());
         }
         
         // Start running NLP algorithms for each column and collct percentage
@@ -177,7 +179,7 @@ public class DataDiscoverer implements IDiscoverer {
             for (Double value : values) {
                 sum += value;
             }
-            return sum.doubleValue() / values.size();
+            return sum / values.size();
         }
         return sum;
     }    

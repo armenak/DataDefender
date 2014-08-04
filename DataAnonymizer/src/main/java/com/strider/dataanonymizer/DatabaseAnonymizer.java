@@ -1,32 +1,38 @@
 package com.strider.dataanonymizer;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import static java.lang.Class.forName;
+import static java.lang.Integer.parseInt;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import static java.sql.DriverManager.getConnection;
+import java.util.Properties;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import static javax.xml.bind.JAXBContext.newInstance;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.functions.Functions;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
-import com.strider.dataanonymizer.utils.AppProperties;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-import java.util.logging.Level;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
+import static com.strider.dataanonymizer.functions.Functions.init;
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -35,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 public class DatabaseAnonymizer implements IAnonymizer { 
     
-    private static Logger log = Logger.getLogger(DatabaseAnonymizer.class);
+    private static Logger log = getLogger(DatabaseAnonymizer.class);
 
     @Override
     public void anonymize(String databasePropertyFile, String anonymizerPropertyFile) 
@@ -64,8 +70,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("Connecting to database");
         Connection connection = null;
         try {
-            Class.forName(driver).newInstance();
-            connection = DriverManager.getConnection(url,userName,password);
+            forName(driver).newInstance();
+            connection = getConnection(url,userName,password);
             connection.setAutoCommit(false);
         } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | SQLException ine) {
             log.error(ine.toString());
@@ -75,23 +81,23 @@ public class DatabaseAnonymizer implements IAnonymizer {
         //Properties props = AppProperties.loadPropertiesFromClassPath(anonymizerPropertyFile);
         Properties props = null;        
         try {
-            props = AppProperties.loadProperties(anonymizerPropertyFile);
-        } catch (UnsupportedEncodingException ex) {
-            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+            props = loadProperties(anonymizerPropertyFile);
+        } catch (UnsupportedEncodingException uex) {
+            log.error(uex.toString());
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex.toString());
         }
         if (props == null) {
             throw new DatabaseAnonymizerException("ERROR: anonymizer.properties file is not defined.");
         }
         String requirementFile = props.getProperty("requirement");
-        int batchSize = Integer.parseInt(props.getProperty("batch_size"));
+        int batchSize = parseInt(props.getProperty("batch_size"));
         
         
         // Now we collect data from the requirement
         Requirement requirement = null;
         try {
-            JAXBContext jc = JAXBContext.newInstance(Requirement.class);
+            JAXBContext jc = newInstance(Requirement.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
             requirement = (Requirement) unmarshaller.unmarshal(new File(requirementFile));
         } catch (JAXBException je) {
@@ -100,7 +106,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
 
         // Initializing static data in Functions
-        Functions.init();
+        init();
         
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
@@ -154,7 +160,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     }
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+                                log.error(ex.toString());
                             }
                         }
                     }

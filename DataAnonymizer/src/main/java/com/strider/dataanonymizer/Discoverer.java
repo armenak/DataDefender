@@ -1,16 +1,17 @@
 package com.strider.dataanonymizer;
 
+import java.util.Properties;
+
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
-
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.dataanonymizer.utils.AppProperties;
-import java.util.Properties;
+import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 
 /**
  * Entry point to Data Discoverer utility. 
@@ -18,7 +19,7 @@ import java.util.Properties;
  */
 public class Discoverer {
     
-    static Logger log = Logger.getLogger(Discoverer.class);
+    static Logger log = getLogger(Discoverer.class);
     
     public static void main( String[] args )
     throws Exception {
@@ -40,7 +41,7 @@ public class Discoverer {
                 databasePropertyFile = line.getOptionValue("D");
             } 
             Properties dbProperties = null;
-            dbProperties = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
+            dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
             if (dbProperties == null) {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            
@@ -50,7 +51,7 @@ public class Discoverer {
                 columnPropertyFile = line.getOptionValue("C");
             }
             Properties columnProperties = null;
-            columnProperties = AppProperties.loadPropertiesFromClassPath(columnPropertyFile);
+            columnProperties = loadPropertiesFromClassPath(columnPropertyFile);
             if (columnProperties == null) {
                 throw new AnonymizerException("ERROR: Column property file is not defined.");
             }                
@@ -65,7 +66,7 @@ public class Discoverer {
                 databasePropertyFile = line.getOptionValue("D");
             } 
             Properties dbProperties = null;
-            dbProperties = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
+            dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
             if (dbProperties == null) {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            

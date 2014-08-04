@@ -9,9 +9,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
 
-import com.strider.dataanonymizer.utils.AppProperties;
-
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+
 
 /**
  * Entry point to Data Anonymizer. 
@@ -22,7 +24,7 @@ import org.apache.log4j.Logger;
  */
 public class Anonymizer  {
  
-    private static final Logger log = Logger.getLogger(Anonymizer.class);
+    private static final Logger log = getLogger(Anonymizer.class);
 
     public static void main( String[] args )
     throws Exception {
@@ -45,7 +47,7 @@ public class Anonymizer  {
         if (line.hasOption("D")) {
             databasePropertyFile = line.getOptionValues("D")[0];
             //props = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
-            props = AppProperties.loadProperties(databasePropertyFile);            
+            props = loadProperties(databasePropertyFile);            
         }
         if (props == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
@@ -56,7 +58,7 @@ public class Anonymizer  {
             anonymizePropertyFile = line.getOptionValue("A");
         } 
         // Properties anonymizerProperties = AppProperties.loadPropertiesFromClassPath(anonymizePropertyFile);
-        Properties anonymizerProperties = AppProperties.loadProperties(anonymizePropertyFile);
+        Properties anonymizerProperties = loadProperties(anonymizePropertyFile);
         if (anonymizerProperties == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
         }                    

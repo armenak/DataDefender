@@ -1,7 +1,8 @@
 package com.strider.dataanonymizer.requirement;
 
-import java.util.Collections;
 import java.util.List;
+import static java.util.Collections.unmodifiableList;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -51,7 +52,7 @@ public class Requirement {
      */
     public List<Table> getTables() {
         if (this.tables != null) {
-            return Collections.unmodifiableList(this.tables);
+            return unmodifiableList(this.tables);
         }
         return null;
     }

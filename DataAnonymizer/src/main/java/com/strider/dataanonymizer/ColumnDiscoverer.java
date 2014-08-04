@@ -2,7 +2,6 @@ package com.strider.dataanonymizer;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,7 +9,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.IteratorUtils;
+import static java.lang.Class.forName;
+import static java.sql.DriverManager.getConnection;
+import static java.util.regex.Pattern.compile;
+import static org.apache.commons.collections.IteratorUtils.toList;
+import static org.apache.log4j.Logger.getLogger;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -22,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class ColumnDiscoverer implements IDiscoverer { 
     
-    static Logger log = Logger.getLogger(ColumnDiscoverer.class);
+    static Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
     public void discover(String databasePropertyFile, String columnPropertyFile) {
@@ -48,8 +52,8 @@ public class ColumnDiscoverer implements IDiscoverer {
         log.info("Connecting to database");
         Connection connection = null;
         try {
-            Class.forName(driver).newInstance();
-            connection = DriverManager.getConnection(url,userName,password);
+            forName(driver).newInstance();
+            connection = getConnection(url,userName,password);
             connection.setAutoCommit(false);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
             log.error("Problem connecting to database.\n" + e.toString(), e);
@@ -83,12 +87,12 @@ public class ColumnDiscoverer implements IDiscoverer {
             log.error(ColumnDiscoverer.class);
         }        
         Iterator<String> iterator = columnsConfiguration.getKeys();
-        List<String> suspList = IteratorUtils.toList(iterator);          
+        List<String> suspList = toList(iterator);          
         
         
         ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
-            Pattern p = Pattern.compile(s);
+            Pattern p = compile(s);
             // Find out if database columns contain any of of the "suspicios" fields
             for(ColumnMetaData pair: map) {
                 String tableName = pair.getTableName();

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
@@ -15,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public final class AppProperties {
     
-    static Logger log = Logger.getLogger(AppProperties.class);
+    static Logger log = getLogger(AppProperties.class);
 
     /**
      * Load property file

@@ -1,7 +1,8 @@
 package com.strider.dataanonymizer.requirement;
 
-import java.util.Collections;
 import java.util.List;   
+import static java.util.Collections.unmodifiableList;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -59,7 +60,7 @@ public class Column {
      */
     public List<Parameter> getParameters() {
         if (this.paramters != null) {
-            return Collections.unmodifiableList(this.paramters);
+            return unmodifiableList(this.paramters);
         }
         return null;
     }    

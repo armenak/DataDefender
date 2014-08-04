@@ -5,25 +5,32 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import static java.util.Arrays.asList;
+import static java.lang.Math.round;
+
+import static java.lang.Integer.parseInt;
+import static java.lang.Math.random;
+import static java.lang.String.valueOf;
+
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * @author strider
  */
 public class Functions {
     
-    static Logger log = Logger.getLogger(Functions.class);
+    static Logger log = getLogger(Functions.class);
 
     
     private static final List<String> firstNameList  = new ArrayList<>();
     private static final List<String> lastNameList   = new ArrayList<>();
     private static final List<String> middleNameList = new ArrayList<>();
     
-    private static final List<String> words          = new ArrayList<String>();
+    private static final List<String> words          = new ArrayList<>();
 
     public static void init() {        
         try 
@@ -120,14 +127,14 @@ public class Functions {
         List<String> rangeList = null;
                 
         if (range.contains(",")) {
-            rangeList = Arrays.asList(range.split(","));
+            rangeList = asList(range.split(","));
             // Checking that the list contains two Strings representing Integers
             if (rangeList.size() == 2) {
                 if (!rangeList.get(0).isEmpty() && !rangeList.get(1).isEmpty() ) {
                     if (isInteger(rangeList.get(0)) && isInteger(rangeList.get(1))) {
                         StringBuilder desc = new StringBuilder();
-                        desc.append(generateRandomString(Integer.parseInt(rangeList.get(0).toString()),
-                                Integer.parseInt(rangeList.get(1).toString())).trim());
+                        desc.append(generateRandomString(parseInt(rangeList.get(0).toString()),
+                                parseInt(rangeList.get(1).toString())).trim());
                         return desc.toString();
                     }
                 }
@@ -141,7 +148,7 @@ public class Functions {
      * @return String
      */
     public static String randomStudentNumber()  {
-        return String.valueOf(Math.round(Math.random()*100000000));
+        return valueOf(round(random()*100000000));
     }    
     
     public static String randomPhoneNumber() {
@@ -170,7 +177,7 @@ public class Functions {
    
     private static boolean isInteger(String str) {
         try {
-            Integer.parseInt(str);
+            parseInt(str);
             return true;
         } catch (NumberFormatException nfe) {
             log.error(nfe.toString());
