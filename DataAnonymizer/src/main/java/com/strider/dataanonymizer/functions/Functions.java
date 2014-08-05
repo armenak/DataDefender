@@ -31,14 +31,11 @@ public class Functions {
     private static final List<String> WORDS            = new ArrayList<>();
 
     public static void init() {        
-        try 
-        {
+        try  {
             log.info("*** Adding list of words into array");
             addWordsIntoArray();
             log.info("*** Array is populated with words from dictionary");
-        } 
-        catch (Exception ode) 
-        {
+        } catch (Exception ode) {
             log.error("Error occurred while reading dictionary.txt file.\n" + ode.toString());
         }
     }    
@@ -86,8 +83,7 @@ public class Functions {
         return MIDDLE_NAME_LIST.get(rand);
     }        
     
-    public static String randomEmail(String domainName) 
-    {
+    public static String randomEmail(String domainName) {
         StringBuilder email = new StringBuilder();
         email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
         return email.toString();
@@ -163,7 +159,7 @@ public class Functions {
         return phoneNumber;        
     }
     
-   private static void addWordsIntoArray() throws Exception
+   private static void addWordsIntoArray()
     {
         try (Scanner scanner = new Scanner(Functions.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext())

@@ -1,18 +1,17 @@
 package com.strider.dataanonymizer;
 
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import java.io.IOException;
 import java.util.Properties;
-
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.HelpFormatter;
-
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 
 
 /**
@@ -26,8 +25,7 @@ public class Anonymizer  {
  
     private static final Logger log = getLogger(Anonymizer.class);
 
-    public static void main( String[] args )
-    throws Exception {
+    public static void main( String[] args ) throws ParseException, AnonymizerException {
 
         if (args.length == 0 ) {
             log.info("To display usage info please type");
@@ -46,7 +44,11 @@ public class Anonymizer  {
         Properties props = null;
         if (line.hasOption("D")) {
             databasePropertyFile = line.getOptionValues("D")[0];
-            props = loadProperties(databasePropertyFile);            
+            try {
+                props = loadProperties(databasePropertyFile);            
+            } catch (IOException ioe) {
+                throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
+            }
         }
         if (props == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
@@ -56,11 +58,16 @@ public class Anonymizer  {
         if (line.hasOption("A")) {
             anonymizePropertyFile = line.getOptionValue("A");
         } 
-        Properties anonymizerProperties = loadProperties(anonymizePropertyFile);
+        
+        Properties anonymizerProperties = null;
+        try {
+            anonymizerProperties = loadProperties(anonymizePropertyFile);
+        } catch (IOException ioe) {
+            throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
+        }
         if (anonymizerProperties == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
         }                    
-        
         
         if (line.hasOption("a")) {
             IAnonymizer anonymizer = new DatabaseAnonymizer();
@@ -76,7 +83,7 @@ public class Anonymizer  {
      * @throws AnonymizerException 
      */
     private static CommandLine getCommandLine(final Options options, final String[] args) 
-    throws AnonymizerException {
+    throws ParseException {
         final CommandLineParser parser = new GnuParser();
         CommandLine line = null;
  
@@ -84,7 +91,6 @@ public class Anonymizer  {
             line = parser.parse(options, args);
         } catch (ParseException e) {
             help(options);
-            throw new AnonymizerException("Unable to process command line arguments", e);
         }
  
         return line;

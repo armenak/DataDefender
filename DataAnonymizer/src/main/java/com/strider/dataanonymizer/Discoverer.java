@@ -21,8 +21,7 @@ public class Discoverer {
     
     private static Logger log = getLogger(Discoverer.class);
     
-    public static void main( String[] args )
-    throws Exception {
+    public static void main( String[] args ) throws AnonymizerException {
 
         if (args.length == 0 ) {
             log.info("To display usage info please type");
@@ -31,7 +30,13 @@ public class Discoverer {
         }        
 
         final Options options = createOptions();
-        final CommandLine line = getCommandLine(options, args);
+        CommandLine line = null;
+        try {
+            line = getCommandLine(options, args);
+        } catch (ParseException pe) {
+            log.error(pe.toString());
+        }
+        
         if (line.hasOption("help")) {
             help(options); 
         } else if (line.hasOption("c")) {
@@ -77,15 +82,14 @@ public class Discoverer {
    }
    
   private static CommandLine getCommandLine(final Options options, final String[] args)
-    throws Exception {
+  throws ParseException {
         final CommandLineParser parser = new GnuParser();
-        final CommandLine line;
+        CommandLine line = null;
  
         try {
             line = parser.parse(options, args);
         } catch (ParseException e) {
             help(options);
-            throw new Exception("Unable to process command line arguments", e);
         }
  
         return line;
