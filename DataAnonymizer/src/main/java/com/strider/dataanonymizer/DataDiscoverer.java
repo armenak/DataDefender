@@ -164,6 +164,7 @@ public class DataDiscoverer implements IDiscoverer {
                     }
                     rs.close();
                     stmt.close();
+                    connection.close();
                 } catch (SQLException sqle) {
                     log.error(sqle.toString());
                 }
