@@ -1,10 +1,13 @@
 package com.strider.dataanonymizer.database;
 
+import com.strider.dataanonymizer.ColumnDiscoverer;
 import static java.lang.Class.forName;
 import static java.sql.DriverManager.getConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -19,15 +22,32 @@ public class MySQLDBConnection implements IDBConnection {
     
     /**
      * Establishes database connection
-     * @param props
-     * @return
+     * @param propertyFile
+     * @return Connection
      * @throws DatabaseAnonymizerException 
      */
     @Override
-    public Connection connect(final Properties props) throws DatabaseAnonymizerException {
+    public Connection connect(String propertyFile) throws DatabaseAnonymizerException {
+
+        Configuration configuration = null;
+        try {
+            configuration = new PropertiesConfiguration(propertyFile);
+        } catch (ConfigurationException ex) {
+            log.error(ColumnDiscoverer.class);
+        }
+        
+        String driver = configuration.getString("driver");
+        String database = configuration.getString("database");
+        String url = configuration.getString("url");
+        String userName = configuration.getString("username");
+        String password = configuration.getString("password");
+        log.debug("Using driver " + driver);
+        log.debug("Database type: " + database);
+        log.debug("Database URL: " + url);
+        log.debug("Logging in using username " + userName); 
         
         try {
-            forName(props.getProperty("driver"));
+            forName(driver);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe.toString());
             throw new DatabaseAnonymizerException(cnfe.toString());
@@ -35,10 +55,7 @@ public class MySQLDBConnection implements IDBConnection {
         
         Connection conn = null;
         try {
-            conn = getConnection(
-                props.getProperty("url"), 
-                props.getProperty("username"), 
-                props.getProperty("password"));
+            conn = getConnection(url, userName, password);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
             throw new DatabaseAnonymizerException(sqle.toString());

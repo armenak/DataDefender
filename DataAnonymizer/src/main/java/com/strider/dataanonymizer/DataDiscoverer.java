@@ -1,32 +1,33 @@
 package com.strider.dataanonymizer;
 
-import static java.lang.Double.parseDouble;
-import static java.lang.Class.forName;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import com.strider.dataanonymizer.database.DBConnectionFactory;
+import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.database.MySQLDBConnection;
+import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import static java.lang.Class.forName;
+import static java.lang.Double.parseDouble;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import static java.sql.DriverManager.getConnection;
+import static java.sql.DriverManager.getConnection;
+import static java.sql.DriverManager.getConnection;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static java.sql.DriverManager.getConnection;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-
-import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -51,42 +52,9 @@ public class DataDiscoverer implements IDiscoverer {
         }
         double probabilityThreshold = parseDouble(anonymizerProperties.getProperty("probability_threshold"));
         
-        // Reading database configuration file
-        Configuration configuration = null;
-        try {
-            configuration = new PropertiesConfiguration(databasePropertyFile);
-        } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
-        }
-        
-        String driver = configuration.getString("driver");
-        String database = configuration.getString("database");
-        String url = configuration.getString("url");
-        String userName = configuration.getString("username");
-        String password = configuration.getString("password");
-        log.debug("Using driver " + driver);
-        log.debug("Database type: " + database);
-        log.debug("Database URL: " + url);
-        log.debug("Logging in using username " + userName);
-
-        log.info("Connecting to database");
-        Connection connection = null;
-        try {
-            forName(driver).newInstance();
-            connection = getConnection(url,userName,password);
-            connection.setAutoCommit(false);
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    log.error("Problem connecting to database.\n" + sqle.toString(), sqle);
-                    throw new AnonymizerException(sqle.toString());                
-                }
-            }
-            log.error("Problem connecting to database.\n" + e.toString(), e);
-            throw new AnonymizerException(e.toString());
-        }        
+        log.info("Connecting to database");        
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
+        Connection connection = dbConnection.connect(databasePropertyFile);
         
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
@@ -119,16 +87,29 @@ public class DataDiscoverer implements IDiscoverer {
         NameFinderME nameFinder = null;
         
         try {
-            modelInToken = new FileInputStream("/Users/sdi/work/strider/DataAnonymizer/DataAnonymizer/src/main/resources/en-token.bin");
-            modelIn = new FileInputStream("/Users/sdi/work/strider/DataAnonymizer/DataAnonymizer/src/main/resources/en-ner-person.bin");            
+            modelInToken = new FileInputStream(anonymizerProperties.getProperty("english_tokens"));
+            modelIn = new FileInputStream(anonymizerProperties.getProperty("english_ner_person"));            
             
             modelToken = new TokenizerModel(modelInToken);
             tokenizer = new TokenizerME(modelToken);            
             
             model = new TokenNameFinderModel(modelIn);
-            nameFinder = new NameFinderME(model);            
+            nameFinder = new NameFinderME(model);    
+            
+            modelInToken.close();
+            modelIn.close();
         } catch (FileNotFoundException ex) {
             log.error(ex.toString());
+            try {
+                if (modelInToken != null) {
+                    modelInToken.close();
+                }
+                if (modelIn != null) {
+                    modelIn.close();
+                }
+            } catch (IOException ioe) {
+                log.error(ioe.toString());
+            }
         } catch (IOException ex) {
             log.error(ex.toString());
         }
@@ -164,8 +145,17 @@ public class DataDiscoverer implements IDiscoverer {
                     }
                     rs.close();
                     stmt.close();
-                    connection.close();
                 } catch (SQLException sqle) {
+                    try {
+                        if (stmt != null) {
+                            stmt.close();
+                        }
+                        if (rs != null) {
+                            rs.close();
+                        }
+                    } catch (SQLException sql) {
+                        log.error(sql.toString());
+                    }
                     log.error(sqle.toString());
                 }
                 

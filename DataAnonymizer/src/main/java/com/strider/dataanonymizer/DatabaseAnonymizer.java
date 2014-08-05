@@ -1,5 +1,6 @@
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.DBConnectionFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -26,6 +27,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBConnection;
 import com.strider.dataanonymizer.functions.Functions;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
@@ -47,37 +49,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(String databasePropertyFile, String anonymizerPropertyFile) 
     throws DatabaseAnonymizerException{
 
-        // Reading configuration file
-        Configuration configuration = null;
-        try {
-            configuration = new PropertiesConfiguration(databasePropertyFile);
-        } catch (ConfigurationException ex) {
-            log.error(ex.toString());
-            throw new DatabaseAnonymizerException(ex.toString());
-        }
+        log.info("Connecting to database");        
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
+        Connection connection = dbConnection.connect(databasePropertyFile);
         
-        // Establishing connection to database
-        String driver = configuration.getString("driver");
-        String database = configuration.getString("database");
-        String url = configuration.getString("url");
-        String userName = configuration.getString("username");
-        String password = configuration.getString("password");
-        log.debug("Using driver " + driver);
-        log.debug("Database type: " + database);
-        log.debug("Database URL: " + url);
-        log.debug("Logging in using username " + userName);
-
-        log.info("Connecting to database");
-        Connection connection = null;
-        try {
-            forName(driver).newInstance();
-            connection = getConnection(url,userName,password);
-            connection.setAutoCommit(false);
-        } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | SQLException ine) {
-            log.error(ine.toString());
-            throw new DatabaseAnonymizerException(ine.toString());
-        }       
-                
         Properties props = null;        
         try {
             props = loadProperties(anonymizerPropertyFile);
@@ -118,7 +93,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             PreparedStatement pstmt = null;
             Statement stmt = null;
             ResultSet rs = null;
-            StringBuilder sql = new StringBuilder("UPDATE " + table.getName() + " SET ");
+            final StringBuilder sql = new StringBuilder("UPDATE " + table.getName() + " SET ");
             int batchCounter = 0;            
             
             // First iteration over columns to build the UPDATE statement
@@ -135,7 +110,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             try {
                 stmt = connection.createStatement();
-                rs = stmt.executeQuery(new StringBuilder("SELECT id FROM ").append(table.getName()).toString());
+                rs = stmt.executeQuery(String.format("SELECT id FROM %s ", table.getName()));
                 pstmt = connection.prepareStatement(updateString);
                 while (rs.next()) {
                     int id = rs.getInt("id");
@@ -174,6 +149,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 }
                 pstmt.executeBatch();
                 connection.commit();
+                stmt.close();
+                pstmt.close();
+                rs.close();
             } catch (SQLException sqle) {
                 log.error(sqle.toString());
                 try {

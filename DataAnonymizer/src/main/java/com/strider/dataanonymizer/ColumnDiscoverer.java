@@ -1,5 +1,8 @@
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.DBConnectionFactory;
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBConnection;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -9,8 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static java.lang.Class.forName;
-import static java.sql.DriverManager.getConnection;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections.IteratorUtils.toList;
 import static org.apache.log4j.Logger.getLogger;
@@ -29,36 +30,12 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(String databasePropertyFile, String columnPropertyFile) {
+    public void discover(String databasePropertyFile, String columnPropertyFile) throws DatabaseAnonymizerException {
 
-        // Reading configuration file
-        Configuration configuration = null;
-        try {
-            configuration = new PropertiesConfiguration(databasePropertyFile);
-        } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
-        }
-        
-        String driver = configuration.getString("driver");
-        String database = configuration.getString("database");
-        String url = configuration.getString("url");
-        String userName = configuration.getString("username");
-        String password = configuration.getString("password");
-        log.debug("Using driver " + driver);
-        log.debug("Database type: " + database);
-        log.debug("Database URL: " + url);
-        log.debug("Logging in using username " + userName);
-
-        log.info("Connecting to database");
-        Connection connection = null;
-        try {
-            forName(driver).newInstance();
-            connection = getConnection(url,userName,password);
-            connection.setAutoCommit(false);
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
-            log.error("Problem connecting to database.\n" + e.toString(), e);
-        }        
-        
+        log.info("Connecting to database");        
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
+        Connection connection = dbConnection.connect(databasePropertyFile);
+                
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
         try {
@@ -112,7 +89,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         }
     }
     
-    public void discover(String databasePropertyFile) {
+    public void discover(String databasePropertyFile) throws DatabaseAnonymizerException {
         this.discover(databasePropertyFile, "column.properties");
     }
 }
