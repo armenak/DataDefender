@@ -85,7 +85,7 @@ public class Discoverer {
             line = parser.parse(options, args);
         } catch (ParseException e) {
             help(options);
-            throw new Exception("Unable to process command line arguments");
+            throw new Exception("Unable to process command line arguments", e);
         }
  
         return line;

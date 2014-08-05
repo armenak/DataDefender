@@ -25,11 +25,10 @@ public class Functions {
     
     private static Logger log = getLogger(Functions.class);
 
-    private static final List<String> firstNameList  = new ArrayList<>();
-    private static final List<String> lastNameList   = new ArrayList<>();
-    private static final List<String> middleNameList = new ArrayList<>();
-    
-    private static final List<String> words          = new ArrayList<>();
+    private static final List<String> FIRST_NAME_LIST  = new ArrayList<>();
+    private static final List<String> LAST_NAME_LIST   = new ArrayList<>();
+    private static final List<String> MIDDLE_NAME_LIST = new ArrayList<>();
+    private static final List<String> WORDS            = new ArrayList<>();
 
     public static void init() {        
         try 
@@ -47,44 +46,44 @@ public class Functions {
     
     public static String randomFirstName(String fileName) throws IOException {
         
-        if (firstNameList.isEmpty()) {
+        if (FIRST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    firstNameList.add(line);
+                    FIRST_NAME_LIST.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,firstNameList.size()-1);
-        return firstNameList.get(rand);
+        int rand = nextIntInRange(0,FIRST_NAME_LIST.size()-1);
+        return FIRST_NAME_LIST.get(rand);
     }
     
     public static String randomLastName(String fileName) throws IOException {
         
-        if (lastNameList.isEmpty()) {
+        if (LAST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    lastNameList.add(line);
+                    LAST_NAME_LIST.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,lastNameList.size()-1);
-        return lastNameList.get(rand);
+        int rand = nextIntInRange(0,LAST_NAME_LIST.size()-1);
+        return LAST_NAME_LIST.get(rand);
     }    
     
     public static String randomMiddleName(String fileName) throws IOException {
         
-        if (middleNameList.isEmpty()) {
+        if (MIDDLE_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    middleNameList.add(line);
+                    MIDDLE_NAME_LIST.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,middleNameList.size()-1);
-        return lastNameList.get(rand);
+        int rand = nextIntInRange(0,MIDDLE_NAME_LIST.size()-1);
+        return MIDDLE_NAME_LIST.get(rand);
     }        
     
     public static String randomEmail(String domainName) 
@@ -110,7 +109,7 @@ public class Functions {
 
         StringBuilder randomString = new StringBuilder();
         for (Integer i : randomNumbers) {
-            randomString.append(words.get(i));
+            randomString.append(WORDS.get(i));
             randomString.append(" ");
         }
         
@@ -169,7 +168,7 @@ public class Functions {
         try (Scanner scanner = new Scanner(Functions.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext())
             {
-                words.add(scanner.next());
+                WORDS.add(scanner.next());
             }
         }
     }    

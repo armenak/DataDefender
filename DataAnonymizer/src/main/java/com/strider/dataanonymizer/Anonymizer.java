@@ -84,7 +84,7 @@ public class Anonymizer  {
             line = parser.parse(options, args);
         } catch (ParseException e) {
             help(options);
-            throw new AnonymizerException("Unable to process command line arguments");
+            throw new AnonymizerException("Unable to process command line arguments", e);
         }
  
         return line;

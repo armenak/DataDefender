@@ -76,7 +76,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             requirement = (Requirement) unmarshaller.unmarshal(new File(requirementFile));
         } catch (JAXBException je) {
             log.error(je.toString());
-            throw new DatabaseAnonymizerException(je.toString());
+            throw new DatabaseAnonymizerException(je.toString(), je);
         }
 
         // Initializing static data in Functions
