@@ -13,7 +13,7 @@ public interface IDiscoverer {
      * for data anonymization.
      * @param databasePropertyFile
      */
-    public void discover(String databasePropertyFile);    
+    public void discover(String databasePropertyFile) throws AnonymizerException;    
     
     /**
      * Discovers data or data containers with data which can be be the subject 
@@ -21,5 +21,5 @@ public interface IDiscoverer {
      * @param databasePropertyFile
      * @param columnPropertyFile
      */
-    public void discover(String databasePropertyFile, String columnPropertyFile);
+    public void discover(String databasePropertyFile, String columnPropertyFile) throws AnonymizerException;
 }

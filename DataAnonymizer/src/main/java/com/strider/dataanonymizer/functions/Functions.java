@@ -23,9 +23,8 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class Functions {
     
-    static Logger log = getLogger(Functions.class);
+    private static Logger log = getLogger(Functions.class);
 
-    
     private static final List<String> firstNameList  = new ArrayList<>();
     private static final List<String> lastNameList   = new ArrayList<>();
     private static final List<String> middleNameList = new ArrayList<>();

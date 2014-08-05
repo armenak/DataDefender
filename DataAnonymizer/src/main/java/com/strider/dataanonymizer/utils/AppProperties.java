@@ -16,7 +16,7 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public final class AppProperties {
     
-    static Logger log = getLogger(AppProperties.class);
+    private static Logger log = getLogger(AppProperties.class);
 
     /**
      * Load property file

@@ -26,16 +26,20 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import static com.strider.dataanonymizer.ColumnDiscoverer.log;
 import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
  * @author Armenak Grigoryan
  */
 public class DataDiscoverer implements IDiscoverer {
+    
+    private static Logger log = getLogger(ColumnDiscoverer.class);
+
     @Override
-    public void discover(String databasePropertyFile) {
+    public void discover(String databasePropertyFile) throws AnonymizerException {
         // Reading anonymizer.properties file
         Properties anonymizerProperties = loadPropertiesFromClassPath("anonymizer.properties");
         if (anonymizerProperties == null) {
@@ -72,7 +76,16 @@ public class DataDiscoverer implements IDiscoverer {
             connection = getConnection(url,userName,password);
             connection.setAutoCommit(false);
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    log.error("Problem connecting to database.\n" + sqle.toString(), sqle);
+                    throw new AnonymizerException(sqle.toString());                
+                }
+            }
             log.error("Problem connecting to database.\n" + e.toString(), e);
+            throw new AnonymizerException(e.toString());
         }        
         
         // Get the metadata from the the database
@@ -92,11 +105,11 @@ public class DataDiscoverer implements IDiscoverer {
                     }
                 }
             }
+            rs.close();
         } catch (SQLException e) {
             log.error(e);
         }  
         
-        // Load models
         InputStream modelInToken = null;
         InputStream modelIn = null;        
         TokenizerModel modelToken = null;
@@ -129,13 +142,12 @@ public class DataDiscoverer implements IDiscoverer {
                 String columnName = pair.getColumnName();                
                 List<Double> probabilityList = new ArrayList<>();
 
-                //log.info("Analyzing " + tableName + "." + columnName);
-
                 Statement stmt = null;
                 ResultSet rs = null;
                 try {
                     stmt = connection.createStatement();
-                    rs = stmt.executeQuery("SELECT " + columnName + " FROM " + tableName);
+                    final String selectStmt = "SELECT " + columnName + " FROM " + tableName;
+                    rs = stmt.executeQuery(selectStmt);
                     while (rs.next()) {
                         String sentence = rs.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
@@ -145,17 +157,14 @@ public class DataDiscoverer implements IDiscoverer {
                             Span nameSpans[] = nameFinder.find(tokens);
                             //find probabilities for names
                             double[] spanProbs = nameFinder.probs(nameSpans);
-
                             //display names
                             for( int i = 0; i<nameSpans.length; i++) {
-                                //log.info(sentence);
-                                //log.info("Span: "+nameSpans[i].toString());
-                                //System.out.println("Covered text is: "+tokens[nameSpans[i].getStart()] + " " + tokens[nameSpans[i].getStart()+1]);
-                                //log.info("Probability is: "+spanProbs[i]);
                                 probabilityList.add(spanProbs[i]);
                             }
                         }
-                    }            
+                    }
+                    rs.close();
+                    stmt.close();
                 } catch (SQLException sqle) {
                     log.error(sqle.toString());
                 }

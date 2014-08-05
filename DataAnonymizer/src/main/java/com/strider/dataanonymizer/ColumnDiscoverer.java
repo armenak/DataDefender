@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class ColumnDiscoverer implements IDiscoverer { 
     
-    static Logger log = getLogger(ColumnDiscoverer.class);
+    private static Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
     public void discover(String databasePropertyFile, String columnPropertyFile) {
@@ -113,6 +113,6 @@ public class ColumnDiscoverer implements IDiscoverer {
     }
     
     public void discover(String databasePropertyFile) {
-        discover("column.properties");
+        this.discover("column.properties");
     }
 }

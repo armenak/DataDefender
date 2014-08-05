@@ -46,7 +46,6 @@ public class Anonymizer  {
         Properties props = null;
         if (line.hasOption("D")) {
             databasePropertyFile = line.getOptionValues("D")[0];
-            //props = AppProperties.loadPropertiesFromClassPath(databasePropertyFile);
             props = loadProperties(databasePropertyFile);            
         }
         if (props == null) {
@@ -57,7 +56,6 @@ public class Anonymizer  {
         if (line.hasOption("A")) {
             anonymizePropertyFile = line.getOptionValue("A");
         } 
-        // Properties anonymizerProperties = AppProperties.loadPropertiesFromClassPath(anonymizePropertyFile);
         Properties anonymizerProperties = loadProperties(anonymizePropertyFile);
         if (anonymizerProperties == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");

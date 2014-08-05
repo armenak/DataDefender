@@ -19,7 +19,7 @@ import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromC
  */
 public class Discoverer {
     
-    static Logger log = getLogger(Discoverer.class);
+    private static Logger log = getLogger(Discoverer.class);
     
     public static void main( String[] args )
     throws Exception {

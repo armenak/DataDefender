@@ -78,7 +78,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             throw new DatabaseAnonymizerException(ine.toString());
         }       
                 
-        //Properties props = AppProperties.loadPropertiesFromClassPath(anonymizerPropertyFile);
         Properties props = null;        
         try {
             props = loadProperties(anonymizerPropertyFile);
@@ -132,11 +131,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             sql.append(" WHERE ").append(table.getPKey()).append(" = ?");
-            String updateString = sql.toString();
+            final String updateString = sql.toString();
             
             try {
                 stmt = connection.createStatement();
-                rs = stmt.executeQuery("SELECT id FROM " + table.getName());
+                final String selectStmt = "SELECT id FROM " + table.getName();
+                rs = stmt.executeQuery(selectStmt);
                 pstmt = connection.prepareStatement(updateString);
                 while (rs.next()) {
                     int id = rs.getInt("id");
@@ -167,7 +167,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     pstmt.setInt(++index, id);
                     pstmt.addBatch();
                     batchCounter++;
-                    // @todo Get rid of this hardcoding
                     if (batchCounter == batchSize) {
                         pstmt.executeBatch();
                         connection.commit();
@@ -194,31 +193,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             log.info("Table " + table.getName() + ". End ...");
             log.info("");
-        }                
-        
-        // log.info(map.toString());
-        
-    }
-    
-    private class Pair {
-        private String tableName;
-        private String columnName;
-
-        Pair(String tableName, String columnName) {
-            this.tableName = tableName;
-            this.columnName = columnName;
-        }
-        
-        public String getTableName() {
-            return this.tableName;
-        }
-        
-        public String getColumnName() {
-            return this.columnName;
-        }
-        
-        public String toString() {
-            return this.tableName + "." + this.columnName;
-        }
+        }       
     }
 }
