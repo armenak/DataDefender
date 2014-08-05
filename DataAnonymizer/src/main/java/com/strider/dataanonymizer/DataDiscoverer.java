@@ -146,8 +146,7 @@ public class DataDiscoverer implements IDiscoverer {
                 ResultSet rs = null;
                 try {
                     stmt = connection.createStatement();
-                    final String selectStmt = "SELECT " + columnName + " FROM " + tableName;
-                    rs = stmt.executeQuery(selectStmt);
+                    rs = stmt.executeQuery(new StringBuilder("SELECT ").append(columnName).append(" FROM ").append(tableName).toString());
                     while (rs.next()) {
                         String sentence = rs.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {

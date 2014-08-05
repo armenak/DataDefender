@@ -113,6 +113,6 @@ public class ColumnDiscoverer implements IDiscoverer {
     }
     
     public void discover(String databasePropertyFile) {
-        this.discover("column.properties");
+        this.discover(databasePropertyFile, "column.properties");
     }
 }

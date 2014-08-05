@@ -135,8 +135,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             try {
                 stmt = connection.createStatement();
-                final String selectStmt = "SELECT id FROM " + table.getName();
-                rs = stmt.executeQuery(selectStmt);
+                rs = stmt.executeQuery(new StringBuilder("SELECT id FROM ").append(table.getName()).toString());
                 pstmt = connection.prepareStatement(updateString);
                 while (rs.next()) {
                     int id = rs.getInt("id");
