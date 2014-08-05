@@ -132,8 +132,8 @@ public class Functions {
                 if (!rangeList.get(0).isEmpty() && !rangeList.get(1).isEmpty() ) {
                     if (isInteger(rangeList.get(0)) && isInteger(rangeList.get(1))) {
                         StringBuilder desc = new StringBuilder();
-                        desc.append(generateRandomString(parseInt(rangeList.get(0).toString()),
-                                parseInt(rangeList.get(1).toString())).trim());
+                        desc.append(generateRandomString(parseInt(rangeList.get(0)),
+                                parseInt(rangeList.get(1))).trim());
                         return desc.toString();
                     }
                 }

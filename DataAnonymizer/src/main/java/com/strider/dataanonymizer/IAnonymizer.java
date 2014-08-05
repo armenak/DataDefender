@@ -13,5 +13,5 @@ public interface IAnonymizer {
      * @param String propertyFile
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    public void anonymize(String propertyFile, String anonymizerPropertFile) throws DatabaseAnonymizerException;    
+    void anonymize(String propertyFile, String anonymizerPropertFile) throws DatabaseAnonymizerException;    
 }

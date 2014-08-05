@@ -3,26 +3,20 @@ package com.strider.dataanonymizer;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import static java.lang.Class.forName;
 import static java.lang.Integer.parseInt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static java.sql.DriverManager.getConnection;
 import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import static javax.xml.bind.JAXBContext.newInstance;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -56,11 +50,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
         Properties props = null;        
         try {
             props = loadProperties(anonymizerPropertyFile);
-        } catch (UnsupportedEncodingException uex) {
+        } catch (IOException uex) {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sql) {
+                    log.error(sql.toString());
+                }
+            }            
             log.error(uex.toString());
-        } catch (IOException ex) {
-            log.error(ex.toString());
         }
+        
         if (props == null) {
             throw new DatabaseAnonymizerException("ERROR: anonymizer.properties file is not defined.");
         }
@@ -93,7 +93,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             PreparedStatement pstmt = null;
             Statement stmt = null;
             ResultSet rs = null;
-            final StringBuilder sql = new StringBuilder("UPDATE " + table.getName() + " SET ");
+            StringBuilder sql = new StringBuilder("UPDATE " + table.getName() + " SET ");
             int batchCounter = 0;            
             
             // First iteration over columns to build the UPDATE statement
@@ -135,6 +135,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 log.error(ex.toString());
+                                try {
+                                    stmt.close();
+                                    if (pstmt != null) {
+                                        pstmt.close();
+                                    }
+                                    rs.close();
+                                } catch (SQLException sqlex) {
+                                    log.error(sqlex.toString());
+                                }                                                
                             }
                         }
                     }

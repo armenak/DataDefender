@@ -2,19 +2,14 @@ package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.database.MySQLDBConnection;
 import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.Class.forName;
 import static java.lang.Double.parseDouble;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import static java.sql.DriverManager.getConnection;
-import static java.sql.DriverManager.getConnection;
-import static java.sql.DriverManager.getConnection;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

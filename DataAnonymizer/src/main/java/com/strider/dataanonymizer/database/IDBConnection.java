@@ -7,6 +7,6 @@ import java.sql.Connection;
  * @author Armenak Grigoryan
  */
 public interface IDBConnection {
-    public Connection connect(final String propertyFile) throws DatabaseAnonymizerException;
-    public void disconnect(final Connection conn) throws DatabaseAnonymizerException;    
+    Connection connect(final String propertyFile) throws DatabaseAnonymizerException;
+    void disconnect(final Connection conn) throws DatabaseAnonymizerException;    
 }

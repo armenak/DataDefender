@@ -1,11 +1,9 @@
 package com.strider.dataanonymizer.utils;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -50,8 +48,7 @@ public final class AppProperties {
         return props;
     }
  
-    public static Properties loadProperties(String fileName) 
-    throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    public static Properties loadProperties(String fileName) throws IOException {
         
         Properties properties = new Properties();
         InputStreamReader in = null;
@@ -62,7 +59,9 @@ public final class AppProperties {
             if (null != in) {
                 try {
                     in.close();
-                } catch (IOException ex) {}
+                } catch (IOException ex) {
+                    log.error(ex.toString(), ex);
+                }
             }
         }
         return properties;

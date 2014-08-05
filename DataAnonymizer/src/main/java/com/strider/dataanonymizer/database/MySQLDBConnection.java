@@ -50,7 +50,7 @@ public class MySQLDBConnection implements IDBConnection {
             forName(driver);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe.toString());
-            throw new DatabaseAnonymizerException(cnfe.toString());
+            throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
         }
         
         Connection conn = null;
@@ -58,7 +58,14 @@ public class MySQLDBConnection implements IDBConnection {
             conn = getConnection(url, userName, password);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
-            throw new DatabaseAnonymizerException(sqle.toString());
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException sql) {
+                    log.error(sql.toString());
+                }
+            }
+            throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
         
         return conn;
@@ -75,7 +82,7 @@ public class MySQLDBConnection implements IDBConnection {
             conn.close();
         } catch (SQLException ex) {
             log.error(ex.toString());
-            throw new DatabaseAnonymizerException(ex.toString());
+            throw new DatabaseAnonymizerException(ex.toString(), ex);
         }
     }
 }

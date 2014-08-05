@@ -36,12 +36,13 @@ public class ColumnDiscoverer implements IDiscoverer {
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
         Connection connection = dbConnection.connect(databasePropertyFile);
                 
+        ResultSet rs = null;
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
-            ResultSet rs = md.getTables(null, null, "%", null);
+            rs = md.getTables(null, null, "%", null);
             while (rs.next()) {
                 String tableName = rs.getString(3);
                 ResultSet resultSet = md.getColumns(null, null, tableName, null);        
@@ -51,8 +52,24 @@ public class ColumnDiscoverer implements IDiscoverer {
                     map.add(new ColumnMetaData(tableName, columnName, columnType));
                 }
             }
+            rs.close();
+            connection.close();
         } catch (SQLException e) {
-            log.error(e);
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    log.error(sqle.toString());
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException sql) {
+                    log.error(sql.toString());
+                }
+            }            
+            log.error(e.toString());
         }
                 
         // Get the list of "suspicios" field names from property file
@@ -65,7 +82,6 @@ public class ColumnDiscoverer implements IDiscoverer {
         }        
         Iterator<String> iterator = columnsConfiguration.getKeys();
         List<String> suspList = toList(iterator);          
-        
         
         ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
