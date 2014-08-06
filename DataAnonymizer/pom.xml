@@ -9,6 +9,7 @@
 
   <name>DataAnonymizer</name>
   <url>http://maven.apache.org</url>
+
     <build>
         <plugins>
             <plugin>
@@ -53,8 +54,11 @@
               </plugin>
         </plugins>
     </build>
-    <properties>
+
+  <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.projectKey>DA</sonar.projectKey>
+    <sonar.profile>SIS</sonar.profile>
   </properties>
 
   <dependencies>
