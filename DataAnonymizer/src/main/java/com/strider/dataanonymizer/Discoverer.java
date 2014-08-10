@@ -23,13 +23,10 @@ public class Discoverer {
     
     public static void main( String[] args ) throws AnonymizerException {
 
-        if (args.length == 0 ) {
-            log.info("To display usage info please type");
-            log.info("    java -jar DataAnonymizer.jar com.strider.Discoverer help");
-            return;
-        }        
-
+        // Define command line options  
         final Options options = createOptions();
+        
+        // 
         CommandLine line = null;
         try {
             line = getCommandLine(options, args);
@@ -37,7 +34,8 @@ public class Discoverer {
             log.error(pe.toString());
         }
         
-        if (line.hasOption("help")) {
+        
+        if (line == null ||  line.hasOption("help")) {
             help(options); 
         } else if (line.hasOption("c")) {
             log.info("Column discovery in process");
@@ -78,6 +76,8 @@ public class Discoverer {
             
             IDiscoverer discoverer = new DataDiscoverer();
             discoverer.discover(databasePropertyFile);            
+        } else {
+            help(options);
         }
    }
    
@@ -95,14 +95,13 @@ public class Discoverer {
         return line;
     }    
     
-    @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
-        options.addOption("help", false, "Display help");
+        options.addOption( "h", "help", false, "Display help");
         options.addOption( "c", "columns", false, "discover candidate column names for anonymization based on provided patterns" );
         options.addOption( "d", "data", false, "discover candidate column for anonymization based on semantic algorithms" );
-        options.addOption( "D", "database properties", true, "define database property file" );
-        options.addOption( "C", "column properties", true, "define column property file" );        
+        options.addOption( "D", "database-properties", true, "define database property file" );
+        options.addOption( "C", "column-properties", true, "define column property file" );        
         return options;
     }
  

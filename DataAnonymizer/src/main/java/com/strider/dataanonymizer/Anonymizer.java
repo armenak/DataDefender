@@ -29,7 +29,7 @@ public class Anonymizer  {
 
         if (args.length == 0 ) {
             log.info("To display usage info please type");
-            log.info("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer help");
+            log.info("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer --help");
             return;
         }        
 
