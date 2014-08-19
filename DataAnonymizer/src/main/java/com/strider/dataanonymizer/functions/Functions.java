@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 /**
- * @author strider
+ * @author Armenak Grigoryan
  */
 public class Functions {
     
@@ -28,6 +28,9 @@ public class Functions {
     private static final List<String> FIRST_NAME_LIST  = new ArrayList<>();
     private static final List<String> LAST_NAME_LIST   = new ArrayList<>();
     private static final List<String> MIDDLE_NAME_LIST = new ArrayList<>();
+    private static final List<String> POSTAL_CODE_LIST = new ArrayList<>();
+    private static final List<String> CITY_LIST        = new ArrayList<>();
+    private static final List<String> STATE_LIST       = new ArrayList<>();    
     private static final List<String> WORDS            = new ArrayList<>();
 
     public static void init() {        
@@ -41,8 +44,7 @@ public class Functions {
     }    
     
     
-    public static String randomFirstName(String fileName) throws IOException {
-        
+    public static String randomFirstName(String fileName) throws IOException {        
         if (FIRST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
@@ -55,8 +57,7 @@ public class Functions {
         return FIRST_NAME_LIST.get(rand);
     }
     
-    public static String randomLastName(String fileName) throws IOException {
-        
+    public static String randomLastName(String fileName) throws IOException {        
         if (LAST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
@@ -69,8 +70,7 @@ public class Functions {
         return LAST_NAME_LIST.get(rand);
     }    
     
-    public static String randomMiddleName(String fileName) throws IOException {
-        
+    public static String randomMiddleName(String fileName) throws IOException {        
         if (MIDDLE_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
@@ -88,6 +88,60 @@ public class Functions {
         email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
         return email.toString();
     }    
+    
+    /**
+     * Returns email address sent as a parameter
+     * @param emailAddress Strirng 
+     * @return email address String 
+     */
+    public static String staticEmail(String emailAddress) {
+        return emailAddress;
+    }        
+
+    /**
+     * Generates random postal code
+     * @param fileName String
+     * @return String Random postal code
+     * @throws IOException 
+     */
+    public static String generateRandomPostalCode(String fileName) throws IOException {
+        if (POSTAL_CODE_LIST.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    POSTAL_CODE_LIST.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,POSTAL_CODE_LIST.size()-1);
+        return POSTAL_CODE_LIST.get(rand);        
+    }
+
+    public static String generateRandomCity(String fileName) throws IOException {
+        if (CITY_LIST.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    CITY_LIST.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,CITY_LIST.size()-1);
+        return CITY_LIST.get(rand);                
+    }
+    
+    public static String generateRandomState(String fileName)  throws IOException {
+        if (STATE_LIST.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    STATE_LIST.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,STATE_LIST.size()-1);
+        return STATE_LIST.get(rand);        
+    }        
     
     private static int nextIntInRange(int min, int max) {
         Random random = new Random();
@@ -159,8 +213,7 @@ public class Functions {
         return phoneNumber;        
     }
     
-   private static void addWordsIntoArray()
-    {
+   private static void addWordsIntoArray() {
         try (Scanner scanner = new Scanner(Functions.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext())
             {
@@ -178,6 +231,5 @@ public class Functions {
         }
         
         return false;
-    }   
-   
+    }
 }

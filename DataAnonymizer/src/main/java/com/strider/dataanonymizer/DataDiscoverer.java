@@ -2,7 +2,6 @@ package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.IDBConnection;
-import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import opennlp.tools.namefind.NameFinderME;
@@ -36,21 +34,12 @@ public class DataDiscoverer implements IDiscoverer {
     private static Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(String databasePropertyFile) throws AnonymizerException {
-        // Reading anonymizer.properties file
-        Properties anonymizerProperties = loadPropertiesFromClassPath("anonymizer.properties");
-        if (anonymizerProperties == null) {
-            try {
-                throw new AnonymizerException("ERROR: Column property file is not defined.");
-            } catch (AnonymizerException ex) {
-                log.error(ex.toString());
-            }
-        }
-        double probabilityThreshold = parseDouble(anonymizerProperties.getProperty("probability_threshold"));
+    public void discover(Properties databaseProperties, Properties dataDiscoveryProperties) throws AnonymizerException {
+        double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
         log.info("Connecting to database");        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
-        Connection connection = dbConnection.connect(databasePropertyFile);
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
+        Connection connection = dbConnection.connect(databaseProperties);
         
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
@@ -83,8 +72,8 @@ public class DataDiscoverer implements IDiscoverer {
         NameFinderME nameFinder = null;
         
         try {
-            modelInToken = new FileInputStream(anonymizerProperties.getProperty("english_tokens"));
-            modelIn = new FileInputStream(anonymizerProperties.getProperty("english_ner_person"));            
+            modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
+            modelIn = new FileInputStream(dataDiscoveryProperties.getProperty("english_ner_person"));            
             
             modelToken = new TokenizerModel(modelInToken);
             tokenizer = new TokenizerME(modelToken);            
@@ -162,11 +151,6 @@ public class DataDiscoverer implements IDiscoverer {
             }
         }
     }
-    
-    @Override
-    public void discover(String databasePropertyFile, String columnPropertyFile) {
-        return;
-    }    
     
     private double calculateAverage(List <Double> values) {
         Double sum = 0.0;

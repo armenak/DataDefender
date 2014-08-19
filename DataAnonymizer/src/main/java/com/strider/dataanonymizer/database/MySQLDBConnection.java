@@ -2,14 +2,16 @@ package com.strider.dataanonymizer.database;
 
 import com.strider.dataanonymizer.ColumnDiscoverer;
 import static java.lang.Class.forName;
-import static java.sql.DriverManager.getConnection;
 import java.sql.Connection;
+import static java.sql.DriverManager.getConnection;
+import static java.sql.DriverManager.getConnection;
 import java.sql.SQLException;
+import java.util.Properties;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 
 /**
@@ -27,20 +29,13 @@ public class MySQLDBConnection implements IDBConnection {
      * @throws DatabaseAnonymizerException 
      */
     @Override
-    public Connection connect(String propertyFile) throws DatabaseAnonymizerException {
+    public Connection connect(Properties properties) throws DatabaseAnonymizerException {
 
-        Configuration configuration = null;
-        try {
-            configuration = new PropertiesConfiguration(propertyFile);
-        } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
-        }
-        
-        String driver = configuration.getString("driver");
-        String database = configuration.getString("database");
-        String url = configuration.getString("url");
-        String userName = configuration.getString("username");
-        String password = configuration.getString("password");
+        String driver = properties.getProperty("driver");
+        String database = properties.getProperty("database");
+        String url = properties.getProperty("url");
+        String userName = properties.getProperty("username");
+        String password = properties.getProperty("password");
         log.debug("Using driver " + driver);
         log.debug("Database type: " + database);
         log.debug("Database URL: " + url);

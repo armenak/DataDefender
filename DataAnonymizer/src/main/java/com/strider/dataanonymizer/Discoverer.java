@@ -40,8 +40,8 @@ public class Discoverer {
         } else if (line.hasOption("c")) {
             log.info("Column discovery in process");
             String databasePropertyFile = "db.properties";
-            if (line.hasOption("D")) {
-                databasePropertyFile = line.getOptionValue("D");
+            if (line.hasOption("P")) {
+                databasePropertyFile = line.getOptionValue("P");
             } 
             Properties dbProperties = null;
             dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
@@ -49,7 +49,7 @@ public class Discoverer {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            
 
-            String columnPropertyFile = "columns.properties";
+            String columnPropertyFile = "columndiscovery.properties";
             if (line.hasOption("C")) {
                 columnPropertyFile = line.getOptionValue("C");
             }
@@ -60,13 +60,13 @@ public class Discoverer {
             }                
             
             IDiscoverer discoverer = new ColumnDiscoverer();
-            discoverer.discover(databasePropertyFile, columnPropertyFile);
+            discoverer.discover(dbProperties, columnProperties);
         } else if (line.hasOption("d")) {
             log.info("Data discovery in process");
             
             String databasePropertyFile = "db.properties";
-            if (line.hasOption("D")) {
-                databasePropertyFile = line.getOptionValue("D");
+            if (line.hasOption("P")) {
+                databasePropertyFile = line.getOptionValue("P");
             } 
             Properties dbProperties = null;
             dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
@@ -74,8 +74,18 @@ public class Discoverer {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            
             
+            String datadiscoveryPropertyFile = "datadiscovery.properties";
+            if (line.hasOption("D")) {
+                datadiscoveryPropertyFile = line.getOptionValue("D");
+            }
+            Properties dataDiscoveryProperties = null;
+            dataDiscoveryProperties = loadPropertiesFromClassPath(datadiscoveryPropertyFile);
+            if (dataDiscoveryProperties == null) {
+                throw new AnonymizerException("ERROR: Data discovery property file is not defined.");
+            }                            
+            
             IDiscoverer discoverer = new DataDiscoverer();
-            discoverer.discover(databasePropertyFile);            
+            discoverer.discover(dbProperties, dataDiscoveryProperties);            
         } else {
             help(options);
         }
@@ -98,10 +108,12 @@ public class Discoverer {
     private static Options createOptions() {
         final Options options = new Options();
         options.addOption( "h", "help", false, "Display help");
-        options.addOption( "c", "columns", false, "discover candidate column names for anonymization based on provided patterns" );
-        options.addOption( "d", "data", false, "discover candidate column for anonymization based on semantic algorithms" );
-        options.addOption( "D", "database-properties", true, "define database property file" );
-        options.addOption( "C", "column-properties", true, "define column property file" );        
+        options.addOption( "c", "column-discovery", false, "discover candidate column names for anonymization based on provided patterns" );
+        options.addOption( "C", "column-properties", true, "define column property file" );                
+        options.addOption( "d", "data-discovery", false, "discover candidate column for anonymization based on semantic algorithms" );        
+        options.addOption( "D", "data-properties", true, "discover candidate column for anonymization based on semantic algorithms" );
+        options.addOption( "P", "database-properties", true, "define database property file" );
+
         return options;
     }
  

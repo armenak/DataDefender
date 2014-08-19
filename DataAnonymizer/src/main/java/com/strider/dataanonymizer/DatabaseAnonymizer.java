@@ -29,6 +29,7 @@ import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
 import static com.strider.dataanonymizer.functions.Functions.init;
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -44,8 +45,14 @@ public class DatabaseAnonymizer implements IAnonymizer {
     throws DatabaseAnonymizerException{
 
         log.info("Connecting to database");        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
-        Connection connection = dbConnection.connect(databasePropertyFile);
+        Properties dbProperties = null;
+        dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
+        if (dbProperties == null) {
+            throw new DatabaseAnonymizerException("ERROR: Database property file is not defined.");
+        }        
+        
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(dbProperties);
+        Connection connection = dbConnection.connect(dbProperties);
         
         Properties props = null;        
         try {

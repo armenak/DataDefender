@@ -10,16 +10,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
-
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.collections.IteratorUtils.toList;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -30,11 +31,11 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(String databasePropertyFile, String columnPropertyFile) throws DatabaseAnonymizerException {
+    public void discover(Properties databaseProperties, Properties columnProperties) throws DatabaseAnonymizerException {
 
         log.info("Connecting to database");        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databasePropertyFile);
-        Connection connection = dbConnection.connect(databasePropertyFile);
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
+        Connection connection = dbConnection.connect(databaseProperties);
                 
         ResultSet rs = null;
         // Get the metadata from the the database
@@ -76,7 +77,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         // Reading configuration file
         Configuration columnsConfiguration = null;
         try {
-            columnsConfiguration = new PropertiesConfiguration("columns.properties");
+            columnsConfiguration = new PropertiesConfiguration("columndiscovery.properties");
         } catch (ConfigurationException ex) {
             log.error(ColumnDiscoverer.class);
         }        
@@ -103,9 +104,5 @@ public class ColumnDiscoverer implements IDiscoverer {
         for (String entry: matches) {
             log.info(entry);
         }
-    }
-    
-    public void discover(String databasePropertyFile) throws DatabaseAnonymizerException {
-        this.discover(databasePropertyFile, "column.properties");
     }
 }
