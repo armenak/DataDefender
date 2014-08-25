@@ -30,7 +30,9 @@ public class Functions {
     private static final List<String> MIDDLE_NAME_LIST = new ArrayList<>();
     private static final List<String> POSTAL_CODE_LIST = new ArrayList<>();
     private static final List<String> CITY_LIST        = new ArrayList<>();
-    private static final List<String> STATE_LIST       = new ArrayList<>();    
+    private static final List<String> STATE_LIST       = new ArrayList<>();
+    private static final List<String> STRING_LIST      = new ArrayList<>();    
+    private static final List<String> STREET_LIST      = new ArrayList<>();        
     private static final List<String> WORDS            = new ArrayList<>();
 
     public static void init() {        
@@ -130,6 +132,19 @@ public class Functions {
         return CITY_LIST.get(rand);                
     }
     
+    public static String generateRandomStreet(String fileName) throws IOException {
+        if (STREET_LIST.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    STREET_LIST.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,STREET_LIST.size()-1);
+        return STREET_LIST.get(rand);                
+    }    
+    
     public static String generateRandomState(String fileName)  throws IOException {
         if (STATE_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -147,6 +162,20 @@ public class Functions {
         Random random = new Random();
         return random.nextInt(max - min + 1) + min;
     }
+    
+    public static String randomStringFromFile(String fileName) throws IOException {
+        if (STRING_LIST.isEmpty()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+                for(String line; (line = br.readLine()) != null; ) {
+                    STRING_LIST.add(line);
+                }
+            }            
+        }
+        
+        int rand = nextIntInRange(0,STRING_LIST.size()-1);
+        return STRING_LIST.get(rand);              
+    }        
+    
     
     public static String generateRandomString(int num, int length) {
         List<Integer> randomNumbers = new ArrayList<>();
