@@ -1,6 +1,7 @@
 package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import java.util.Properties;
 
 /**
  * Defines contract for all anonymizers
@@ -13,5 +14,5 @@ public interface IAnonymizer {
      * @param String propertyFile
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    void anonymize(String propertyFile, String anonymizerPropertFile) throws DatabaseAnonymizerException;    
+    void anonymize(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException;    
 }

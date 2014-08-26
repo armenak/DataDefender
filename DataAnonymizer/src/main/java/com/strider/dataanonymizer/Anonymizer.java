@@ -12,8 +12,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-
-
 /**
  * Entry point to Data Anonymizer. 
  *  
@@ -38,12 +36,12 @@ public class Anonymizer  {
         if (line.hasOption("help")) {
             help(options);
             return;
-        } 
+        }
         
         String databasePropertyFile = "db.properties";
         Properties props = null;
-        if (line.hasOption("D")) {
-            databasePropertyFile = line.getOptionValues("D")[0];
+        if (line.hasOption("P")) {
+            databasePropertyFile = line.getOptionValues("P")[0];
             try {
                 props = loadProperties(databasePropertyFile);            
             } catch (IOException ioe) {
@@ -54,16 +52,16 @@ public class Anonymizer  {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
         }
         
-        String anonymizePropertyFile = "anonymize.properties";
+        String anonymizerPropertyFile = "anonymizer.properties";
         if (line.hasOption("A")) {
-            anonymizePropertyFile = line.getOptionValue("A");
+            anonymizerPropertyFile = line.getOptionValue("A");
         } 
         
         Properties anonymizerProperties = null;
         try {
-            anonymizerProperties = loadProperties(anonymizePropertyFile);
+            anonymizerProperties = loadProperties(anonymizerPropertyFile);
         } catch (IOException ioe) {
-            throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
+            throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
         }
         if (anonymizerProperties == null) {
             throw new AnonymizerException("ERROR: Database property file is not defined.");
@@ -71,7 +69,7 @@ public class Anonymizer  {
         
         if (line.hasOption("a")) {
             IAnonymizer anonymizer = new DatabaseAnonymizer();
-            anonymizer.anonymize(databasePropertyFile, anonymizePropertyFile);
+            anonymizer.anonymize(props, anonymizerProperties);
         }
     }
     
@@ -104,11 +102,10 @@ public class Anonymizer  {
     @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
-        options.addOption("help", false, "Display help");
+        options.addOption( "h", "help", false, "Display help");        
         options.addOption( "a", "anonymize", false, "anonymize database" );
-        options.addOption( "D", "database properties", true, "define database property file" );
         options.addOption( "A", "anonymizer properties", true, "define anonymizer property file" );
-        
+        options.addOption( "P", "database properties", true, "define database property file" );
         return options;
     }
  

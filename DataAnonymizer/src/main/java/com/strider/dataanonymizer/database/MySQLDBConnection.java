@@ -1,17 +1,11 @@
 package com.strider.dataanonymizer.database;
 
-import com.strider.dataanonymizer.ColumnDiscoverer;
 import static java.lang.Class.forName;
 import java.sql.Connection;
 import static java.sql.DriverManager.getConnection;
-import static java.sql.DriverManager.getConnection;
 import java.sql.SQLException;
 import java.util.Properties;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 
 /**
@@ -24,7 +18,7 @@ public class MySQLDBConnection implements IDBConnection {
     
     /**
      * Establishes database connection
-     * @param propertyFile
+     * @param properties
      * @return Connection
      * @throws DatabaseAnonymizerException 
      */
@@ -51,6 +45,7 @@ public class MySQLDBConnection implements IDBConnection {
         Connection conn = null;
         try {
             conn = getConnection(url, userName, password);
+            conn.setAutoCommit(false);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
             if (conn != null) {

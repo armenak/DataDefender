@@ -25,15 +25,15 @@ public class Functions {
     
     private static Logger log = getLogger(Functions.class);
 
-    private static final List<String> FIRST_NAME_LIST  = new ArrayList<>();
-    private static final List<String> LAST_NAME_LIST   = new ArrayList<>();
-    private static final List<String> MIDDLE_NAME_LIST = new ArrayList<>();
-    private static final List<String> POSTAL_CODE_LIST = new ArrayList<>();
-    private static final List<String> CITY_LIST        = new ArrayList<>();
-    private static final List<String> STATE_LIST       = new ArrayList<>();
-    private static final List<String> STRING_LIST      = new ArrayList<>();    
-    private static final List<String> STREET_LIST      = new ArrayList<>();        
-    private static final List<String> WORDS            = new ArrayList<>();
+    private static List<String> FIRST_NAME_LIST  = new ArrayList<>();
+    private static List<String> LAST_NAME_LIST   = new ArrayList<>();
+    private static List<String> MIDDLE_NAME_LIST = new ArrayList<>();
+    private static List<String> POSTAL_CODE_LIST = new ArrayList<>();
+    private static List<String> CITY_LIST        = new ArrayList<>();
+    private static List<String> STATE_LIST       = new ArrayList<>();
+    private static List<String> STRING_LIST      = new ArrayList<>();    
+    private static List<String> STREET_LIST      = new ArrayList<>();        
+    private static List<String> WORDS            = new ArrayList<>();
 
     public static void init() {        
         try  {
@@ -164,6 +164,7 @@ public class Functions {
     }
     
     public static String randomStringFromFile(String fileName) throws IOException {
+        log.info(fileName);
         if (STRING_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {

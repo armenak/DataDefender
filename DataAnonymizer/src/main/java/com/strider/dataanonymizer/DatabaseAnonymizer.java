@@ -2,7 +2,6 @@ package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import static java.lang.Integer.parseInt;
@@ -28,8 +27,6 @@ import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
 import static com.strider.dataanonymizer.functions.Functions.init;
-import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
-import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -41,38 +38,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private static Logger log = getLogger(DatabaseAnonymizer.class);
 
     @Override
-    public void anonymize(String databasePropertyFile, String anonymizerPropertyFile) 
+    public void anonymize(Properties databaseProperties, Properties anonymizerProperties) 
     throws DatabaseAnonymizerException{
 
         log.info("Connecting to database");        
-        Properties dbProperties = null;
-        dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
-        if (dbProperties == null) {
-            throw new DatabaseAnonymizerException("ERROR: Database property file is not defined.");
-        }        
+        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
+        Connection connection = dbConnection.connect(databaseProperties);
         
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(dbProperties);
-        Connection connection = dbConnection.connect(dbProperties);
-        
-        Properties props = null;        
-        try {
-            props = loadProperties(anonymizerPropertyFile);
-        } catch (IOException uex) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sql) {
-                    log.error(sql.toString());
-                }
-            }            
-            log.error(uex.toString());
-        }
-        
-        if (props == null) {
-            throw new DatabaseAnonymizerException("ERROR: anonymizer.properties file is not defined.");
-        }
-        String requirementFile = props.getProperty("requirement");
-        int batchSize = parseInt(props.getProperty("batch_size"));
+        String requirementFile = anonymizerProperties.getProperty("requirement");
+        int batchSize = parseInt(anonymizerProperties.getProperty("batch_size"));
         
         
         // Now we collect data from the requirement
@@ -95,8 +69,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         for(Table table : requirement.getTables()) {
             log.info("Table [" + table.getName() + "]. Start ...");
             
-            // Here we start building SQL query
-            
+            // Here we start building SQL query            
             PreparedStatement pstmt = null;
             Statement stmt = null;
             ResultSet rs = null;
@@ -122,7 +95,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     int index = 0;
-
+                    
                     for(Column column : table.getColumns()) {
                         String function = column.getFunction();
                         if (function == null || function.equals("")) {
