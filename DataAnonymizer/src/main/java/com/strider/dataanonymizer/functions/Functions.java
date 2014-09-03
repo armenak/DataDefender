@@ -1,6 +1,7 @@
 package com.strider.dataanonymizer.functions;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -14,6 +15,7 @@ import static java.lang.Math.round;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.random;
 import static java.lang.String.valueOf;
+import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -46,12 +48,16 @@ public class Functions {
     }    
     
     
-    public static String randomFirstName(String fileName) throws IOException {        
+    public static String randomFirstName(String fileName){        
         if (FIRST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
                     FIRST_NAME_LIST.add(line);
                 }
+            } catch (FileNotFoundException ex) {
+                log.error(ex.toString());
+            } catch (IOException ex) {
+                log.error(ex.toString());
             }            
         }
         
@@ -106,7 +112,7 @@ public class Functions {
      * @return String Random postal code
      * @throws IOException 
      */
-    public static String generateRandomPostalCode(String fileName) throws IOException {
+    public static String randomPostalCode(String fileName) throws IOException {
         if (POSTAL_CODE_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {
@@ -164,7 +170,7 @@ public class Functions {
     }
     
     public static String randomStringFromFile(String fileName) throws IOException {
-        log.info(fileName);
+        //log.info(fileName);
         if (STRING_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
                 for(String line; (line = br.readLine()) != null; ) {

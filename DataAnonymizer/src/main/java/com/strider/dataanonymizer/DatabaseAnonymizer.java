@@ -1,32 +1,35 @@
 package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DBConnectionFactory;
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.functions.Functions;
+import static com.strider.dataanonymizer.functions.Functions.init;
+import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Parameter;
+import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Table;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import static java.lang.Integer.parseInt;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import static java.lang.Integer.parseInt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import static javax.xml.bind.JAXBContext.newInstance;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.functions.Functions;
-import com.strider.dataanonymizer.requirement.Column;
-import com.strider.dataanonymizer.requirement.Parameter;
-import com.strider.dataanonymizer.requirement.Requirement;
-import com.strider.dataanonymizer.requirement.Table;
-import static com.strider.dataanonymizer.functions.Functions.init;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -54,10 +57,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
         try {
             JAXBContext jc = newInstance(Requirement.class);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
-            requirement = (Requirement) unmarshaller.unmarshal(new File(requirementFile));
+            requirement = (Requirement) unmarshaller.unmarshal(new FileInputStream(new File(requirementFile)));
         } catch (JAXBException je) {
             log.error(je.toString());
             throw new DatabaseAnonymizerException(je.toString(), je);
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // Initializing static data in Functions
@@ -114,6 +119,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     }
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                ex.printStackTrace();
                                 log.error(ex.toString());
                                 try {
                                     stmt.close();

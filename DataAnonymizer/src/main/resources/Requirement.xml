@@ -3,18 +3,24 @@
     <Client>Integrated Science</Client>
     <Version>1.0</Version>
     <Tables>
-        <Table Name="test" PKey="id">
+        <Table Name="isp_faculty" PKey="id">
             <Columns>
                 <Column Name="first" ReturnType="String">
                     <Function>randomFirstName</Function>
                     <Parameters>
-                        <Parameter Name="file" Value="/Users/strider/RandomFirstNames.txt" Type="String"/>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomFirstNames.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="last" ReturnType="String">
                     <Function>randomLastName</Function>
                     <Parameters>
-                        <Parameter Name="file" Value="/Users/strider/RandomLastNames.txt" Type="String"/>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomLastNames.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="middle" ReturnType="String">
+                    <Function>randomMiddleName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomMiddleNames.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="email" ReturnType="String">
@@ -22,17 +28,77 @@
                     <Parameters>
                         <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
                     </Parameters>
-                </Column>                
-                <Column Name="description" ReturnType="String">
-                    <Function>randomDescription</Function>
-                    <Parameters>
-                        <Parameter Name="range" Value="1,100" Type="Range"/>
-                    </Parameters>
                 </Column>
-                <Column Name="stud_no" ReturnType="String">
-                    <Function>randomStudentNumber</Function>
-                </Column>                
+                <Column Name="phone" ReturnType="String">
+                    <Function>randomPhoneNumber</Function>
+                </Column>
+                <Column Name="fax" ReturnType="String">
+                    <Function>randomPhoneNumber</Function>
+                </Column>
             </Columns>
         </Table>
+        <Table Name="isp_students" PKey="id">
+            <Columns>
+                <Column Name="first" ReturnType="String">
+                    <Function>randomFirstName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomFirstNames.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="last" ReturnType="String">
+                    <Function>randomLastName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomLastNames.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="middle" ReturnType="String">
+                    <Function>randomMiddleName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomMiddleNames.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="email" ReturnType="String">
+                    <Function>randomEmail</Function>
+                    <Parameters>
+                        <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
+                    </Parameters>
+                </Column>     
+                <Column Name="street" ReturnType="String">
+                    <Function>randomStringFromFile</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomStreets.txt" Type="String"/>
+                    </Parameters>
+                </Column>                     
+                <Column Name="city" ReturnType="String">
+                    <Function>randomStringFromFile</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomCities.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="postal_code" ReturnType="String">
+                    <Function>randomStringFromFile</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="C:\\work\\appdba\\db-depot\\intsci\\RandomPostalCodes.txt" Type="String"/>
+                    </Parameters>
+                </Column>                
+            </Columns>
+        </Table>      
+        <Table Name="isp_course_applications" PKey="id">
+            <Columns>
+                <Column Name="super_name" ReturnType="String">
+                    <Function>randomStringFromFile</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="RandomFirstLastNames.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="super_email" ReturnType="String">
+                    <Function>randomEmail</Function>
+                    <Parameters>
+                        <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
+                    </Parameters>
+                </Column>     
+            </Columns>
+        </Table>              
     </Tables>
+    
 </Requirement>
