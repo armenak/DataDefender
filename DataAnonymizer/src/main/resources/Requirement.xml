@@ -6,33 +6,33 @@
         <Table Name="isp_students" PKey="id">
             <Columns>
                 <Column Name="first" ReturnType="String">
-                    <Function>randomFirstName</Function>
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="/Users/sdi/work/ubc/demos/demo/RandomFirstNames.txt" Type="String"/>
                         <Parameter Name="test" Value="123" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="last" ReturnType="String">
-                    <Function>randomLastName</Function>
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="/Users/sdi/work/ubc/demos/demo/RandomLastNames.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="email" ReturnType="String">
-                    <Function>randomEmail</Function>
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomEmail</Function>
                     <Parameters>
                         <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
                     </Parameters>
                 </Column>                
                 <Column Name="description" ReturnType="String">
-                    <Function>randomDescription</Function>
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomDescription</Function>
                     <Parameters>
                         <Parameter Name="min" Value="1" Type="String"/>
                         <Parameter Name="max" Value="100" Type="String"/>                        
                     </Parameters>
                 </Column>
                 <Column Name="student_no" ReturnType="String">
-                    <Function>randomStudentNumber</Function>
+                    <Function>com.strider.dataanonymizer.extensions.IntegratedScience.randomStudentNumber</Function>
                 </Column>                
             </Columns>
         </Table>

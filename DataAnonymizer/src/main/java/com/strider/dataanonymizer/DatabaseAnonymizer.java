@@ -5,6 +5,7 @@ import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBConnection;
 import com.strider.dataanonymizer.functions.Functions;
 import static com.strider.dataanonymizer.functions.Functions.init;
+import com.strider.dataanonymizer.functions.Utils;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
@@ -107,18 +108,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             log.warn("    Function is not defined for column [" + column + "]. Moving to the next column.");
                         } else {
                             try {
-                                Class clazz = Functions.class;
+                                String className = Utils.getClassName(function);
+                                String methodName = Utils.getMethodName(function);
+                                Class clazz = Class.forName(className);
+                                //Class clazz = com.strider.dataanonymizer.functions.CoreFunctions.class;
+                                Object instance = clazz.newInstance();
+
                                 if (column.getParameters() == null) {
-                                    Method method = clazz.getMethod(function,null);
-                                    pstmt.setString(++index, method.invoke(null).toString());
+                                    Method method = clazz.getMethod(methodName,null);
+                                    pstmt.setString(++index, method.invoke(instance).toString());
                                 } else {
-                                    Method method = clazz.getMethod(function, String[].class);
+                                    Method method = clazz.getMethod(methodName, String[].class);
                                     String[] stringParams = new String[column.getParameters().size()];
                                     for(int i=0; i<=column.getParameters().size()-1;i++) {
                                         Parameter parameter = column.getParameters().get(i);
                                         stringParams[i] = parameter.getValue().toString();
                                     }
-                                    Object result = method.invoke(null, (Object)stringParams);
+                                    //Object result = method.invoke(null, (Object)stringParams);
+                                    Object result = method.invoke(instance, (Object)stringParams);
+
                                     pstmt.setString(++index, result.toString());
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -133,6 +141,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                 } catch (SQLException sqlex) {
                                     log.error(sqlex.toString());
                                 }                                                
+                            } catch (InstantiationException ex) {
+                                java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (ClassNotFoundException ex) {
+                                java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }
