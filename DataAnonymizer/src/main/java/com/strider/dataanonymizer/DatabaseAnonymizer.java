@@ -107,11 +107,14 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     Method method = clazz.getMethod(function,null);
                                     pstmt.setString(++index, method.invoke(null).toString());
                                 } else {
-                                    for(Parameter parameter : column.getParameters()) {
-                                        Method method = clazz.getMethod(function, String.class);
-                                        String result = method.invoke(null, parameter.getValue()).toString();
-                                        pstmt.setString(++index, result);
+                                    Method method = clazz.getMethod(function, String[].class);
+                                    String[] stringParams = new String[column.getParameters().size()];
+                                    for(int i=0; i<=column.getParameters().size()-1;i++) {
+                                        Parameter parameter = column.getParameters().get(i);
+                                        stringParams[i] = parameter.getValue().toString();
                                     }
+                                    Object result = method.invoke(null, (Object)stringParams);
+                                    pstmt.setString(++index, result.toString());
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 log.error(ex.toString());

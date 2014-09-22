@@ -3,18 +3,19 @@
     <Client>Integrated Science</Client>
     <Version>1.0</Version>
     <Tables>
-        <Table Name="test" PKey="id">
+        <Table Name="isp_students" PKey="id">
             <Columns>
                 <Column Name="first" ReturnType="String">
                     <Function>randomFirstName</Function>
                     <Parameters>
-                        <Parameter Name="file" Value="/Users/strider/RandomFirstNames.txt" Type="String"/>
+                        <Parameter Name="file" Value="/Users/sdi/work/ubc/demos/demo/RandomFirstNames.txt" Type="String"/>
+                        <Parameter Name="test" Value="123" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="last" ReturnType="String">
                     <Function>randomLastName</Function>
                     <Parameters>
-                        <Parameter Name="file" Value="/Users/strider/RandomLastNames.txt" Type="String"/>
+                        <Parameter Name="file" Value="/Users/sdi/work/ubc/demos/demo/RandomLastNames.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="email" ReturnType="String">
@@ -26,10 +27,11 @@
                 <Column Name="description" ReturnType="String">
                     <Function>randomDescription</Function>
                     <Parameters>
-                        <Parameter Name="range" Value="1,100" Type="Range"/>
+                        <Parameter Name="min" Value="1" Type="String"/>
+                        <Parameter Name="max" Value="100" Type="String"/>                        
                     </Parameters>
                 </Column>
-                <Column Name="stud_no" ReturnType="String">
+                <Column Name="student_no" ReturnType="String">
                     <Function>randomStudentNumber</Function>
                 </Column>                
             </Columns>
