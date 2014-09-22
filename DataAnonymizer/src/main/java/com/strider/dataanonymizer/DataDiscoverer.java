@@ -31,7 +31,7 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class DataDiscoverer implements IDiscoverer {
     
-    private static Logger log = getLogger(ColumnDiscoverer.class);
+    private static Logger log = getLogger(DataDiscoverer.class);
 
     @Override
     public void discover(Properties databaseProperties, Properties dataDiscoveryProperties) throws AnonymizerException {
