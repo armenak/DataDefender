@@ -8,6 +8,13 @@
   <packaging>jar</packaging>
 
   <name>DataAnonymizer</name>
+  <developers>
+    <developer>
+        <id>armenak.grigoryan</id>
+        <name>Armenak Grigoryan</name>
+    </developer>
+  </developers>
+
   <url>http://maven.apache.org</url>
 
     <build>
@@ -92,5 +99,10 @@
 	<artifactId>opennlp-tools</artifactId>
 	<version>1.5.3</version>
     </dependency>    
+    <dependency>
+        <groupId>dk.brics.automaton</groupId>
+        <artifactId>automaton</artifactId>
+        <version>1.11-8</version>
+    </dependency>
   </dependencies>
 </project>
