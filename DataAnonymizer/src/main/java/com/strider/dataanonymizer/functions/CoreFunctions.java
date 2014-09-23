@@ -69,21 +69,6 @@ public class CoreFunctions {
         return instance.generate();
     }
     
-    public String randomTestMultipleParams(String ... params) throws IOException {        
-        log.info(params[0]);
-        log.info(params[1]);
-        if (FIRST_NAME_LIST.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    FIRST_NAME_LIST.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,FIRST_NAME_LIST.size()-1);
-        return FIRST_NAME_LIST.get(rand);
-    }    
-    
     public String randomFirstName(String ... params) throws IOException {        
         if (FIRST_NAME_LIST.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
