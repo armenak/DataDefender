@@ -24,7 +24,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
- * @author Armenak Grigoryan
+ * @authors Armenak Grigoryan
  */
 public class Utils {
     
