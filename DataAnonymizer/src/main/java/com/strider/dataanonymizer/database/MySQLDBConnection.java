@@ -30,7 +30,7 @@ import static org.apache.log4j.Logger.getLogger;
  * MySQL database connection
  * @author Armenak Grigoryan
  */
-public class MySQLDBConnection implements IDBConnection {
+public class MySQLDBConnection extends DBConnection {
 
     private static final Logger log = getLogger(MySQLDBConnection.class);
     
@@ -80,21 +80,5 @@ public class MySQLDBConnection implements IDBConnection {
         }
         
         return conn;
-    }
-    
-    /**
-     * Closes database connection
-     * @param conn
-     * @throws DatabaseAnonymizerException 
-     */
-    @Override
-    public void disconnect(final Connection conn) throws DatabaseAnonymizerException {
-        try {
-            log.info("Closing connection");
-            conn.close();
-        } catch (SQLException ex) {
-            log.error(ex.toString());
-            throw new DatabaseAnonymizerException(ex.toString(), ex);
-        }
     }
 }

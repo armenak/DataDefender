@@ -39,7 +39,7 @@ public class DBConnectionFactory {
         } else if (database.equalsIgnoreCase("mssql")){
             return new MSSQLDBConnection();
         } else if (database.equalsIgnoreCase("oracle")) {
-            return new MSSQLDBConnection();
+            return new OracleDBConnection();
         }
         
         throw new IllegalArgumentException("Database " + database + " is not supported");
