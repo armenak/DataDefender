@@ -36,7 +36,11 @@ public class DBConnectionFactory {
         String database = databaseProperties.getProperty("database");
         if (database.equalsIgnoreCase("mysql")){
             return new MySQLDBConnection();
-        } 
+        } else if (database.equalsIgnoreCase("mssql")){
+            return new MSSQLDBConnection();
+        } else if (database.equalsIgnoreCase("oracle")) {
+            return new MSSQLDBConnection();
+        }
         
         throw new IllegalArgumentException("Database " + database + " is not supported");
     }

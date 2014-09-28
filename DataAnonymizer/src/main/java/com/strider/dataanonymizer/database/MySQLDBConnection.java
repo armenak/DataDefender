@@ -43,17 +43,19 @@ public class MySQLDBConnection implements IDBConnection {
     @Override
     public Connection connect(Properties properties) throws DatabaseAnonymizerException {
 
-        String driver = properties.getProperty("driver");
-        String database = properties.getProperty("database");
-        String url = properties.getProperty("url");
+        String driver   = properties.getProperty("driver");
+        String vendor   = properties.getProperty("vendor");
+        String url      = properties.getProperty("url");
         String userName = properties.getProperty("username");
         String password = properties.getProperty("password");
+        
+        log.debug("Database vendor: " + vendor);
         log.debug("Using driver " + driver);
-        log.debug("Database type: " + database);
         log.debug("Database URL: " + url);
         log.debug("Logging in using username " + userName); 
         
         try {
+            log.info("Loading database driver");
             forName(driver);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe.toString());
@@ -62,6 +64,7 @@ public class MySQLDBConnection implements IDBConnection {
         
         Connection conn = null;
         try {
+            log.info("Establishing database connection");
             conn = getConnection(url, userName, password);
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
@@ -87,6 +90,7 @@ public class MySQLDBConnection implements IDBConnection {
     @Override
     public void disconnect(final Connection conn) throws DatabaseAnonymizerException {
         try {
+            log.info("Closing connection");
             conn.close();
         } catch (SQLException ex) {
             log.error(ex.toString());

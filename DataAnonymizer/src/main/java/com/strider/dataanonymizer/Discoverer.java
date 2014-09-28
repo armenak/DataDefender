@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer;
 
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLineParser;
@@ -30,6 +31,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
+import java.io.IOException;
 
 /**
  * Entry point to Data Discoverer utility. 
@@ -39,7 +41,7 @@ public class Discoverer {
     
     private static Logger log = getLogger(Discoverer.class);
     
-    public static void main( String[] args ) throws AnonymizerException {
+    public static void main( String[] args ) throws AnonymizerException, IOException {
 
         // Define command line options  
         final Options options = createOptions();
@@ -62,7 +64,7 @@ public class Discoverer {
                 databasePropertyFile = line.getOptionValue("P");
             } 
             Properties dbProperties = null;
-            dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
+            dbProperties = loadProperties(databasePropertyFile);
             if (dbProperties == null) {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            
@@ -72,7 +74,7 @@ public class Discoverer {
                 columnPropertyFile = line.getOptionValue("C");
             }
             Properties columnProperties = null;
-            columnProperties = loadPropertiesFromClassPath(columnPropertyFile);
+            columnProperties = loadProperties(columnPropertyFile);
             if (columnProperties == null) {
                 throw new AnonymizerException("ERROR: Column property file is not defined.");
             }                
@@ -87,7 +89,7 @@ public class Discoverer {
                 databasePropertyFile = line.getOptionValue("P");
             } 
             Properties dbProperties = null;
-            dbProperties = loadPropertiesFromClassPath(databasePropertyFile);
+            dbProperties = loadProperties(databasePropertyFile);
             if (dbProperties == null) {
                 throw new AnonymizerException("ERROR: Database property file is not defined.");
             }            
@@ -97,7 +99,7 @@ public class Discoverer {
                 datadiscoveryPropertyFile = line.getOptionValue("D");
             }
             Properties dataDiscoveryProperties = null;
-            dataDiscoveryProperties = loadPropertiesFromClassPath(datadiscoveryPropertyFile);
+            dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
             if (dataDiscoveryProperties == null) {
                 throw new AnonymizerException("ERROR: Data discovery property file is not defined.");
             }                            

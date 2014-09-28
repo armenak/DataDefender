@@ -9,7 +9,6 @@
                     <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="/Users/sdi/work/ubc/demos/demo/RandomFirstNames.txt" Type="String"/>
-                        <Parameter Name="test" Value="123" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="last" ReturnType="String">
