@@ -30,7 +30,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import static com.strider.dataanonymizer.utils.AppProperties.loadPropertiesFromClassPath;
 import java.io.IOException;
 
 /**

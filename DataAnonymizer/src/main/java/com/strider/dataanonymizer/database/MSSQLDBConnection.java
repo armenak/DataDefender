@@ -43,12 +43,12 @@ public class MSSQLDBConnection extends DBConnection {
     public Connection connect(Properties properties) throws DatabaseAnonymizerException {
 
         String driver = properties.getProperty("driver");
-        String database = properties.getProperty("database");
+        String vendor = properties.getProperty("vendor");
         String url = properties.getProperty("url");
         String userName = properties.getProperty("username");
         String password = properties.getProperty("password");
         log.debug("Using driver " + driver);
-        log.debug("Database type: " + database);
+        log.debug("Database type: " + vendor);
         log.debug("Database URL: " + url);
         log.debug("Logging in using username " + userName); 
         
@@ -59,9 +59,13 @@ public class MSSQLDBConnection extends DBConnection {
             throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
         }
         
+            //jdbc:sqlserver://localhost;user=sa;password=taverna68;databaseName=da_test        
+        StringBuilder sqlServerURL = new StringBuilder(url);
+        sqlServerURL.append(";user=").append(userName).append(";password=").append(password);
         Connection conn = null;
         try {
-            conn = getConnection(url, userName, password);
+            log.info("Connecting to " + sqlServerURL.toString());
+            conn = getConnection(sqlServerURL.toString());
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
             log.error(sqle.toString());

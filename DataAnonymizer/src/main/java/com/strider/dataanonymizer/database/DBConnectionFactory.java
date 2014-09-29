@@ -33,15 +33,15 @@ public class DBConnectionFactory {
     public static IDBConnection createDBConnection(final Properties databaseProperties) 
     throws DatabaseAnonymizerException {
         
-        String database = databaseProperties.getProperty("database");
-        if (database.equalsIgnoreCase("mysql")){
+        String vendor = databaseProperties.getProperty("vendor");
+        if (vendor.equalsIgnoreCase("mysql")){
             return new MySQLDBConnection();
-        } else if (database.equalsIgnoreCase("mssql")){
+        } else if (vendor.equalsIgnoreCase("mssql")){
             return new MSSQLDBConnection();
-        } else if (database.equalsIgnoreCase("oracle")) {
+        } else if (vendor.equalsIgnoreCase("oracle")) {
             return new OracleDBConnection();
         }
         
-        throw new IllegalArgumentException("Database " + database + " is not supported");
+        throw new IllegalArgumentException("Database " + vendor + " is not supported");
     }
 }
