@@ -64,7 +64,7 @@ public class MSSQLDBConnection extends DBConnection {
         sqlServerURL.append(";user=").append(userName).append(";password=").append(password);
         Connection conn = null;
         try {
-            log.info("Connecting to " + sqlServerURL.toString());
+            log.info("Connecting to " + url);
             conn = getConnection(sqlServerURL.toString());
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
@@ -78,8 +78,6 @@ public class MSSQLDBConnection extends DBConnection {
             }
             throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
-        
         return conn;
     }
-        
 }

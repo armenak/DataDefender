@@ -59,15 +59,25 @@ public class DataDiscoverer implements IDiscoverer {
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
         
+        ResultSet rs = null;
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
-            ResultSet rs = md.getTables(null, null, "%", null);
+            if (databaseProperties.getProperty("vendor").equals("mssql")) {
+                rs = md.getTables(null, null, null, new String[] {"TABLE"});
+            } else {
+                rs = md.getTables(null, null, "%", null);
+            }            
             while (rs.next()) {
                 String tableName = rs.getString(3);
-                ResultSet resultSet = md.getColumns(null, null, tableName, null);        
+                ResultSet resultSet = null;   
+                if (databaseProperties.getProperty("vendor").equals("mssql")) {
+                    resultSet = md.getColumns("da_test", "dbo", tableName, null);
+                } else {
+                    resultSet = md.getColumns(null, null, tableName, null);
+                }                
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
                     if (resultSet.getInt(5) == java.sql.Types.VARCHAR) {
@@ -127,12 +137,12 @@ public class DataDiscoverer implements IDiscoverer {
                 List<Double> probabilityList = new ArrayList<>();
 
                 Statement stmt = null;
-                ResultSet rs = null;
+                ResultSet resultSet = null;
                 try {
                     stmt = connection.createStatement();
-                    rs = stmt.executeQuery(new StringBuilder("SELECT ").append(columnName).append(" FROM ").append(tableName).toString());
-                    while (rs.next()) {
-                        String sentence = rs.getString(1);
+                    resultSet = stmt.executeQuery(new StringBuilder("SELECT ").append(columnName).append(" FROM ").append(tableName).toString());
+                    while (resultSet.next()) {
+                        String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
                             // Convert sentence into tokens
                             String tokens[] = tokenizer.tokenize(sentence);
@@ -146,15 +156,15 @@ public class DataDiscoverer implements IDiscoverer {
                             }
                         }
                     }
-                    rs.close();
+                    resultSet.close();
                     stmt.close();
                 } catch (SQLException sqle) {
                     try {
                         if (stmt != null) {
                             stmt.close();
                         }
-                        if (rs != null) {
-                            rs.close();
+                        if (resultSet != null) {
+                            resultSet.close();
                         }
                     } catch (SQLException sql) {
                         log.error(sql.toString());
