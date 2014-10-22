@@ -52,14 +52,18 @@ public class ColumnDiscoverer implements IDiscoverer {
         log.info("Connecting to database");        
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
-                
+
+        String vendor = databaseProperties.getProperty("vendor");
+        String schema = databaseProperties.getProperty("schema");
+        
         ResultSet rs = null;
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
-            if (databaseProperties.getProperty("vendor").equals("mssql")) {
+            log.info("Fetching table names"); 
+            if (vendor.equals("mssql")) {
                 rs = md.getTables(null, null, null, new String[] {"TABLE"});
             } else {
                 rs = md.getTables(null, null, "%", null);
@@ -67,9 +71,12 @@ public class ColumnDiscoverer implements IDiscoverer {
             
             while (rs.next()) {
                 String tableName = rs.getString(3);
+                log.info("Processing table " + tableName); 
                 ResultSet resultSet = null;
-                if (databaseProperties.getProperty("vendor").equals("mssql")) {
-                    resultSet = md.getColumns("da_test", "dbo", tableName, null);
+                
+                log.info("Fetching columns"); 
+                if (vendor.equals("mssql")) {
+                    resultSet = md.getColumns("da_test", schema, tableName, null);
                 } else {
                     resultSet = md.getColumns(null, null, tableName, null);
                 }
