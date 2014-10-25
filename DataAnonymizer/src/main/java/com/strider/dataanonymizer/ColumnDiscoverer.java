@@ -62,9 +62,9 @@ public class ColumnDiscoverer implements IDiscoverer {
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
-            log.info("Fetching table names"); 
+            log.info("Fetching table names from schema " + schema); 
             if (vendor.equals("mssql")) {
-                rs = md.getTables(null, null, null, new String[] {"TABLE"});
+                rs = md.getTables(null, schema, null, new String[] {"TABLE"});
             } else {
                 rs = md.getTables(null, null, "%", null);
             }
