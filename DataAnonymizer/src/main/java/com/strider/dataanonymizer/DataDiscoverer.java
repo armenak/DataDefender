@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.IDBConnection;
 import java.io.FileInputStream;
@@ -59,13 +60,16 @@ public class DataDiscoverer implements IDiscoverer {
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
         
+        String vendor = databaseProperties.getProperty("vendor");
+        String schema = databaseProperties.getProperty("schema");        
+        
         ResultSet rs = null;
         // Get the metadata from the the database
         List<ColumnMetaData> map = new ArrayList<>();
         try {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
-            if (databaseProperties.getProperty("vendor").equals("mssql")) {
+            if (vendor.equals("mssql")) {
                 rs = md.getTables(null, null, null, new String[] {"TABLE"});
             } else {
                 rs = md.getTables(null, null, "%", null);
@@ -73,14 +77,16 @@ public class DataDiscoverer implements IDiscoverer {
             while (rs.next()) {
                 String tableName = rs.getString(3);
                 ResultSet resultSet = null;   
-                if (databaseProperties.getProperty("vendor").equals("mssql")) {
-                    resultSet = md.getColumns("da_test", "dbo", tableName, null);
+                if (vendor.equals("mssql")) {
+                    resultSet = md.getColumns(null, schema, tableName, null);
                 } else {
                     resultSet = md.getColumns(null, null, tableName, null);
                 }                
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
-                    if (resultSet.getInt(5) == java.sql.Types.VARCHAR) {
+                    log.info(columnName + ":" + resultSet.getInt(5));
+                    if ((resultSet.getInt(5) == java.sql.Types.VARCHAR) || 
+                        (resultSet.getInt(5) == java.sql.Types.NVARCHAR)) {
                         ColumnMetaData columnMetaData = new ColumnMetaData(tableName, columnName, "String");
                         map.add(columnMetaData);                        
                     }
@@ -140,7 +146,13 @@ public class DataDiscoverer implements IDiscoverer {
                 ResultSet resultSet = null;
                 try {
                     stmt = connection.createStatement();
-                    resultSet = stmt.executeQuery(new StringBuilder("SELECT ").append(columnName).append(" FROM ").append(tableName).toString());
+                    String table = tableName;
+                    if (vendor.equals("mssql")) {
+                        table = schema + "." + tableName;
+                    }
+                    String query = "SELECT " + columnName + " FROM " + table;
+                    log.info(query);
+                    resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
                         String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {

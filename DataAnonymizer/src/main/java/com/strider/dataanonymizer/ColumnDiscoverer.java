@@ -17,6 +17,7 @@
  */
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBConnection;
@@ -76,7 +77,7 @@ public class ColumnDiscoverer implements IDiscoverer {
                 
                 log.info("Fetching columns"); 
                 if (vendor.equals("mssql")) {
-                    resultSet = md.getColumns("da_test", schema, tableName, null);
+                    resultSet = md.getColumns(null, schema, tableName, null);
                 } else {
                     resultSet = md.getColumns(null, null, tableName, null);
                 }

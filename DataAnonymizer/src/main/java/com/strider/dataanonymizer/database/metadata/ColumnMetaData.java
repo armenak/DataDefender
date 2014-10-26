@@ -16,23 +16,36 @@
  *
  */
 
-package com.strider.dataanonymizer;
+package com.strider.dataanonymizer.database.metadata;
 
 /**
  *
  * @author Armenak Grigoryan
  */
 public class ColumnMetaData {
-    private String tableName;
-    private String columnName;
-    private String columnType;
+    private final String schemaName;
+    private final String tableName;
+    private final String columnName;
+    private final String columnType;
 
-    ColumnMetaData(String tableName, String columnName, String columnType) {
+    public ColumnMetaData(final String schemaName, final String tableName, final String columnName, final String columnType) {
+        this.schemaName = schemaName;
+        this.tableName  = tableName;
+        this.columnName = columnName;
+        this.columnType = columnType;
+    }   
+    
+    public ColumnMetaData(final String tableName, final String columnName, final String columnType) {
+        this.schemaName = null;
         this.tableName  = tableName;
         this.columnName = columnName;
         this.columnType = columnType;
     }
 
+    public String getSchemaName() {
+        return this.schemaName;
+    }
+    
     public String getTableName() {
         return this.tableName;
     }
