@@ -17,20 +17,13 @@
  */
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import static java.util.regex.Pattern.compile;
+
 import static org.apache.commons.collections.IteratorUtils.toList;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -38,75 +31,25 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.metadata.IMetaData;
+import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
 
 /**
- *
  * @author Armenak Grigoryan
  */
 public class ColumnDiscoverer implements IDiscoverer { 
     
-    private static Logger log = getLogger(ColumnDiscoverer.class);
+    private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(Properties databaseProperties, Properties columnProperties) throws DatabaseAnonymizerException {
-
-        log.info("Connecting to database");        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);
-
-        String vendor = databaseProperties.getProperty("vendor");
-        String schema = databaseProperties.getProperty("schema");
+    public void discover(Properties databaseProperties, Properties columnProperties) 
+    throws DatabaseAnonymizerException {
         
-        ResultSet rs = null;
-        // Get the metadata from the the database
-        List<ColumnMetaData> map = new ArrayList<>();
-        try {
-            // Getting all tables name
-            DatabaseMetaData md = connection.getMetaData();
-            log.info("Fetching table names from schema " + schema); 
-            if (vendor.equals("mssql")) {
-                rs = md.getTables(null, schema, null, new String[] {"TABLE"});
-            } else {
-                rs = md.getTables(null, null, "%", null);
-            }
-            
-            while (rs.next()) {
-                String tableName = rs.getString(3);
-                log.info("Processing table " + tableName); 
-                ResultSet resultSet = null;
-                
-                log.info("Fetching columns"); 
-                if (vendor.equals("mssql")) {
-                    resultSet = md.getColumns(null, schema, tableName, null);
-                } else {
-                    resultSet = md.getColumns(null, null, tableName, null);
-                }
-                while (resultSet.next()) {
-                    String columnName = resultSet.getString("COLUMN_NAME");
-                    String columnType = resultSet.getString("DATA_TYPE");
-                    map.add(new ColumnMetaData(tableName, columnName, columnType));
-                }
-            }
-            rs.close();
-            connection.close();
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    log.error(sqle.toString());
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException sql) {
-                    log.error(sql.toString());
-                }
-            }            
-            log.error(e.toString());
-        }
-                
+        IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
+        List<ColumnMetaData> map = metaData.getMetaData();
+        
         // Get the list of "suspicios" field names from property file
         // Reading configuration file
         Configuration columnsConfiguration = null;

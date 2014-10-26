@@ -59,12 +59,11 @@ public class MSSQLDBConnection extends DBConnection {
             throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
         }
         
-            //jdbc:sqlserver://localhost;user=sa;password=taverna68;databaseName=da_test        
         StringBuilder sqlServerURL = new StringBuilder(url);
         sqlServerURL.append(";user=").append(userName).append(";password=").append(password);
         Connection conn = null;
         try {
-            log.info("Connecting to " + url);
+            log.info("Connecting to database " + url);
             conn = getConnection(sqlServerURL.toString());
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
