@@ -84,13 +84,13 @@ public class MSSQLMetaData implements IMetaData {
                 resultSet = md.getColumns(null, schema, tableName, null);
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
-                    String columnType = resultSet.getString("DATA_TYPE");
+                    String colType = resultSet.getString("DATA_TYPE");
                     if (this.columnType != null) {
                         if (SQLToJavaMapping.isString(resultSet.getInt(5))) {
-                            columnType = "String";
+                            colType = "String";
                         }
                     }                    
-                    map.add(new ColumnMetaData(tableName, columnName, columnType));
+                    map.add(new ColumnMetaData(tableName, columnName, colType));
                 }
             }
             rs.close();
