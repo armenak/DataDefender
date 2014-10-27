@@ -64,6 +64,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("Connecting to database");        
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
+
+        String schema = databaseProperties.getProperty("schema");
         
         String requirementFile = anonymizerProperties.getProperty("requirement");
         int batchSize = parseInt(anonymizerProperties.getProperty("batch_size"));
@@ -109,10 +111,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             try {
                 stmt = connection.createStatement();
-                rs = stmt.executeQuery(String.format("SELECT id FROM %s ", table.getName()));
+                rs = stmt.executeQuery(String.format("SELECT %s FROM %s ", table.getPKey(), table.getName()));
                 pstmt = connection.prepareStatement(updateString);
                 while (rs.next()) {
-                    int id = rs.getInt("id");
+                    int id = rs.getInt(table.getPKey());
                     int index = 0;
                     
                     for(Column column : table.getColumns()) {

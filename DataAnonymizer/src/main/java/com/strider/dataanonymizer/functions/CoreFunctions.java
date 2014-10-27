@@ -115,8 +115,8 @@ public class CoreFunctions {
     }    
     
     /**
-     * Returns email address sent as a parameter
-     * @param emailAddress Strirng 
+     * Returns email address sent as a parameter 
+     * @param params
      * @return email address String 
      */
     public String staticEmail(String ... params) {
@@ -125,7 +125,7 @@ public class CoreFunctions {
 
     /**
      * Generates random postal code
-     * @param fileName String
+     * @param params
      * @return String Random postal code
      * @throws IOException 
      */
