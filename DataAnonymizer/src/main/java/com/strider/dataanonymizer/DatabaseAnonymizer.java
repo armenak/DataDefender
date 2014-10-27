@@ -61,12 +61,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(Properties databaseProperties, Properties anonymizerProperties) 
     throws DatabaseAnonymizerException{
 
-        log.info("Connecting to database");        
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
 
-        String schema = databaseProperties.getProperty("schema");
-        
         String requirementFile = anonymizerProperties.getProperty("requirement");
         int batchSize = parseInt(anonymizerProperties.getProperty("batch_size"));
         

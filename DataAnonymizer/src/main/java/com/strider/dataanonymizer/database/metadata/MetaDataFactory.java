@@ -41,9 +41,7 @@ public class MetaDataFactory {
         } else if (vendor.equalsIgnoreCase("mssql")){
             return new MSSQLMetaData(databaseProperties);
         } else if (vendor.equalsIgnoreCase("oracle")) {
-            // return new OracleMetaData(databaseProperties);
-        }  else if (vendor.equalsIgnoreCase("postgresql")) {
-            //return new PostgreSQLMetaData(databaseProperties);
+            return new OracleMetaData(databaseProperties);
         }
         
         throw new IllegalArgumentException("Database " + vendor + " is not supported");

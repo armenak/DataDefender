@@ -40,15 +40,15 @@ public class CoreFunctions {
     
     private static Logger log = getLogger(CoreFunctions.class);
 
-    private static List<String> FIRST_NAME_LIST  = new ArrayList<>();
-    private static List<String> LAST_NAME_LIST   = new ArrayList<>();
-    private static List<String> MIDDLE_NAME_LIST = new ArrayList<>();
-    private static List<String> POSTAL_CODE_LIST = new ArrayList<>();
-    private static List<String> CITY_LIST        = new ArrayList<>();
-    private static List<String> STATE_LIST       = new ArrayList<>();
-    private static List<String> STRING_LIST      = new ArrayList<>();    
-    private static List<String> STREET_LIST      = new ArrayList<>();        
-    private static List<String> WORDS            = new ArrayList<>();
+    private static List<String> firstNameList  = new ArrayList<>();
+    private static List<String> lastNameList   = new ArrayList<>();
+    private static List<String> middleNameList = new ArrayList<>();
+    private static List<String> postalCodeList = new ArrayList<>();
+    private static List<String> cityList       = new ArrayList<>();
+    private static List<String> stateList      = new ArrayList<>();
+    private static List<String> stringList     = new ArrayList<>();    
+    private static List<String> streetList     = new ArrayList<>();        
+    private static List<String> words          = new ArrayList<>();
 
     static {        
         try  {
@@ -70,42 +70,42 @@ public class CoreFunctions {
     }
     
     public String randomFirstName(String ... params) throws IOException {        
-        if (FIRST_NAME_LIST.isEmpty()) {
+        if (firstNameList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    FIRST_NAME_LIST.add(line);
+                    firstNameList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,FIRST_NAME_LIST.size()-1);
-        return FIRST_NAME_LIST.get(rand);
+        int rand = nextIntInRange(0,firstNameList.size()-1);
+        return firstNameList.get(rand);
     }
     
     public String randomLastName(String ... params) throws IOException {        
-        if (LAST_NAME_LIST.isEmpty()) {
+        if (lastNameList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    LAST_NAME_LIST.add(line);
+                    lastNameList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,LAST_NAME_LIST.size()-1);
-        return LAST_NAME_LIST.get(rand);
+        int rand = nextIntInRange(0,lastNameList.size()-1);
+        return lastNameList.get(rand);
     }    
     
     public String randomMiddleName(String ... params) throws IOException {        
-        if (MIDDLE_NAME_LIST.isEmpty()) {
+        if (middleNameList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    MIDDLE_NAME_LIST.add(line);
+                    middleNameList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,MIDDLE_NAME_LIST.size()-1);
-        return MIDDLE_NAME_LIST.get(rand);
+        int rand = nextIntInRange(0,middleNameList.size()-1);
+        return middleNameList.get(rand);
     }        
     
     public String randomEmail(String ... params) {
@@ -130,55 +130,55 @@ public class CoreFunctions {
      * @throws IOException 
      */
     public String randomPostalCode(String ... params) throws IOException {
-        if (POSTAL_CODE_LIST.isEmpty()) {
+        if (postalCodeList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    POSTAL_CODE_LIST.add(line);
+                    postalCodeList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,POSTAL_CODE_LIST.size()-1);
-        return POSTAL_CODE_LIST.get(rand);        
+        int rand = nextIntInRange(0,postalCodeList.size()-1);
+        return postalCodeList.get(rand);        
     }
 
     public String randomCity(String ... params) throws IOException {
-        if (CITY_LIST.isEmpty()) {
+        if (cityList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    CITY_LIST.add(line);
+                    cityList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,CITY_LIST.size()-1);
-        return CITY_LIST.get(rand);                
+        int rand = nextIntInRange(0,cityList.size()-1);
+        return cityList .get(rand);                
     }
     
     public String randomStreet(String ... params) throws IOException {
-        if (STREET_LIST.isEmpty()) {
+        if (streetList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    STREET_LIST.add(line);
+                    streetList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,STREET_LIST.size()-1);
-        return STREET_LIST.get(rand);                
+        int rand = nextIntInRange(0,streetList.size()-1);
+        return streetList.get(rand);                
     }    
     
     public String randomState(String ... params)  throws IOException {
-        if (STATE_LIST.isEmpty()) {
+        if (stateList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    STATE_LIST.add(line);
+                    stateList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,STATE_LIST.size()-1);
-        return STATE_LIST.get(rand);        
+        int rand = nextIntInRange(0,stateList.size()-1);
+        return stateList.get(rand);        
     }        
     
     private int nextIntInRange(int min, int max) {
@@ -187,16 +187,16 @@ public class CoreFunctions {
     }
     
     public String randomStringFromFile(String ... params) throws IOException {
-        if (STRING_LIST.isEmpty()) {
+        if (stringList.isEmpty()) {
             try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for(String line; (line = br.readLine()) != null; ) {
-                    STRING_LIST.add(line);
+                    stringList.add(line);
                 }
             }            
         }
         
-        int rand = nextIntInRange(0,STRING_LIST.size()-1);
-        return STRING_LIST.get(rand);              
+        int rand = nextIntInRange(0,stringList.size()-1);
+        return stringList.get(rand);              
     }        
     
     
@@ -211,7 +211,7 @@ public class CoreFunctions {
 
         StringBuilder randomString = new StringBuilder();
         for (Integer i : randomNumbers) {
-            randomString.append(WORDS.get(i));
+            randomString.append(words.get(i));
             randomString.append(" ");
         }
         
@@ -253,7 +253,7 @@ public class CoreFunctions {
         try (Scanner scanner = new Scanner(CoreFunctions.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext())
             {
-                WORDS.add(scanner.next());
+                words.add(scanner.next());
             }
         }
     }    
