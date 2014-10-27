@@ -31,6 +31,7 @@ import static org.apache.log4j.Logger.getLogger;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
 /**
  *
@@ -41,9 +42,16 @@ public class MySQLMetaData implements IMetaData {
     private static final Logger log = getLogger(MySQLMetaData.class);
     
     private Properties databaseProperties = null;
+    private String columnType = null;
     
     public MySQLMetaData(final Properties databaseProperties) {
         this.databaseProperties = databaseProperties;
+    }
+
+    @Override
+    public List<ColumnMetaData> getMetaData(String columnType) {
+        this.columnType = columnType;
+        return this.getMetaData();
     }
     
     @Override
@@ -76,6 +84,11 @@ public class MySQLMetaData implements IMetaData {
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
                     String columnType = resultSet.getString("DATA_TYPE");
+                    if (this.columnType != null) {
+                        if (SQLToJavaMapping.isString(resultSet.getInt(5))) {
+                            columnType = "String";
+                        }
+                    }
                     map.add(new ColumnMetaData(tableName, columnName, columnType));
                 }
             }

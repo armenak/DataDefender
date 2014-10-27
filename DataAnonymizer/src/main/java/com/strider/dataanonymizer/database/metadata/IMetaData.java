@@ -6,7 +6,6 @@
 package com.strider.dataanonymizer.database.metadata;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Public interface to define the contract for all database-specific
@@ -16,4 +15,5 @@ import java.util.Properties;
  */
 public interface IMetaData {
     public List<ColumnMetaData> getMetaData();
+    public List<ColumnMetaData> getMetaData(String columnType);
 }

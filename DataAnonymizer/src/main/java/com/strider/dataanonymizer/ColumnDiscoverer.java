@@ -56,7 +56,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         try {
             columnsConfiguration = new PropertiesConfiguration("columndiscovery.properties");
         } catch (ConfigurationException ex) {
-            log.error(ColumnDiscoverer.class);
+            log.error(ex.toString());
         }        
         Iterator<String> iterator = columnsConfiguration.getKeys();
         List<String> suspList = toList(iterator);          

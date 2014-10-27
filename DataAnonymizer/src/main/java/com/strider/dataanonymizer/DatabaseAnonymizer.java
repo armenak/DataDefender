@@ -143,7 +143,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     pstmt.setString(++index, result.toString());
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                ex.printStackTrace();
                                 log.error(ex.toString());
                                 try {
                                     stmt.close();
@@ -154,10 +153,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                 } catch (SQLException sqlex) {
                                     log.error(sqlex.toString());
                                 }                                                
-                            } catch (InstantiationException ex) {
-                                java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (ClassNotFoundException ex) {
-                                java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InstantiationException | ClassNotFoundException ex) {
+                                log.error(ex.toString());
                             }
                         }
                     }
