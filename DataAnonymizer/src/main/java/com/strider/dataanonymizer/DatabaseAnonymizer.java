@@ -68,7 +68,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         int batchSize = parseInt(anonymizerProperties.getProperty("batch_size"));
         
         
-        // Now we collect data from the requirement
+        // Collect data from the requirement document
         Requirement requirement = null;
         try {
             JAXBContext jc = newInstance(Requirement.class);
@@ -83,16 +83,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-        
         for(Table table : requirement.getTables()) {
             log.info("Table [" + table.getName() + "]. Start ...");
             
-            // Here we start building SQL query            
+            // Start building SQL query            
             PreparedStatement pstmt = null;
-            Statement stmt = null;
-            ResultSet rs = null;
-            StringBuilder sql = new StringBuilder("UPDATE " + table.getName() + " SET ");
-            int batchCounter = 0;            
+            Statement stmt          = null;
+            ResultSet rs            = null;
+            StringBuilder sql       = new StringBuilder("UPDATE " + table.getName() + " SET ");
+            int batchCounter        = 0;            
             
             // First iteration over columns to build the UPDATE statement
             for(Column column : table.getColumns()) {
@@ -104,7 +103,22 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             sql.append(" WHERE ").append(table.getPKey()).append(" = ?");
+            
+            // Second iteration over columns to add exeptions (if any)
+            for(Column column : table.getColumns()) {
+                String exception = column.getException();
+                if (exception != null && !exception.equals("")) {
+                    String sqlNot = " != ";
+                    if (exception.contains("%")) {
+                        sqlNot = " NOT LIKE ";
+                    }
+                    sql.append( " AND ").append(column.getName()).append(sqlNot).append("'").append(exception).append("'");
+                }
+                
+            }            
+            
             final String updateString = sql.toString();
+            log.info(updateString);
             
             try {
                 stmt = connection.createStatement();
