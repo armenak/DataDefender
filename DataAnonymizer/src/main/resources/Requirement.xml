@@ -22,6 +22,7 @@
                     <Parameters>
                         <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
                     </Parameters>
+                    <Exception>test@test.domain.com</Exception>
                 </Column>                
                 <Column Name="description" ReturnType="String">
                     <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomDescription</Function>

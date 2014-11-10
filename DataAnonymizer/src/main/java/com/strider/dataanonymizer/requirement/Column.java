@@ -44,6 +44,9 @@ public class Column {
     @XmlElement(name="ReturnType")
     private String returnType;        
     
+    @XmlElement(name="Exception")
+    private String exception;            
+    
     @XmlElementWrapper(name="Parameters")
     @XmlElement(name="Parameter")
     private List<Parameter> paramters;
@@ -71,6 +74,14 @@ public class Column {
     public String getReturnType() {
         return this.returnType;
     }    
+    
+    /**
+     * Getter method for exception attribute
+     * @return String
+     */
+    public String getException() {
+        return this.exception;
+    }
     
     /**
      * Getter method for Parameters attribute
