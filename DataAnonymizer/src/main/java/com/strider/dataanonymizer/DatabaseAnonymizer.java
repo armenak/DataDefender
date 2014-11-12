@@ -118,7 +118,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }            
             
             final String updateString = sql.toString();
-            log.info(updateString);
+            //log.info(updateString);
             
             try {
                 stmt = connection.createStatement();

@@ -18,7 +18,7 @@
                     </Parameters>
                 </Column>
                 <Column Name="MiddleName" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomStringFromFile</Function>
                     <Parameters>
                         <Parameter Name="file" Value="C:\work\da\RandomMiddleNames.txt" Type="String"/>
                     </Parameters>
