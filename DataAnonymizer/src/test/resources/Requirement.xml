@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Requirement>
+    <Client>Test Client</Client>
+    <Version>1.0</Version>
+    <Tables>
+        <Table Name="test_table" PKey="id">
+            <Columns>
+                <Column Name="column1" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="file1.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="column2" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="file2.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="column3" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomEmail</Function>
+                    <Parameters>
+                        <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
+                    </Parameters>
+                </Column>                
+                <Column Name="column4" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomDescription</Function>
+                    <Parameters>
+                        <Parameter Name="min" Value="1" Type="String"/>
+                        <Parameter Name="max" Value="100" Type="String"/>                        
+                    </Parameters>
+                </Column>
+                <Column Name="column5" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.extensions.IntegratedScience.randomStudentNumber</Function>
+                </Column>                
+            </Columns>
+        </Table>
+    </Tables>
+</Requirement>
