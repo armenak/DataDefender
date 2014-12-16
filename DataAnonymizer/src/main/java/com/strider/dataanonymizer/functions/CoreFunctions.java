@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,14 +42,7 @@ public class CoreFunctions {
     
     private static Logger log = getLogger(CoreFunctions.class);
 
-    private static List<String> firstNameList  = new ArrayList<>();
-    private static List<String> lastNameList   = new ArrayList<>();
-    private static List<String> middleNameList = new ArrayList<>();
-    private static List<String> postalCodeList = new ArrayList<>();
-    private static List<String> cityList       = new ArrayList<>();
-    private static List<String> stateList      = new ArrayList<>();
-    private static List<String> stringList     = new ArrayList<>();    
-    private static List<String> streetList     = new ArrayList<>();        
+    private static Map<String, List<String>> fileList = new HashMap<String, List<String>>();
     private static List<String> words          = new ArrayList<>();
 
     static {        
@@ -69,43 +64,43 @@ public class CoreFunctions {
         return instance.generate();
     }
     
-    public String randomFirstName(String ... params) throws IOException {        
-        if (firstNameList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    firstNameList.add(line);
+    /**
+     * Generates a list of random strings from a list of strings (new-
+     * line separated) in a file.
+     * 
+     * @param params The first parameter is the filename
+     * @return A random string from the file
+     */
+    public String randomStringFromFile(String ... params) throws IOException {
+		String fileName = params[0];
+		log.info("*** random string from " + fileName);
+		if (!fileList.containsKey(fileName)) {
+			log.info("*** reading from " + fileName);
+			List<String> values = new ArrayList<String>();
+			try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
+                for (String line; (line = br.readLine()) != null; ) {
+                    values.add(line);
                 }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,firstNameList.size()-1);
-        return firstNameList.get(rand);
+                
+            }
+            fileList.put(fileName, values);
+		}
+		log.info("*** selecting random string from " + fileName);
+		List<String> values = fileList.get(fileName);
+		int rand = nextIntInRange(0, values.size() - 1);
+		return values.get(rand);
+	}
+    
+    public String randomFirstName(String ... params) throws IOException {
+		return randomStringFromFile(params);
     }
     
     public String randomLastName(String ... params) throws IOException {        
-        if (lastNameList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    lastNameList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,lastNameList.size()-1);
-        return lastNameList.get(rand);
+        return randomStringFromFile(params);
     }    
     
     public String randomMiddleName(String ... params) throws IOException {        
-        if (middleNameList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    middleNameList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,middleNameList.size()-1);
-        return middleNameList.get(rand);
+        return randomStringFromFile(params);
     }        
     
     public String randomEmail(String ... params) {
@@ -130,75 +125,25 @@ public class CoreFunctions {
      * @throws IOException 
      */
     public String randomPostalCode(String ... params) throws IOException {
-        if (postalCodeList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    postalCodeList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,postalCodeList.size()-1);
-        return postalCodeList.get(rand);        
+        return randomStringFromFile(params);
     }
 
     public String randomCity(String ... params) throws IOException {
-        if (cityList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    cityList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,cityList.size()-1);
-        return cityList .get(rand);                
+        return randomStringFromFile(params);
     }
     
     public String randomStreet(String ... params) throws IOException {
-        if (streetList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    streetList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,streetList.size()-1);
-        return streetList.get(rand);                
+        return randomStringFromFile(params);
     }    
     
     public String randomState(String ... params)  throws IOException {
-        if (stateList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    stateList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,stateList.size()-1);
-        return stateList.get(rand);        
+        return randomStringFromFile(params);
     }        
     
     private int nextIntInRange(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min + 1) + min;
     }
-    
-    public String randomStringFromFile(String ... params) throws IOException {
-        if (stringList.isEmpty()) {
-            try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
-                for(String line; (line = br.readLine()) != null; ) {
-                    stringList.add(line);
-                }
-            }            
-        }
-        
-        int rand = nextIntInRange(0,stringList.size()-1);
-        return stringList.get(rand);              
-    }        
-    
     
     public String generateRandomString(int num, int length) {
         List<Integer> randomNumbers = new ArrayList<>();
@@ -251,8 +196,7 @@ public class CoreFunctions {
     
    private static void addWordsIntoArray() {
         try (Scanner scanner = new Scanner(CoreFunctions.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
-            while (scanner.hasNext())
-            {
+            while (scanner.hasNext()) {
                 words.add(scanner.next());
             }
         }

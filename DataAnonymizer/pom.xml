@@ -41,7 +41,7 @@
                   <appendAssemblyId>false</appendAssemblyId>                  
                   <archive>
                     <manifest>
-                      <mainClass>org.sample.App</mainClass>
+                      <mainClass>com.strider.dataanonymizer.Anonymizer</mainClass>
                     </manifest>
                   </archive>
                 </configuration>
