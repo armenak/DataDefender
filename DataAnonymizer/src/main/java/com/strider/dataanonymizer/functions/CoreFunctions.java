@@ -73,7 +73,6 @@ public class CoreFunctions {
      */
     public String randomStringFromFile(String ... params) throws IOException {
 		String fileName = params[0];
-		log.info("*** random string from " + fileName);
 		if (!fileList.containsKey(fileName)) {
 			log.info("*** reading from " + fileName);
 			List<String> values = new ArrayList<String>();
@@ -85,7 +84,6 @@ public class CoreFunctions {
             }
             fileList.put(fileName, values);
 		}
-		log.info("*** selecting random string from " + fileName);
 		List<String> values = fileList.get(fileName);
 		int rand = nextIntInRange(0, values.size() - 1);
 		return values.get(rand);

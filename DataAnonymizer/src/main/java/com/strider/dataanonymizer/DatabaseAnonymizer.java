@@ -144,7 +144,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     Method method = clazz.getMethod(methodName,null);
                                     pstmt.setString(++index, method.invoke(instance).toString());
                                 } else {
-                                    log.info("Method name: " + methodName);
                                     Method method = clazz.getMethod(methodName, String[].class);
                                     String[] stringParams = new String[column.getParameters().size()];
                                     for(int i=0; i<=column.getParameters().size()-1;i++) {
