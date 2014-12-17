@@ -129,6 +129,24 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     int index = 0;
                     
                     for(Column column : table.getColumns()) {
+                    
+                        if (column.isIgnoreEmpty()) {
+                            String colName = column.getName();
+                            Statement cStmt = connection.createStatement();
+                            ResultSet cRs = cStmt.executeQuery(String.format("SELECT %s FROM %s WHERE %s = %d", colName, table.getName(), table.getPKey(), id));
+                            if (!cRs.next()) {
+                                pstmt.setString(++index, "");
+                                continue;
+                            }
+                            String value = cRs.getString(colName);
+                            if (value == null || value.length() == 0) {
+                                pstmt.setString(++index, "");
+                                continue;
+                            }
+                            cStmt.close();
+                            cRs.close();
+                        }
+                    
                         String function = column.getFunction();
                         if (function == null || function.equals("")) {
                             log.warn("    Function is not defined for column [" + column + "]. Moving to the next column.");
@@ -152,7 +170,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     }
                                     //Object result = method.invoke(null, (Object)stringParams);
                                     Object result = method.invoke(instance, (Object)stringParams);
-
                                     pstmt.setString(++index, result.toString());
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

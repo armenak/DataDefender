@@ -38,11 +38,14 @@ public class Column {
     @XmlAttribute(name="Name")
     private String name;
 
+    @XmlAttribute(name="IgnoreEmpty")
+    private String ignoreEmpty;
+    
     @XmlElement(name="Function")
     private String function;    
     
     @XmlElement(name="ReturnType")
-    private String returnType;        
+    private String returnType;
     
     @XmlElement(name="Exception")
     private String exception;            
@@ -73,7 +76,15 @@ public class Column {
      */
     public String getReturnType() {
         return this.returnType;
-    }    
+    }
+    
+    /**
+     * Getter method for inoreEmpty attribute
+     * @return boolean
+     */
+    public boolean isIgnoreEmpty() {
+        return (this.ignoreEmpty != null && this.ignoreEmpty.equals("true"));
+    }
     
     /**
      * Getter method for exception attribute
