@@ -182,7 +182,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     rs.close();
                                 } catch (SQLException sqlex) {
                                     log.error(sqlex.toString());
-                                }                                                
+                                }
                             } catch (InstantiationException | ClassNotFoundException ex) {
                                 log.error(ex.toString());
                             }
