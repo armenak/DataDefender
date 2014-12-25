@@ -129,6 +129,24 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     int index = 0;
                     
                     for(Column column : table.getColumns()) {
+
+                        ++index;
+
+                        if (column.isIgnoreEmpty()) {
+                            String colName = column.getName();
+                            Statement cStmt = connection.createStatement();
+                            ResultSet cRs = cStmt.executeQuery(String.format("SELECT %s FROM %s WHERE %s = %d", colName, table.getName(), table.getPKey(), id));
+                            if (cRs.next()) {
+                                String value = cRs.getString(colName);
+                                cStmt.close();
+                                cRs.close();
+                                if (value == null || value.length() == 0) {
+                                    pstmt.setString(index, value);
+                                    continue;
+                                }
+                            }
+                        }
+                    
                         String function = column.getFunction();
                         if (function == null || function.equals("")) {
                             log.warn("    Function is not defined for column [" + column + "]. Moving to the next column.");
@@ -142,7 +160,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                                 if (column.getParameters() == null) {
                                     Method method = clazz.getMethod(methodName,null);
-                                    pstmt.setString(++index, method.invoke(instance).toString());
+                                    pstmt.setString(index, method.invoke(instance).toString());
                                 } else {
                                     Method method = clazz.getMethod(methodName, String[].class);
                                     String[] stringParams = new String[column.getParameters().size()];
@@ -152,8 +170,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                                     }
                                     //Object result = method.invoke(null, (Object)stringParams);
                                     Object result = method.invoke(instance, (Object)stringParams);
-
-                                    pstmt.setString(++index, result.toString());
+                                    pstmt.setString(index, result.toString());
                                 }
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 log.error(ex.toString());
