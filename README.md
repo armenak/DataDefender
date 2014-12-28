@@ -6,9 +6,9 @@ Purpose
 While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content.
 
 The tool allows:
-1. to identify personal data (column and data discovery utilities);
-2. create custom plan (requirement document) to define what columns are to be anonymized;
-3. anonymize the data based on custom data sources.
+1. to identify personal data (column and data discovery utilities)
+2. create custom plan (requirement document) to define what columns are to be anonymized
+3. anonymize the data based on custom data sources
 
 Prerequisites
 ----------------
