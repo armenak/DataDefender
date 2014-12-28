@@ -1,6 +1,15 @@
 DataAnonymizer
 ==============
 
+Purpose
+-------
+While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content.
+
+The tool allows:
+• to identify personal data (column and data discovery utilities);
+• create custom plan (requirement document) to define what columns are to be anonymized
+* anonymize the data based on custom data sources
+
 Prerequisites
 ----------------
 1. JDK 1.7+
