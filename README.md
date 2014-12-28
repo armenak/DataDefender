@@ -33,13 +33,11 @@ will generate an executeable jar file in the "target" directory. Once this has b
     java -jar DataAnonymizer.jar --help
     
 DA can be run in two different discovery modes, column discovery and data discovery. In each of these modes you need to provide
-DA with a database property file. This tells DA which database to connect to and how to connect. The location of this property file
-it passed in to DA using the -P or --database-properties switch.
+DA with a database property file. This tells DA which database to connect to and how to connect. The location of this property file it passed in to DA using the -P or --database-properties switch.
 
 Column Discovery
 --------------------
-In this mode DA attempts to query your database and identified columns that should be anonymized based on their names. To run in this mode
-type the following:
+In this mode DA attempts to query your database and identified columns that should be anonymized based on their names. To run in this mode type the following:
 
     java -jar DataAnonymizer.jar --database-properties <db.properties> --column-discovery <columndiscovery.properties>
     
