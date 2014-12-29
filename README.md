@@ -7,9 +7,10 @@ While performing the application development, testing, or maintenance, it is imp
 
 Features
 --------
-1. identifies personal data (column and data discovery utilities)
-2. creates custom plan (requirement document) to define what columns are to be anonymized
-3. anonymizes the data based on custom data sources
+1. identifies personal data (column and data discovery utilities).
+2. creates custom plan (requirement document) to define what columns are to be anonymized.
+3. anonymizes the data based on custom data sources.
+4. Platform-independent. The tool supports common databases such as Oracle, MS SQL Server, DB2, MySQL, Postgres.
 
 Prerequisites
 ----------------
