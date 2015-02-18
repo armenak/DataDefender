@@ -33,15 +33,17 @@ import java.io.FileNotFoundException;
 import static java.lang.Integer.parseInt;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.Math;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -97,10 +99,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             ResultSet rs            = null;
             StringBuilder sql       = new StringBuilder("UPDATE " + table.getName() + " SET ");
             int batchCounter        = 0;            
-            List<Key> aKeys         = table.getPrimaryKeys();
-            String pKey             = table.getPKey();
-            Set<String> colNames    = new HashSet<String>();
+            List<String> aKeys      = new LinkedList<String>();
+            Set<String> colNames    = new LinkedHashSet<String>();
             Set<String> updateKeys  = new HashSet<String>();
+            
+            // Creating a string list out of either the primary keys list or the PKey value - adds a loop
+            // but clearer because I don't have to check for getPrimaryKeys() or getPKey() every time
+            List<Key> pKeys = table.getPrimaryKeys();
+            if (pKeys != null && pKeys.size() != 0) {
+                for (Key key : pKeys) {
+                    aKeys.add(key.getName());
+                }
+            } else {
+                aKeys.add(table.getPKey());
+            }
             
             // First iteration over columns to build the UPDATE statement
             String comma = "";
@@ -112,27 +124,18 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             // Including keys in the updated columns to ensure ON UPDATE doesn't update them and their
             // values don't change without them being meant to
-            if (aKeys == null || aKeys.isEmpty()) {
-                if (!colNames.contains(pKey)) {
-                    sql.append(comma).append(pKey).append(" = ?");
-                    updateKeys.add(pKey);
-                }
-            } else {
-                for(Key key : table.getPrimaryKeys()) {
-                    sql.append(comma).append(key.getName()).append(" = ?");
-                    updateKeys.add(key.getName());
+            for(String key : aKeys) {
+                if (!colNames.contains(key)) {
+                    sql.append(comma).append(key).append(" = ?");
+                    updateKeys.add(key);
                 }
             }
             
             sql.append(" WHERE ");
-            if (aKeys == null || aKeys.isEmpty()) {
-                sql.append(table.getPKey()).append(" = ?");
-            } else {
-                String oper = "";
-                for(Key key : table.getPrimaryKeys()) {
-                    sql.append(oper).append(key.getName()).append(" = ?");
-                    oper = " AND ";
-                }
+            String oper = "";
+            for(String key : aKeys) {
+                sql.append(oper).append(key).append(" = ?");
+                oper = " AND ";
             }
             
             // Second iteration over columns to add exeptions (if any)
@@ -153,14 +156,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             try {
                 
                 StringBuilder keyQuery = new StringBuilder("SELECT ");
-                if (aKeys == null || aKeys.isEmpty()) {
-                    keyQuery.append(table.getPKey());
-                } else {
-                    comma = "";
-                    for (Key key : aKeys) {
-                        keyQuery.append(comma).append(key.getName());
-                        comma = ",";
-                    }
+                comma = "";
+                for (String key : aKeys) {
+                    keyQuery.append(comma).append(key);
+                    comma = ",";
                 }
                 keyQuery.append(" FROM ").append(table.getName());
                 
@@ -171,29 +170,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 while (rs.next()) {
                     
                     int index = 0;
-                    int nKeys = Math.max((aKeys != null) ? aKeys.size() : 1, 1);
-                    int nCols = table.getColumns().size();
-                    int keyIndex = 1;
+                    int nCols = colNames.size();
+                    int keyIndex = nCols + 1;
                     
-                    String[] aKeyNames = new String[nKeys];
-                    String[] aKeyValues = new String[nKeys];
-                    if (aKeys == null || aKeys.isEmpty()) {
-                        aKeyNames[0] = table.getPKey();
-                        aKeyValues[0] = rs.getString(table.getPKey());
-                        if (updateKeys.contains(aKeyNames[0])) {
-                            pstmt.setString(nCols + keyIndex, aKeyValues[0]);
+                    List<String> keyValues = new LinkedList<String>();
+                    for (String key : aKeys) {
+                        String value = rs.getString(key);
+                        keyValues.add(value);
+                        if (updateKeys.contains(key)) {
+                            pstmt.setString(keyIndex, value);
                             ++keyIndex;
-                        }
-                    } else {
-                        for (int i = 0; i < aKeyValues.length; ++i) {
-                            aKeyNames[i] = aKeys.get(i).getName();
-                            aKeyValues[i] = rs.getString(aKeyNames[i]);
-                            
-                            // add to update statement if needed
-                            if (updateKeys.contains(aKeyNames[i])) {
-                                pstmt.setString(nCols + keyIndex, aKeyValues[i]);
-                                ++keyIndex;
-                            }
                         }
                     }
                     
@@ -204,15 +190,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             String colName = column.getName();
                             StringBuilder colQuery = new StringBuilder("SELECT ").append(colName).append(" FROM ").append(table.getName()).append(" WHERE ");
                             
-                            String oper = "";
-                            for (String name : aKeyNames) {
-                                colQuery.append(oper).append(name).append(" = ?");
+                            oper = "";
+                            for (String key : aKeys) {
+                                colQuery.append(oper).append(key).append(" = ?");
                                 oper = " AND ";
                             }
                             
                             PreparedStatement cStmt = connection.prepareStatement(colQuery.toString());
-                            for (int i = 0; i < aKeyValues.length; ++i) {
-                                cStmt.setString(i + 1, aKeyValues[i]);
+                            Iterator<String> it = keyValues.iterator();
+                            for (int i = 1; it.hasNext(); ++i) {
+                                cStmt.setString(i, it.next());
                             }
                             
                             ResultSet cRs = cStmt.executeQuery();
@@ -270,8 +257,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     }
                     
                     index = keyIndex;
-                    for (String value : aKeyValues) {
-                        pstmt.setString(++index, value);
+                    for (String value : keyValues) {
+                        pstmt.setString(index, value);
+                        ++index;
                     }
 
                     pstmt.addBatch();
