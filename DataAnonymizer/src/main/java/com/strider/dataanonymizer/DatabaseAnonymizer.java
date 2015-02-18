@@ -25,6 +25,7 @@ import com.strider.dataanonymizer.functions.Utils;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Key;
 import com.strider.dataanonymizer.requirement.Table;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,11 +33,15 @@ import java.io.FileNotFoundException;
 import static java.lang.Integer.parseInt;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.Math;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -86,56 +91,131 @@ public class DatabaseAnonymizer implements IAnonymizer {
         for(Table table : requirement.getTables()) {
             log.info("Table [" + table.getName() + "]. Start ...");
             
-            // Start building SQL query            
+            // Start building SQL query
             PreparedStatement pstmt = null;
             Statement stmt          = null;
             ResultSet rs            = null;
             StringBuilder sql       = new StringBuilder("UPDATE " + table.getName() + " SET ");
             int batchCounter        = 0;            
+            List<Key> aKeys         = table.getPrimaryKeys();
+            String pKey             = table.getPKey();
+            Set<String> colNames    = new HashSet<String>();
+            Set<String> updateKeys  = new HashSet<String>();
             
             // First iteration over columns to build the UPDATE statement
-            for(Column column : table.getColumns()) {
-                sql.append(column.getName()).append(" = ?,");
-            }
-            // remove training ","
-            if (sql.length() > 0) {
-                sql.setLength(sql.length() - 1);
+            String comma = "";
+            for (Column column : table.getColumns()) {
+                colNames.add(column.getName());
+                sql.append(comma).append(column.getName()).append(" = ?");
+                comma = ", ";
             }
             
-            sql.append(" WHERE ").append(table.getPKey()).append(" = ?");
+            // Including keys in the updated columns to ensure ON UPDATE doesn't update them and their
+            // values don't change without them being meant to
+            if (aKeys == null || aKeys.isEmpty()) {
+                if (!colNames.contains(pKey)) {
+                    sql.append(comma).append(pKey).append(" = ?");
+                    updateKeys.add(pKey);
+                }
+            } else {
+                for(Key key : table.getPrimaryKeys()) {
+                    sql.append(comma).append(key.getName()).append(" = ?");
+                    updateKeys.add(key.getName());
+                }
+            }
+            
+            sql.append(" WHERE ");
+            if (aKeys == null || aKeys.isEmpty()) {
+                sql.append(table.getPKey()).append(" = ?");
+            } else {
+                String oper = "";
+                for(Key key : table.getPrimaryKeys()) {
+                    sql.append(oper).append(key.getName()).append(" = ?");
+                    oper = " AND ";
+                }
+            }
             
             // Second iteration over columns to add exeptions (if any)
-            for(Column column : table.getColumns()) {
+            for (Column column : table.getColumns()) {
                 String exception = column.getException();
                 if (exception != null && !exception.equals("")) {
                     String sqlNot = " != ";
                     if (exception.contains("%")) {
                         sqlNot = " NOT LIKE ";
                     }
-                    sql.append( " AND ").append(column.getName()).append(sqlNot).append("'").append(exception).append("'");
+                    sql.append(" AND ").append(column.getName()).append(sqlNot).append("'").append(exception).append("'");
                 }
-                
             }            
             
             final String updateString = sql.toString();
             //log.info(updateString);
             
             try {
+                
+                StringBuilder keyQuery = new StringBuilder("SELECT ");
+                if (aKeys == null || aKeys.isEmpty()) {
+                    keyQuery.append(table.getPKey());
+                } else {
+                    comma = "";
+                    for (Key key : aKeys) {
+                        keyQuery.append(comma).append(key.getName());
+                        comma = ",";
+                    }
+                }
+                keyQuery.append(" FROM ").append(table.getName());
+                
                 stmt = connection.createStatement();
-                rs = stmt.executeQuery(String.format("SELECT %s FROM %s ", table.getPKey(), table.getName()));
+                rs = stmt.executeQuery(keyQuery.toString());
                 pstmt = connection.prepareStatement(updateString);
+                
                 while (rs.next()) {
-                    int id = rs.getInt(table.getPKey());
-                    int index = 0;
                     
-                    for(Column column : table.getColumns()) {
-
+                    int index = 0;
+                    int nKeys = Math.max((aKeys != null) ? aKeys.size() : 1, 1);
+                    int nCols = table.getColumns().size();
+                    int keyIndex = 1;
+                    
+                    String[] aKeyNames = new String[nKeys];
+                    String[] aKeyValues = new String[nKeys];
+                    if (aKeys == null || aKeys.isEmpty()) {
+                        aKeyNames[0] = table.getPKey();
+                        aKeyValues[0] = rs.getString(table.getPKey());
+                        if (updateKeys.contains(aKeyNames[0])) {
+                            pstmt.setString(nCols + keyIndex, aKeyValues[0]);
+                            ++keyIndex;
+                        }
+                    } else {
+                        for (int i = 0; i < aKeyValues.length; ++i) {
+                            aKeyNames[i] = aKeys.get(i).getName();
+                            aKeyValues[i] = rs.getString(aKeyNames[i]);
+                            
+                            // add to update statement if needed
+                            if (updateKeys.contains(aKeyNames[i])) {
+                                pstmt.setString(nCols + keyIndex, aKeyValues[i]);
+                                ++keyIndex;
+                            }
+                        }
+                    }
+                    
+                    for (Column column : table.getColumns()) {
                         ++index;
-
                         if (column.isIgnoreEmpty()) {
+                            
                             String colName = column.getName();
-                            Statement cStmt = connection.createStatement();
-                            ResultSet cRs = cStmt.executeQuery(String.format("SELECT %s FROM %s WHERE %s = %d", colName, table.getName(), table.getPKey(), id));
+                            StringBuilder colQuery = new StringBuilder("SELECT ").append(colName).append(" FROM ").append(table.getName()).append(" WHERE ");
+                            
+                            String oper = "";
+                            for (String name : aKeyNames) {
+                                colQuery.append(oper).append(name).append(" = ?");
+                                oper = " AND ";
+                            }
+                            
+                            PreparedStatement cStmt = connection.prepareStatement(colQuery.toString());
+                            for (int i = 0; i < aKeyValues.length; ++i) {
+                                cStmt.setString(i + 1, aKeyValues[i]);
+                            }
+                            
+                            ResultSet cRs = cStmt.executeQuery();
                             if (cRs.next()) {
                                 String value = cRs.getString(colName);
                                 cStmt.close();
@@ -188,7 +268,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             }
                         }
                     }
-                    pstmt.setInt(++index, id);
+                    
+                    index = keyIndex;
+                    for (String value : aKeyValues) {
+                        pstmt.setString(++index, value);
+                    }
+
                     pstmt.addBatch();
                     batchCounter++;
                     if (batchCounter == batchSize) {

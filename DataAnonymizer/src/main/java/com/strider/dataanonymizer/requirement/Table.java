@@ -18,7 +18,7 @@
 
 package com.strider.dataanonymizer.requirement;
 
-import java.util.List;   
+import java.util.List;
 import static java.util.Collections.unmodifiableList;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,6 +46,10 @@ public class Table {
     @XmlElement(name="Column")
     private List<Column> columns;
     
+    @XmlElementWrapper(name="PrimaryKey")
+    @XmlElement(name="Key")
+    private List<Key> primaryKeys;
+    
     /**
      * Getter method for name attribute
      * @return String
@@ -55,16 +59,28 @@ public class Table {
     }
     
     /**
+     * Returns a List of keys defining the primary key.
+     * 
+     * @return List<Key>
+     */
+    public List<Key> getPrimaryKeys() {
+        if (this.primaryKeys != null) {
+            return unmodifiableList(this.primaryKeys);
+        }
+        return null;
+    }
+    
+    /**
      * Getter method for PKey attribute
      * @return String
      */
-    public String getPKey()  {
+    public String getPKey() {
         return this.pkey;
-    }    
+    }
     
     /**
      * Getter method for columns attribute
-     * @return 
+     * @return List<Column>
      */
     public List<Column> getColumns() {
         if (this.columns != null) {
