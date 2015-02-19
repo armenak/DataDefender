@@ -18,6 +18,7 @@
 package com.strider.dataanonymizer.utils;
 
 import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Key;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import junit.framework.TestCase;
@@ -51,13 +52,19 @@ public class RequirementUtilsTest extends TestCase {
         assertNotNull(requirement);
         assertEquals("Test Client", requirement.getClient());
         assertEquals("1.0", requirement.getVersion());
-        assertEquals(1, requirement.getTables().size());
+        assertEquals(2, requirement.getTables().size());
         assertEquals("test_table", requirement.getTables().get(0).getName());
 
         int columnNo = 0;
         for (Column column : requirement.getTables().get(0).getColumns()) {
             assertEquals(("column" + ++columnNo), column.getName());
         }
+        
+        List<Key> pKeys = requirement.getTables().get(1).getPrimaryKeys();
+        assertNotNull(pKeys);
+        assertEquals(2, pKeys.size());
+        assertEquals("id1", pKeys.get(0).getName());
+        assertEquals("id2", pKeys.get(1).getName());
 
         assertEquals(5, columnNo);
     }
