@@ -18,7 +18,8 @@
 
 package com.strider.dataanonymizer.requirement;
 
-import java.util.List;   
+import java.util.List;
+import java.util.ArrayList;
 import static java.util.Collections.unmodifiableList;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -47,12 +48,13 @@ public class Column {
     @XmlElement(name="ReturnType")
     private String returnType;
     
-    @XmlElement(name="Exception")
-    private String exception;            
-    
     @XmlElementWrapper(name="Parameters")
     @XmlElement(name="Parameter")
     private List<Parameter> paramters;
+    
+    @XmlElementWrapper(name="Exclusions")
+    @XmlElement(name="Exclude")
+    private List<Exclude> exclusions;
     
     /**
      * Getter method for name attribute
@@ -87,11 +89,21 @@ public class Column {
     }
     
     /**
-     * Getter method for exception attribute
-     * @return String
+     * Returns a list of exclusions
+     * 
+     * @return List<Exclude>
      */
-    public String getException() {
-        return this.exception;
+    public List<Exclude> getExclusions() {
+        if (exclusions == null && ignoreEmpty != null && ignoreEmpty.equals("true")) {
+            Exclude exc = new Exclude();
+            exc.setIgnoreEmpty();
+            exclusions = new ArrayList<>();
+            exclusions.add(exc);
+        }
+        if (this.exclusions != null) {
+            return unmodifiableList(this.exclusions);
+        }
+        return null;
     }
     
     /**
@@ -103,6 +115,5 @@ public class Column {
             return unmodifiableList(this.paramters);
         }
         return null;
-    }    
-
+    }
 }
