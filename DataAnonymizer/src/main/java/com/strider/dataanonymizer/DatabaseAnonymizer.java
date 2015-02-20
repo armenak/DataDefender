@@ -262,6 +262,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
         return "";
     }
     
+    /**
+     * Returns the anonymized value of a column, or its current value if it
+     * should be excluded.
+     * 
+     * Checks for exclusions against the current row and column values, either
+     * returning the column's current value or returning an anonymized value by
+     * calling callAnonymizingFunctionFor.
+     * 
+     * @param db
+     * @param row
+     * @param column
+     * @return the columns value
+     * @throws SQLException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     private String getAnonymizedColumnValue(Connection db, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
@@ -301,6 +320,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
         return callAnonymizingFunctionFor(column, db);
     }
     
+    /**
+     * Anonymizes a row of columns.
+     * 
+     * Sets query parameters on the passed updateStmt - this includes the key
+     * values - and calls anonymization functions for the columns.
+     * 
+     * @param updateStmt
+     * @param tableColumns
+     * @param keyNames
+     * @param updateKeys
+     * @param db
+     * @param row
+     * @throws SQLException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     private void anonymizeRow(
         PreparedStatement updateStmt,
         Collection<Column> tableColumns,
