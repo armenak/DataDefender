@@ -26,7 +26,9 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 import static org.apache.log4j.Logger.getLogger;
 
 /**
@@ -53,6 +55,12 @@ public class Anonymizer  {
         if (line.hasOption("help")) {
             help(options);
             return;
+        }
+        
+        if (line.hasOption("debug")) {
+            LogManager.getRootLogger().setLevel(Level.DEBUG);
+        } else {
+            LogManager.getRootLogger().setLevel(Level.INFO);
         }
         
         String databasePropertyFile = "db.properties";
@@ -119,10 +127,11 @@ public class Anonymizer  {
     @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
-        options.addOption( "h", "help", false, "Display help");        
-        options.addOption( "a", "anonymize", false, "anonymize database" );
-        options.addOption( "A", "anonymizer properties", true, "define anonymizer property file" );
-        options.addOption( "P", "database properties", true, "define database property file" );
+        options.addOption("h", "help", false, "Display help");        
+        options.addOption("a", "anonymize", false, "anonymize database");
+        options.addOption("A", "anonymizer properties", true, "define anonymizer property file");
+        options.addOption("P", "database properties", true, "define database property file");
+        options.addOption("debug", false, "Enable debug output");
         return options;
     }
  
