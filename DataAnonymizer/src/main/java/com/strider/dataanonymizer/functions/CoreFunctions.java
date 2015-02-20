@@ -19,12 +19,20 @@
 package com.strider.dataanonymizer.functions;
 
 import com.strider.dataanonymizer.utils.Xeger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,8 +50,14 @@ public class CoreFunctions {
     
     private static Logger log = getLogger(CoreFunctions.class);
 
-    private static Map<String, List<String>> fileList = new HashMap<String, List<String>>();
-    private static List<String> words          = new ArrayList<>();
+    private static Map<String, List<String>> stringLists = new HashMap<String, List<String>>();
+    private static Map<String, Iterator<String>> stringIters = new HashMap<String, Iterator<String>>();
+    private static List<String> words = new ArrayList<>();
+    
+    /**
+     * Set after construction with a call to setDatabaseConnection.
+     */
+    protected Connection db;
 
     static {        
         try  {
@@ -58,6 +72,42 @@ public class CoreFunctions {
     public CoreFunctions() {
     }
     
+    /**
+     * Passes the active database connection.
+     * 
+     * The database connection is available in the protected db member variable.
+     * CoreFunctions uses the connection to generate random strings from data in
+     * the database.
+     * 
+     * @param db the active database connection
+     */
+    public void setDatabaseConnection(Connection db)
+    {
+        this.db = db;
+    }
+    
+    /**
+     * Returns the next shuffled item from the named collection.
+     * 
+     * @param name
+     * @return 
+     */
+    private String getNextShuffledItemFor(String name) {
+        if (stringIters.containsKey(name)) {
+            Iterator<String> iter = stringIters.get(name);
+            if (iter.hasNext()) {
+                return iter.next();
+            }
+        }
+        
+        List<String> list = stringLists.get(name);
+        Collections.shuffle(list);
+        
+        Iterator<String> iter = list.iterator();
+        stringIters.put(name, iter);
+        return iter.next();
+    }
+    
     public String generateStringFromPattern(String ... params) {
         String regex = params[0];
         Xeger instance = new Xeger(regex);
@@ -68,26 +118,65 @@ public class CoreFunctions {
      * Generates a list of random strings from a list of strings (new-
      * line separated) in a file.
      * 
+     * The function randomizes the collection, exhausting all possible values
+     * before re-shuffling and re-using items.
+     * 
      * @param params The first parameter is the filename
      * @return A random string from the file
      */
     public String randomStringFromFile(String ... params) throws IOException {
 		String fileName = params[0];
-		if (!fileList.containsKey(fileName)) {
+		if (!stringLists.containsKey(fileName)) {
 			log.info("*** reading from " + fileName);
-			List<String> values = new ArrayList<String>();
+			List<String> values = new LinkedList<String>();
 			try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     values.add(line);
                 }
-                
             }
-            fileList.put(fileName, values);
+            stringLists.put(fileName, values);
 		}
-		List<String> values = fileList.get(fileName);
-		int rand = nextIntInRange(0, values.size() - 1);
-		return values.get(rand);
+		
+        return getNextShuffledItemFor(fileName);
 	}
+    
+    /**
+     * Generates a randomized collection of column values and selects and
+     * returns one.
+     * 
+     * The function selects distinct, non-null and non-empty values to choose
+     * from, then shuffles the collection of strings once before returning items
+     * from it.  Once all strings have been returned, the collection is
+     * re-shuffled and re-used.
+     * 
+     * @param params the first parameter is the table's name, and the second is
+     *        the column name where values should be extracted from
+     * @return the next item
+     * @throws SQLException 
+     */
+    public String randomColumnValue(String ... params) throws SQLException {
+        
+        String tableName = params[0];
+        String columnName = params[1];
+        String keyName = tableName + "." + columnName;
+        
+        if (!stringLists.containsKey(keyName)) {
+            log.info("*** reading from database column: " + keyName);
+			List<String> values = new LinkedList<String>();
+            
+            Statement stmt = db.createStatement();
+            ResultSet rs = stmt.executeQuery(String.format("SELECT DISTINCT %s FROM %s WHERE %s IS NOT NULL AND %s <> ''", columnName, tableName, columnName, columnName));
+            while (rs.next()) {
+                values.add(rs.getString(columnName));
+            }
+            rs.close();
+            stmt.close();
+            
+            stringLists.put(keyName, values);
+        }
+        
+        return getNextShuffledItemFor(keyName);
+    }
     
     public String randomFirstName(String ... params) throws IOException {
 		return randomStringFromFile(params);
