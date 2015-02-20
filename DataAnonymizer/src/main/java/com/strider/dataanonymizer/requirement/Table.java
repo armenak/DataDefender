@@ -50,11 +50,15 @@ public class Table {
     @XmlElement(name="Key")
     private List<Key> primaryKeys;
     
+    @XmlElementWrapper(name="Exclusions")
+    @XmlElement(name="Exclude")
+    private List<Exclude> exclusions;
+    
     /**
      * Getter method for name attribute
      * @return String
      */
-    public String getName()  {
+    public String getName() {
         return this.name;
     }
     
@@ -85,6 +89,18 @@ public class Table {
     public List<Column> getColumns() {
         if (this.columns != null) {
             return unmodifiableList(this.columns);
+        }
+        return null;
+    }
+    
+    /**
+     * Returns a list of exclusions
+     * 
+     * @return List<Exclude>
+     */
+    public List<Exclude> getExclusions() {
+        if (this.exclusions != null) {
+            return unmodifiableList(this.exclusions);
         }
         return null;
     }

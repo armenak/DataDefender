@@ -28,6 +28,8 @@ import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Key;
 import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.requirement.Exclude;
+import com.strider.dataanonymizer.utils.LikeMatcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +40,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.LinkedHashSet;
@@ -166,12 +167,48 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param columns
      * @return 
      */
-    private String getSelectQuery(String tableName, Collection<String> columns) {
-        return String.format(
-            "SELECT %s FROM %s",
-            StringUtils.join(columns, ", "),
-            tableName
-        );
+    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> columns) throws SQLException {
+        
+        List<String> params = new LinkedList<>();
+        StringBuilder query = new StringBuilder("SELECT ");
+        query.append(StringUtils.join(columns, ", ")).append(" FROM ").append(table.getName());
+        
+        List<Exclude> exclusions = table.getExclusions();
+        if (exclusions != null) {
+            String separator = " WHERE ";
+            for (Exclude exc : exclusions) {
+                String eq = exc.getEqualsValue();
+                String lk = exc.getLikeValue();
+                boolean nl = exc.isExcludeNulls();
+                String col = exc.getName();
+
+                if (col != null && col.length() != 0) {
+                    if (eq != null) {
+                        query.append(separator).append(col).append(" != ?");
+                        params.add(eq);
+                        separator = " AND ";
+                    }
+                    if (lk != null && lk.length() != 0) {
+                        query.append(separator).append(col).append(" NOT LIKE ?");
+                        params.add(lk);
+                        separator = " AND ";
+                    }
+                    if (nl) {
+                        query.append(separator).append(col).append(" IS NOT NULL");
+                        separator = " AND ";
+                    }
+                }
+            }
+        }
+        
+        PreparedStatement stmt = db.prepareStatement(query.toString());
+        int paramIndex = 1;
+        for (String param : params) {
+            stmt.setString(paramIndex, param);
+            ++paramIndex;
+        }
+        
+        return stmt;
     }
     
     /**
@@ -187,7 +224,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private String getAnonymizedValueForColumn(Column column, Connection dbConn)
+    private String callAnonymizingFunctionFor(Column column, Connection dbConn)
         throws NoSuchMethodException,
                SecurityException,
                IllegalAccessException,
@@ -226,6 +263,128 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     /**
+     * Returns the anonymized value of a column, or its current value if it
+     * should be excluded.
+     * 
+     * Checks for exclusions against the current row and column values, either
+     * returning the column's current value or returning an anonymized value by
+     * calling callAnonymizingFunctionFor.
+     * 
+     * @param db
+     * @param row
+     * @param column
+     * @return the columns value
+     * @throws SQLException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
+    private String getAnonymizedColumnValue(Connection db, ResultSet row, Column column)
+        throws SQLException,
+               NoSuchMethodException,
+               SecurityException,
+               IllegalAccessException,
+               IllegalArgumentException,
+               InvocationTargetException {
+        
+        String columnName = column.getName();
+        String columnValue = row.getString(columnName);
+        
+        List<Exclude> exclusions = column.getExclusions();
+        if (exclusions != null) {
+            for (Exclude exc : exclusions) {
+                String name = exc.getName();
+                String eq = exc.getEqualsValue();
+                String lk = exc.getLikeValue();
+                boolean nl = exc.isExcludeNulls();
+                if (name == null || name.length() == 0) {
+                    name = columnName;
+                }
+                String testValue = row.getString(name);
+
+                if (nl && testValue == null) {
+                    return columnValue;
+                } else if (eq != null && testValue.equals(eq)) {
+                    return columnValue;
+                } else if (lk != null && lk.length() != 0) {
+                    LikeMatcher matcher = new LikeMatcher(lk);
+                    if (matcher.matches(testValue)) {
+                        return columnValue;
+                    }
+                }
+            }
+        }
+
+        return callAnonymizingFunctionFor(column, db);
+    }
+    
+    /**
+     * Anonymizes a row of columns.
+     * 
+     * Sets query parameters on the passed updateStmt - this includes the key
+     * values - and calls anonymization functions for the columns.
+     * 
+     * @param updateStmt
+     * @param tableColumns
+     * @param keyNames
+     * @param updateKeys
+     * @param db
+     * @param row
+     * @throws SQLException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
+    private void anonymizeRow(
+        PreparedStatement updateStmt,
+        Collection<Column> tableColumns,
+        Collection<String> keyNames,
+        Collection<String> updateKeys,
+        Connection db,
+        ResultSet row
+    ) throws SQLException,
+             NoSuchMethodException,
+             SecurityException,
+             IllegalAccessException,
+             IllegalArgumentException,
+             InvocationTargetException {
+        
+        int fieldIndex = 0;
+        Set<String> updatedColumns = new HashSet<>(tableColumns.size());
+
+        for (Column column : tableColumns) {
+            String columnName = column.getName();
+            if (updatedColumns.contains(columnName)) {
+                log.warn("Column " + columnName + " is declared more than once - ignoring second definition");
+                continue;
+            }
+            updatedColumns.add(columnName);
+            ++fieldIndex;
+            
+            String colValue = getAnonymizedColumnValue(db, row, column);
+            updateStmt.setString(fieldIndex, colValue);
+        }
+
+        int nUpdateKeys = updateKeys.size();
+        int whereIndex = nUpdateKeys + fieldIndex;
+        for (String key : keyNames) {
+            String value = row.getString(key);
+            updateStmt.setString(++whereIndex, value);
+            log.debug(whereIndex + " = " + value);
+            if (updateKeys.contains(key)) {
+                updateStmt.setString(++fieldIndex, value);
+                log.debug(fieldIndex + " = " + value);
+            }
+        }
+
+        updateStmt.addBatch();
+    }
+    
+    /**
      * Anonymization function for a single table.
      * 
      * Sets up queries, loops over columns and anonymizes columns for the passed
@@ -233,16 +392,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(int batchSize, Connection connection, Table table) {
+    private void anonymizeTable(int batchSize, Connection db, Table table) {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
         List<Column> tableColumns = table.getColumns();
-        PreparedStatement pstmt = null;
-        Statement stmt          = null;
-        ResultSet rs            = null;
-        int batchCounter        = 0;
-        
         // colNames is looked up with contains, and iterated over.  Using LinkedHashSet means
         // duplicate column names won't be added to the query, so a check in the column loop
         // below was created to ensure a reasonable warning message is logged if that happens.
@@ -252,6 +406,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         // updateKeys is used for contains() and is added to allColumns (which needs to be in
         // a predictable order) - so it needs to be a LinkedHashSet
         Set<String> updateKeys = new LinkedHashSet<>();
+        // exceptCols is added as query params
 
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
@@ -261,102 +416,54 @@ public class DatabaseAnonymizer implements IAnonymizer {
         allColumns.addAll(colNames);
         allColumns.addAll(updateKeys);
         
-        String selectQuery = getSelectQuery(table.getName(), allColumns);
+        // required in this scope for 'catch' block
+        PreparedStatement selectStmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet rs = null;
         
         try {
 
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(selectQuery);
+            selectStmt = getSelectQueryStatement(db, table, allColumns);
+            rs = selectStmt.executeQuery();
             
             String updateString = getUpdateQuery(table, allColumns, keyNames);
-            pstmt = connection.prepareStatement(updateString);
+            updateStmt = db.prepareStatement(updateString);
             log.debug(updateString);
             
+            int batchCounter = 0;
             while (rs.next()) {
-
-                int fieldIndex = 0;
-                Set<String> updatedColumns = new HashSet<>(tableColumns.size());
-                for (Column column : tableColumns) {
-                    
-                    String columnName = column.getName();
-                    String columnValue = rs.getString(columnName);
-                    if (updatedColumns.contains(columnName)) {
-                        log.warn("Column " + columnName + " is declared more than once - ignoring second definition");
-                        continue;
-                    }
-                    
-                    updatedColumns.add(columnName);
-                    ++fieldIndex;
-                    
-                    if (column.isIgnoreEmpty()) {
-                        if (columnValue == null || columnValue.length() == 0) {
-                            pstmt.setString(fieldIndex, columnValue);
-                            continue;
-                        }
-                    }
-                    try {
-                        String value = "";
-                        pstmt.setString(fieldIndex, value = getAnonymizedValueForColumn(column, connection));
-                        log.debug(fieldIndex + " = " + value);
-                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                        
-                        log.error(ex.toString());
-                        try {
-                            stmt.close();
-                            if (pstmt != null) {
-                                pstmt.close();
-                            }
-                            rs.close();
-                            return;
-                        } catch (SQLException sqlex) {
-                            log.error(sqlex.toString());
-                        }
-                    }
-                }
-                
-                int nUpdateKeys = updateKeys.size();
-                int whereIndex = nUpdateKeys + fieldIndex;
-                for (String key : keyNames) {
-                    String value = rs.getString(key);
-                    pstmt.setString(++whereIndex, value);
-                    log.debug(whereIndex + " = " + value);
-                    if (updateKeys.contains(key)) {
-                        pstmt.setString(++fieldIndex, value);
-                        log.debug(fieldIndex + " = " + value);
-                    }
-                }
-                
-                pstmt.addBatch();
+                anonymizeRow(updateStmt, tableColumns, keyNames, updateKeys, db, rs);
                 batchCounter++;
                 if (batchCounter == batchSize) {
-                    pstmt.executeBatch();
-                    connection.commit();
+                    updateStmt.executeBatch();
+                    db.commit();
                     batchCounter = 0;
                 }
             }
             
-            pstmt.executeBatch();
-            connection.commit();
-            stmt.close();
-            pstmt.close();
+            updateStmt.executeBatch();
+            db.commit();
+            selectStmt.close();
+            updateStmt.close();
             rs.close();
             
-        } catch (SQLException sqle) {
-            log.error(sqle.toString());
+        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            log.error(ex.toString());
             try {
-                if (stmt != null) {
-                    stmt.close();
+                if (selectStmt != null) {
+                    selectStmt.close();
                 }
-                if (pstmt != null) {
-                    pstmt.close();
+                if (updateStmt != null) {
+                    updateStmt.close();
                 }
                 if (rs != null) {
                     rs.close();
                 }
             } catch (SQLException sqlex) {
                 log.error(sqlex.toString());
-            }                
+            }
         }
+        
         log.info("Table " + table.getName() + ". End ...");
         log.info("");
     }
