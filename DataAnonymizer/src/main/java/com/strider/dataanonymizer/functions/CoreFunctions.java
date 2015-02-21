@@ -20,7 +20,6 @@ package com.strider.dataanonymizer.functions;
 
 import com.strider.dataanonymizer.utils.Xeger;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,7 +31,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,9 +48,10 @@ public class CoreFunctions {
     
     private static Logger log = getLogger(CoreFunctions.class);
 
-    private static Map<String, List<String>> stringLists = new HashMap<String, List<String>>();
-    private static Map<String, Iterator<String>> stringIters = new HashMap<String, Iterator<String>>();
+    private static Map<String, List<String>> stringLists = new HashMap<>();
+    private static Map<String, Iterator<String>> stringIters = new HashMap<>();
     private static List<String> words = new ArrayList<>();
+    private static Map<String, Map<String, String>> predictableShuffle = new HashMap<>();
     
     /**
      * Set after construction with a call to setDatabaseConnection.
@@ -81,8 +80,7 @@ public class CoreFunctions {
      * 
      * @param db the active database connection
      */
-    public void setDatabaseConnection(Connection db)
-    {
+    public void setDatabaseConnection(Connection db) {
         this.db = db;
     }
     
@@ -108,8 +106,41 @@ public class CoreFunctions {
         return iter.next();
     }
     
-    public String generateStringFromPattern(String ... params) {
-        String regex = params[0];
+    /**
+     * Sets up a map, mapping a list of values to a list of shuffled values.
+     * 
+     * If the value is not mapped, the function guarantees returning the same
+     * randomized value for a given column value - however it does not guarantee
+     * that more than one column value do not have the same randomized value.
+     * 
+     * @param params
+     * @return 
+     */
+    private String getPredictableShuffledValueFor(String name, String value) {
+        if (!predictableShuffle.containsKey(name)) {
+            List<String> list = stringLists.get(name);
+            List<String> shuffled = new ArrayList<String>(list);
+            Collections.shuffle(shuffled);
+            
+            Map<String, String> smap = new HashMap<>();
+            Iterator<String> lit = list.iterator();
+            Iterator<String> sit = shuffled.iterator();
+            while (lit.hasNext()) {
+                smap.put(lit.next(), sit.next());
+            }
+            predictableShuffle.put(name, smap);
+        }
+        
+        Map<String, String> map = predictableShuffle.get(name);
+        if (!map.containsKey(value)) {
+            String[] vals = map.values().toArray(new String[map.size()]);
+            int index = (int) Math.abs((long) value.hashCode()) % vals.length;
+            return vals[index];
+        }
+        return map.get(value);
+    }
+    
+    public String generateStringFromPattern(String regex) {
         Xeger instance = new Xeger(regex);
         return instance.generate();
     }
@@ -121,24 +152,47 @@ public class CoreFunctions {
      * The function randomizes the collection, exhausting all possible values
      * before re-shuffling and re-using items.
      * 
-     * @param params The first parameter is the filename
+     * @param file the file name
      * @return A random string from the file
      */
-    public String randomStringFromFile(String ... params) throws IOException {
-		String fileName = params[0];
-		if (!stringLists.containsKey(fileName)) {
-			log.info("*** reading from " + fileName);
-			List<String> values = new LinkedList<String>();
-			try (BufferedReader br = new BufferedReader(new FileReader(params[0]))) {
+    public String randomStringFromFile(String file) throws IOException {
+		if (!stringLists.containsKey(file)) {
+			log.info("*** reading from " + file);
+			List<String> values = new ArrayList<String>();
+			try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     values.add(line);
                 }
             }
-            stringLists.put(fileName, values);
+            stringLists.put(file, values);
 		}
 		
-        return getNextShuffledItemFor(fileName);
+        return getNextShuffledItemFor(file);
 	}
+    
+    /**
+     * Creates a string list of values by querying the database.
+     * 
+     * @param keyName
+     * @param query
+     * @return 
+     */
+    protected void generateStringListFromDb(String keyName, String query) throws SQLException {
+        if (!stringLists.containsKey(keyName)) {
+            log.info("*** reading from database column: " + keyName);
+			List<String> values = new ArrayList<String>();
+            
+            Statement stmt = db.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                values.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+            
+            stringLists.put(keyName, values);
+        }
+    }
     
     /**
      * Generates a randomized collection of column values and selects and
@@ -149,50 +203,51 @@ public class CoreFunctions {
      * from it.  Once all strings have been returned, the collection is
      * re-shuffled and re-used.
      * 
-     * @param params the first parameter is the table's name, and the second is
-     *        the column name where values should be extracted from
+     * @param table the table name
+     * @param column the column name
      * @return the next item
      * @throws SQLException 
      */
-    public String randomColumnValue(String ... params) throws SQLException {
-        
-        String tableName = params[0];
-        String columnName = params[1];
-        String keyName = tableName + "." + columnName;
-        
-        if (!stringLists.containsKey(keyName)) {
-            log.info("*** reading from database column: " + keyName);
-			List<String> values = new LinkedList<String>();
-            
-            Statement stmt = db.createStatement();
-            ResultSet rs = stmt.executeQuery(String.format("SELECT DISTINCT %s FROM %s WHERE %s IS NOT NULL AND %s <> ''", columnName, tableName, columnName, columnName));
-            while (rs.next()) {
-                values.add(rs.getString(columnName));
-            }
-            rs.close();
-            stmt.close();
-            
-            stringLists.put(keyName, values);
-        }
-        
+    public String randomColumnValue(String table, String column) throws SQLException {
+        String keyName = table + "." + column;
+        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s WHERE %s IS NOT NULL AND %s <> ''", column, table, column, column));
         return getNextShuffledItemFor(keyName);
     }
     
-    public String randomFirstName(String ... params) throws IOException {
-		return randomStringFromFile(params);
+    /**
+     * Returns a 'predictable' shuffled value based on the passed value which is
+     * guaranteed to return the same random value for the same column value.
+     * 
+     * Note that more than one column value may result in having the same
+     * shuffled value.
+     * 
+     * @param table
+     * @param column
+     * @param value
+     * @return
+     * @throws SQLException 
+     */
+    public String mappedColumnShuffle(String table, String column, String value) throws SQLException {
+        String keyName = table + "." + column;
+        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s", column, table, column, column));
+        return getPredictableShuffledValueFor(keyName, value);
     }
     
-    public String randomLastName(String ... params) throws IOException {        
-        return randomStringFromFile(params);
+    public String randomFirstName(String file) throws IOException {
+		return randomStringFromFile(file);
+    }
+    
+    public String randomLastName(String file) throws IOException {        
+        return randomStringFromFile(file);
     }    
     
-    public String randomMiddleName(String ... params) throws IOException {        
-        return randomStringFromFile(params);
+    public String randomMiddleName(String file) throws IOException {        
+        return randomStringFromFile(file);
     }        
     
-    public String randomEmail(String ... params) {
+    public String randomEmail(String domainName) {
         StringBuilder email = new StringBuilder();
-        email.append(generateRandomString(1,43).trim()).append("@").append(params[0]);
+        email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
         return email.toString();
     }    
     
@@ -201,8 +256,8 @@ public class CoreFunctions {
      * @param params
      * @return email address String 
      */
-    public String staticEmail(String ... params) {
-        return params[0];
+    public String staticEmail(String email) {
+        return email;
     }        
 
     /**
@@ -211,20 +266,20 @@ public class CoreFunctions {
      * @return String Random postal code
      * @throws IOException 
      */
-    public String randomPostalCode(String ... params) throws IOException {
-        return randomStringFromFile(params);
+    public String randomPostalCode(String file) throws IOException {
+        return randomStringFromFile(file);
     }
 
-    public String randomCity(String ... params) throws IOException {
-        return randomStringFromFile(params);
+    public String randomCity(String file) throws IOException {
+        return randomStringFromFile(file);
     }
     
-    public String randomStreet(String ... params) throws IOException {
-        return randomStringFromFile(params);
+    public String randomStreet(String file) throws IOException {
+        return randomStringFromFile(file);
     }    
     
-    public String randomState(String ... params)  throws IOException {
-        return randomStringFromFile(params);
+    public String randomState(String file)  throws IOException {
+        return randomStringFromFile(file);
     }        
     
     private int nextIntInRange(int min, int max) {
@@ -252,20 +307,12 @@ public class CoreFunctions {
             stringLength = randomString.length();
         }
         
-        return randomString.toString().substring(0, stringLength);
-    }    
+        return randomString.toString().substring(0, stringLength).trim();
+    }
     
-    public String randomDescription(String ... params) {
-                
-        if (!params[0].isEmpty() && !params[1].isEmpty() ) {
-            if (Utils.isInteger(params[0]) && Utils.isInteger(params[1])) {
-                StringBuilder desc = new StringBuilder();
-                desc.append(generateRandomString(parseInt(params[0]), parseInt(params[1])).trim());
-                return desc.toString();
-            }
-        }
-        return "";
-    }    
+    public String randomDescription(int num, int length) {
+        return this.generateRandomString(num, length);
+    }
  
     public String randomPhoneNumber() {
         Random rand = new Random();
@@ -287,5 +334,5 @@ public class CoreFunctions {
                 words.add(scanner.next());
             }
         }
-    }    
+    }
 }
