@@ -27,8 +27,8 @@
                 <Column Name="description" ReturnType="String">
                     <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomDescription</Function>
                     <Parameters>
-                        <Parameter Name="min" Value="1" Type="String"/>
-                        <Parameter Name="max" Value="100" Type="String"/>                        
+                        <Parameter Name="num" Value="1" Type="int"/>
+                        <Parameter Name="length" Value="100" Type="int"/>                        
                     </Parameters>
                 </Column>
                 <Column Name="student_no" ReturnType="String">
