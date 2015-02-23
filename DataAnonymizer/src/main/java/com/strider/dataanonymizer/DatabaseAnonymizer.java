@@ -33,10 +33,8 @@ import com.strider.dataanonymizer.utils.LikeMatcher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import static java.lang.Integer.parseInt;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,7 +48,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
@@ -59,11 +56,10 @@ import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import java.util.Arrays;
 
 /**
@@ -256,12 +252,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
             instance.setDatabaseConnection(dbConn);
 
             List<Parameter> parms = column.getParameters();
-            Map<String, Parameter> stringParams = new HashMap<>(parms.size());
-            for (Parameter parm : parms) {
-                stringParams.put(parm.getName(), parm);
+            Map<String, Object> paramValues = new HashMap<>(parms.size());
+            for (Parameter param : parms) {
+                paramValues.put(param.getName(), param.getTypeValue());
             }
             
-            List<Object> parameterValues = new ArrayList<>(parms.size());
+            List<Object> fnArguments = new ArrayList<>(parms.size());
             Method[] methods = clazz.getMethods();
             Method selectedMethod = null;
             
@@ -269,59 +265,40 @@ public class DatabaseAnonymizer implements IAnonymizer {
             for (Method m : methods) {
                 if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
                     java.lang.reflect.Parameter[] mParams = m.getParameters();
-                    parameterValues.clear();
+                    fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
                         
                         // need a better place for this
-                        if (par.getName().equals("value")) {
-                            parameterValues.add(columnValue);
+                        if (par.getName().equals("@@value@@")) {
+                            fnArguments.add(columnValue);
                             continue;
-                        } else if (par.getName().equals("row") && par.getType() == ResultSet.class) {
-                            parameterValues.add(row);
+                        } else if (par.getName().equals("@@row@@") && par.getType() == ResultSet.class) {
+                            fnArguments.add(row);
                             continue;
                         }
                         
-                        if (!stringParams.containsKey(par.getName())) {
+                        if (!paramValues.containsKey(par.getName())) {
                             continue methodLoop;
                         }
                         
-                        Parameter colPar = stringParams.get(par.getName());
-                        Class fnParameterType = par.getType();
-                        String columnTypeName = colPar.getType();
-                        String argumentValue = colPar.getValue();
+                        Object value = paramValues.get(par.getName());
+                        Class confParamType = value.getClass();
+                        Class fnParamType = par.getType();
                         
-                        // if not defined specifically, use whatever's defined
-                        if (columnTypeName == null) {
-                            columnTypeName = fnParameterType.getName();
+                        if (ClassUtils.isPrimitiveWrapper(confParamType)) {
+                            if (!ClassUtils.isPrimitiveOrWrapper(fnParamType)) {
+                                continue methodLoop;
+                            }
+                            fnParamType = ClassUtils.primitiveToWrapper(fnParamType);
                         }
-                        
-                        if (fnParameterType == byte.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Byte(Byte.parseByte(argumentValue)));
-                        } else if (fnParameterType == short.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Short(Short.parseShort(argumentValue)));
-                        } else if (fnParameterType == char.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Character(argumentValue.charAt(0)));
-                        } else if (fnParameterType == int.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Integer(Integer.parseInt(argumentValue)));
-                        } else if (fnParameterType == long.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Long(Long.parseLong(argumentValue)));
-                        } else if (fnParameterType == float.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Float(Float.parseFloat(argumentValue)));
-                        } else if (fnParameterType == double.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Double(Double.parseDouble(argumentValue)));
-                        } else if (fnParameterType == boolean.class && columnTypeName.equals(fnParameterType.getName())) {
-                            parameterValues.add(new Boolean(Boolean.parseBoolean(argumentValue)));
-                        } else if ((fnParameterType == String.class) && (columnTypeName.equals(String.class.getName()) || columnTypeName.equals("String"))) {
-                            parameterValues.add(argumentValue);
-                        } else if (fnParameterType.getName().equals(columnTypeName)) {
-                            Class parClass = Class.forName(columnTypeName);
-                            Constructor constr = parClass.getConstructor(String.class);
-                            parameterValues.add(constr.newInstance(argumentValue));
+                        if (fnParamType != confParamType) {
+                            continue methodLoop;
                         }
+                        fnArguments.add(value);
                     }
                     
                     // actual parameters check less than xml defined parameters size, because values could be auto-assigned (like 'values' and 'row' params)
-                    if (parameterValues.size() != mParams.length || parameterValues.size() < stringParams.size()) {
+                    if (fnArguments.size() != mParams.length || fnArguments.size() < paramValues.size()) {
                         continue;
                     }
                     
@@ -342,8 +319,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 throw new NoSuchMethodException(s.toString());
             }
             
-            log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(parameterValues.toArray()));
-            return selectedMethod.invoke(instance, parameterValues.toArray()).toString();
+            log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
+            return selectedMethod.invoke(instance, fnArguments.toArray()).toString();
             
         } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
@@ -563,7 +540,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
         Connection connection = dbConnection.connect(databaseProperties);
 
-        int batchSize = parseInt(anonymizerProperties.getProperty("batch_size"));
+        int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         Requirement requirement = getRequirement(anonymizerProperties.getProperty("requirement"));
 
         // Iterate over the requirement

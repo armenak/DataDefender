@@ -18,9 +18,18 @@
 
 package com.strider.dataanonymizer.requirement;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.List;
+import java.util.Collections;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * JAXB class that defines parameter elements in Requirement.xml file
@@ -34,10 +43,13 @@ public class Parameter {
     private String name;
 
     @XmlAttribute(name="Value")
-    private String value;    
+    private String value;
     
     @XmlAttribute(name="Type")
-    private String type;        
+    private String type;
+    
+    @XmlElement(name="Element")
+    private List<ArrayElement> elements;
     
     /**
      * Getter method for name attribute
@@ -55,11 +67,108 @@ public class Parameter {
         return this.value;
     }
     
+    private Object getArrayForValues(List<Object> list, String type) throws ClassNotFoundException {
+        if (type.equals("String")) {
+            type = "java.lang.String";
+        }
+        Class<?> c = ClassUtils.getClass(type);
+        if (c.isPrimitive()) {
+            Class<?> w = ClassUtils.primitiveToWrapper(c);
+            Object array = Array.newInstance(w, list.size());
+            array = list.toArray((Object[]) array);
+            if (c == boolean.class) {
+                return ArrayUtils.toPrimitive((Boolean[]) array);
+            } else if (c == byte.class) {
+                return ArrayUtils.toPrimitive((Byte[]) array);
+            } else if (c == short.class) {
+                return ArrayUtils.toPrimitive((Short[]) array);
+            } else if (c == char.class) {
+                return ArrayUtils.toPrimitive((Character[]) array);
+            } else if (c == int.class) {
+                return ArrayUtils.toPrimitive((Integer[]) array);
+            } else if (c == long.class) {
+                return ArrayUtils.toPrimitive((Long[]) array);
+            } else if (c == float.class) {
+                return ArrayUtils.toPrimitive((Float[]) array);
+            } else if (c == double.class) {
+                return ArrayUtils.toPrimitive((Double[]) array);
+            }
+            throw new IllegalArgumentException("Unhandled primitive type: " + c.getName());
+        }
+        Object array = Array.newInstance(c, list.size());
+        return list.toArray((Object[]) array);
+    }
+    
+    private Object getTypeValueOf(String type, String value)
+        throws ClassNotFoundException,
+               NoSuchMethodException,
+               InstantiationException,
+               IllegalAccessException,
+               InvocationTargetException {
+        
+        if (type.equals(boolean.class.getName())) {
+            return Boolean.parseBoolean(value);
+        } else if (type.equals(byte.class.getName())) {
+            return Byte.parseByte(value);
+        } else if (type.equals(short.class.getName())) {
+            return Short.parseShort(value);
+        } else if (type.equals(char.class.getName())) {
+            return value.charAt(0);
+        } else if (type.equals(int.class.getName())) {
+            return Integer.parseInt(value);
+        } else if (type.equals(long.class.getName())) {
+            return Long.parseLong(value);
+        } else if (type.equals(float.class.getName())) {
+            return Float.parseFloat(value);
+        } else if (type.equals(double.class.getName())) {
+            return Double.parseDouble(value);
+        } else if (type.equals(String.class.getName()) || type.equals("String")) {
+            return value;
+        } else {
+            Class parClass = Class.forName(type);
+            Constructor constr = parClass.getConstructor(String.class);
+            return constr.newInstance(value);
+        }
+    }
+    
+    public Object getTypeValue()
+        throws ClassNotFoundException,
+               NoSuchMethodException,
+               InstantiationException,
+               IllegalAccessException,
+               InvocationTargetException {
+        
+        String typeName = type;
+        if (typeName == null) {
+            typeName = "String";
+            if (elements != null && value == null) {
+                typeName += "[]";
+            }
+        }
+        
+        if (typeName.endsWith("[]")) {
+            if (elements == null) {
+                return null;
+            }
+            String arrayType = typeName.substring(0, typeName.length() - 2);
+            List<Object> arr = new ArrayList<>(elements.size());
+            for (ArrayElement el : elements) {
+                arr.add(getTypeValueOf(arrayType, el.getValue()));
+            }
+            return getArrayForValues(arr, arrayType);
+        }
+        return getTypeValueOf(typeName, value);
+    }
+    
     /**
      * Getter method for type attribute
      * @return String
      */
     public String getType() {
         return this.type;
-    }    
+    }
+    
+    public List<ArrayElement> getArrayElements() {
+        return Collections.unmodifiableList(this.elements);
+    }
 }

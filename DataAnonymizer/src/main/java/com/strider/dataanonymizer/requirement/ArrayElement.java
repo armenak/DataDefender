@@ -23,29 +23,28 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * JAXB class defining a Table's key column.
+ * JAXB class defining values for array parameters.
  * 
- * Represents a single key column in a table's primary key - could be part of a
- * set comprising a compound key.
+ * Represents the value of a single array element for a given Parameter.
  * 
- * @see Table.getKeys
+ * @see Parameter.getArrayElements
  * @author Zaahid Bateson
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Key {
+public class ArrayElement {
     
     /**
-     * The column name in the database
+     * The array element's value
      */
-    @XmlAttribute(name="Name")
-    private String name;
+    @XmlAttribute(name="Value")
+    private String value;
     
     /**
-     * Returns the column name represented by this key
+     * Returns the String value of the array element
      * 
      * @return String
      */
-    public String getName() {
-        return this.name;
+    public String getValue() {
+        return this.value;
     }
 }
