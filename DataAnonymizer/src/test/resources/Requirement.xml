@@ -55,5 +55,47 @@
                 </Column>
             </Columns>
         </Table>
+        <Table Name="test_table3">
+            <Columns>
+                <Column Name="column1" ReturnType="String">
+                    <Function>testPrimitives</Function>
+                    <Parameters>
+                        <Parameter Name="testBoolean" Value="true" Type="boolean"/>
+                        <Parameter Name="testByte" Value="1" Type="byte"/>
+                        <Parameter Name="testShort" Value="2" Type="short"/>
+                        <Parameter Name="testChar" Value="s" Type="char"/>
+                        <Parameter Name="testInt" Value="-3" Type="int"/>
+                        <Parameter Name="testLong" Value="4" Type="long"/>
+                        <Parameter Name="testFloat" Value="0.25" Type="float"/>
+                        <Parameter Name="testDouble" Value="0.5" Type="double"/>
+                    </Parameters>
+                </Column>
+                <Column Name="column2" ReturnType="String">
+                    <Function>testStringArray</Function>
+                    <Parameters>
+                        <Parameter Name="keys" Type="String[]">
+                            <Element Value="column1"/>
+                            <Element Value="column2"/>
+                            <Element Value="column3"/>
+                        </Parameter>
+                    </Parameters>
+                </Column>
+                <Column Name="column3" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.nonExistentFunction</Function>
+                    <Parameters>
+                        <Parameter Name="test" Type="int[]">
+                            <Element Value="1"/>
+                            <Element Value="10"/>
+                            <Element Value="-20"/>
+                        </Parameter>
+                        <Parameter Name="test2" Type="double[]">
+                            <Element Value="1.2"/>
+                            <Element Value="10.5"/>
+                            <Element Value="-20.1"/>
+                        </Parameter>
+                    </Parameters>
+                </Column>
+            </Columns>
+        </Table>        
     </Tables>
 </Requirement>
