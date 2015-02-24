@@ -229,7 +229,7 @@ public class CoreFunctions {
      */
     public String mappedColumnShuffle(String table, String column, String value) throws SQLException {
         String keyName = table + "." + column;
-        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s", column, table, column, column));
+        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s", column, table));
         return getPredictableShuffledValueFor(keyName, value);
     }
     

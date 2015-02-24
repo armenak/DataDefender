@@ -173,7 +173,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> columns) throws SQLException {
         
         List<String> params = new LinkedList<>();
-        StringBuilder query = new StringBuilder("SELECT ");
+        StringBuilder query = new StringBuilder("SELECT DISTINCT ");
         query.append(StringUtils.join(columns, ", ")).append(" FROM ").append(table.getName());
         
         List<Exclude> exclusions = table.getExclusions();
@@ -254,7 +254,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
             List<Parameter> parms = column.getParameters();
             Map<String, Object> paramValues = new HashMap<>(parms.size());
             for (Parameter param : parms) {
-                paramValues.put(param.getName(), param.getTypeValue());
+                if (param.getValue().equals("@@value@@")) {
+                    paramValues.put(param.getName(), columnValue);
+                } else if (param.getValue().equals("@@row@@") && param.getType().equals("java.sql.ResultSet")) {
+                    paramValues.put(param.getName(), row);
+                } else {
+                    paramValues.put(param.getName(), param.getTypeValue());
+                }
             }
             
             List<Object> fnArguments = new ArrayList<>(parms.size());
@@ -268,23 +274,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
                         
-                        // need a better place for this
-                        if (par.getName().equals("@@value@@")) {
-                            fnArguments.add(columnValue);
-                            continue;
-                        } else if (par.getName().equals("@@row@@") && par.getType() == ResultSet.class) {
-                            fnArguments.add(row);
-                            continue;
-                        }
-                        
                         if (!paramValues.containsKey(par.getName())) {
                             continue methodLoop;
                         }
                         
                         Object value = paramValues.get(par.getName());
-                        Class confParamType = value.getClass();
                         Class fnParamType = par.getType();
+                        Class confParamType = (value == null) ? fnParamType : value.getClass();
                         
+                        if (fnParamType.isPrimitive() && value == null) {
+                            continue methodLoop;
+                        }
                         if (ClassUtils.isPrimitiveWrapper(confParamType)) {
                             if (!ClassUtils.isPrimitiveOrWrapper(fnParamType)) {
                                 continue methodLoop;
@@ -320,7 +320,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
-            return selectedMethod.invoke(instance, fnArguments.toArray()).toString();
+            Object anonymizedValue = selectedMethod.invoke(instance, fnArguments.toArray());
+            if (anonymizedValue == null) {
+                return null;
+            }
+            return anonymizedValue.toString();
             
         } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
@@ -373,7 +377,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (nl && testValue == null) {
                     return columnValue;
-                } else if (eq != null && testValue.equals(eq)) {
+                } else if (eq != null && eq.equals(testValue)) {
                     return columnValue;
                 } else if (lk != null && lk.length() != 0) {
                     LikeMatcher matcher = new LikeMatcher(lk);
@@ -488,6 +492,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         try {
 
+            db.setAutoCommit(false);
             selectStmt = getSelectQueryStatement(db, table, allColumns);
             rs = selectStmt.executeQuery();
             
@@ -514,6 +519,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
         } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             log.error(ex.toString());
+            if (ex.getCause() != null) {
+                log.error(ex.getCause().toString());
+            }
             try {
                 if (selectStmt != null) {
                     selectStmt.close();
