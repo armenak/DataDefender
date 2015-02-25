@@ -22,9 +22,6 @@ import static java.lang.Math.random;
 import static java.lang.Math.round;
 import static java.lang.String.valueOf;
 
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.dataanonymizer.functions.CoreFunctions;
 
 /**
@@ -32,8 +29,6 @@ import com.strider.dataanonymizer.functions.CoreFunctions;
  */
 public class IntegratedScience extends CoreFunctions {
     
-    private static Logger log = getLogger(IntegratedScience.class);
-
     public IntegratedScience() {
     }
     

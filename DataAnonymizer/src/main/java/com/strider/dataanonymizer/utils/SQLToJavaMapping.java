@@ -14,17 +14,17 @@ import java.util.Map;
  */
 public class SQLToJavaMapping {
     
-    private static final Map<Integer, String> sqlToJava = new HashMap();
+    private static final Map<Integer, String> SQL_TO_JAVA = new HashMap();
     
     static {
-        sqlToJava.put(java.sql.Types.VARCHAR, "String");
-        sqlToJava.put(java.sql.Types.NVARCHAR, "String");
-        sqlToJava.put(java.sql.Types.NCHAR, "Char");
-        sqlToJava.put(java.sql.Types.CHAR, "Char");
+        SQL_TO_JAVA.put(java.sql.Types.VARCHAR, "String");
+        SQL_TO_JAVA.put(java.sql.Types.NVARCHAR, "String");
+        SQL_TO_JAVA.put(java.sql.Types.NCHAR, "Char");
+        SQL_TO_JAVA.put(java.sql.Types.CHAR, "Char");
     }
     
     public static boolean isString(final int type) {
-        final String value = sqlToJava.get(type);
+        final String value = SQL_TO_JAVA.get(type);
         if ( (value != null) && (value.equals("String"))) {
             return true;
         }

@@ -28,8 +28,6 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class DBConnectionFactory {
     
-    private static final Logger log = getLogger(DBConnectionFactory.class);
-    
     public static IDBConnection createDBConnection(final Properties databaseProperties) 
     throws DatabaseAnonymizerException {
         

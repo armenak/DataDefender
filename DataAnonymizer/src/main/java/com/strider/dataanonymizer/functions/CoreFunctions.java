@@ -36,8 +36,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-import static java.lang.Integer.parseInt;
-
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -46,7 +44,7 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class CoreFunctions {
     
-    private static Logger log = getLogger(CoreFunctions.class);
+    private static final Logger log = getLogger(CoreFunctions.class);
 
     private static Map<String, List<String>> stringLists = new HashMap<>();
     private static Map<String, Iterator<String>> stringIters = new HashMap<>();
@@ -56,7 +54,7 @@ public class CoreFunctions {
     /**
      * Set after construction with a call to setDatabaseConnection.
      */
-    protected Connection db;
+    private Connection db;
 
     static {        
         try  {
@@ -281,11 +279,6 @@ public class CoreFunctions {
     public String randomState(String file)  throws IOException {
         return randomStringFromFile(file);
     }        
-    
-    private int nextIntInRange(int min, int max) {
-        Random random = new Random();
-        return random.nextInt(max - min + 1) + min;
-    }
     
     public String generateRandomString(int num, int length) {
         List<Integer> randomNumbers = new ArrayList<>();

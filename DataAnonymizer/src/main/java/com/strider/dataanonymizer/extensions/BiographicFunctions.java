@@ -19,24 +19,15 @@
 package com.strider.dataanonymizer.extensions;
 
 import com.strider.dataanonymizer.functions.CoreFunctions;
-import org.apache.log4j.Logger;
-
-
-import java.util.Arrays;
 import java.util.Random;
-
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  * @author Matthew Eaton
  */
 public class BiographicFunctions extends CoreFunctions {
 
-    private static Logger log = getLogger(BiographicFunctions.class);
-
     public BiographicFunctions() {
     }
-    
     
     /**
      * Generates random 9-digit social insurance number
@@ -53,7 +44,7 @@ public class BiographicFunctions extends CoreFunctions {
             sinDigits = increment(sinDigits);
         }
 
-        StringBuffer sin = new StringBuffer(9);
+        StringBuilder sin = new StringBuilder(9);
         for (int digit : sinDigits) {
             sin.append(String.valueOf(digit));
         }
