@@ -62,47 +62,8 @@ public class DataDiscoverer implements IDiscoverer {
         
         IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
         List<ColumnMetaData> map = metaData.getMetaData();    
-        
-//        log.info("Connecting to database");        
-//        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-//        Connection connection = dbConnection.connect(databaseProperties);
-//        
-//        String vendor = databaseProperties.getProperty("vendor");
-//        String schema = databaseProperties.getProperty("schema");        
-//        
-//        ResultSet rs = null;
-//        // Get the metadata from the the database
-//        List<ColumnMetaData> map = new ArrayList<>();
-//        try {
-//            // Getting all tables name
-//            DatabaseMetaData md = connection.getMetaData();
-//            if (vendor.equals("mssql")) {
-//                rs = md.getTables(null, null, null, new String[] {"TABLE"});
-//            } else {
-//                rs = md.getTables(null, null, "%", null);
-//            }            
-//            while (rs.next()) {
-//                String tableName = rs.getString(3);
-//                ResultSet resultSet = null;   
-//                if (vendor.equals("mssql")) {
-//                    resultSet = md.getColumns(null, schema, tableName, null);
-//                } else {
-//                    resultSet = md.getColumns(null, null, tableName, null);
-//                }                
-//                while (resultSet.next()) {
-//                    String columnName = resultSet.getString("COLUMN_NAME");
-//                    log.info(columnName + ":" + resultSet.getInt(5));
-//                    if (SQLToJavaMapping.isString(resultSet.getInt(5))) {
-//                        ColumnMetaData columnMetaData = new ColumnMetaData(tableName, columnName, "String");
-//                        map.add(columnMetaData);                           
-//                    }
-//                }
-//            }
-//            rs.close();
-//        } catch (SQLException e) {
-//            log.error(e);
-//        }  
-        
+       
+       
         InputStream modelInToken = null;
         InputStream modelIn = null;        
         TokenizerModel modelToken = null;

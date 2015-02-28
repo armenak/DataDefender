@@ -51,16 +51,20 @@ public class ColumnDiscoverer implements IDiscoverer {
         List<ColumnMetaData> map = metaData.getMetaData();
         
         // Get the list of "suspicios" field names from property file
-        // Reading configuration file
-        Configuration columnsConfiguration = null;
-        try {
-            columnsConfiguration = new PropertiesConfiguration("columndiscovery.properties");
-        } catch (ConfigurationException ex) {
-            log.error(ex.toString());
-        }        
-        Iterator<String> iterator = columnsConfiguration.getKeys();
-        List<String> suspList = toList(iterator);          
+//        // Reading configuration file
+//        Configuration columnsConfiguration = null;
+//        try {
+//            columnsConfiguration = new PropertiesConfiguration("columndiscovery.properties");
+//        } catch (ConfigurationException ex) {
+//            log.error(ex.toString());
+//        }        
+//        Iterator<String> iterator = columnsConfiguration.getKeys();
+//        List<String> suspList = toList(iterator);
         
+	// Converting HashMap keys into ArrayList
+        List<String> suspList = new ArrayList(columnProperties.keySet());
+        System.out.println("\n==> Size of Key list: " + suspList.size());
+ 
         ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
             Pattern p = compile(s);
