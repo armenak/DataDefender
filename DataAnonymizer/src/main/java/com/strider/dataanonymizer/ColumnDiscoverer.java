@@ -18,16 +18,11 @@
 package com.strider.dataanonymizer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import static java.util.regex.Pattern.compile;
 
-import static org.apache.commons.collections.IteratorUtils.toList;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -35,6 +30,7 @@ import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
+import java.util.Collections;
 
 /**
  * @author Armenak Grigoryan
@@ -50,21 +46,8 @@ public class ColumnDiscoverer implements IDiscoverer {
         IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
         List<ColumnMetaData> map = metaData.getMetaData();
         
-        // Get the list of "suspicios" field names from property file
-//        // Reading configuration file
-//        Configuration columnsConfiguration = null;
-//        try {
-//            columnsConfiguration = new PropertiesConfiguration("columndiscovery.properties");
-//        } catch (ConfigurationException ex) {
-//            log.error(ex.toString());
-//        }        
-//        Iterator<String> iterator = columnsConfiguration.getKeys();
-//        List<String> suspList = toList(iterator);
-        
 	// Converting HashMap keys into ArrayList
         List<String> suspList = new ArrayList(columnProperties.keySet());
-        System.out.println("\n==> Size of Key list: " + suspList.size());
- 
         ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
             Pattern p = compile(s);
@@ -82,6 +65,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         log.info("-----------------");        
         log.info("List of suspects:");
         log.info("-----------------");
+        Collections.sort(matches);        
         for (String entry: matches) {
             log.info(entry);
         }

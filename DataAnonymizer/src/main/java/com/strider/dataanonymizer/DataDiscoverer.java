@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.Double.parseDouble;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,7 +61,6 @@ public class DataDiscoverer implements IDiscoverer {
         
         IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
         List<ColumnMetaData> map = metaData.getMetaData();    
-       
        
         InputStream modelInToken = null;
         InputStream modelIn = null;        
