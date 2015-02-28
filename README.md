@@ -14,7 +14,7 @@ Features
 
 Prerequisites
 ----------------
-1. JDK 1.7+
+1. JDK 1.8+
 2. Maven 3+
 
 How to build DataAnonymizer
