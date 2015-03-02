@@ -19,12 +19,10 @@ Prerequisites
 
 How to build DataAnonymizer
 ------------------------------
-1. Download ZIP file
-2. Unzip in directory of your choice
-3. cd DataAnonymizer-master
-4. cd DataAnonymizer
-5. mvn install
-6. DataAnonymizer.jar will be located in "target" directory
+1. Download ZIP file and unzip in a directory of your choice, or clone repo
+2. cd {dir}/DataAnonymizer/
+3. mvn install
+4. DataAnonymizer.jar will be located in "target" directory {dir}/DataAnonymizer/target/
 
 Contributing
 -------------------------
@@ -43,14 +41,16 @@ will generate an executeable jar file in the "target" directory. Once this has b
 
     java -jar DataAnonymizer.jar --help
     
-DA can be run in two different discovery modes, column discovery and data discovery. In each of these modes you need to provide
+DA can be run in anonymizer mode, and two different discovery modes, column discovery and data discovery. In each of these modes you need to provide
 DA with a database property file. This tells DA which database to connect to and how to connect. The location of this property file it passed in to DA using the -P or --database-properties switch.
+
+All modes support an optional list of tables at the end to use for either discover, or anonymization of a specific table or list of tables.
 
 Column Discovery
 --------------------
 In this mode DA attempts to query your database and identified columns that should be anonymized based on their names. To run in this mode type the following:
 
-    java -jar DataAnonymizer.jar --database-properties <db.properties> --column-discovery <columndiscovery.properties>
+    java -jar DataAnonymizer.jar discover -c --database-properties <db.properties> --column-discovery <columndiscovery.properties>
     
 Where:
     <db.properties>              - Path and file name of the file containing database connection properties 
@@ -62,3 +62,32 @@ Where:
 
 Data Discovery
 ------------------
+To run DA in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.
+
+    java -jar DataAnonymizer.jar discover -d --database-properties <db.properties> --data-discovery <datadiscovery.properties>
+
+Where:
+    <db.properties>            - Path and file name of the file containing database connection properties 
+                                (see src/main/resources/db.properties for an example)
+
+    <datadiscovery.properties> - Path and file name of the file containing data discovery properties
+                                (see src/main/resources/datadiscovery.properties for an example)
+
+Anonymizer
+------------------
+In this mode, DA will anonymize the data in the database based on the requirements file specified in the anonymizer.properties file.  The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to src/main/resources/Requirement.xml.
+
+    java -jar DataAnonymizer.jar anonymize --database-properties <db.properties> --anonymizer-properties <anonymizer.properties>
+
+Where:
+    <db.properties>         - Path and file name of the file containing database connection properties 
+                             (see src/main/resources/db.properties for an example)
+
+    <anonymizer.properties> - Path and file name of the file containing anonymizer properties
+                             (see src/main/resources/anonymizer.properties for an example)
+
+To run the anonymizer on specific tables, the table names can be passed at the end:
+
+    java -jar DataAnonymizer.jar anonymize -P db.properties -A anonymizer.properties myTable1 myTable2
+
+This would run the anonymizer for tables defined in the requirements XML file with the name myTable1 or myTable2 only.  Any other tables defined in the requirements would be ignored.

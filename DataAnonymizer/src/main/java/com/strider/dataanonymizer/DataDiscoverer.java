@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import opennlp.tools.namefind.NameFinderME;
@@ -55,8 +56,10 @@ public class DataDiscoverer implements IDiscoverer {
     private static Logger log = getLogger(DataDiscoverer.class);
 
     @Override
-    public void discover(Properties databaseProperties, Properties dataDiscoveryProperties) 
+    public void discover(Properties databaseProperties, Properties dataDiscoveryProperties, Collection<String> tables) 
     throws AnonymizerException {
+        
+        log.info("Data discovery in process");
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
         IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
@@ -111,6 +114,10 @@ public class DataDiscoverer implements IDiscoverer {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();                
                 List<Double> probabilityList = new ArrayList<>();
+                
+                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
+                    continue;
+                }
 
                 Statement stmt = null;
                 ResultSet resultSet = null;

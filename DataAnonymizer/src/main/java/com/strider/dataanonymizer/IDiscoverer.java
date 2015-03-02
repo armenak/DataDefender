@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer;
 
+import java.util.Collection;
 import java.util.Properties;
 
 /**
@@ -31,7 +32,10 @@ public interface IDiscoverer {
      * for data anonymization.
      * @param databaseProperties
      * @param properties
+     * @param tables Optional list of tables to anonymize -
+     *        if the collection is empty, all tables specified in requirements
+     *        are anonymized.
      * @throws com.strider.dataanonymizer.AnonymizerException
      */
-    void discover(Properties databaseProperties, Properties properties) throws AnonymizerException;
+    void discover(Properties databaseProperties, Properties properties, Collection<String> tables) throws AnonymizerException;
 }
