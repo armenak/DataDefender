@@ -544,7 +544,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     @Override
-    public void anonymize(Properties databaseProperties, Properties anonymizerProperties) 
+    public void anonymize(Properties databaseProperties, Properties anonymizerProperties, Collection<String> tables) 
     throws DatabaseAnonymizerException{
 
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
@@ -556,7 +556,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(Table table : requirement.getTables()) {
-            anonymizeTable(batchSize, connection, table);
+            if (tables.isEmpty() || tables.contains(table.getName())) {
+                anonymizeTable(batchSize, connection, table);
+            }
         }
         
         dbConnection.disconnect(connection);

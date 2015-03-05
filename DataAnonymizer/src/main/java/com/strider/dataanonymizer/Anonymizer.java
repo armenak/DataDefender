@@ -19,7 +19,10 @@ package com.strider.dataanonymizer;
 
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -42,80 +45,99 @@ public class Anonymizer  {
  
     private static final Logger log = getLogger(Anonymizer.class);
 
-    public static void main( String[] args ) throws ParseException, AnonymizerException {
-
-        if (args.length == 0 ) {
-            log.info("To display usage info please type");
-            log.info("    java -jar DataAnonymizer.jar com.strider.DataAnonymyzer --help");
-            return;
-        }        
+    public static void main(String[] args) throws ParseException, AnonymizerException {
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
-        if (line.hasOption("help")) {
+        List<String> unparsedArgs = line.getArgList();
+        
+        if (line.hasOption("help") || args.length == 0 || unparsedArgs.size() < 1) {
             help(options);
             return;
         }
-        
         if (line.hasOption("debug")) {
             LogManager.getRootLogger().setLevel(Level.DEBUG);
         } else {
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
         
-        String databasePropertyFile = "db.properties";
+        String cmd = unparsedArgs.get(0);
+        Collection<String> tables = getTableArgs(unparsedArgs);
+        
+        String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = null;
-        if (line.hasOption("P")) {
-            databasePropertyFile = line.getOptionValues("P")[0];
-            try {
-                props = loadProperties(databasePropertyFile);            
-            } catch (IOException ioe) {
-                throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-            }
-        }
-        if (props == null) {
-            throw new AnonymizerException("ERROR: Database property file is not defined.");
-        }
         
-        String anonymizerPropertyFile = "anonymizer.properties";
-        if (line.hasOption("A")) {
-            anonymizerPropertyFile = line.getOptionValue("A");
-        } 
-        
-        Properties anonymizerProperties = null;
-        try {
-            anonymizerProperties = loadProperties(anonymizerPropertyFile);
-        } catch (IOException ioe) {
-            throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
-        }
-        if (anonymizerProperties == null) {
-            throw new AnonymizerException("ERROR: Database property file is not defined.");
-        }                    
-        
-        if (line.hasOption("a")) {
-            IAnonymizer anonymizer = new DatabaseAnonymizer();
-            anonymizer.anonymize(props, anonymizerProperties);
+        switch (cmd) {
+            case "anonymize":
+                try {
+                    props = loadProperties(databasePropertyFile);            
+                } catch (IOException ioe) {
+                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
+                }
+                
+                String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                Properties anonymizerProperties = null;
+                try {
+                    anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                } catch (IOException ioe) {
+                    throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
+                }
+                IAnonymizer anonymizer = new DatabaseAnonymizer();
+                anonymizer.anonymize(props, anonymizerProperties, tables);
+                break;
+            case "discover":
+                try {
+                    props = loadProperties(databasePropertyFile);            
+                } catch (IOException ioe) {
+                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
+                }
+                
+                if (line.hasOption('c')) {
+                    
+                    String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
+                    Properties columnProperties = null;
+                    try {
+                        columnProperties = loadProperties(columnPropertyFile);
+                    } catch (IOException ioe) {
+                        throw new AnonymizerException("ERROR: Unable to load " + columnPropertyFile, ioe);
+                    }
+                    IDiscoverer discoverer = new ColumnDiscoverer();
+                    discoverer.discover(props, columnProperties, tables);
+                }
+                if (line.hasOption('d')) {
+                    log.info("Data discovery in process");
+                    String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                    Properties dataDiscoveryProperties = null;
+                    try {
+                        dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
+                    }  catch (IOException ioe) {
+                        throw new AnonymizerException("ERROR: Unable to load " + datadiscoveryPropertyFile, ioe);
+                    }                            
+                    IDiscoverer discoverer = new DataDiscoverer();
+                    discoverer.discover(props, dataDiscoveryProperties, tables);
+                }
+                break;
+            default:
+                help(options);
+                break;
         }
     }
     
     /**
      * Parses command line arguments
+     * 
      * @param options
      * @param args
      * @return CommandLine
-     * @throws AnonymizerException 
      */
-    private static CommandLine getCommandLine(final Options options, final String[] args) 
-    throws ParseException {
+    private static CommandLine getCommandLine(final Options options, final String[] args) {
         final CommandLineParser parser = new GnuParser();
         CommandLine line = null;
- 
         try {
-            line = parser.parse(options, args);
+            line = parser.parse(options, args, false);
         } catch (ParseException e) {
             help(options);
         }
- 
         return line;
     }    
     
@@ -128,20 +150,38 @@ public class Anonymizer  {
     private static Options createOptions() {
         final Options options = new Options();
         options.addOption("h", "help", false, "Display help");        
-        options.addOption("a", "anonymize", false, "anonymize database");
-        options.addOption("A", "anonymizer properties", true, "define anonymizer property file");
+        options.addOption("A", "anonymizer-properties", true, "define anonymizer property file");
+        options.addOption("c", "columns", false, "discover candidate column names for anonymization based on provided patterns");
+        options.addOption("C", "column-properties", true, "define column property file");
+        options.addOption("d", "data", false, "discover candidate column for anonymization based on semantic algorithms");
+        options.addOption("D", "data-properties", true, "discover candidate column for anonymization based on semantic algorithms");
         options.addOption("P", "database properties", true, "define database property file");
         options.addOption("debug", false, "Enable debug output");
         return options;
     }
  
     /**
-     * Displays help
+     * Displays command-line help options
      * 
      * @param Options 
      */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("DataAnonymizer", options);
-    }    
+        formatter.printHelp("DataAnonymizer anonymize|discover [options] [table1 [table2 [...]]]", options);
+    }
+    
+    /**
+     * Returns the list of unparsed arguments as a list of table names by
+     * transforming the strings to lower case.
+     * 
+     * This guarantees table names to be in lower case, so functions comparing
+     * can use contains() with a lower case name.
+     * 
+     * @param unparsedArgs
+     * @return The list of table names
+     */
+    private static Collection<String> getTableArgs(List<String> unparsedArgs) {
+        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
+        return unparsedArgs.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+    }
 }

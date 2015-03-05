@@ -30,6 +30,7 @@ import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
+import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -40,13 +41,14 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(Properties databaseProperties, Properties columnProperties) 
+    public void discover(Properties databaseProperties, Properties columnProperties, Collection<String> tables) 
     throws DatabaseAnonymizerException {
-        
+     
+        log.info("Column discovery in process");
         IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
         List<ColumnMetaData> map = metaData.getMetaData();
         
-	// Converting HashMap keys into ArrayList
+        // Converting HashMap keys into ArrayList
         List<String> suspList = new ArrayList(columnProperties.keySet());
         ArrayList<String> matches = new ArrayList<>();
         for(String s: suspList) {
@@ -55,6 +57,9 @@ public class ColumnDiscoverer implements IDiscoverer {
             for(ColumnMetaData pair: map) {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();
+                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
+                    continue;
+                }
                 if (p.matcher(columnName).matches()) {
                     matches.add(tableName + "." + columnName);
                 }                            
