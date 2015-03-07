@@ -1,5 +1,4 @@
 /*
- * 
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,37 +14,20 @@
  * Lesser General Public License for more details.
  *
  */
-
-package com.strider.dataanonymizer.utils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Scanner;
+package com.strider.dataanonymizer.database.sqlbuilder;
 
 /**
+ * Interface for all classes implementing database connection
  * @author Armenak Grigoryan
  */
-public class CommonUtils {
+public class MSSQLSQLBuilder implements ISQLBuilder{
     
-    /**
-     *
-     * @param fileName
-     * @return
-     * @throws java.io.IOException
-     * @throws java.io.FileNotFoundException
-     */
-    public static List<String> readStreamOfLines(String fileName) 
-    throws IOException, FileNotFoundException, FileNotFoundException {
-        List names = new ArrayList();
-        Scanner s = new Scanner(new File(fileName));
-        while (s.hasNext()){
-            names.add(s.next());
-        }
-        s.close();
+    @Override
+    public String buildSelectWithLimit(String sqlString, int limit) {
+        StringBuilder sql = new StringBuilder(sqlString);
+        
+        sql.append(" LIMIT ").append(limit);
+        return sql.toString();
+    }
     
-        return names;
-   }    
 }
