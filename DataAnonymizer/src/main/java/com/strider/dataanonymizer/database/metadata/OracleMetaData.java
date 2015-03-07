@@ -83,10 +83,10 @@ public class OracleMetaData implements IMetaData {
                 
                 resultSet = md.getColumns(null, schema, tableName, null);
                 while (resultSet.next()) {
-                    String columnName = resultSet.getString("COLUMN_NAME");
-                    String colType = resultSet.getString("DATA_TYPE");
+                    String columnName = resultSet.getString(4);
+                    String colType = resultSet.getString(6);
                     if (this.columnType != null) {
-                        if (SQLToJavaMapping.isString(resultSet.getInt(5))) {
+                        if (SQLToJavaMapping.isString(colType)) {
                             colType = "String";
                         }
                     }                    

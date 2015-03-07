@@ -121,7 +121,6 @@ public class DataDiscoverer implements IDiscoverer {
         log.info(formatter.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         
         for(ColumnMetaData pair: map) {
-            //if (SQLToJavaMapping.isString(Integer.parseInt(pair.getColumnType()))) {
             if (SQLToJavaMapping.isString(pair.getColumnType())) {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();           
@@ -146,7 +145,6 @@ public class DataDiscoverer implements IDiscoverer {
                             " FROM " + table + 
                             " WHERE " + columnName  + " IS NOT NULL ", 100);
                     
-                    //String query = "SELECT " + columnName + " FROM " + table + " WHERE " + columnName  + " IS NOT NULL AND rownum <= " + 100;
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
                         String sentence = resultSet.getString(1);
@@ -188,7 +186,6 @@ public class DataDiscoverer implements IDiscoverer {
                 if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
                     formatter = new Formatter();
                     log.info(formatter.format("%20s %20s %20s", tableName, columnName, averageProbability));
-                    //log.info("Probability for " + tableName + "." + columnName + " is " + averageProbability );
                 }
             }
         }

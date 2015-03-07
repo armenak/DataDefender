@@ -83,13 +83,13 @@ public class MySQLMetaData implements IMetaData {
                 resultSet = md.getColumns(null, null, tableName, null);
                 while (resultSet.next()) {
                     String columnName = resultSet.getString("COLUMN_NAME");
-                    String columnType = resultSet.getString("DATA_TYPE");
+                    String colType = resultSet.getString(6);
                     if (this.columnType != null) {
-                        if (SQLToJavaMapping.isString(resultSet.getInt(5))) {
+                        if (SQLToJavaMapping.isString(colType)) {
                             columnType = "String";
                         }
                     }
-                    map.add(new ColumnMetaData(tableName, columnName, columnType));
+                    map.add(new ColumnMetaData(tableName, columnName, colType));
                 }
             }
             rs.close();

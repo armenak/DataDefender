@@ -13,22 +13,24 @@ import java.util.Map;
  * @author armenak
  */
 public class SQLToJavaMapping {
-    
-    private static final Map<Integer, String> SQL_TO_JAVA = new HashMap();
-    
-    static {
-        SQL_TO_JAVA.put(java.sql.Types.VARCHAR, "String");
-        SQL_TO_JAVA.put(java.sql.Types.NVARCHAR, "String");
-        SQL_TO_JAVA.put(java.sql.Types.NCHAR, "Char");
-        SQL_TO_JAVA.put(java.sql.Types.CHAR, "Char");
+    private static final Map<String, String> JAVA_TYPES = new HashMap();
+
+    static { 
+        JAVA_TYPES.put("VARCHAR", "String");
+        JAVA_TYPES.put("NVARCHAR", "String");
+        JAVA_TYPES.put("VARCHAR2", "String");
+        JAVA_TYPES.put("NVARCHAR2", "String");
+        JAVA_TYPES.put("LONGNVARCHAR", "String");
+        JAVA_TYPES.put("LONGVARCHAR", "String");
+        JAVA_TYPES.put("NCHAR", "Char");        
+        JAVA_TYPES.put("CHAR", "Char");
     }
     
-    public static boolean isString(final int type) {
-        final String value = SQL_TO_JAVA.get(type);
+    public static boolean isString(final String type) {
+        final String value = JAVA_TYPES.get(type);
         if ( (value != null) && (value.equals("String"))) {
             return true;
         }
         return false;
-    }
-    
+    }    
 }
