@@ -26,7 +26,9 @@ public class OracleSQLBuilder implements ISQLBuilder{
     public String buildSelectWithLimit(String sqlString, int limit) {
         StringBuilder sql = new StringBuilder(sqlString);
         
-        sql.append(" AND ").append( "rownum <= ").append(limit);
+        if (limit != 0) {
+            sql.append(" AND ").append( "rownum <= ").append(limit);
+        }
         return sql.toString();
     }
     

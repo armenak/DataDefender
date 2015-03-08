@@ -26,7 +26,9 @@ public class MySQLSQLBuilder implements ISQLBuilder{
     public String buildSelectWithLimit(String sqlString, int limit) {
         StringBuilder sql = new StringBuilder(sqlString);
         
-        sql.append(" LIMIT ").append(limit);
+        if (limit != 0) {
+            sql.append(" LIMIT ").append(limit);
+        }
         return sql.toString();
     }
     

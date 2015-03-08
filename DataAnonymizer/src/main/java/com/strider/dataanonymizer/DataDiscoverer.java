@@ -139,11 +139,12 @@ public class DataDiscoverer implements IDiscoverer {
                         table = schema + "." + tableName;
                     }
                     
+                    int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
                     ISQLBuilder sqlBuilder = SQLBuilderFactory.createSQLBuilder(databaseProperties);
                     String query = sqlBuilder.buildSelectWithLimit(
                             "SELECT " + columnName + 
                             " FROM " + table + 
-                            " WHERE " + columnName  + " IS NOT NULL ", 100);
+                            " WHERE " + columnName  + " IS NOT NULL ", limit);
                     
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
