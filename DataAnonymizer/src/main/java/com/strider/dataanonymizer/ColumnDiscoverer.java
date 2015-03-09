@@ -60,7 +60,7 @@ public class ColumnDiscoverer implements IDiscoverer {
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
                     continue;
                 }
-                if (p.matcher(columnName).matches()) {
+                if (p.matcher(columnName.toLowerCase()).matches()) {
                     matches.add(tableName + "." + columnName);
                 }                            
             }            
