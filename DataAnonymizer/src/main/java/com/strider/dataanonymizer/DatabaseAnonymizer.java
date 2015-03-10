@@ -53,8 +53,6 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import static javax.xml.bind.JAXBContext.newInstance;
 
-import java.lang.reflect.*;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.lang3.StringUtils;

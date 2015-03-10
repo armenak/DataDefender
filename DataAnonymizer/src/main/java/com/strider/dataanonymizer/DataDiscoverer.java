@@ -18,9 +18,9 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
 import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
@@ -33,15 +33,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import static java.lang.Double.parseDouble;
 import java.sql.Connection;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import static java.util.regex.Pattern.compile;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
@@ -49,6 +51,7 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 
 /**
@@ -129,6 +132,14 @@ public class DataDiscoverer implements IDiscoverer {
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
                     continue;
                 }
+                
+                String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
+                if (!CommonUtils.isEmptyString(tableNamePattern)) {
+                    Pattern p = compile(tableNamePattern);
+                    if (!p.matcher(tableName).matches()) {
+                        continue;
+                    }
+                }
 
                 Statement stmt = null;
                 ResultSet resultSet = null;
@@ -139,11 +150,12 @@ public class DataDiscoverer implements IDiscoverer {
                         table = schema + "." + tableName;
                     }
                     
+                    int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
                     ISQLBuilder sqlBuilder = SQLBuilderFactory.createSQLBuilder(databaseProperties);
                     String query = sqlBuilder.buildSelectWithLimit(
                             "SELECT " + columnName + 
                             " FROM " + table + 
-                            " WHERE " + columnName  + " IS NOT NULL ", 100);
+                            " WHERE " + columnName  + " IS NOT NULL ", limit);
                     
                     resultSet = stmt.executeQuery(query);
                     while (resultSet.next()) {
@@ -185,7 +197,8 @@ public class DataDiscoverer implements IDiscoverer {
                 double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
                     formatter = new Formatter();
-                    log.info(formatter.format("%20s %20s %20s", tableName, columnName, averageProbability));
+                    String probability = new DecimalFormat("#.##").format(averageProbability);
+                    log.info(formatter.format("%20s %20s %20s", tableName, columnName, probability));
                 }
             }
         }

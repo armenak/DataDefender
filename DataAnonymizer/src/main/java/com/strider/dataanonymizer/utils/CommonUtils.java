@@ -48,4 +48,12 @@ public class CommonUtils {
     
         return names;
    }    
+    
+    public static boolean isEmptyString(String str) {
+        if (str == null || str.length() == 0) {
+            return true;
+        }
+        
+        return false;
+    }
 }
