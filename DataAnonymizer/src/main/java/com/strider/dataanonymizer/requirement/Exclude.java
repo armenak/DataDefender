@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * JAXB class definition for <Exclude> tags defining exclusion rules.
+ * JAXB class definition for &lt;Exclude&gt; tags defining exclusion rules.
  * 
  * The exclude tag has a Name attribute, and either an Equals attribute, a Like
  * attribute (corresponding to an SQL LIKE comparison), or a Null attribute.
@@ -41,6 +41,11 @@ import javax.xml.bind.annotation.XmlAttribute;
  * value.  The Like attribute requires a value.
  * 
  * Exclude nulls with the optional Null attribute (takes a boolean value).
+ * 
+ * Inclusions can be defined with the NotLike and NotEquals attribute.  In a
+ * list of &lt;Exclusions&gt; and associated &lt;Exclude&gt; tags, a column's
+ * value must match at least one NotLike or NotEquals definition if any are
+ * defined.
  * 
  * Note that column exclusions are not actual SQL exclusions - so some
  * differences may apply, for instance in SQL an = comparison may be case
@@ -75,6 +80,28 @@ public class Exclude {
     private String like;
     
     /**
+     * The excluded value if the value should match with an SQL != comparison in
+     * the WHERE clause.
+     * 
+     * NotEquals values represent "inclusions", where one NotEquals value must
+     * be matched in a series of listed <Exclusions> for the column's value to
+     * be anonymized.
+     */
+    @XmlAttribute(name="NotEquals")
+    private String notEquals;
+    
+    /**
+     * The excluded value if the value should match with an SQL NOT LIKE
+     * comparison in the WHERE clause.
+     * 
+     * NotLike values represent "inclusions", where one NotEquals value must be
+     * matched in a series of listed <Exclusions> for the column's value to be
+     * anonymized.
+     */
+    @XmlAttribute(name="NotLike")
+    private String notLike;
+    
+    /**
      * The excluded value includes nulls.
      */
     @XmlAttribute(name="Null")
@@ -105,6 +132,24 @@ public class Exclude {
      */
     public String getLikeValue() {
         return this.like;
+    }
+    
+    /**
+     * Returns the identical value that is not excluded for the column (!=)
+     * 
+     * @return String
+     */
+    public String getNotEqualsValue() {
+        return this.notEquals;
+    }
+    
+    /**
+     * Returns the (LIKE) value that is not excluded for the column (NOT LIKE)
+     * 
+     * @return String
+     */
+    public String getNotLikeValue() {
+        return this.notLike;
     }
     
     /**
