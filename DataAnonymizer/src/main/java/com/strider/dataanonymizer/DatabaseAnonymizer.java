@@ -470,7 +470,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 columnIndexes.put(columnName, columnIndex);
             }
             if (isExcludedColumn(db, row, column)) {
-                log.debug("Excluding column: " + columnName + " with value: " + row.getString(columnName));
+                String columnValue = row.getString(columnName);
+                updateStmt.setString(columnIndexes.get(columnName), columnValue);
+                log.debug("Excluding column: " + columnName + " with value: " + columnValue);
                 continue;
             }
             
