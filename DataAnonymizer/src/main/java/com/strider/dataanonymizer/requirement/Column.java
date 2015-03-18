@@ -94,16 +94,16 @@ public class Column {
      * @return List<Exclude>
      */
     public List<Exclude> getExclusions() {
-        if (exclusions == null && ignoreEmpty != null && ignoreEmpty.equals("true")) {
+        List<Exclude> lst = new ArrayList<>();
+        if (exclusions != null && !exclusions.isEmpty()) {
+            lst.addAll(exclusions);
+        }
+        if (ignoreEmpty != null && ignoreEmpty.equals("true")) {
             Exclude exc = new Exclude();
             exc.setIgnoreEmpty();
-            exclusions = new ArrayList<>();
-            exclusions.add(exc);
+            lst.add(exc);
         }
-        if (this.exclusions != null) {
-            return unmodifiableList(this.exclusions);
-        }
-        return null;
+        return unmodifiableList(lst);
     }
     
     /**
