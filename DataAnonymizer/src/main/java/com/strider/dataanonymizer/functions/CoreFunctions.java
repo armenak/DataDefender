@@ -354,13 +354,13 @@ public class CoreFunctions {
         StringBuilder sb = new StringBuilder();
         
         int nSentences = max - rand.nextInt((max + 1) - min);
+        String separator = "";
         mainLoop:
         for (int i = 0, start = rand.nextInt(lp.size()); i < nSentences; ++start) {
             String para = lp.get(start % lp.size());
             String[] sentences = para.split("\\.");
-            String separator = "";
             for (String s : sentences) {
-                s = s.trim().replaceAll("[\r\n]+", " ");
+                s = s.trim().replaceAll("\\s+", " ");
                 if (s.isEmpty()) {
                     sb.append(".");
                     continue;
