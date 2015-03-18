@@ -187,12 +187,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (col != null && col.length() != 0) {
                     if (eq != null) {
-                        query.append(separator).append(col).append(" != ?");
+                        query.append(separator).append("(").append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
                         separator = " AND ";
                     }
                     if (lk != null && lk.length() != 0) {
-                        query.append(separator).append(col).append(" NOT LIKE ?");
+                        query.append(separator).append("(").append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
                         separator = " AND ";
                     }
@@ -223,7 +223,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
             }
             
-            if (query.indexOf(" AND ") != -1) {
+            if (query.indexOf(" WHERE (") != -1) {
                 query.append(")");
             }
         }
