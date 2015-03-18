@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -50,12 +52,13 @@ public class CoreFunctions {
     private static Map<String, Iterator<String>> stringIters = new HashMap<>();
     private static List<String> words = new ArrayList<>();
     private static Map<String, Map<String, String>> predictableShuffle = new HashMap<>();
+    private static List<String> lipsumParagraphs = new ArrayList<>();
     
     /**
      * Set after construction with a call to setDatabaseConnection.
      */
     private Connection db;
-
+    
     static {        
         try  {
             log.info("*** Adding list of words into array");
@@ -80,6 +83,32 @@ public class CoreFunctions {
      */
     public void setDatabaseConnection(Connection db) {
         this.db = db;
+    }
+    
+    /**
+     * Returns a List of paragraphs loaded from the lorem ipsum text file.
+     * 
+     * The function separates the text into paragraphs, adding each paragraph to
+     * the list and returning it.
+     * 
+     * @return the list of paragraphs
+     * @throws IOException if an error occurs reading from the file.
+     */
+    private List<String> getLipsumParagraphs() throws IOException {
+        if (lipsumParagraphs.isEmpty()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(CoreFunctions.class.getClassLoader().getResourceAsStream("lipsum.txt")));
+            StringBuilder sb = new StringBuilder();
+            for (String line; (line = br.readLine()) != null; ) {
+                if (line.trim().length() == 0) {
+                    lipsumParagraphs.add(sb.toString());
+                    sb.setLength(0);
+                    continue;
+                }
+                sb.append(line);
+            }
+            lipsumParagraphs.add(sb.toString());
+        }
+        return lipsumParagraphs;
     }
     
     /**
@@ -280,31 +309,127 @@ public class CoreFunctions {
         return randomStringFromFile(file);
     }        
     
+    /**
+     * Generates a random string of 'num' words, with at most 'length'
+     * characters (shortening the string if more characters appear in the
+     * string).
+     * 
+     * @param num The number of desired words
+     * @param length The maximum length of the string
+     * @return 
+     */
     public String generateRandomString(int num, int length) {
-        List<Integer> randomNumbers = new ArrayList<>();
         Random random = new Random();
-
-        for (int i=0;i<num;i++) {
-            int rand = random.nextInt(479617);
-            randomNumbers.add(rand);
-        }
-
         StringBuilder randomString = new StringBuilder();
-        for (Integer i : randomNumbers) {
-            randomString.append(words.get(i));
-            randomString.append(" ");
+        for (int i = 0; i < num && randomString.length() < length; i++) {
+            int rand = random.nextInt(479617);
+            randomString.append(words.get(rand)).append(" ");
         }
-        
-        int stringLength = length;
-        if (randomString.length() <= length) {
-            stringLength = randomString.length();
+
+        if (randomString.length() > length) {
+            return randomString.toString().substring(0, length).trim();
         }
-        
-        return randomString.toString().substring(0, stringLength).trim();
+        return randomString.toString();
     }
     
     public String randomDescription(int num, int length) {
         return this.generateRandomString(num, length);
+    }
+    
+    /**
+     * Generates between min and max (inclusive) lorem ipsum sentences.
+     * 
+     * The sentences are generated from the beginning of paragraphs, although
+     * the first paragraph chosen is random.  Paragraphs are joined together to
+     * form sentences without line breaks.
+     * 
+     * @param min Minimum number of sentences to generate
+     * @param max Maximum number of sentences to generate
+     * @return the generated sentences.
+     * @throws IOException if an error occurs reading from the lipsum text file
+     */
+    public String lipsumSentences(int min, int max) throws IOException {
+        List<String> lp = getLipsumParagraphs();
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+        
+        int nSentences = max - rand.nextInt((max + 1) - min);
+        mainLoop:
+        for (int i = 0, start = rand.nextInt(lp.size()); i < nSentences; ++start) {
+            String para = lp.get(start % lp.size());
+            String[] sentences = para.split("\\.");
+            String separator = "";
+            for (String s : sentences) {
+                s = s.trim().replaceAll("[\r\n]+", " ");
+                if (s.isEmpty()) {
+                    sb.append(".");
+                    continue;
+                }
+                
+                sb.append(separator).append(s).append(".");
+                separator = " ";
+                ++i;
+                
+                if (i == nSentences) {
+                    break mainLoop;
+                }
+            }
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Generates the specified number of paragraphs.
+     * 
+     * The paragraphs are generated from the loaded lorem ipsum text.  The start
+     * position of the text is randomized, however the following paragraphs
+     * appear in sequence - restarting at the beginning if all paragraphs have
+     * been used.
+     * 
+     * @param paragraphs the number of paragraphs to generate
+     * @return the paragraphs
+     * @throws IOException if an error occurs reading from the lipsum text file
+     */
+    public String lipsumParagraphs(int paragraphs) throws IOException {
+        List<String> lp = getLipsumParagraphs();
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, start = rand.nextInt(lp.size()); i < paragraphs; ++i, ++start) {
+            sb.append(lp.get(start % lp.size())).append("\r\n\r\n");
+        }
+        return sb.toString().trim();
+    }
+    
+    /**
+     * Generates text similar to the text passed as a parameter.
+     * 
+     * The method counts the number of paragraphs in the text, generating the
+     * same number of "lorem ipsum" paragraphs.  If the text doesn't contain
+     * paragraphs, the method counts the number of sentences and generates a
+     * similar amount of sentences (+/- 1 sentence).
+     * 
+     * @param text the text to use as a basis for generation
+     * @return the generated lorem ipsum text
+     * @throws IOException if an error occurs reading from the lipsum text file
+     */
+    public String lipsumSimilar(String text) throws IOException {
+        text = text.trim();
+        String sParas = text.replaceAll("\r\n", "\n");
+        int nParas = StringUtils.countMatches(sParas, "\n");
+        if (nParas > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (String para : sParas.split("\n")) {
+                if (para.trim().isEmpty()) {
+                    sb.append("\r\n");
+                    continue;
+                }
+                sb.append(lipsumSimilar(para)).append("\r\n");
+            }
+            return sb.toString().trim();
+        }
+        int nSent = StringUtils.countMatches(text.replaceAll("\\.{2,}", "."), ".");
+        return lipsumSentences(Math.max(1, nSent - 1), Math.max(1, nSent + 1));
     }
  
     public String randomPhoneNumber() {
