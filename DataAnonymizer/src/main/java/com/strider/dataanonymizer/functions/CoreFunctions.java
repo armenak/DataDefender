@@ -146,9 +146,9 @@ public class CoreFunctions {
     private String getPredictableShuffledValueFor(String name, String value) {
         if (!predictableShuffle.containsKey(name)) {
             List<String> list = stringLists.get(name);
-            List<String> shuffled = new ArrayList<String>(list);
+            List<String> shuffled = new ArrayList<>(list);
             Collections.shuffle(shuffled);
-            
+
             Map<String, String> smap = new HashMap<>();
             Iterator<String> lit = list.iterator();
             Iterator<String> sit = shuffled.iterator();
@@ -216,7 +216,10 @@ public class CoreFunctions {
             }
             rs.close();
             stmt.close();
-            
+            if (values.isEmpty()) {
+                // TODO: throw a meaningful exception here
+                log.error("!!! Database column " + keyName + " did not return any values");
+            }
             stringLists.put(keyName, values);
         }
     }
