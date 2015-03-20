@@ -178,7 +178,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
-            String separator = " WHERE ";
+            String separator = " WHERE (";
             for (Exclude exc : exclusions) {
                 String eq = exc.getEqualsValue();
                 String lk = exc.getLikeValue();
@@ -187,12 +187,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (col != null && col.length() != 0) {
                     if (eq != null) {
-                        query.append(separator).append(col).append(" != ?");
+                        query.append(separator).append("(").append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
                         separator = " AND ";
                     }
                     if (lk != null && lk.length() != 0) {
-                        query.append(separator).append(col).append(" NOT LIKE ?");
+                        query.append(separator).append("(").append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
                         separator = " AND ";
                     }
@@ -201,6 +201,30 @@ public class DatabaseAnonymizer implements IAnonymizer {
                         separator = " AND ";
                     }
                 }
+            }
+            
+            if (query.indexOf(" WHERE (") != -1) {
+                separator = ") AND (";
+            }
+            
+            for (Exclude exc : exclusions) {
+                String neq = exc.getNotEqualsValue();
+                String nlk = exc.getNotLikeValue();
+                String col = exc.getName();
+                
+                if (neq != null) {
+                    query.append(separator).append(col).append(" = ?");
+                    separator = " OR ";
+                }
+                if (nlk != null && nlk.length() != 0) {
+                    query.append(separator).append(col).append(" LIKE ?");
+                    separator = " OR ";
+                }
+
+            }
+            
+            if (query.indexOf(" WHERE (") != -1) {
+                query.append(")");
             }
         }
         
@@ -211,6 +235,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
             ++paramIndex;
         }
         
+        log.debug("Querying for: " + query.toString());
+        log.debug("\t - with parameters: " + StringUtils.join(params));
+        
         return stmt;
     }
     
@@ -218,8 +245,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * Calls the anonymization function for the given Column, and returns its
      * anonymized value.
      * 
-     * @param column
      * @param dbConn
+     * @param row
+     * @param column
      * @return
      * @throws NoSuchMethodException
      * @throws SecurityException
@@ -227,7 +255,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private String callAnonymizingFunctionFor(ResultSet row, Column column, Connection dbConn)
+    private String callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -334,41 +362,30 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     /**
-     * Returns the anonymized value of a column, or its current value if it
-     * should be excluded.
-     * 
-     * Checks for exclusions against the current row and column values, either
-     * returning the column's current value or returning an anonymized value by
-     * calling callAnonymizingFunctionFor.
+     * Returns true if the current column's value is excluded by the rulesets
+     * defined by the Requirements.
      * 
      * @param db
      * @param row
      * @param column
      * @return the columns value
      * @throws SQLException
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
      */
-    private String getAnonymizedColumnValue(Connection db, ResultSet row, Column column)
-        throws SQLException,
-               NoSuchMethodException,
-               SecurityException,
-               IllegalAccessException,
-               IllegalArgumentException,
-               InvocationTargetException {
+    private boolean isExcludedColumn(Connection db, ResultSet row, Column column) throws SQLException {
         
         String columnName = column.getName();
-        String columnValue = row.getString(columnName);
         
         List<Exclude> exclusions = column.getExclusions();
+        boolean hasInclusions = false;
+        boolean passedInclusion = false;
+        
         if (exclusions != null) {
             for (Exclude exc : exclusions) {
                 String name = exc.getName();
                 String eq = exc.getEqualsValue();
                 String lk = exc.getLikeValue();
+                String neq = exc.getNotEqualsValue();
+                String nlk = exc.getNotLikeValue();
                 boolean nl = exc.isExcludeNulls();
                 if (name == null || name.length() == 0) {
                     name = columnName;
@@ -376,19 +393,33 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 String testValue = row.getString(name);
 
                 if (nl && testValue == null) {
-                    return columnValue;
+                    return true;
                 } else if (eq != null && eq.equals(testValue)) {
-                    return columnValue;
+                    return true;
                 } else if (lk != null && lk.length() != 0) {
                     LikeMatcher matcher = new LikeMatcher(lk);
                     if (matcher.matches(testValue)) {
-                        return columnValue;
+                        return true;
+                    }
+                }
+                
+                if (neq != null) {
+                    hasInclusions = true;
+                    if (neq.equals(testValue)) {
+                        passedInclusion = true;
+                    }
+                }
+                if (nlk != null && nlk.length() != 0) {
+                    hasInclusions = true;
+                    LikeMatcher matcher = new LikeMatcher(nlk);
+                    if (matcher.matches(testValue)) {
+                        passedInclusion = true;
                     }
                 }
             }
         }
 
-        return callAnonymizingFunctionFor(row, column, db);
+        return (hasInclusions && !passedInclusion);
     }
     
     /**
@@ -425,19 +456,29 @@ public class DatabaseAnonymizer implements IAnonymizer {
              InvocationTargetException {
         
         int fieldIndex = 0;
-        Set<String> updatedColumns = new HashSet<>(tableColumns.size());
+        Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
+        Set<String> anonymized = new HashSet<>(tableColumns.size());
 
         for (Column column : tableColumns) {
             String columnName = column.getName();
-            if (updatedColumns.contains(columnName)) {
-                log.warn("Column " + columnName + " is declared more than once - ignoring second definition");
+            if (anonymized.contains(columnName)) {
                 continue;
             }
-            updatedColumns.add(columnName);
-            ++fieldIndex;
+            int columnIndex = 0;
+            if (!columnIndexes.containsKey(columnName)) {
+                columnIndex = ++fieldIndex;
+                columnIndexes.put(columnName, columnIndex);
+            }
+            if (isExcludedColumn(db, row, column)) {
+                String columnValue = row.getString(columnName);
+                updateStmt.setString(columnIndexes.get(columnName), columnValue);
+                log.debug("Excluding column: " + columnName + " with value: " + columnValue);
+                continue;
+            }
             
-            String colValue = getAnonymizedColumnValue(db, row, column);
-            updateStmt.setString(fieldIndex, colValue);
+            anonymized.add(columnName);
+            String colValue = callAnonymizingFunctionFor(db, row, column);
+            updateStmt.setString(columnIndexes.get(columnName), colValue);
         }
 
         int nUpdateKeys = updateKeys.size();

@@ -52,7 +52,6 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
@@ -173,9 +172,9 @@ public class DataDiscoverer implements IDiscoverer {
                             }
                             
                             // Now let's try to find first or last name
-                            if (firstAndLastNames.contains(sentence.toUpperCase())) {
-                                probabilityList.add(0.95);
-                            }
+                            //if (firstAndLastNames.contains(sentence.toUpperCase())) {
+                            //    probabilityList.add(0.95);
+                            //}
                         }
                     }
                     resultSet.close();
