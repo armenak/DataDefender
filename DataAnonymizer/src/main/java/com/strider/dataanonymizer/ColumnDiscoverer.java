@@ -21,15 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
 import static java.util.regex.Pattern.compile;
 
 import org.apache.log4j.Logger;
+
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -49,8 +52,9 @@ public class ColumnDiscoverer implements IDiscoverer {
         List<ColumnMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         List<String> suspList = new ArrayList(columnProperties.keySet());
-        ArrayList<String> matches = new ArrayList<>();
+        ArrayList<String> matches = new ArrayList<String>();
         for(String s: suspList) {
             Pattern p = compile(s);
             // Find out if database columns contain any of of the "suspicios" fields

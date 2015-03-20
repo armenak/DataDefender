@@ -28,8 +28,6 @@ import com.strider.dataanonymizer.requirement.Table;
 import com.strider.dataanonymizer.utils.RequirementUtils;
 import org.apache.log4j.Logger;
 
-import static javax.xml.bind.JAXBContext.newInstance;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

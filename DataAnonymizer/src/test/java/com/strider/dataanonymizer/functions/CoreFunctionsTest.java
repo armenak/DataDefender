@@ -22,7 +22,6 @@ import com.strider.dataanonymizer.functions.CoreFunctions;
 
 import com.strider.dataanonymizer.utils.Xeger;
 import com.strider.dataanonymizer.utils.XegerTest;
-import static junit.framework.Assert.assertTrue;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;

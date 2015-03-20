@@ -13,7 +13,7 @@ import java.util.Map;
  * @author armenak
  */
 public class SQLToJavaMapping {
-    private static final Map<String, String> JAVA_TYPES = new HashMap();
+    private static final Map<String, String> JAVA_TYPES = new HashMap<String, String>();
 
     static { 
         JAVA_TYPES.put("VARCHAR", "String");

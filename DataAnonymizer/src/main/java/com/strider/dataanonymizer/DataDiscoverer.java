@@ -39,7 +39,6 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Formatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -60,8 +59,9 @@ import static org.apache.log4j.Logger.getLogger;
 public class DataDiscoverer implements IDiscoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
+//    TODO: Uncomment back in if/when we need it
+//    private static List firstAndLastNames = new ArrayList();
     
-    private static List firstAndLastNames = new ArrayList();
     
     @Override
     public void discover(Properties databaseProperties, Properties dataDiscoveryProperties, Collection<String> tables) 
@@ -83,7 +83,8 @@ public class DataDiscoverer implements IDiscoverer {
         NameFinderME nameFinder = null;
         
         try {
-            firstAndLastNames = CommonUtils.readStreamOfLines(dataDiscoveryProperties.getProperty("names"));
+        
+//            firstAndLastNames = CommonUtils.readStreamOfLines(dataDiscoveryProperties.getProperty("names"));
 
             modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
             modelIn = new FileInputStream(dataDiscoveryProperties.getProperty("english_ner_person"));            
@@ -119,8 +120,7 @@ public class DataDiscoverer implements IDiscoverer {
 
         // Start running NLP algorithms for each column and collct percentage
         log.info("List of suspects:");
-        Formatter formatter = new Formatter();
-        log.info(formatter.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
+        log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         
         for(ColumnMetaData pair: map) {
             if (SQLToJavaMapping.isString(pair.getColumnType())) {
@@ -195,9 +195,8 @@ public class DataDiscoverer implements IDiscoverer {
                 
                 double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
-                    formatter = new Formatter();
                     String probability = new DecimalFormat("#.##").format(averageProbability);
-                    log.info(formatter.format("%20s %20s %20s", tableName, columnName, probability));
+                    log.info(String.format("%20s %20s %20s", tableName, columnName, probability));
                 }
             }
         }

@@ -56,7 +56,7 @@ public class MySQLMetaData implements IMetaData {
     
     @Override
     public List<ColumnMetaData> getMetaData() {
-        List<ColumnMetaData> map = new ArrayList();
+        List<ColumnMetaData> map = new ArrayList<ColumnMetaData>();
         
         IDBConnection dbConnection = null;
         Connection connection = null;

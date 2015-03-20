@@ -119,7 +119,6 @@ public class Generator {
      * 
      * @return Options
      */
-    @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
         options.addOption( "h", "help", false, "Display help");        

@@ -18,11 +18,13 @@
 package com.strider.dataanonymizer;
 
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -32,6 +34,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+
 import static org.apache.log4j.Logger.getLogger;
 
 /**
@@ -49,6 +52,7 @@ public class Anonymizer  {
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
+        @SuppressWarnings("unchecked")
         List<String> unparsedArgs = line.getArgList();
         
         if (line.hasOption("help") || args.length == 0 || unparsedArgs.size() < 1) {
@@ -146,7 +150,6 @@ public class Anonymizer  {
      * 
      * @return Options
      */
-    @SuppressWarnings("static-access")
     private static Options createOptions() {
         final Options options = new Options();
         options.addOption("h", "help", false, "Display help");        

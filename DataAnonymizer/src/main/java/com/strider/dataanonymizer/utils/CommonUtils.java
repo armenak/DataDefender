@@ -39,7 +39,7 @@ public class CommonUtils {
      */
     public static List<String> readStreamOfLines(String fileName) 
     throws IOException, FileNotFoundException, FileNotFoundException {
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         Scanner s = new Scanner(new File(fileName));
         while (s.hasNext()){
             names.add(s.next());

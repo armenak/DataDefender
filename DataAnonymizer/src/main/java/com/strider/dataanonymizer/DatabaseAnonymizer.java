@@ -30,6 +30,7 @@ import com.strider.dataanonymizer.requirement.Key;
 import com.strider.dataanonymizer.requirement.Table;
 import com.strider.dataanonymizer.requirement.Exclude;
 import com.strider.dataanonymizer.utils.LikeMatcher;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,14 +51,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
+
 import javax.xml.bind.JAXBContext;
+
 import static javax.xml.bind.JAXBContext.newInstance;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.log4j.Logger;
+
 import static org.apache.log4j.Logger.getLogger;
 
 import java.util.Arrays;
@@ -236,7 +241,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         log.debug("Querying for: " + query.toString());
-        log.debug("\t - with parameters: " + StringUtils.join(params));
+        log.debug("\t - with parameters: " + StringUtils.join(params, ','));
         
         return stmt;
     }
@@ -274,9 +279,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             String className = Utils.getClassName(function);
             String methodName = Utils.getMethodName(function);
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             
-            CoreFunctions instance = (CoreFunctions) clazz.newInstance();
+            CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
 
             List<Parameter> parms = column.getParameters();
@@ -307,8 +312,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
                         }
                         
                         Object value = paramValues.get(par.getName());
-                        Class fnParamType = par.getType();
-                        Class confParamType = (value == null) ? fnParamType : value.getClass();
+                        Class<?> fnParamType = par.getType();
+                        Class<?> confParamType = (value == null) ? fnParamType : value.getClass();
                         
                         if (fnParamType.isPrimitive() && value == null) {
                             continue methodLoop;

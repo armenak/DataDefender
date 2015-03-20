@@ -19,8 +19,6 @@
 package com.strider.dataanonymizer.database;
 
 import java.util.Properties;
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  *

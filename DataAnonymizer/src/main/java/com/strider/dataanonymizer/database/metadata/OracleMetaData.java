@@ -55,7 +55,7 @@ public class OracleMetaData implements IMetaData {
     
     @Override
     public List<ColumnMetaData> getMetaData() {
-        List<ColumnMetaData> map = new ArrayList();
+        List<ColumnMetaData> map = new ArrayList<ColumnMetaData>();
         
         String schema = databaseProperties.getProperty("schema");        
         
