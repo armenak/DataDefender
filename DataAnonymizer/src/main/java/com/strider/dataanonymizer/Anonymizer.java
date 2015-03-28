@@ -18,8 +18,8 @@
 package com.strider.dataanonymizer;
 
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import static org.apache.log4j.Logger.getLogger;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -32,10 +32,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
-
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
 
 /**
  * Entry point to Data Anonymizer. 
@@ -73,50 +71,29 @@ public class Anonymizer  {
         
         switch (cmd) {
             case "anonymize":
-                try {
-                    props = loadProperties(databasePropertyFile);            
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-                }
+                props = loadProperties(databasePropertyFile);            
                 
                 String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                 Properties anonymizerProperties = null;
-                try {
-                    anonymizerProperties = loadProperties(anonymizerPropertyFile);
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
-                }
+                anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                
                 IAnonymizer anonymizer = new DatabaseAnonymizer();
                 anonymizer.anonymize(props, anonymizerProperties, tables);
                 break;
             case "discover":
-                try {
-                    props = loadProperties(databasePropertyFile);            
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-                }
+                props = loadProperties(databasePropertyFile);            
                 
                 if (line.hasOption('c')) {
                     
                     String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
-                    Properties columnProperties = null;
-                    try {
-                        columnProperties = loadProperties(columnPropertyFile);
-                    } catch (IOException ioe) {
-                        throw new AnonymizerException("ERROR: Unable to load " + columnPropertyFile, ioe);
-                    }
+                    Properties columnProperties = loadProperties(columnPropertyFile);
                     IDiscoverer discoverer = new ColumnDiscoverer();
                     discoverer.discover(props, columnProperties, tables);
                 }
                 if (line.hasOption('d')) {
                     log.info("Data discovery in process");
                     String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
-                    Properties dataDiscoveryProperties = null;
-                    try {
-                        dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                    }  catch (IOException ioe) {
-                        throw new AnonymizerException("ERROR: Unable to load " + datadiscoveryPropertyFile, ioe);
-                    }                            
+                    Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                     IDiscoverer discoverer = new DataDiscoverer();
                     discoverer.discover(props, dataDiscoveryProperties, tables);
                 }

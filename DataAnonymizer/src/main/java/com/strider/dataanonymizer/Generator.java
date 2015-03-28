@@ -17,6 +17,11 @@
  */
 package com.strider.dataanonymizer;
 
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import static org.apache.log4j.Logger.getLogger;
+
+import java.util.Properties;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -24,12 +29,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-
-import java.io.IOException;
-import java.util.Properties;
-
-import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Entry point to Data Generator.
@@ -58,36 +57,18 @@ public class Generator {
         }
 
         String databasePropertyFile = "db.properties";
-        Properties props = null;
         if (line.hasOption("P")) {
             databasePropertyFile = line.getOptionValues("P")[0];
-            try {
-                props = loadProperties(databasePropertyFile);
-            } catch (IOException ioe) {
-                throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-            }
         }
-        if (props == null) {
-            throw new AnonymizerException("ERROR: Database property file is not defined.");
-        }
+        Properties props = loadProperties(databasePropertyFile);
 
         String anonymizerPropertyFile = "anonymizer.properties";
         if (line.hasOption("A")) {
             anonymizerPropertyFile = line.getOptionValue("A");
         }
-
-        Properties anonymizerProperties = null;
-        try {
-            anonymizerProperties = loadProperties(anonymizerPropertyFile);
-        } catch (IOException ioe) {
-            throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
-        }
-        if (anonymizerProperties == null) {
-            throw new AnonymizerException("ERROR: Database property file is not defined.");
-        }
+        Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
 
         IGenerator generator = new DataGenerator();
-
         if (line.hasOption("g")) {
             generator.generate(props, anonymizerProperties);
         }
