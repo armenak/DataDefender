@@ -592,7 +592,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     throws DatabaseAnonymizerException{
 
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);
+        Connection connection = dbConnection.connect();
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         Requirement requirement = getRequirement(anonymizerProperties.getProperty("requirement"));

@@ -18,16 +18,54 @@
 
 package com.strider.dataanonymizer.database;
 
+import static java.lang.Class.forName;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.dataanonymizer.utils.ISupplierWithException;
 
 /**
  * Abstract class handling database connections
  */
 public abstract class DBConnection implements IDBConnection {
-    private static final Logger log = getLogger(MSSQLDBConnection.class);
+    private static final Logger log = getLogger(DBConnectionTest.class);
+
+    protected final String driver;
+    protected final String vendor;
+    protected final String url;
+    protected final String userName;
+    protected final String password;
+    
+    /**
+     * Default constructor, initializes connection properties and loads db class.
+     * @param properties
+     * @throws DatabaseAnonymizerException
+     */
+    public DBConnection(Properties properties) throws DatabaseAnonymizerException {
+        driver   = properties.getProperty("driver");
+        vendor   = properties.getProperty("vendor");
+        url      = properties.getProperty("url");
+        userName = properties.getProperty("username");
+        password = properties.getProperty("password");
+        
+        log.debug("Database vendor: " + vendor);
+        log.debug("Using driver " + driver);
+        log.debug("Database URL: " + url);
+        log.debug("Logging in using username " + userName); 
+        
+        try {
+            log.info("Loading database driver");
+            forName(driver);
+        } catch (ClassNotFoundException cnfe) {
+            log.error(cnfe.toString());
+            throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
+        }
+    }
     
     /**
      * Closes database connection
@@ -42,5 +80,32 @@ public abstract class DBConnection implements IDBConnection {
             log.error(ex.toString());
             throw new DatabaseAnonymizerException(ex.toString(), ex);
         }
-    }        
+    }
+
+    /**
+     * Handles the actual creating of the connection, but running the supplier function provided by subclasses.
+     * @param supplier
+     * @return
+     * @throws DatabaseAnonymizerException
+     */
+    protected Connection doConnect(ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
+        Connection conn = null;
+        try {
+            log.info("Establishing database connection");
+            conn = supplier.get();
+            conn.setAutoCommit(false);
+        } catch (SQLException sqle) {
+            log.error(sqle.toString());
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException sql) {
+                    log.error(sql.toString());
+                }
+            }
+            throw new DatabaseAnonymizerException(sqle.toString(), sqle);
+        }
+        return conn;
+    }
 }
+

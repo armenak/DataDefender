@@ -62,7 +62,7 @@ public class MySQLMetaData implements IMetaData {
         Connection connection = null;
         try {
             dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-            connection = dbConnection.connect(databaseProperties);
+            connection = dbConnection.connect();
         } catch (DatabaseAnonymizerException ex) {
             log.info(ex.toString());
         }

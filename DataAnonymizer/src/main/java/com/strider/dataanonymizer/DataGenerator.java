@@ -58,7 +58,7 @@ public class DataGenerator  implements IGenerator {
     public void generate(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         log.info("Connecting to database");
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);
+        Connection connection = dbConnection.connect();
 
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

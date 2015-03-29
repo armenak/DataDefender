@@ -30,12 +30,12 @@ public class DBConnectionFactory {
     throws DatabaseAnonymizerException {
         
         String vendor = databaseProperties.getProperty("vendor");
-        if (vendor.equalsIgnoreCase("mysql")){
-            return new MySQLDBConnection();
-        } else if (vendor.equalsIgnoreCase("mssql")){
-            return new MSSQLDBConnection();
-        } else if (vendor.equalsIgnoreCase("oracle")) {
-            return new OracleDBConnection();
+        if ("mysql".equalsIgnoreCase(vendor)){
+            return new MySQLDBConnection(databaseProperties);
+        } else if ("mssql".equalsIgnoreCase(vendor)){
+            return new MSSQLDBConnection(databaseProperties);
+        } else if ("oracle".equalsIgnoreCase(vendor)) {
+            return new OracleDBConnection(databaseProperties);
         }
         
         throw new IllegalArgumentException("Database " + vendor + " is not supported");

@@ -114,7 +114,7 @@ public class DataDiscoverer implements IDiscoverer {
         }
         
         IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);        
+        Connection connection = dbConnection.connect();        
         
         String schema = databaseProperties.getProperty("schema");    
 
