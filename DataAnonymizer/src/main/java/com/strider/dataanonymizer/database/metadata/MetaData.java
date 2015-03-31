@@ -42,7 +42,7 @@ public abstract class MetaData implements IMetaData {
     private static final Logger log = getLogger(MetaData.class);
     
     private final Properties databaseProperties;
-    private String columnType;
+    protected String columnType;
     
     public MetaData(Properties databaseProperties) {
         this.databaseProperties = databaseProperties;
@@ -92,10 +92,7 @@ public abstract class MetaData implements IMetaData {
                     try (ResultSet columnRS = md.getColumns(null, schema, tableName, null)) {
                         while (columnRS.next()) {
                             String columnName = getColumnName(columnRS);
-                            String colType = columnRS.getString(6);
-                            if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
-                                colType = "String";
-                            }
+                            String colType = getColumnType(columnRS);
                             map.add(new ColumnMetaData(tableName, columnName, colType));
                         }
                     }
@@ -106,5 +103,13 @@ public abstract class MetaData implements IMetaData {
         }
         
         return map;
+    }
+
+    String getColumnType(ResultSet columnRS) throws SQLException {
+        String colType = columnRS.getString(6);
+        if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
+            colType = "String";
+        }
+        return colType;
     }
 }

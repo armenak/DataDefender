@@ -55,6 +55,7 @@ public class MetaDataTest {
     
     private String schema = "test-schema";
     private String table = "test-table";
+    private String cType = "test-cType";
     
     @SuppressWarnings("serial")
     private Properties testProperties = new Properties() {{
@@ -62,8 +63,9 @@ public class MetaDataTest {
     }};
     
     private class TestMetaData extends MetaData {
-        public TestMetaData(Properties databaseProperties) {
+        public TestMetaData(Properties databaseProperties, String columnType) {
             super(databaseProperties);
+            this.columnType = columnType;
         }
         @Override
         public Connection getConnection() throws DatabaseAnonymizerException {
@@ -72,11 +74,22 @@ public class MetaDataTest {
     }
 
     @Test
+    public void testOverride() throws SQLException {
+        when(mockColumnRS.getString(6)).thenReturn(cType).thenReturn(cType).thenReturn("VARCHAR");
+        
+        TestMetaData metaData = new TestMetaData(testProperties, null);
+        assertEquals("No override", cType, metaData.getColumnType(mockColumnRS));
+        metaData = new TestMetaData(testProperties, "Override-Strings-pls!-type");
+        assertEquals("Override, but not valid string type.", cType, metaData.getColumnType(mockColumnRS));
+        assertEquals("Override, with valid string type.", "String", metaData.getColumnType(mockColumnRS));
+    }
+    
+    @Test
     public void testNoTables() throws DatabaseAnonymizerException, SQLException {
         when(mockConnection.getMetaData()).thenReturn(mockMetaData);
         when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
         
-        TestMetaData metaData = new TestMetaData(testProperties);
+        TestMetaData metaData = new TestMetaData(testProperties, null);
         List<ColumnMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
@@ -93,7 +106,7 @@ public class MetaDataTest {
         when(mockTableRS.getString(3)).thenReturn(table);
         when(mockTableRS.next()).thenReturn(true).thenReturn(false);
         
-        TestMetaData metaData = new TestMetaData(testProperties);
+        TestMetaData metaData = new TestMetaData(testProperties, null);
         List<ColumnMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
@@ -112,14 +125,14 @@ public class MetaDataTest {
         when(mockTableRS.next()).thenReturn(true).thenReturn(false); // just one element
         when(mockColumnRS.next()).thenReturn(true).thenReturn(false);
         when(mockColumnRS.getString(4)).thenReturn("cName");
-        when(mockColumnRS.getString(6)).thenReturn("cType");
+        when(mockColumnRS.getString(6)).thenReturn(cType);
                 
-        TestMetaData metaData = new TestMetaData(testProperties);
+        TestMetaData metaData = new TestMetaData(testProperties, null);
         List<ColumnMetaData> result = metaData.getMetaData();
         assertEquals(1, result.size());
         assertEquals(table, result.get(0).getTableName());
         assertEquals("cName", result.get(0).getColumnName());
-        assertEquals("cType", result.get(0).getColumnType());
+        assertEquals(cType, result.get(0).getColumnType());
         
         verify(mockTableRS, times(1)).close();
         verify(mockColumnRS, times(1)).close();
@@ -135,7 +148,7 @@ public class MetaDataTest {
         when(mockTableRS.next()).thenReturn(true).thenReturn(false); // just one element
         when(mockColumnRS.next()).thenThrow(new SQLException());
         
-        TestMetaData metaData = new TestMetaData(testProperties);
+        TestMetaData metaData = new TestMetaData(testProperties, null);
         List<ColumnMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
