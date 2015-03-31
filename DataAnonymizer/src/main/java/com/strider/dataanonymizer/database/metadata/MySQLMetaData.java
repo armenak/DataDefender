@@ -17,101 +17,31 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.utils.SQLToJavaMapping;
+import java.util.Properties;
 
 /**
  *
  * @author armenak
  */
-public class MySQLMetaData implements IMetaData {
-    
-    private static final Logger log = getLogger(MySQLMetaData.class);
-    
-    private Properties databaseProperties = null;
-    private String columnType = null;
+public class MySQLMetaData extends MetaData {
     
     public MySQLMetaData(final Properties databaseProperties) {
-        this.databaseProperties = databaseProperties;
+        super(databaseProperties);
     }
 
     @Override
-    public List<ColumnMetaData> getMetaData(String columnType) {
-        this.columnType = columnType;
-        return this.getMetaData();
+    protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
+        return md.getTables(null, null, "%", null);
     }
-    
     @Override
-    public List<ColumnMetaData> getMetaData() {
-        List<ColumnMetaData> map = new ArrayList<ColumnMetaData>();
-        
-        IDBConnection dbConnection = null;
-        Connection connection = null;
-        try {
-            dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-            connection = dbConnection.connect();
-        } catch (DatabaseAnonymizerException ex) {
-            log.info(ex.toString());
-        }
-                
-        ResultSet rs = null;
-        // Get the metadata from the the database
-        try {
-            // Getting all tables name
-            DatabaseMetaData md = connection.getMetaData();
-            log.info("Fetching table names"); 
-            rs = md.getTables(null, null, "%", null);
-            
-            while (rs.next()) {
-                String tableName = rs.getString(3);
-                log.info("...Processing table " + tableName); 
-                ResultSet resultSet = null;
-                
-                resultSet = md.getColumns(null, null, tableName, null);
-                while (resultSet.next()) {
-                    String columnName = resultSet.getString("COLUMN_NAME");
-                    String colType = resultSet.getString(6);
-                    if (this.columnType != null) {
-                        if (SQLToJavaMapping.isString(colType)) {
-                            columnType = "String";
-                        }
-                    }
-                    map.add(new ColumnMetaData(tableName, columnName, colType));
-                }
-            }
-            rs.close();
-            connection.close();
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException sqle) {
-                    log.error(sqle.toString());
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException sql) {
-                    log.error(sql.toString());
-                }
-            }            
-            log.error(e.toString());
-        }        
-        
-        return map;
+    protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
+        return md.getColumns(null, null, tableName, null);
+    }
+    @Override
+    protected String getColumnName(ResultSet columnRS) throws SQLException {
+        return columnRS.getString("COLUMN_NAME");
     }
 }
