@@ -128,27 +128,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     /**
-     * Adds primary key column names from keys into the 'updatable' collection
-     * if they are not in the columns collection from the table.
-     * 
-     * The list of key columns that can be updated consists of columns that have
-     * not been specified by the requirements as a column that needs to be
-     * anonymized.  It is used to avoid ON UPDATE statements from being
-     * triggered for those columns.
-     * 
-     * @param keys
-     * @param columns
-     * @param updatable 
-     */
-    private void fillUpdatableKeys(final Collection<String> keys, final Collection<String> columns, Collection<String> updatable) {
-        for (String key : keys) {
-            if (!columns.contains(key)) {
-                updatable.add(key);
-            }
-        }
-    }
-    
-    /**
      * Creates the UPDATE query for a single row of results.
      * 
      * @param table
@@ -169,14 +148,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * Creates the SELECT query for key and update columns.
      * 
      * @param tableName
+     * @param keys
      * @param columns
      * @return 
      */
-    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> columns) throws SQLException {
+    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> keys, Collection<String> columns) throws SQLException {
         
         List<String> params = new LinkedList<>();
         StringBuilder query = new StringBuilder("SELECT DISTINCT ");
-        query.append(StringUtils.join(columns, ", ")).append(" FROM ").append(table.getName());
+        query.append(StringUtils.join(keys, ", ")).append(", ");
+        query.append(StringUtils.join(columns, ", "));
+        query.append(" FROM ").append(table.getName());
         
         List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
@@ -433,7 +415,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param updateStmt
      * @param tableColumns
      * @param keyNames
-     * @param updateKeys
      * @param db
      * @param row
      * @throws SQLException
@@ -447,7 +428,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         PreparedStatement updateStmt,
         Collection<Column> tableColumns,
         Collection<String> keyNames,
-        Collection<String> updateKeys,
         Connection db,
         ResultSet row
     ) throws SQLException,
@@ -483,14 +463,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt.setString(columnIndexes.get(columnName), colValue);
         }
 
-        int nUpdateKeys = updateKeys.size();
-        int whereIndex = nUpdateKeys + fieldIndex;
+        int whereIndex = fieldIndex;
         for (String key : keyNames) {
             String value = row.getString(key);
             updateStmt.setString(++whereIndex, value);
-            if (updateKeys.contains(key)) {
-                updateStmt.setString(++fieldIndex, value);
-            }
         }
 
         updateStmt.addBatch();
@@ -515,19 +491,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
         Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
         // keyNames is only iterated over, so no need for a hash set
         List<String> keyNames = new LinkedList<>();
-        // updateKeys is used for contains() and is added to allColumns (which needs to be in
-        // a predictable order) - so it needs to be a LinkedHashSet
-        Set<String> updateKeys = new LinkedHashSet<>();
-        // exceptCols is added as query params
-
+        
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
-        fillUpdatableKeys(keyNames, colNames, updateKeys);
-        
-        List<String> allColumns = new LinkedList<>();
-        allColumns.addAll(colNames);
-        allColumns.addAll(updateKeys);
-        
+
         // required in this scope for 'catch' block
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
@@ -536,16 +503,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
         try {
 
             db.setAutoCommit(false);
-            selectStmt = getSelectQueryStatement(db, table, allColumns);
+            selectStmt = getSelectQueryStatement(db, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
-            String updateString = getUpdateQuery(table, allColumns, keyNames);
+            String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = db.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
             int batchCounter = 0;
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateKeys, db, rs);
+                anonymizeRow(updateStmt, tableColumns, keyNames, db, rs);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();
