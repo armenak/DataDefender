@@ -18,18 +18,8 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.functions.CoreFunctions;
-import com.strider.dataanonymizer.functions.Utils;
-import com.strider.dataanonymizer.requirement.Column;
-import com.strider.dataanonymizer.requirement.Parameter;
-import com.strider.dataanonymizer.requirement.Requirement;
-import com.strider.dataanonymizer.requirement.Key;
-import com.strider.dataanonymizer.requirement.Table;
-import com.strider.dataanonymizer.requirement.Exclude;
-import com.strider.dataanonymizer.utils.LikeMatcher;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static org.apache.log4j.Logger.getLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,31 +31,38 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.LinkedHashSet;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
-
-import static javax.xml.bind.JAXBContext.newInstance;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.Arrays;
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.functions.CoreFunctions;
+import com.strider.dataanonymizer.functions.Utils;
+import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Exclude;
+import com.strider.dataanonymizer.requirement.Key;
+import com.strider.dataanonymizer.requirement.Parameter;
+import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.LikeMatcher;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -591,7 +588,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(Properties databaseProperties, Properties anonymizerProperties, Collection<String> tables) 
     throws DatabaseAnonymizerException{
 
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
+        IDBConnection dbConnection = IDBFactory.get(databaseProperties).createDBConnection();
         Connection connection = dbConnection.connect();
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));

@@ -1,6 +1,6 @@
 package com.strider.dataanonymizer.database;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Properties;
 
@@ -9,19 +9,19 @@ import org.junit.Test;
 /**
  * @author Akira Matsuo
  */
-public class DBConnectionFactoryTest {
+public class IDBFactoryTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidNoProps() throws DatabaseAnonymizerException {
         Properties invalidProps = new Properties();
-        DBConnectionFactory.createDBConnection(invalidProps );
+        IDBFactory.get(invalidProps).createDBConnection();
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidProps() throws DatabaseAnonymizerException {
         Properties invalidProps = new Properties();
         invalidProps.setProperty("vendor", "my-invalid-db");
-        DBConnectionFactory.createDBConnection(invalidProps );
+        IDBFactory.get(invalidProps).createDBConnection();
     }
     
     @Test
@@ -30,7 +30,7 @@ public class DBConnectionFactoryTest {
         // mysql should be provided via mvn dependencies
         validProps.setProperty("vendor", "mysql");
         validProps.setProperty("driver", "com.mysql.jdbc.Driver");
-        IDBConnection con = DBConnectionFactory.createDBConnection(validProps );
+        IDBConnection con = IDBFactory.get(validProps).createDBConnection();
         assertNotNull(con);
     }
 }

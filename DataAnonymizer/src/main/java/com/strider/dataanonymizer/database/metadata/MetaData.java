@@ -17,6 +17,8 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
+import static org.apache.log4j.Logger.getLogger;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -27,11 +29,9 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
-
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Class to hold common logic between different metadata implementations.
@@ -61,7 +61,7 @@ public abstract class MetaData implements IMetaData {
      * @throws DatabaseAnonymizerException
      */
     protected Connection getConnection() throws DatabaseAnonymizerException {
-        return DBConnectionFactory.createDBConnection(databaseProperties).connect();
+        return IDBFactory.get(databaseProperties).createDBConnection().connect();
     }
     // protected methods that allow subclasses to customize behaviour
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {

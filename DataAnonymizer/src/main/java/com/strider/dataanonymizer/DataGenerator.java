@@ -18,15 +18,7 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.requirement.Column;
-import com.strider.dataanonymizer.requirement.Parameter;
-import com.strider.dataanonymizer.requirement.Requirement;
-import com.strider.dataanonymizer.requirement.Table;
-import com.strider.dataanonymizer.utils.RequirementUtils;
-import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +30,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBConnection;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Parameter;
+import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.RequirementUtils;
 
 /**
  * Entry point for RDBMS data generator
@@ -57,7 +58,7 @@ public class DataGenerator  implements IGenerator {
      */
     public void generate(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         log.info("Connecting to database");
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
+        IDBConnection dbConnection = IDBFactory.get(databaseProperties).createDBConnection();
         Connection connection = dbConnection.connect();
 
         // Now we collect data from the requirement

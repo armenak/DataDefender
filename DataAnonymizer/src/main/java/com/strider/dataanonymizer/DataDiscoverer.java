@@ -18,20 +18,14 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
-import com.strider.dataanonymizer.database.metadata.IMetaData;
-import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
-import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
-import com.strider.dataanonymizer.database.sqlbuilder.SQLBuilderFactory;
-import com.strider.dataanonymizer.utils.CommonUtils;
-import com.strider.dataanonymizer.utils.SQLToJavaMapping;
+import static java.lang.Double.parseDouble;
+import static java.util.regex.Pattern.compile;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.Double.parseDouble;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,15 +36,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
-import static java.util.regex.Pattern.compile;
+
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
+
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
+import com.strider.dataanonymizer.database.metadata.IMetaData;
+import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
+import com.strider.dataanonymizer.utils.CommonUtils;
+import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
 /**
  *
@@ -71,7 +72,7 @@ public class DataDiscoverer implements IDiscoverer {
 
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
-        IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
+        IMetaData metaData = IDBFactory.get(databaseProperties).fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();    
        
         InputStream modelInToken = null;
@@ -112,9 +113,8 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (IOException ex) {
             log.error(ex.toString());
         }
-        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect();        
+        IDBFactory dbFactory = IDBFactory.get(databaseProperties);
+        Connection connection = dbFactory.createDBConnection().connect();
         
         String schema = databaseProperties.getProperty("schema");    
 
@@ -150,7 +150,7 @@ public class DataDiscoverer implements IDiscoverer {
                     }
                     
                     int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                    ISQLBuilder sqlBuilder = SQLBuilderFactory.createSQLBuilder(databaseProperties);
+                    ISQLBuilder sqlBuilder = dbFactory.createSQLBuilder();
                     String query = sqlBuilder.buildSelectWithLimit(
                             "SELECT " + columnName + 
                             " FROM " + table + 

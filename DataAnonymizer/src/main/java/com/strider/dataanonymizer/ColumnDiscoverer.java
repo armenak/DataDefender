@@ -17,24 +17,22 @@
  */
 package com.strider.dataanonymizer;
 
+import static java.util.regex.Pattern.compile;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static java.util.regex.Pattern.compile;
-
 import org.apache.log4j.Logger;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
-import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Armenak Grigoryan
@@ -48,7 +46,7 @@ public class ColumnDiscoverer implements IDiscoverer {
     throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
-        IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
+        IMetaData metaData = IDBFactory.get(databaseProperties).fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList
