@@ -53,7 +53,6 @@ public class H2DBTest {
 
     private static void setUpDB() throws SQLException {
         try (Statement stmt = con.createStatement()) {
-            //stmt.executeUpdate( "DROP TABLE table1" );
             stmt.executeUpdate("CREATE TABLE ju_users ( " +
                 "id MEDIUMINT NOT NULL AUTO_INCREMENT, fname VARCHAR(50), lname VARCHAR(50), PRIMARY KEY (id) )" );
             stmt.executeUpdate("INSERT INTO ju_users ( fname, lname ) VALUES ( 'Claudio', 'Bravo' )");
