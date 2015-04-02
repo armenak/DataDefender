@@ -33,7 +33,7 @@ import com.strider.dataanonymizer.utils.ISupplierWithException;
  * Abstract class handling database connections
  */
 public abstract class DBConnection implements IDBConnection {
-    private static final Logger log = getLogger(DBConnectionTest.class);
+    private static final Logger log = getLogger(DBConnection.class);
 
     protected final String driver;
     protected final String vendor;
