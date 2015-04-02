@@ -47,7 +47,7 @@ public interface IDBFactory {
      */
     static IDBFactory get(final Properties dbProps) {
         String vendor = dbProps.getProperty("vendor");
-        if ("mysql".equalsIgnoreCase(vendor)) {
+        if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
             return new IDBFactory() {
                 @Override
                 public IDBConnection createDBConnection() throws DatabaseAnonymizerException {
