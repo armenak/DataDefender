@@ -552,10 +552,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     @Override
-    public void anonymize(Properties databaseProperties, Properties anonymizerProperties, Collection<String> tables) 
+    public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Collection<String> tables) 
     throws DatabaseAnonymizerException{
 
-        IDBConnection dbConnection = IDBFactory.get(databaseProperties).createDBConnection();
+        IDBConnection dbConnection = dbFactory.createDBConnection();
         Connection connection = dbConnection.connect();
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));

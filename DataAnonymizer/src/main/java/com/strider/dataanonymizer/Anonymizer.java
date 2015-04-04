@@ -35,6 +35,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import com.strider.dataanonymizer.database.IDBFactory;
+
 /**
  * Entry point to Data Anonymizer. 
  *  
@@ -67,35 +69,32 @@ public class Anonymizer  {
         Collection<String> tables = getTableArgs(unparsedArgs);
         
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
-        Properties props = null;
+        Properties props = loadProperties(databasePropertyFile);
+        IDBFactory dbFactory = IDBFactory.get(props);
         
         switch (cmd) {
             case "anonymize":
-                props = loadProperties(databasePropertyFile);            
-                
                 String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                 Properties anonymizerProperties = null;
                 anonymizerProperties = loadProperties(anonymizerPropertyFile);
                 
                 IAnonymizer anonymizer = new DatabaseAnonymizer();
-                anonymizer.anonymize(props, anonymizerProperties, tables);
+                anonymizer.anonymize(dbFactory, anonymizerProperties, tables);
                 break;
             case "discover":
-                props = loadProperties(databasePropertyFile);            
-                
                 if (line.hasOption('c')) {
                     
                     String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                     Properties columnProperties = loadProperties(columnPropertyFile);
                     IDiscoverer discoverer = new ColumnDiscoverer();
-                    discoverer.discover(props, columnProperties, tables);
+                    discoverer.discover(dbFactory, columnProperties, tables);
                 }
                 if (line.hasOption('d')) {
                     log.info("Data discovery in process");
                     String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                     Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                     IDiscoverer discoverer = new DataDiscoverer();
-                    discoverer.discover(props, dataDiscoveryProperties, tables);
+                    discoverer.discover(dbFactory, dataDiscoveryProperties, tables);
                 }
                 break;
             default:

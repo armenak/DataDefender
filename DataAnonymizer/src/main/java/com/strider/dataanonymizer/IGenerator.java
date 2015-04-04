@@ -19,6 +19,7 @@
 package com.strider.dataanonymizer;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
 
 import java.util.Properties;
 
@@ -33,6 +34,6 @@ public interface IGenerator {
      * @param anonymizerProperties Anonymizer property file name and path
      * @throws DatabaseAnonymizerException
      */
-    void generate(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException;
+    void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException;
 
 }

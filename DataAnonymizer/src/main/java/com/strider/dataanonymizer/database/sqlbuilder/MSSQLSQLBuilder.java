@@ -16,20 +16,14 @@
  */
 package com.strider.dataanonymizer.database.sqlbuilder;
 
+import java.util.Properties;
+
 /**
- * Interface for all classes implementing database connection
  * @author Armenak Grigoryan
  */
-public class MSSQLSQLBuilder implements ISQLBuilder{
+public class MSSQLSQLBuilder extends SQLBuilder{
     
-    @Override
-    public String buildSelectWithLimit(String sqlString, int limit) {
-        StringBuilder sql = new StringBuilder(sqlString);
-        
-        if (limit != 0) {
-            sql.append(" LIMIT ").append(limit);
-        }
-        return sql.toString();
+    public MSSQLSQLBuilder(Properties databaseProperties) {
+        super(databaseProperties);
     }
-    
 }

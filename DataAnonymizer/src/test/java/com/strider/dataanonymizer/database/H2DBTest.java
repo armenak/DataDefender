@@ -19,17 +19,13 @@ package com.strider.dataanonymizer.database;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
@@ -40,41 +36,7 @@ import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
  * 
  * @author Akira Matsuo
  */
-public class H2DBTest {
-    
-    @SuppressWarnings("serial")
-    private static Properties h2Props = new Properties() {{
-        setProperty("vendor", "h2");
-        setProperty("driver", "org.h2.Driver");
-        setProperty("url", "jdbc:h2:mem:utest;MODE=MySQL;DB_CLOSE_DELAY=-1");
-        setProperty("username", "test");
-        setProperty("password", "");
-    }};
-
-    private static void setUpDB() throws SQLException {
-        try (Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("CREATE TABLE ju_users ( " +
-                "id MEDIUMINT NOT NULL AUTO_INCREMENT, fname VARCHAR(50), lname VARCHAR(50), PRIMARY KEY (id) )" );
-            stmt.executeUpdate("INSERT INTO ju_users ( fname, lname ) VALUES ( 'Claudio', 'Bravo' )");
-            stmt.executeUpdate("INSERT INTO ju_users ( fname, lname ) VALUES ( 'Ugo', 'Bernasconi' )");
-        }
-    }
-    
-    private static IDBFactory factory = IDBFactory.get(h2Props);
-    private static Connection con;
-    @BeforeClass
-    public static void classSetUp() throws DatabaseAnonymizerException, SQLException {
-        con = factory.createDBConnection().connect();
-        setUpDB();
-    }
-    @AfterClass
-    public static void classTearDown() throws SQLException {
-        try (Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("DROP TABLE ju_users");
-        } finally {
-            con.close();
-        }
-    }
+public class H2DBTest extends H2DB {
 
     private void assertQuery(String[] asserts) throws SQLException {
         try (Statement stmt = con.createStatement(); 
@@ -88,12 +50,12 @@ public class H2DBTest {
             assertEquals(asserts.length, i);
         }
     }
-    
+
     @Test
     public void testData() throws DatabaseAnonymizerException, SQLException {
         assertQuery(new String[] { "1: Claudio, Bravo", "2: Ugo, Bernasconi"});
     }
-    
+
     @Test
     public void testMetaData() throws DatabaseAnonymizerException {
         List<ColumnMetaData> meta = factory.fetchMetaData().getMetaData();
@@ -103,7 +65,7 @@ public class H2DBTest {
         List<String> expected = Arrays.asList("ju_users.id(integer)", "ju_users.fname(varchar)", "ju_users.lname(varchar)");
         assertTrue(expected.equals(actual));
     }
-    
+
     @Test
     public void testSQLBuilder() {
         String sql = factory.createSQLBuilder().buildSelectWithLimit("SELECT * FROM blah", 1);

@@ -30,6 +30,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
+import com.strider.dataanonymizer.database.IDBFactory;
+
 /**
  * Entry point to Data Generator.
  *  
@@ -70,7 +72,8 @@ public class Generator {
 
         IGenerator generator = new DataGenerator();
         if (line.hasOption("g")) {
-            generator.generate(props, anonymizerProperties);
+            IDBFactory dbFactory = IDBFactory.get(props);
+            generator.generate(dbFactory, anonymizerProperties);
         }
     }
 

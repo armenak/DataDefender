@@ -42,11 +42,11 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(Properties databaseProperties, Properties columnProperties, Collection<String> tables) 
+    public void discover(IDBFactory factory, Properties columnProperties, Collection<String> tables) 
     throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
-        IMetaData metaData = IDBFactory.get(databaseProperties).fetchMetaData();
+        IMetaData metaData = factory.fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList

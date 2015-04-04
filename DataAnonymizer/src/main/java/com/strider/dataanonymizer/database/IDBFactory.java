@@ -59,7 +59,7 @@ public interface IDBFactory {
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
-                    return new MySQLSQLBuilder();
+                    return new MySQLSQLBuilder(dbProps);
                 }
             };
         } else if ("mssql".equalsIgnoreCase(vendor)){
@@ -74,7 +74,7 @@ public interface IDBFactory {
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
-                    return new MSSQLSQLBuilder();
+                    return new MSSQLSQLBuilder(dbProps);
                 }
             };
         } else if ("oracle".equalsIgnoreCase(vendor)) {
@@ -89,7 +89,7 @@ public interface IDBFactory {
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
-                    return new OracleSQLBuilder();
+                    return new OracleSQLBuilder(dbProps);
                 }
             };
         }

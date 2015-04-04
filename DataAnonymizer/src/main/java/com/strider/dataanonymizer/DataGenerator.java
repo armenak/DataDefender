@@ -33,7 +33,6 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
 import com.strider.dataanonymizer.database.IDBFactory;
 import com.strider.dataanonymizer.requirement.Column;
 import com.strider.dataanonymizer.requirement.Parameter;
@@ -56,10 +55,9 @@ public class DataGenerator  implements IGenerator {
      * @param anonymizerProperties  Properties for anonymizer
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    public void generate(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException {
+    public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         log.info("Connecting to database");
-        IDBConnection dbConnection = IDBFactory.get(databaseProperties).createDBConnection();
-        Connection connection = dbConnection.connect();
+        Connection connection = dbFactory.createDBConnection().connect();
 
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

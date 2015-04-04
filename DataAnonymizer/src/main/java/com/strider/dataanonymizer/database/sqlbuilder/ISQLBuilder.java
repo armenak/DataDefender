@@ -17,9 +17,16 @@
 package com.strider.dataanonymizer.database.sqlbuilder;
 
 /**
- * Interface for all classes implementing database connection
+ * Interface for all classes implementing sql builder.
  * @author Armenak Grigoryan
  */
 public interface ISQLBuilder {
     public String buildSelectWithLimit(String sqlString, int limit);
+    // May not be the best place for this logic... consider moving if a more appropriate place exists
+    /**
+     * Prefix table name with schema is present.
+     * @param tableName
+     * @return
+     */
+    public String prefixSchema(String tableName);
 }

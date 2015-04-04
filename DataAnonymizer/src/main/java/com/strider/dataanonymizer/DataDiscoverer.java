@@ -65,14 +65,13 @@ public class DataDiscoverer implements IDiscoverer {
     
     
     @Override
-    public void discover(Properties databaseProperties, Properties dataDiscoveryProperties, Collection<String> tables) 
+    public void discover(IDBFactory factory, Properties dataDiscoveryProperties, Collection<String> tables) 
     throws AnonymizerException {
-        
         log.info("Data discovery in process");
 
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
-        IMetaData metaData = IDBFactory.get(databaseProperties).fetchMetaData();
+        IMetaData metaData = factory.fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();    
        
         InputStream modelInToken = null;
@@ -113,10 +112,8 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (IOException ex) {
             log.error(ex.toString());
         }
-        IDBFactory dbFactory = IDBFactory.get(databaseProperties);
-        Connection connection = dbFactory.createDBConnection().connect();
-        
-        String schema = databaseProperties.getProperty("schema");    
+        Connection connection = factory.createDBConnection().connect();
+        ISQLBuilder sqlBuilder = factory.createSQLBuilder();
 
         // Start running NLP algorithms for each column and collct percentage
         log.info("List of suspects:");
@@ -144,13 +141,9 @@ public class DataDiscoverer implements IDiscoverer {
                 ResultSet resultSet = null;
                 try {
                     stmt = connection.createStatement();
-                    String table = tableName;
-                    if (schema != null && !schema.equals("")) {
-                        table = schema + "." + tableName;
-                    }
+                    String table = sqlBuilder.prefixSchema(tableName);
                     
                     int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                    ISQLBuilder sqlBuilder = dbFactory.createSQLBuilder();
                     String query = sqlBuilder.buildSelectWithLimit(
                             "SELECT " + columnName + 
                             " FROM " + table + 
