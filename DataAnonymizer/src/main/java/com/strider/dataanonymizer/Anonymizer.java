@@ -20,9 +20,9 @@ package com.strider.dataanonymizer;
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 import static org.apache.log4j.Logger.getLogger;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
@@ -66,7 +66,7 @@ public class Anonymizer  {
         }
         
         String cmd = unparsedArgs.get(0);
-        Collection<String> tables = getTableArgs(unparsedArgs);
+        Set<String> tables = getTableArgs(unparsedArgs);
         
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = loadProperties(databasePropertyFile);
@@ -159,7 +159,7 @@ public class Anonymizer  {
      * @param unparsedArgs
      * @return The list of table names
      */
-    private static Collection<String> getTableArgs(List<String> unparsedArgs) {
+    private static Set<String> getTableArgs(List<String> unparsedArgs) {
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         return unparsedArgs.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
     }

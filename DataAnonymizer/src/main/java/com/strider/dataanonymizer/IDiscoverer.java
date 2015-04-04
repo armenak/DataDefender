@@ -18,8 +18,9 @@
 
 package com.strider.dataanonymizer;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import com.strider.dataanonymizer.database.IDBFactory;
 
@@ -38,6 +39,8 @@ public interface IDiscoverer {
      *        if the collection is empty, all tables specified in requirements
      *        are anonymized.
      * @throws com.strider.dataanonymizer.AnonymizerException
+     * @returns List of results introduced for testing purposes, may return different results in the future 
+     * if we need to feed the results into other processes
      */
-    void discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Collection<String> tables) throws AnonymizerException;
+    List<String> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
 }

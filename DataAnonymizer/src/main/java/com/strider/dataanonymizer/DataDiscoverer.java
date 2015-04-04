@@ -32,9 +32,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import opennlp.tools.namefind.NameFinderME;
@@ -65,7 +65,7 @@ public class DataDiscoverer implements IDiscoverer {
     
     
     @Override
-    public void discover(IDBFactory factory, Properties dataDiscoveryProperties, Collection<String> tables) 
+    public List<String> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
 
@@ -118,6 +118,8 @@ public class DataDiscoverer implements IDiscoverer {
         // Start running NLP algorithms for each column and collct percentage
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        List<String> results = new ArrayList<>();
         
         for(ColumnMetaData pair: map) {
             if (SQLToJavaMapping.isString(pair.getColumnType())) {
@@ -188,11 +190,14 @@ public class DataDiscoverer implements IDiscoverer {
                 
                 double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
-                    String probability = new DecimalFormat("#.##").format(averageProbability);
-                    log.info(String.format("%20s %20s %20s", tableName, columnName, probability));
+                    String probability = decimalFormat.format(averageProbability);
+                    String result = String.format("%20s %20s %20s", tableName, columnName, probability);
+                    log.info(result);
+                    results.add(result);
                 }
             }
         }
+        return results;
     }
     
     private double calculateAverage(List <Double> values) {
