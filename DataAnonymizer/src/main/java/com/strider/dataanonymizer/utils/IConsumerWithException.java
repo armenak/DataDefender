@@ -22,9 +22,9 @@ package com.strider.dataanonymizer.utils;
  * @author Akira Matsuo
  *
  * @param <T>
- * Much like a java.util.Supplier but throws an exception.
+ * Much like a java.util.Consumer but throws an exception.
  */
 @FunctionalInterface
-public interface ISupplierWithException<T, E extends Exception> {
-    public T get() throws E;
+public interface IConsumerWithException<T, E extends Exception> {
+    public void accept(T obj) throws E;
 }

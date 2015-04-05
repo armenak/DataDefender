@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -93,7 +92,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.error(je.toString());
             throw new DatabaseAnonymizerException(je.toString(), je);
         } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex.toString());
         }
         return req;
     }
@@ -220,7 +219,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         log.debug("Querying for: " + query.toString());
-        log.debug("\t - with parameters: " + StringUtils.join(params, ','));
+        if (params.size() > 0) {
+            log.debug("\t - with parameters: " + StringUtils.join(params, ','));
+        }
         
         return stmt;
     }
@@ -255,7 +256,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         } 
         
         try {
-            
             String className = Utils.getClassName(function);
             String methodName = Utils.getMethodName(function);
             Class<?> clazz = Class.forName(className);
@@ -282,10 +282,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
             methodLoop:
             for (Method m : methods) {
                 if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
+                    
+                    log.debug("  Found method: " + m.getName());
+                    log.debug("  Match w/: " + paramValues);
+                    
                     java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
                         
+                        log.debug("    Real param: " + par.getName());
                         if (!paramValues.containsKey(par.getName())) {
                             continue methodLoop;
                         }
@@ -327,7 +332,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     s.append(comma).append(p.getType()).append(" ").append(p.getName());
                     comma = ", ";
                 }
-                s.append(") was not found in class ").append(className);
+                s.append(") was not found in class ").append(className).append(
+                    "\n*Hint: arg names should be named 'argX', where X is the positional int.");
                 throw new NoSuchMethodException(s.toString());
             }
             
@@ -510,7 +516,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt = db.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
-            int batchCounter = 0;
+            int batchCounter = 0, rowCount = 0;
             while (rs.next()) {
                 anonymizeRow(updateStmt, tableColumns, keyNames, db, rs);
                 batchCounter++;
@@ -519,7 +525,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     db.commit();
                     batchCounter = 0;
                 }
+                rowCount++;
             }
+            log.debug("Rows processed: " + rowCount);
             
             updateStmt.executeBatch();
             db.commit();
@@ -563,9 +571,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-        for(Table table : requirement.getTables()) {
-            if (tables.isEmpty() || tables.contains(table.getName())) {
-                anonymizeTable(batchSize, connection, table);
+        for(Table reqTable : requirement.getTables()) {
+            if (tables.isEmpty() || tables.contains(reqTable.getName())) {
+                anonymizeTable(batchSize, connection, reqTable);
             }
         }
         

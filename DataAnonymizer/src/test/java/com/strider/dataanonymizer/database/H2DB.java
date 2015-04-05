@@ -16,13 +16,19 @@
  */
 package com.strider.dataanonymizer.database;
 
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import com.strider.dataanonymizer.utils.IConsumerWithException;
 
 /**
  * Handles the setup and teardown of h2db for testing.
@@ -51,7 +57,8 @@ public abstract class H2DB {
                 "id MEDIUMINT NOT NULL AUTO_INCREMENT, fname VARCHAR(50), lname VARCHAR(50), PRIMARY KEY (id) )" );
             stmt.executeUpdate("INSERT INTO ju_users ( fname, lname ) VALUES ( 'Claudio', 'Bravo' )");
             stmt.executeUpdate("INSERT INTO ju_users ( fname, lname ) VALUES ( 'Ugo', 'Bernasconi' )");
-        }
+        } // make sure other connections can see this data, too
+        con.commit();
     }
     @AfterClass
     public static void tearDownDB() throws SQLException {
@@ -60,5 +67,28 @@ public abstract class H2DB {
         } finally {
             con.close();
         }
+    }
+    
+    // Helper methods to assist in testing data
+    protected void consumeQuery(IConsumerWithException<ResultSet, SQLException> cons) throws SQLException {
+        try (Statement stmt = con.createStatement(); 
+            ResultSet rs = stmt.executeQuery("SELECT * FROM ju_users");) {
+            cons.accept(rs);
+        }
+    }
+    
+    protected void assertInitialData(ResultSet rs) throws SQLException {
+        assertData(rs, (expected, actual) -> assertEquals(expected, actual));
+    }
+    
+    protected void assertData(ResultSet rs, BiConsumer<String, String> cons) throws SQLException {
+        String[] asserts = new String[]{ "1: Claudio, Bravo", "2: Ugo, Bernasconi"};
+        int i = 0;
+        while(rs.next())  {
+            String line = rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname");
+            cons.accept(asserts[i], line);
+            i++;
+        }
+        assertEquals(asserts.length, i);
     }
 }

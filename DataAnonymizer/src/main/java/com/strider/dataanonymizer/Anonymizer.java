@@ -75,8 +75,7 @@ public class Anonymizer  {
         switch (cmd) {
             case "anonymize":
                 String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                Properties anonymizerProperties = null;
-                anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
                 
                 IAnonymizer anonymizer = new DatabaseAnonymizer();
                 anonymizer.anonymize(dbFactory, anonymizerProperties, tables);

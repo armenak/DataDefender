@@ -19,9 +19,7 @@ package com.strider.dataanonymizer.database;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,23 +35,10 @@ import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
  * @author Akira Matsuo
  */
 public class H2DBTest extends H2DB {
-
-    private void assertQuery(String[] asserts) throws SQLException {
-        try (Statement stmt = con.createStatement(); 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM ju_users");) {
-            int i = 0;
-            while(rs.next())  {
-                String line = rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname");
-                assertEquals(asserts[i], line);
-                i++;
-            }
-            assertEquals(asserts.length, i);
-        }
-    }
-
+    
     @Test
     public void testData() throws DatabaseAnonymizerException, SQLException {
-        assertQuery(new String[] { "1: Claudio, Bravo", "2: Ugo, Bernasconi"});
+        consumeQuery(this::assertInitialData);
     }
 
     @Test
