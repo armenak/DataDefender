@@ -100,7 +100,7 @@ Unfortunately, not all JDBC drivers are downloadable via a publicly available ma
 - http://www.oracle.com/technetwork/apps-tech/jdbc-112010-090769.html
 - http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774
 
-In order to use these drivers via maven you can add the driver to your private maven repository if you have one or install locally:
+In order to use these drivers via maven you can add the driver jar to your private maven repository if you have one or install locally:
 
 1.) download package
 2.) unzip/extract jdbc jar file from package
