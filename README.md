@@ -91,3 +91,23 @@ To run the anonymizer on specific tables, the table names can be passed at the e
     java -jar DataAnonymizer.jar anonymize -P db.properties -A anonymizer.properties myTable1 myTable2
 
 This would run the anonymizer for tables defined in the requirements XML file with the name myTable1 or myTable2 only.  Any other tables defined in the requirements would be ignored.
+
+
+Using 3rd-Party JDBC Drivers with Maven
+------------------
+Unfortunately, not all JDBC drivers are downloadable via a publicly available maven repostitory and must be downloaded individually.  For example:
+
+- http://www.oracle.com/technetwork/apps-tech/jdbc-112010-090769.html
+- http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774
+
+In order to use these drivers via maven you can add the driver to your private maven repository if you have one or install locally:
+
+1.) download package
+2.) unzip/extract jdbc jar file from package
+3.) Add driver to your local maven repository by executing:  mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar 
+4.) add dependency to pom.xml:
+    <dependency>
+        <groupId>${groupId}</groupId>
+        <artifactId>${artifactId}</artifactId>
+        <version>${version}</version>
+    </dependency>
