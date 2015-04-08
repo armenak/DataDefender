@@ -102,12 +102,15 @@ Unfortunately, not all JDBC drivers are downloadable via a publicly available ma
 
 In order to use these drivers via maven you can add the driver jar to your private maven repository if you have one or install locally:
 
-1.) download package
-2.) unzip/extract jdbc jar file from package
-3.) Add driver to your local maven repository by executing:  mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar 
-4.) add dependency to pom.xml:
+<ol>
+<li>download package</li>
+<li>unzip/extract jdbc jar file from package</li>
+<li>add driver to your local maven repository by executing:  mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar</li> 
+<li>add dependency to pom.xml:
     <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${artifactId}</artifactId>
         <version>${version}</version>
     </dependency>
+</li>
+</ol>
