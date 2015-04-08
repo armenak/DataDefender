@@ -111,12 +111,12 @@ mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${grou
 </pre>
 </li> 
 <li>add dependency to pom.xml:
-```xml
+<textarea>
     <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${artifactId}</artifactId>
         <version>${version}</version>
     </dependency>
-```
+</textarea>
 </li>
 </ol>
