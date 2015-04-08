@@ -106,17 +106,17 @@ In order to use these drivers via maven you can add the driver jar to your priva
 <li>download package</li>
 <li>unzip/extract jdbc jar file from package</li>
 <li>add driver to your local maven repository by executing:  
-<code>
+<pre>
 mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar
-</code>
+</pre>
 </li> 
 <li>add dependency to pom.xml:
-<code>
+<pre>
     <dependency>
         <groupId>${groupId}</groupId>
         <artifactId>${artifactId}</artifactId>
         <version>${version}</version>
     </dependency>
-</code>
+</pre>
 </li>
 </ol>
