@@ -20,6 +20,7 @@ package com.strider.dataanonymizer;
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 import static org.apache.log4j.Logger.getLogger;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -49,6 +50,7 @@ public class Anonymizer  {
     private static final Logger log = getLogger(Anonymizer.class);
 
     public static void main(String[] args) throws ParseException, AnonymizerException {
+        log.info("Cli args: " + Arrays.toString(args));
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);

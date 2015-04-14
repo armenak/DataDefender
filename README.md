@@ -120,3 +120,27 @@ mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${grou
 </pre>
 </li>
 </ol>
+
+
+Using Maven to execute Anonymizer
+------------------
+
+The pom.xml has been configured to allow easy execution of the Anonymizer suite of programs from the command line.  Most of the configurable options are supported via Maven, but please read on for the details.
+
+<h3>Prerequisites</h3>
+
+Ensure that:
+- The required database driver has been installed and configured for Maven (refer to 3rd party JDBC section if necessary).
+- 'mvn clean compile' or even better 'mvn clean test' has been run successfully
+- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/dir).
+
+<h3>Configuration</h3>
+
+${execAppDir} can be overridden via the command line (ie; -DexecAppDir=blah...) to set the Anonymizer working directory (and also the relative directory where the properties files should be placed).  *Note: the log directory will also be created under ${execAppDir}
+
+<h3>Execution</h3>
+
+A maven profile has been configured for each application, so to run:
+- column discovery: mvn exec:exec -P column-discovery
+- data discovery: mvn exec:exec -P data-discovery
+- anonymizer: mvn exec:exec -P anonymize
