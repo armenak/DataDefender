@@ -52,6 +52,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
         List<String> suspList = new ArrayList(columnProperties.keySet());
+        suspList.remove("tables"); // removing 'special' tables property that's not a pattern
         ArrayList<String> matches = new ArrayList<>();
         for(String suspStr: suspList) {
             Pattern p = compile(suspStr);

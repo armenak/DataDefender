@@ -332,8 +332,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     s.append(comma).append(p.getType()).append(" ").append(p.getName());
                     comma = ", ";
                 }
-                s.append(") was not found in class ").append(className).append(
-                    "\n*Hint: arg names should be named 'argX', where X is the positional int.");
+                s.append(") was not found in class ").append(className);
                 throw new NoSuchMethodException(s.toString());
             }
             
@@ -560,7 +559,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     @Override
-    public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Collection<String> tables) 
+    public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
     throws DatabaseAnonymizerException{
 
         IDBConnection dbConnection = dbFactory.createDBConnection();

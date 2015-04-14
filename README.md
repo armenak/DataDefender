@@ -132,11 +132,12 @@ The pom.xml has also been configured to allow easy execution of the Anonymizer s
 Ensure that:
 - The required database driver has been installed and configured for Maven (refer to 3rd party JDBC section if necessary).
 - 'mvn clean compile' or even better 'mvn clean test' has been run successfully
-- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/dir).
+- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery|anonymizer.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/dir).
 
 <h3>Configuration</h3>
 
-${execAppDir} can be overridden via the command line (ie; -DexecAppDir=blah...) to set the Anonymizer working directory (and also the relative directory where the properties files should be placed).  *Note: the log directory will also be created under ${execAppDir}
+- ${execAppDir} can be overridden via the command line (ie; -DexecAppDir=blah...) to set the Anonymizer working directory (and also the relative directory where the properties files should be placed).  *Note: the log directory will also be created under ${execAppDir}
+- Maven doesn't handle dynamic behaviour very well (such as a variable # of tables names given on the command line); therefore, tableNames must be provided via the 'tables' property in the appropriate application properties file (columndiscovery|datadiscovery|anonymizer.properites).
 
 <h3>Execution</h3>
 

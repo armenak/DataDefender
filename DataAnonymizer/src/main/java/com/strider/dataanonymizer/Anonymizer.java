@@ -21,6 +21,7 @@ import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
 import static org.apache.log4j.Logger.getLogger;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -67,35 +68,31 @@ public class Anonymizer  {
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
         
-        String cmd = unparsedArgs.get(0);
-        Set<String> tables = getTableArgs(unparsedArgs);
-        
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = loadProperties(databasePropertyFile);
         IDBFactory dbFactory = IDBFactory.get(props);
+        String cmd = unparsedArgs.get(0); // get & remove command arg
+        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
         switch (cmd) {
             case "anonymize":
                 String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                 Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
-                
                 IAnonymizer anonymizer = new DatabaseAnonymizer();
-                anonymizer.anonymize(dbFactory, anonymizerProperties, tables);
+                anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
                 break;
             case "discover":
                 if (line.hasOption('c')) {
-                    
                     String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                     Properties columnProperties = loadProperties(columnPropertyFile);
                     IDiscoverer discoverer = new ColumnDiscoverer();
-                    discoverer.discover(dbFactory, columnProperties, tables);
+                    discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
                 }
                 if (line.hasOption('d')) {
-                    log.info("Data discovery in process");
                     String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                     Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                     IDiscoverer discoverer = new DataDiscoverer();
-                    discoverer.discover(dbFactory, dataDiscoveryProperties, tables);
+                    discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                 }
                 break;
             default:
@@ -157,11 +154,24 @@ public class Anonymizer  {
      * This guarantees table names to be in lower case, so functions comparing
      * can use contains() with a lower case name.
      * 
-     * @param unparsedArgs
+     * If tables names are not supplied via command line, then will search the property file
+     * for space separated list of table names.
+     * 
+     * @param tableNames
+     * @param props application property file
      * @return The list of table names
      */
-    private static Set<String> getTableArgs(List<String> unparsedArgs) {
-        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
-        return unparsedArgs.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+    static Set<String> getTableNames(List<String> tableNames, Properties props) {
+        if (tableNames.isEmpty()) {
+            String tableStr = props.getProperty("tables");
+            if (tableStr == null) {
+                return Collections.emptySet();
+            }
+            tableNames = Arrays.asList(tableStr.split(" "));
+            log.info("Adding tables from property file.");
+        }
+        Set<String> tables = tableNames.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+        log.info("Tables: " + Arrays.toString(tables.toArray()));
+        return tables;
     }
 }
