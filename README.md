@@ -137,7 +137,7 @@ Ensure that:
 <h3>Configuration</h3>
 
 - ${execAppDir} can be overridden via the command line (ie; -DexecAppDir=blah...) to set the Anonymizer working directory (and also the relative directory where the properties files should be placed).  *Note: the log directory will also be created under ${execAppDir}
-- Maven doesn't handle dynamic behaviour very well (such as a variable # of tables names given on the command line); therefore, tableNames must be provided via the 'tables' property in the appropriate application properties file (columndiscovery|datadiscovery|anonymizer.properites).
+- Maven doesn't handle dynamic behaviour very well (such as a variable # of tables names given on the command line); therefore, in order to restrict applications to certain tables, table names must be provided via the optional 'tables' property in the appropriate application properties file (columndiscovery|datadiscovery|anonymizer.properites).
 
 <h3>Execution</h3>
 
