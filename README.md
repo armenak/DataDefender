@@ -132,7 +132,7 @@ The pom.xml has also been configured to allow easy execution of the Anonymizer s
 Ensure that:
 - The required database driver has been installed and configured for Maven (refer to 3rd party JDBC section if necessary).
 - 'mvn clean compile' or even better 'mvn clean test' has been run successfully
-- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery|anonymizer.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/dir).
+- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery|anonymizer.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/ directory).
 
 <h3>Configuration</h3>
 
