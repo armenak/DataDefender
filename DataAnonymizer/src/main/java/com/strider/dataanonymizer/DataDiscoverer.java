@@ -112,7 +112,7 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (IOException ex) {
             log.error(ex.toString());
         }
-        Connection connection = factory.createDBConnection().connect();
+        Connection connection = factory.getConnection().connect();
         ISQLBuilder sqlBuilder = factory.createSQLBuilder();
 
         // Start running NLP algorithms for each column and collct percentage

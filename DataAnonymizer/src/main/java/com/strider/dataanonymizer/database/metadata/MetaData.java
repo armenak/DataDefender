@@ -42,10 +42,13 @@ public abstract class MetaData implements IMetaData {
     private static final Logger log = getLogger(MetaData.class);
     
     private final Properties databaseProperties;
+    private final String schema;
     protected String columnType;
+
     
     public MetaData(Properties databaseProperties) {
         this.databaseProperties = databaseProperties;
+        this.schema = databaseProperties.getProperty("schema");
     }
     
     @Override
@@ -61,14 +64,14 @@ public abstract class MetaData implements IMetaData {
      * @throws DatabaseAnonymizerException
      */
     protected Connection getConnection() throws DatabaseAnonymizerException {
-        return IDBFactory.get(databaseProperties).createDBConnection().connect();
+        return IDBFactory.get(databaseProperties).getConnection().connect();
     }
     // protected methods that allow subclasses to customize behaviour
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
-        return md.getTables(null, databaseProperties.getProperty("schema"), null, new String[] {"TABLE"});
+        return md.getTables(null, schema, null, new String[] {"TABLE"});
     }
     protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
-        return md.getColumns(null, databaseProperties.getProperty("schema"), tableName, null);
+        return md.getColumns(null, schema, tableName, null);
     }
     protected String getColumnName(ResultSet columnRS) throws SQLException {
         return columnRS.getString(4);

@@ -39,6 +39,13 @@
                 <execAppFlag></execAppFlag>
             </properties>
         </profile>
+        <profile>
+            <id>generate</id>
+            <properties>
+                <execAppName>generate</execAppName>
+                <execAppFlag></execAppFlag>
+            </properties>
+        </profile>
     </profiles>
 
     <properties>

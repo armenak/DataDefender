@@ -18,12 +18,8 @@
 
 package com.strider.dataanonymizer;
 
-import static javax.xml.bind.JAXBContext.newInstance;
 import static org.apache.log4j.Logger.getLogger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -42,16 +38,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
 import com.strider.dataanonymizer.database.IDBFactory;
 import com.strider.dataanonymizer.functions.CoreFunctions;
 import com.strider.dataanonymizer.functions.Utils;
@@ -62,6 +53,7 @@ import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
 import com.strider.dataanonymizer.utils.LikeMatcher;
+import com.strider.dataanonymizer.utils.RequirementUtils;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -72,30 +64,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     private static Logger log = getLogger(DatabaseAnonymizer.class);
 
-    /**
-     * Returns a Requirement object for a given XML file.
-     * 
-     * Initializes JAXB parser and parses, returning the parsed Requirement
-     * object
-     * 
-     * @param file the filename
-     * @return
-     * @throws DatabaseAnonymizerException 
-     */
-    private Requirement getRequirement(String file) throws DatabaseAnonymizerException {
-        Requirement req = null;
-        try {
-            JAXBContext jc = newInstance(Requirement.class);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            req = (Requirement) unmarshaller.unmarshal(new FileInputStream(new File(file)));
-        } catch (JAXBException je) {
-            log.error(je.toString());
-            throw new DatabaseAnonymizerException(je.toString(), je);
-        } catch (FileNotFoundException ex) {
-            log.error(ex.toString());
-        }
-        return req;
-    }
     
     /**
      * Adds column names from the table to the passed collection of strings.
@@ -563,11 +531,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
     throws DatabaseAnonymizerException{
 
-        IDBConnection dbConnection = dbFactory.createDBConnection();
-        Connection connection = dbConnection.connect();
+        Connection connection = dbFactory.getConnection().connect();
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
-        Requirement requirement = getRequirement(anonymizerProperties.getProperty("requirement"));
+        Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
 
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
@@ -576,7 +543,5 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 anonymizeTable(batchSize, connection, reqTable);
             }
         }
-        
-        dbConnection.disconnect(connection);
     }
 }

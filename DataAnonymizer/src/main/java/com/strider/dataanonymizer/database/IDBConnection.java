@@ -25,5 +25,4 @@ import java.sql.Connection;
  */
 public interface IDBConnection {
     Connection connect() throws DatabaseAnonymizerException;
-    void disconnect(final Connection conn) throws DatabaseAnonymizerException;    
 }

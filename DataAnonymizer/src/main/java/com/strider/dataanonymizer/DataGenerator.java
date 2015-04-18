@@ -57,7 +57,7 @@ public class DataGenerator  implements IGenerator {
      */
     public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         log.info("Connecting to database");
-        Connection connection = dbFactory.createDBConnection().connect();
+        Connection connection = dbFactory.getConnection().connect();
 
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
@@ -83,7 +83,6 @@ public class DataGenerator  implements IGenerator {
                     
                     StringBuilder sql = new StringBuilder(100);
                     sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
-                    
                     try (Statement stmt = connection.createStatement();
                         ResultSet rs = stmt.executeQuery(sql.toString());
                         BufferedWriter bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));) {

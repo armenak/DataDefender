@@ -51,7 +51,7 @@ public abstract class H2DB {
 
     @BeforeClass
     public static void setUpDB() throws DatabaseAnonymizerException, SQLException {
-        con = factory.createDBConnection().connect();
+        con = factory.getConnection().connect();
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("CREATE TABLE ju_users ( " +
                 "id MEDIUMINT NOT NULL AUTO_INCREMENT, fname VARCHAR(50), lname VARCHAR(50), PRIMARY KEY (id) )" );

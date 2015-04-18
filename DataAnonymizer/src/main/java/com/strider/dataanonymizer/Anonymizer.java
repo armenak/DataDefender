@@ -87,13 +87,18 @@ public class Anonymizer  {
                     Properties columnProperties = loadProperties(columnPropertyFile);
                     IDiscoverer discoverer = new ColumnDiscoverer();
                     discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
-                }
-                if (line.hasOption('d')) {
+                } else if (line.hasOption('d')) {
                     String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                     Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                     IDiscoverer discoverer = new DataDiscoverer();
                     discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                 }
+                break;
+            case "generate":
+                IGenerator generator = new DataGenerator();
+                String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                Properties generatorProperties = loadProperties(generatorPropertyFile);
+                generator.generate(dbFactory, generatorProperties);
                 break;
             default:
                 help(options);
@@ -144,7 +149,7 @@ public class Anonymizer  {
      */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("DataAnonymizer anonymize|discover [options] [table1 [table2 [...]]]", options);
+        formatter.printHelp("DataAnonymizer anonymize|discover|generate [options] [table1 [table2 [...]]]", options);
     }
     
     /**

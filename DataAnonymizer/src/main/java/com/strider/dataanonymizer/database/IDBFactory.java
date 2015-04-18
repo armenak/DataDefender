@@ -36,7 +36,7 @@ import com.strider.dataanonymizer.database.sqlbuilder.OracleSQLBuilder;
  */
 public interface IDBFactory {
     
-    IDBConnection createDBConnection() throws DatabaseAnonymizerException;
+    IDBConnection getConnection() throws DatabaseAnonymizerException;
     IMetaData fetchMetaData() throws DatabaseAnonymizerException;
     ISQLBuilder createSQLBuilder();
     
@@ -50,7 +50,7 @@ public interface IDBFactory {
         if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
             return new IDBFactory() {
                 @Override
-                public IDBConnection createDBConnection() throws DatabaseAnonymizerException {
+                public IDBConnection getConnection() throws DatabaseAnonymizerException {
                     return new MySQLDBConnection(dbProps);
                 }
                 @Override
@@ -65,7 +65,7 @@ public interface IDBFactory {
         } else if ("mssql".equalsIgnoreCase(vendor)){
             return new IDBFactory() {
                 @Override
-                public IDBConnection createDBConnection() throws DatabaseAnonymizerException {
+                public IDBConnection getConnection() throws DatabaseAnonymizerException {
                     return new MSSQLDBConnection(dbProps);
                 }
                 @Override
@@ -80,7 +80,7 @@ public interface IDBFactory {
         } else if ("oracle".equalsIgnoreCase(vendor)) {
             return new IDBFactory() {
                 @Override
-                public IDBConnection createDBConnection() throws DatabaseAnonymizerException {
+                public IDBConnection getConnection() throws DatabaseAnonymizerException {
                     return new OracleDBConnection(dbProps);
                 }
                 @Override

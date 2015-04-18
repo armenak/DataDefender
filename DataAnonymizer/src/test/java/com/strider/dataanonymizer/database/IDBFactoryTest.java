@@ -30,14 +30,14 @@ public class IDBFactoryTest {
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidNoProps() throws DatabaseAnonymizerException {
         Properties invalidProps = new Properties();
-        IDBFactory.get(invalidProps).createDBConnection();
+        IDBFactory.get(invalidProps).getConnection();
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidProps() throws DatabaseAnonymizerException {
         Properties invalidProps = new Properties();
         invalidProps.setProperty("vendor", "my-invalid-db");
-        IDBFactory.get(invalidProps).createDBConnection();
+        IDBFactory.get(invalidProps).getConnection();
     }
     
     @Test
@@ -46,7 +46,7 @@ public class IDBFactoryTest {
         // mysql should be provided via mvn dependencies
         validProps.setProperty("vendor", "mysql");
         validProps.setProperty("driver", "com.mysql.jdbc.Driver");
-        IDBConnection con = IDBFactory.get(validProps).createDBConnection();
+        IDBConnection con = IDBFactory.get(validProps).getConnection();
         assertNotNull(con);
     }
 }
