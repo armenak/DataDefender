@@ -41,6 +41,6 @@ public class SQLToJavaMapping {
     private static final String CHAR = "Char";
     
     public static boolean isString(final String type) {
-        return STRING.equals(JAVA_TYPES.get(type));
+        return STRING.equals(JAVA_TYPES.get(type.toUpperCase()));
     }
 }

@@ -44,7 +44,8 @@ public class DatabaseAnonymizerTest extends H2DB {
             System.out.println(rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname"));
         }
     }
-    
+    // Note: if this test fails w/ NoSuchMethodException and running in an IDE ensure that the -parameter is passed to compiler
+    //       in eclipse it's under java compiler->classfile generation->store information about parameters
     @Test
     public void testHappyPath() throws AnonymizerException, SQLException { 
         consumeQuery(this::assertInitialData);
