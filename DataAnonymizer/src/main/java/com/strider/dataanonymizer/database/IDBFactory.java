@@ -18,7 +18,13 @@
 
 package com.strider.dataanonymizer.database;
 
+import static org.apache.log4j.Logger.getLogger;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 import com.strider.dataanonymizer.database.metadata.MSSQLMetaData;
@@ -28,34 +34,65 @@ import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.database.sqlbuilder.MSSQLSQLBuilder;
 import com.strider.dataanonymizer.database.sqlbuilder.MySQLSQLBuilder;
 import com.strider.dataanonymizer.database.sqlbuilder.OracleSQLBuilder;
+import com.strider.dataanonymizer.utils.ICloseableNoException;
 
 /**
  * Aggregate all the various db factories.
- * 
+ * Will handle the 'pooling' of connections (currently only one).
+ * All clients should close the connection by calling the close() method of the AutoCloseable interface.
  * @author Akira Matsuo
  */
-public interface IDBFactory {
+public interface IDBFactory extends ICloseableNoException {
     
-    IDBConnection getConnection() throws DatabaseAnonymizerException;
+    Connection getConnection();
     IMetaData fetchMetaData() throws DatabaseAnonymizerException;
     ISQLBuilder createSQLBuilder();
+    
+    // Implements the common logic of get/closing of connections
+    static abstract class DBFactory implements IDBFactory {
+        private static final Logger log = getLogger(DBFactory.class);
+        private final Connection connection;
+
+        DBFactory() throws DatabaseAnonymizerException {
+            log.info("Connecting to database");
+            connection = createConnection();
+        }
+        
+        abstract Connection createConnection() throws DatabaseAnonymizerException;
+        @Override
+        public Connection getConnection() {
+            return connection;
+        }
+        @Override
+        public void close() {
+            if (connection == null) {
+                return;
+            }
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                log.error(e);
+            }
+        }
+    }
     
     /**
      * Create db factory for given rdbms. Or illegal argument exception.
      * @param dbProps
      * @return db factory instance
+     * @throws DatabaseAnonymizerException 
      */
-    static IDBFactory get(final Properties dbProps) {
+    static IDBFactory get(final Properties dbProps) throws DatabaseAnonymizerException {
         String vendor = dbProps.getProperty("vendor");
         if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
-            return new IDBFactory() {
+            return new DBFactory() {
                 @Override
-                public IDBConnection getConnection() throws DatabaseAnonymizerException {
-                    return new MySQLDBConnection(dbProps);
+                public Connection createConnection() throws DatabaseAnonymizerException {
+                    return new MySQLDBConnection(dbProps).connect();
                 }
                 @Override
                 public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
-                    return new MySQLMetaData(dbProps);
+                    return new MySQLMetaData(dbProps, getConnection());
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
@@ -63,14 +100,14 @@ public interface IDBFactory {
                 }
             };
         } else if ("mssql".equalsIgnoreCase(vendor)){
-            return new IDBFactory() {
+            return new DBFactory() {
                 @Override
-                public IDBConnection getConnection() throws DatabaseAnonymizerException {
-                    return new MSSQLDBConnection(dbProps);
+                public Connection createConnection() throws DatabaseAnonymizerException {
+                    return new MSSQLDBConnection(dbProps).connect();
                 }
                 @Override
                 public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
-                    return new MSSQLMetaData(dbProps);
+                    return new MSSQLMetaData(dbProps, getConnection());
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
@@ -78,14 +115,14 @@ public interface IDBFactory {
                 }
             };
         } else if ("oracle".equalsIgnoreCase(vendor)) {
-            return new IDBFactory() {
+            return new DBFactory() {
                 @Override
-                public IDBConnection getConnection() throws DatabaseAnonymizerException {
-                    return new OracleDBConnection(dbProps);
+                public Connection createConnection() throws DatabaseAnonymizerException {
+                    return new OracleDBConnection(dbProps).connect();
                 }
                 @Override
                 public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
-                    return new OracleMetaData(dbProps);
+                    return new OracleMetaData(dbProps, getConnection());
                 }
                 @Override
                 public ISQLBuilder createSQLBuilder() {
@@ -96,6 +133,5 @@ public interface IDBFactory {
         
         throw new IllegalArgumentException("Database " + vendor + " is not supported");
     }
-    
 }
 

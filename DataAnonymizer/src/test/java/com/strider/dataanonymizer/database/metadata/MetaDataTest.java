@@ -64,12 +64,8 @@ public class MetaDataTest {
     
     private class TestMetaData extends MetaData {
         public TestMetaData(Properties databaseProperties, String columnType) {
-            super(databaseProperties);
+            super(databaseProperties, mockConnection);
             this.columnType = columnType;
-        }
-        @Override
-        public Connection getConnection() throws DatabaseAnonymizerException {
-            return mockConnection;
         }
     }
 
@@ -95,7 +91,6 @@ public class MetaDataTest {
         
         verify(mockTableRS, times(1)).next(); // should return false
         verify(mockTableRS, times(1)).close();
-        verify(mockConnection, times(1)).close();
     }
     
     @Test
@@ -113,7 +108,6 @@ public class MetaDataTest {
         verify(mockColumnRS, times(1)).next(); // returns false
         verify(mockTableRS, times(1)).close();
         verify(mockColumnRS, times(1)).close();
-        verify(mockConnection, times(1)).close();
     }
     
     @Test
@@ -136,7 +130,6 @@ public class MetaDataTest {
         
         verify(mockTableRS, times(1)).close();
         verify(mockColumnRS, times(1)).close();
-        verify(mockConnection, times(1)).close();
     }
     
     @Test
@@ -154,6 +147,5 @@ public class MetaDataTest {
         
         verify(mockTableRS, times(1)).close();
         verify(mockColumnRS, times(1)).close();
-        verify(mockConnection, times(1)).close();
     }
 }

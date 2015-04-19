@@ -17,6 +17,7 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,8 +29,8 @@ import java.util.Properties;
  */
 public class MySQLMetaData extends MetaData {
     
-    public MySQLMetaData(final Properties databaseProperties) {
-        super(databaseProperties);
+    public MySQLMetaData(Properties databaseProperties, Connection connection) {
+        super(databaseProperties, connection);
     }
 
     @Override

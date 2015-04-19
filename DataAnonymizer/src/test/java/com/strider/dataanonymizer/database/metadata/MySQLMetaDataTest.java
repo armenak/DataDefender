@@ -60,11 +60,7 @@ public class MySQLMetaDataTest {
     
     private class TestMSQLMetaData extends MySQLMetaData {
         public TestMSQLMetaData(Properties databaseProperties) {
-            super(databaseProperties);
-        }
-        @Override
-        public Connection getConnection() throws DatabaseAnonymizerException {
-            return mockConnection;
+            super(databaseProperties, mockConnection);
         }
     }
     
@@ -88,6 +84,5 @@ public class MySQLMetaDataTest {
         
         verify(mockTableRS, times(1)).close();
         verify(mockColumnRS, times(1)).close();
-        verify(mockConnection, times(1)).close();
     }
 }

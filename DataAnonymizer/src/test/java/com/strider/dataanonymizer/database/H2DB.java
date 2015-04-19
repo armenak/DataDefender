@@ -46,12 +46,13 @@ public abstract class H2DB {
         setProperty("password", "");
     }};
 
-    protected static IDBFactory factory = IDBFactory.get(h2Props);
+    protected static IDBFactory factory;
     protected static Connection con;
 
     @BeforeClass
     public static void setUpDB() throws DatabaseAnonymizerException, SQLException {
-        con = factory.getConnection().connect();
+        factory = IDBFactory.get(h2Props);
+        con = factory.getConnection();
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("CREATE TABLE ju_users ( " +
                 "id MEDIUMINT NOT NULL AUTO_INCREMENT, fname VARCHAR(50), lname VARCHAR(50), PRIMARY KEY (id) )" );
@@ -61,11 +62,13 @@ public abstract class H2DB {
         con.commit();
     }
     @AfterClass
-    public static void tearDownDB() throws SQLException {
+    public static void tearDownDB() throws Exception {
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("DROP TABLE ju_users");
-        } finally {
-            con.close();
+        } finally { // manually close connection
+            if (factory != null) {
+                factory.close();
+            }
         }
     }
     

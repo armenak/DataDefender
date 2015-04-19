@@ -531,8 +531,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
     throws DatabaseAnonymizerException{
 
-        Connection connection = dbFactory.getConnection().connect();
-
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
 
@@ -540,7 +538,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(Table reqTable : requirement.getTables()) {
             if (tables.isEmpty() || tables.contains(reqTable.getName())) {
-                anonymizeTable(batchSize, connection, reqTable);
+                anonymizeTable(batchSize, dbFactory.getConnection(), reqTable);
             }
         }
     }

@@ -70,39 +70,41 @@ public class Anonymizer  {
         
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = loadProperties(databasePropertyFile);
-        IDBFactory dbFactory = IDBFactory.get(props);
-        String cmd = unparsedArgs.get(0); // get & remove command arg
-        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
+        try (IDBFactory dbFactory = IDBFactory.get(props);) {
         
-        switch (cmd) {
-            case "anonymize":
-                String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
-                IAnonymizer anonymizer = new DatabaseAnonymizer();
-                anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
-                break;
-            case "discover":
-                if (line.hasOption('c')) {
-                    String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
-                    Properties columnProperties = loadProperties(columnPropertyFile);
-                    IDiscoverer discoverer = new ColumnDiscoverer();
-                    discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
-                } else if (line.hasOption('d')) {
-                    String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
-                    Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                    IDiscoverer discoverer = new DataDiscoverer();
-                    discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
-                }
-                break;
-            case "generate":
-                IGenerator generator = new DataGenerator();
-                String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                Properties generatorProperties = loadProperties(generatorPropertyFile);
-                generator.generate(dbFactory, generatorProperties);
-                break;
-            default:
-                help(options);
-                break;
+            String cmd = unparsedArgs.get(0); // get & remove command arg
+            unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
+            
+            switch (cmd) {
+                case "anonymize":
+                    String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                    IAnonymizer anonymizer = new DatabaseAnonymizer();
+                    anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
+                    break;
+                case "discover":
+                    if (line.hasOption('c')) {
+                        String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
+                        Properties columnProperties = loadProperties(columnPropertyFile);
+                        IDiscoverer discoverer = new ColumnDiscoverer();
+                        discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                    } else if (line.hasOption('d')) {
+                        String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
+                        IDiscoverer discoverer = new DataDiscoverer();
+                        discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
+                    }
+                    break;
+                case "generate":
+                    IGenerator generator = new DataGenerator();
+                    String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    Properties generatorProperties = loadProperties(generatorPropertyFile);
+                    generator.generate(dbFactory, generatorProperties);
+                    break;
+                default:
+                    help(options);
+                    break;
+            }
         }
     }
     

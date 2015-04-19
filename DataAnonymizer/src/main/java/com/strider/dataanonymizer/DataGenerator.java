@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -56,12 +55,8 @@ public class DataGenerator  implements IGenerator {
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
     public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
-        log.info("Connecting to database");
-        Connection connection = dbFactory.getConnection().connect();
-
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
-
         // Iterate over the requirement and generate data sets
         log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
 
@@ -83,7 +78,7 @@ public class DataGenerator  implements IGenerator {
                     
                     StringBuilder sql = new StringBuilder(100);
                     sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
-                    try (Statement stmt = connection.createStatement();
+                    try (Statement stmt = dbFactory.getConnection().createStatement();
                         ResultSet rs = stmt.executeQuery(sql.toString());
                         BufferedWriter bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));) {
                         

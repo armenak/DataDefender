@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -112,7 +111,6 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (IOException ex) {
             log.error(ex.toString());
         }
-        Connection connection = factory.getConnection().connect();
         ISQLBuilder sqlBuilder = factory.createSQLBuilder();
 
         // Start running NLP algorithms for each column and collct percentage
@@ -138,20 +136,16 @@ public class DataDiscoverer implements IDiscoverer {
                         continue;
                     }
                 }
+                String table = sqlBuilder.prefixSchema(tableName);
+                int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
+                String query = sqlBuilder.buildSelectWithLimit(
+                    "SELECT " + columnName + 
+                    " FROM " + table + 
+                    " WHERE " + columnName  + " IS NOT NULL ", limit);
 
-                Statement stmt = null;
-                ResultSet resultSet = null;
-                try {
-                    stmt = connection.createStatement();
-                    String table = sqlBuilder.prefixSchema(tableName);
-                    
-                    int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                    String query = sqlBuilder.buildSelectWithLimit(
-                            "SELECT " + columnName + 
-                            " FROM " + table + 
-                            " WHERE " + columnName  + " IS NOT NULL ", limit);
-                    
-                    resultSet = stmt.executeQuery(query);
+                try (Statement stmt = factory.getConnection().createStatement();
+                    ResultSet resultSet = stmt.executeQuery(query);) {
+
                     while (resultSet.next()) {
                         String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
@@ -172,19 +166,7 @@ public class DataDiscoverer implements IDiscoverer {
                             //}
                         }
                     }
-                    resultSet.close();
-                    stmt.close();
                 } catch (SQLException sqle) {
-                    try {
-                        if (stmt != null) {
-                            stmt.close();
-                        }
-                        if (resultSet != null) {
-                            resultSet.close();
-                        }
-                    } catch (SQLException sql) {
-                        log.error(sql.toString());
-                    }
                     log.error(sqle.toString());
                 }
                 

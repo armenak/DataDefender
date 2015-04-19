@@ -66,21 +66,6 @@ public abstract class DBConnection implements IDBConnection {
             throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
         }
     }
-//    
-//    /**
-//     * Closes database connection
-//     * @param conn
-//     * @throws DatabaseAnonymizerException 
-//     */
-//    @Override
-//    public void disconnect(final Connection conn) throws DatabaseAnonymizerException {
-//        try {
-//            conn.close();
-//        } catch (SQLException ex) {
-//            log.error(ex.toString());
-//            throw new DatabaseAnonymizerException(ex.toString(), ex);
-//        }
-//    }
 
     /**
      * Handles the actual creating of the connection, but running the supplier function provided by subclasses.

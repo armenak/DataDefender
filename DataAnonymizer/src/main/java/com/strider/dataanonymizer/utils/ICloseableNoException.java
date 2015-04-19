@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -15,20 +15,13 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.dataanonymizer.database.metadata;
-
-import java.sql.Connection;
-import java.util.Properties;
+package com.strider.dataanonymizer.utils;
 
 /**
- * @author armenak
- * 
- * Essentially does the same thing as the MetaData class, but creating
- * an extra class here just to be explicit and to carry on the current model.
+ * Just hide the Exception thrown by close() as we don't need to throw one.
+ * @author Akira Matsuo
  */
-public class MSSQLMetaData extends MetaData {
-
-    public MSSQLMetaData(Properties databaseProperties, Connection connection) {
-        super(databaseProperties, connection);
-    }
+public interface ICloseableNoException extends AutoCloseable {
+    @Override 
+    public void close();
 }

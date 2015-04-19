@@ -17,6 +17,7 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
+import java.sql.Connection;
 import java.util.Properties;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Properties;
  */
 public class OracleMetaData extends MSSQLMetaData {
     
-    public OracleMetaData(final Properties databaseProperties) {
-        super(databaseProperties);
+    public OracleMetaData(final Properties databaseProperties, Connection connection) {
+        super(databaseProperties, connection);
     }
 }

@@ -29,8 +29,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBFactory;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
 /**
@@ -43,12 +41,14 @@ public abstract class MetaData implements IMetaData {
     
     private final Properties databaseProperties;
     private final String schema;
+    private final Connection connection;
     protected String columnType;
 
     
-    public MetaData(Properties databaseProperties) {
+    public MetaData(Properties databaseProperties, Connection connection) {
         this.databaseProperties = databaseProperties;
         this.schema = databaseProperties.getProperty("schema");
+        this.connection = connection;
     }
     
     @Override
@@ -56,16 +56,7 @@ public abstract class MetaData implements IMetaData {
         this.columnType = columnType;
         return getMetaData();
     }
-    
-    /**
-     * Helper method to return connection to allow unit testing.  
-     * @param databaseProperties
-     * @return db connection
-     * @throws DatabaseAnonymizerException
-     */
-    protected Connection getConnection() throws DatabaseAnonymizerException {
-        return IDBFactory.get(databaseProperties).getConnection().connect();
-    }
+
     // protected methods that allow subclasses to customize behaviour
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
         return md.getTables(null, schema, null, new String[] {"TABLE"});
@@ -82,7 +73,7 @@ public abstract class MetaData implements IMetaData {
         List<ColumnMetaData> map = new ArrayList<ColumnMetaData>();
         
         // Get the metadata from the the database
-        try (Connection connection = getConnection()) { 
+        try { 
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
             String schema = databaseProperties.getProperty("schema");
@@ -101,7 +92,7 @@ public abstract class MetaData implements IMetaData {
                     }
                 }
             }
-        } catch (SQLException | DatabaseAnonymizerException e) {
+        } catch (SQLException e) {
             log.error(e.toString());
         }
         
