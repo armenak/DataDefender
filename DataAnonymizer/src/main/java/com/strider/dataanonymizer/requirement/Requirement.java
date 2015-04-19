@@ -55,7 +55,7 @@ public class Requirement {
     { 
         return this.client; 
     }
-    
+
     /**
      * Getter method for version attribute
      * @return String
@@ -73,5 +73,18 @@ public class Requirement {
             return unmodifiableList(this.tables);
         }
         return null;
+    }
+    
+    // Setter methods
+    public void setClient(String client) {
+        this.client = client;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setTables(List<Table> tables) {
+        this.tables = tables;
     }
 }

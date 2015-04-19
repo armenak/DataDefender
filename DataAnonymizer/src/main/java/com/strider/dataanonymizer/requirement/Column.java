@@ -116,4 +116,29 @@ public class Column {
         }
         return null;
     }
+    
+    // Setter methods
+    public void setIgnoreEmpty(String ignoreEmpty) {
+        this.ignoreEmpty = ignoreEmpty;
+    }
+
+    public void setParamters(List<Parameter> paramters) {
+        this.paramters = paramters;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
+
+    public void setReturnType(String returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setExclusions(List<Exclude> exclusions) {
+        this.exclusions = exclusions;
+    }
 }

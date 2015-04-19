@@ -48,4 +48,9 @@ public class Key {
     public String getName() {
         return this.name;
     }
+    
+    // Setter method
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -92,7 +92,7 @@ public class Table {
         }
         return null;
     }
-    
+
     /**
      * Returns a list of exclusions
      * 
@@ -103,5 +103,26 @@ public class Table {
             return unmodifiableList(this.exclusions);
         }
         return null;
+    }
+    
+    // Setter methods
+    public void setPkey(String pkey) {
+        this.pkey = pkey;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setColumns(List<Column> columns) {
+        this.columns = columns;
+    }
+
+    public void setPrimaryKeys(List<Key> primaryKeys) {
+        this.primaryKeys = primaryKeys;
+    }
+
+    public void setExclusions(List<Exclude> exclusions) {
+        this.exclusions = exclusions;
     }
 }

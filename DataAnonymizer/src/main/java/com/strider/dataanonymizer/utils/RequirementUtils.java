@@ -21,11 +21,14 @@ package com.strider.dataanonymizer.utils;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
+
 import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,6 +73,21 @@ public class RequirementUtils {
         }
 
         return requirement;
+    }
+    
+    public static void write(Requirement requirement, String fileName) throws DatabaseAnonymizerException {
+        log.info("Requirement.write() to file: " + fileName);
+        File outFile = new File(fileName);
+
+        try {
+            JAXBContext jc = newInstance(Requirement.class);
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(requirement, outFile);
+        } catch (JAXBException je) {
+            log.error(je.toString());
+            throw new DatabaseAnonymizerException(je.toString(), je);
+        }
     }
 
     /**

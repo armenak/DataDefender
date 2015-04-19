@@ -18,18 +18,19 @@
 
 package com.strider.dataanonymizer.requirement;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.List;
-import java.util.Collections;
-import org.apache.commons.lang3.ClassUtils;
+
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * JAXB class that defines parameter elements in Requirement.xml file
@@ -166,8 +167,21 @@ public class Parameter {
     public String getType() {
         return this.type;
     }
-    
-    public List<ArrayElement> getArrayElements() {
-        return Collections.unmodifiableList(this.elements);
+
+    // Setter methods
+    public void setElements(List<ArrayElement> elements) {
+        this.elements = elements;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
