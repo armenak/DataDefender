@@ -18,11 +18,13 @@
 package com.strider.dataanonymizer;
 
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import static org.apache.log4j.Logger.getLogger;
 
-import java.io.IOException;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
@@ -32,10 +34,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
-import static org.apache.log4j.Logger.getLogger;
+import com.strider.dataanonymizer.database.IDBFactory;
 
 /**
  * Entry point to Data Anonymizer. 
@@ -49,6 +51,7 @@ public class Anonymizer  {
     private static final Logger log = getLogger(Anonymizer.class);
 
     public static void main(String[] args) throws ParseException, AnonymizerException {
+        log.info("Cli args: " + Arrays.toString(args));
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
@@ -65,65 +68,43 @@ public class Anonymizer  {
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
         
-        String cmd = unparsedArgs.get(0);
-        Collection<String> tables = getTableArgs(unparsedArgs);
-        
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
-        Properties props = null;
+        Properties props = loadProperties(databasePropertyFile);
+        try (IDBFactory dbFactory = IDBFactory.get(props);) {
         
-        switch (cmd) {
-            case "anonymize":
-                try {
-                    props = loadProperties(databasePropertyFile);            
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-                }
-                
-                String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                Properties anonymizerProperties = null;
-                try {
-                    anonymizerProperties = loadProperties(anonymizerPropertyFile);
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + anonymizerPropertyFile, ioe);
-                }
-                IAnonymizer anonymizer = new DatabaseAnonymizer();
-                anonymizer.anonymize(props, anonymizerProperties, tables);
-                break;
-            case "discover":
-                try {
-                    props = loadProperties(databasePropertyFile);            
-                } catch (IOException ioe) {
-                    throw new AnonymizerException("ERROR: Unable to load " + databasePropertyFile, ioe);
-                }
-                
-                if (line.hasOption('c')) {
-                    
-                    String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
-                    Properties columnProperties = null;
-                    try {
-                        columnProperties = loadProperties(columnPropertyFile);
-                    } catch (IOException ioe) {
-                        throw new AnonymizerException("ERROR: Unable to load " + columnPropertyFile, ioe);
+            String cmd = unparsedArgs.get(0); // get & remove command arg
+            unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
+            
+            switch (cmd) {
+                case "anonymize":
+                    String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                    IAnonymizer anonymizer = new DatabaseAnonymizer();
+                    anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
+                    break;
+                case "discover":
+                    if (line.hasOption('c')) {
+                        String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
+                        Properties columnProperties = loadProperties(columnPropertyFile);
+                        IDiscoverer discoverer = new ColumnDiscoverer();
+                        discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                    } else if (line.hasOption('d')) {
+                        String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
+                        IDiscoverer discoverer = new DataDiscoverer();
+                        discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                     }
-                    IDiscoverer discoverer = new ColumnDiscoverer();
-                    discoverer.discover(props, columnProperties, tables);
-                }
-                if (line.hasOption('d')) {
-                    log.info("Data discovery in process");
-                    String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
-                    Properties dataDiscoveryProperties = null;
-                    try {
-                        dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                    }  catch (IOException ioe) {
-                        throw new AnonymizerException("ERROR: Unable to load " + datadiscoveryPropertyFile, ioe);
-                    }                            
-                    IDiscoverer discoverer = new DataDiscoverer();
-                    discoverer.discover(props, dataDiscoveryProperties, tables);
-                }
-                break;
-            default:
-                help(options);
-                break;
+                    break;
+                case "generate":
+                    IGenerator generator = new DataGenerator();
+                    String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    Properties generatorProperties = loadProperties(generatorPropertyFile);
+                    generator.generate(dbFactory, generatorProperties);
+                    break;
+                default:
+                    help(options);
+                    break;
+            }
         }
     }
     
@@ -170,7 +151,7 @@ public class Anonymizer  {
      */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("DataAnonymizer anonymize|discover [options] [table1 [table2 [...]]]", options);
+        formatter.printHelp("DataAnonymizer anonymize|discover|generate [options] [table1 [table2 [...]]]", options);
     }
     
     /**
@@ -180,11 +161,24 @@ public class Anonymizer  {
      * This guarantees table names to be in lower case, so functions comparing
      * can use contains() with a lower case name.
      * 
-     * @param unparsedArgs
+     * If tables names are not supplied via command line, then will search the property file
+     * for space separated list of table names.
+     * 
+     * @param tableNames
+     * @param props application property file
      * @return The list of table names
      */
-    private static Collection<String> getTableArgs(List<String> unparsedArgs) {
-        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
-        return unparsedArgs.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+    static Set<String> getTableNames(List<String> tableNames, Properties props) {
+        if (tableNames.isEmpty()) {
+            String tableStr = props.getProperty("tables");
+            if (tableStr == null) {
+                return Collections.emptySet();
+            }
+            tableNames = Arrays.asList(tableStr.split(" "));
+            log.info("Adding tables from property file.");
+        }
+        Set<String> tables = tableNames.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+        log.info("Tables: " + Arrays.toString(tables.toArray()));
+        return tables;
     }
 }

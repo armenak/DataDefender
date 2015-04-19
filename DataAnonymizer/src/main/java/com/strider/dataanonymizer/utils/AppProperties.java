@@ -18,13 +18,17 @@
 
 package com.strider.dataanonymizer.utils;
 
+import static org.apache.log4j.Logger.getLogger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
+
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.dataanonymizer.AnonymizerException;
 
 /**
  *
@@ -66,22 +70,13 @@ public final class AppProperties {
         return props;
     }
  
-    public static Properties loadProperties(String fileName) throws IOException {
-        
+    public static Properties loadProperties(String fileName) throws AnonymizerException {
         Properties properties = new Properties();
-        InputStreamReader in = null;
-        try {
-            in = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
+        try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
             properties.load(in);
-        } finally {
-            if (null != in) {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    log.error(ex.toString(), ex);
-                }
-            }
+            return properties;
+        } catch (IOException e) {
+            throw new AnonymizerException("ERROR: Unable to load " + fileName, e);
         }
-        return properties;
     }
 }

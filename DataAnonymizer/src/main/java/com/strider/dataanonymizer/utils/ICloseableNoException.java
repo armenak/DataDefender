@@ -1,4 +1,5 @@
 /*
+ * 
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,16 +15,13 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.dataanonymizer.database.sqlbuilder;
-
-import java.util.Properties;
+package com.strider.dataanonymizer.utils;
 
 /**
- * @author Armenak Grigoryan
+ * Just hide the Exception thrown by close() as we don't need to throw one.
+ * @author Akira Matsuo
  */
-public class MSSQLSQLBuilder extends SQLBuilder{
-    
-    public MSSQLSQLBuilder(Properties databaseProperties) {
-        super(databaseProperties);
-    }
+public interface ICloseableNoException extends AutoCloseable {
+    @Override 
+    public void close();
 }

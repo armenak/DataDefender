@@ -1,4 +1,5 @@
 /*
+ * 
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,16 +15,16 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.dataanonymizer.database.sqlbuilder;
+package com.strider.dataanonymizer.utils;
 
-import java.util.Properties;
 
 /**
- * @author Armenak Grigoryan
+ * @author Akira Matsuo
+ *
+ * @param <T>
+ * Much like a java.util.Supplier but throws an exception.
  */
-public class MSSQLSQLBuilder extends SQLBuilder{
-    
-    public MSSQLSQLBuilder(Properties databaseProperties) {
-        super(databaseProperties);
-    }
+@FunctionalInterface
+public interface ISupplierWithException<T, E extends Exception> {
+    public T get() throws E;
 }

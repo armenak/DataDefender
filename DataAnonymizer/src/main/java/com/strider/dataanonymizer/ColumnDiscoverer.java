@@ -17,24 +17,22 @@
  */
 package com.strider.dataanonymizer;
 
+import static java.util.regex.Pattern.compile;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
-
-import static java.util.regex.Pattern.compile;
 
 import org.apache.log4j.Logger;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
-import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Armenak Grigoryan
@@ -44,20 +42,21 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public void discover(Properties databaseProperties, Properties columnProperties, Collection<String> tables) 
+    public List<String> discover(IDBFactory factory, Properties columnProperties, Set<String> tables) 
     throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
-        IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
+        IMetaData metaData = factory.fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
         List<String> suspList = new ArrayList(columnProperties.keySet());
-        ArrayList<String> matches = new ArrayList<String>();
-        for(String s: suspList) {
-            Pattern p = compile(s);
-            // Find out if database columns contain any of of the "suspicios" fields
+        suspList.remove("tables"); // removing 'special' tables property that's not a pattern
+        ArrayList<String> matches = new ArrayList<>();
+        for(String suspStr: suspList) {
+            Pattern p = compile(suspStr);
+            // Find out if database columns contain any of of the "suspicious" fields
             for(ColumnMetaData pair: map) {
                 String tableName = pair.getTableName();
                 String columnName = pair.getColumnName();
@@ -78,5 +77,6 @@ public class ColumnDiscoverer implements IDiscoverer {
         for (String entry: matches) {
             log.info(entry);
         }
+        return matches;
     }
 }

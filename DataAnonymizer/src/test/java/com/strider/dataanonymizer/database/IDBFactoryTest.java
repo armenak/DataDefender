@@ -1,5 +1,4 @@
 /*
- * 
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,42 +14,27 @@
  * Lesser General Public License for more details.
  *
  */
+package com.strider.dataanonymizer.database;
 
-package com.strider.dataanonymizer;
+import java.util.Properties;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.Test;
 
 /**
- * Unit test for simple App.
+ * @author Akira Matsuo
  */
-public class DataAnonymizerTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public DataAnonymizerTest( String testName )
-    {
-        super( testName );
-    }
+public class IDBFactoryTest {
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( DataAnonymizerTest.class );
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvalidNoProps() throws DatabaseAnonymizerException {
+        Properties invalidProps = new Properties();
+        IDBFactory.get(invalidProps).getConnection();
     }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvalidProps() throws DatabaseAnonymizerException {
+        Properties invalidProps = new Properties();
+        invalidProps.setProperty("vendor", "my-invalid-db");
+        IDBFactory.get(invalidProps).getConnection();
     }
 }

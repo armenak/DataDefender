@@ -15,32 +15,33 @@
  * Lesser General Public License for more details.
  *
  */
-
 package com.strider.dataanonymizer.utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
+import static org.junit.Assert.*;
+
+import java.util.Properties;
+
+import org.junit.Test;
+
+import com.strider.dataanonymizer.AnonymizerException;
+
 
 /**
- *
- * @author armenak
- */
-public class SQLToJavaMapping {
-    @SuppressWarnings("serial")
-    private static final Map<String, String> JAVA_TYPES = new HashMap<String, String>() {{
-        put("VARCHAR", STRING);
-        put("NVARCHAR", STRING);
-        put("VARCHAR2", STRING);
-        put("NVARCHAR2", STRING);
-        put("LONGNVARCHAR", STRING);
-        put("LONGVARCHAR", STRING);
-        put("NCHAR", CHAR);
-        put("CHAR", CHAR);
-    }};
-    private static final String STRING = "String";
-    private static final String CHAR = "Char";
+* @author Akira Matsuo
+*/
+public class AppPropertiesTest {
     
-    public static boolean isString(final String type) {
-        return STRING.equals(JAVA_TYPES.get(type.toUpperCase()));
+    @Test(expected=AnonymizerException.class)
+    public void testLoadPropertiesNoFile() throws AnonymizerException {
+        loadProperties("/do/not/exist.properties");
+    }
+
+    @Test
+    public void testLoadPropertiesValid() throws AnonymizerException {
+        String path = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
+        Properties props = loadProperties(path);
+        assertNotNull(props);
+        assertEquals("yyy", props.get("xxx"));
     }
 }

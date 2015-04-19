@@ -18,22 +18,8 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.functions.CoreFunctions;
-import com.strider.dataanonymizer.functions.Utils;
-import com.strider.dataanonymizer.requirement.Column;
-import com.strider.dataanonymizer.requirement.Parameter;
-import com.strider.dataanonymizer.requirement.Requirement;
-import com.strider.dataanonymizer.requirement.Key;
-import com.strider.dataanonymizer.requirement.Table;
-import com.strider.dataanonymizer.requirement.Exclude;
-import com.strider.dataanonymizer.utils.LikeMatcher;
+import static org.apache.log4j.Logger.getLogger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -41,31 +27,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.LinkedHashSet;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
+import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-
-import static javax.xml.bind.JAXBContext.newInstance;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.Arrays;
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.functions.CoreFunctions;
+import com.strider.dataanonymizer.functions.Utils;
+import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Exclude;
+import com.strider.dataanonymizer.requirement.Key;
+import com.strider.dataanonymizer.requirement.Parameter;
+import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.LikeMatcher;
+import com.strider.dataanonymizer.utils.RequirementUtils;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -76,30 +64,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     private static Logger log = getLogger(DatabaseAnonymizer.class);
 
-    /**
-     * Returns a Requirement object for a given XML file.
-     * 
-     * Initializes JAXB parser and parses, returning the parsed Requirement
-     * object
-     * 
-     * @param file the filename
-     * @return
-     * @throws DatabaseAnonymizerException 
-     */
-    private Requirement getRequirement(String file) throws DatabaseAnonymizerException {
-        Requirement req = null;
-        try {
-            JAXBContext jc = newInstance(Requirement.class);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            req = (Requirement) unmarshaller.unmarshal(new FileInputStream(new File(file)));
-        } catch (JAXBException je) {
-            log.error(je.toString());
-            throw new DatabaseAnonymizerException(je.toString(), je);
-        } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DatabaseAnonymizer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return req;
-    }
     
     /**
      * Adds column names from the table to the passed collection of strings.
@@ -131,27 +95,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     /**
-     * Adds primary key column names from keys into the 'updatable' collection
-     * if they are not in the columns collection from the table.
-     * 
-     * The list of key columns that can be updated consists of columns that have
-     * not been specified by the requirements as a column that needs to be
-     * anonymized.  It is used to avoid ON UPDATE statements from being
-     * triggered for those columns.
-     * 
-     * @param keys
-     * @param columns
-     * @param updatable 
-     */
-    private void fillUpdatableKeys(final Collection<String> keys, final Collection<String> columns, Collection<String> updatable) {
-        for (String key : keys) {
-            if (!columns.contains(key)) {
-                updatable.add(key);
-            }
-        }
-    }
-    
-    /**
      * Creates the UPDATE query for a single row of results.
      * 
      * @param table
@@ -172,14 +115,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * Creates the SELECT query for key and update columns.
      * 
      * @param tableName
+     * @param keys
      * @param columns
      * @return 
      */
-    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> columns) throws SQLException {
+    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> keys, Collection<String> columns) throws SQLException {
         
         List<String> params = new LinkedList<>();
         StringBuilder query = new StringBuilder("SELECT DISTINCT ");
-        query.append(StringUtils.join(columns, ", ")).append(" FROM ").append(table.getName());
+        query.append(StringUtils.join(keys, ", ")).append(", ");
+        query.append(StringUtils.join(columns, ", "));
+        query.append(" FROM ").append(table.getName());
         
         List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
@@ -241,7 +187,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         log.debug("Querying for: " + query.toString());
-        log.debug("\t - with parameters: " + StringUtils.join(params, ','));
+        if (params.size() > 0) {
+            log.debug("\t - with parameters: " + StringUtils.join(params, ','));
+        }
         
         return stmt;
     }
@@ -276,7 +224,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         } 
         
         try {
-            
             String className = Utils.getClassName(function);
             String methodName = Utils.getMethodName(function);
             Class<?> clazz = Class.forName(className);
@@ -303,10 +250,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
             methodLoop:
             for (Method m : methods) {
                 if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
+                    
+                    log.debug("  Found method: " + m.getName());
+                    log.debug("  Match w/: " + paramValues);
+                    
                     java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
-                        
+//                        log.debug("    Name present? " + par.isNamePresent());
+                        // Note: requires -parameter compiler flag
+                        log.debug("    Real param: " + par.getName());
                         if (!paramValues.containsKey(par.getName())) {
                             continue methodLoop;
                         }
@@ -436,7 +389,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param updateStmt
      * @param tableColumns
      * @param keyNames
-     * @param updateKeys
      * @param db
      * @param row
      * @throws SQLException
@@ -450,7 +402,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         PreparedStatement updateStmt,
         Collection<Column> tableColumns,
         Collection<String> keyNames,
-        Collection<String> updateKeys,
         Connection db,
         ResultSet row
     ) throws SQLException,
@@ -486,14 +437,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt.setString(columnIndexes.get(columnName), colValue);
         }
 
-        int nUpdateKeys = updateKeys.size();
-        int whereIndex = nUpdateKeys + fieldIndex;
+        int whereIndex = fieldIndex;
         for (String key : keyNames) {
             String value = row.getString(key);
             updateStmt.setString(++whereIndex, value);
-            if (updateKeys.contains(key)) {
-                updateStmt.setString(++fieldIndex, value);
-            }
         }
 
         updateStmt.addBatch();
@@ -518,19 +465,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
         Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
         // keyNames is only iterated over, so no need for a hash set
         List<String> keyNames = new LinkedList<>();
-        // updateKeys is used for contains() and is added to allColumns (which needs to be in
-        // a predictable order) - so it needs to be a LinkedHashSet
-        Set<String> updateKeys = new LinkedHashSet<>();
-        // exceptCols is added as query params
-
+        
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
-        fillUpdatableKeys(keyNames, colNames, updateKeys);
-        
-        List<String> allColumns = new LinkedList<>();
-        allColumns.addAll(colNames);
-        allColumns.addAll(updateKeys);
-        
+
         // required in this scope for 'catch' block
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
@@ -539,23 +477,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
         try {
 
             db.setAutoCommit(false);
-            selectStmt = getSelectQueryStatement(db, table, allColumns);
+            selectStmt = getSelectQueryStatement(db, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
-            String updateString = getUpdateQuery(table, allColumns, keyNames);
+            String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = db.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
-            int batchCounter = 0;
+            int batchCounter = 0, rowCount = 0;
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateKeys, db, rs);
+                anonymizeRow(updateStmt, tableColumns, keyNames, db, rs);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();
                     db.commit();
                     batchCounter = 0;
                 }
+                rowCount++;
             }
+            log.debug("Rows processed: " + rowCount);
             
             updateStmt.executeBatch();
             db.commit();
@@ -588,23 +528,18 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     @Override
-    public void anonymize(Properties databaseProperties, Properties anonymizerProperties, Collection<String> tables) 
+    public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
     throws DatabaseAnonymizerException{
 
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);
-
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
-        Requirement requirement = getRequirement(anonymizerProperties.getProperty("requirement"));
+        Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
 
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-        for(Table table : requirement.getTables()) {
-            if (tables.isEmpty() || tables.contains(table.getName())) {
-                anonymizeTable(batchSize, connection, table);
+        for(Table reqTable : requirement.getTables()) {
+            if (tables.isEmpty() || tables.contains(reqTable.getName())) {
+                anonymizeTable(batchSize, dbFactory.getConnection(), reqTable);
             }
         }
-        
-        dbConnection.disconnect(connection);
     }
 }

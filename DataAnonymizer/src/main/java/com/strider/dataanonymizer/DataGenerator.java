@@ -18,27 +18,26 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.requirement.Column;
-import com.strider.dataanonymizer.requirement.Parameter;
-import com.strider.dataanonymizer.requirement.Requirement;
-import com.strider.dataanonymizer.requirement.Table;
-import com.strider.dataanonymizer.utils.RequirementUtils;
-import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.requirement.Column;
+import com.strider.dataanonymizer.requirement.Parameter;
+import com.strider.dataanonymizer.requirement.Requirement;
+import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.RequirementUtils;
 
 /**
  * Entry point for RDBMS data generator
@@ -55,22 +54,14 @@ public class DataGenerator  implements IGenerator {
      * @param anonymizerProperties  Properties for anonymizer
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    public void generate(Properties databaseProperties, Properties anonymizerProperties) throws DatabaseAnonymizerException {
-        log.info("Connecting to database");
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);
-
+    public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
-
         // Iterate over the requirement and generate data sets
         log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
 
         for(Table table : requirement.getTables()) {
             log.info("Table [" + table.getName() + "]. Start ...");
-
-            Statement stmt = null;
-            ResultSet rs = null;
 
             // Iterate over columns to generate data set for each column
             for (Column column : table.getColumns()) {
@@ -79,58 +70,29 @@ public class DataGenerator  implements IGenerator {
 
                 if (fileParameter != null) {
                     log.debug("Processing file " + fileParameter.getValue());
-
+                    
+                    // Backup existing data set file
+                    if (!backupExistingFile(fileParameter.getValue())) {
+                        throw new DatabaseAnonymizerException("Unable to rename existing data set file " + fileParameter.getValue());
+                    }
+                    
                     StringBuilder sql = new StringBuilder(100);
                     sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
-
-                    try {
-                        stmt = connection.createStatement();
-                        rs = stmt.executeQuery(sql.toString());
-
-                        // Backup existing data set file
-                        if (!backupExistingFile(fileParameter.getValue())) {
-                            throw new DatabaseAnonymizerException("Unable to rename existing data set file " + fileParameter.getValue());
+                    try (Statement stmt = dbFactory.getConnection().createStatement();
+                        ResultSet rs = stmt.executeQuery(sql.toString());
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));) {
+                        
+                        // Write each column value to data set file
+                        while (rs.next()) {
+                            bw.write(rs.getString(1));
+                            bw.newLine();
                         }
-
-                        BufferedWriter bw = null;
-                        try {
-                            bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));
-
-                            // Write each column value to data set file
-                            while (rs.next()) {
-                                bw.write(rs.getString(1));
-                                bw.newLine();
-                            }
-                        } catch (IOException ioException) {
-                            log.error(ioException.toString());
-                            throw new DatabaseAnonymizerException(ioException.toString(), ioException);
-                        } finally {
-                            if (bw != null) {
-                                try {
-                                    bw.flush();
-                                    bw.close();
-                                } catch (IOException e) {
-                                    log.error(e.toString());
-                                    throw new DatabaseAnonymizerException(e.toString(), e);
-                                }
-                            }
-                        }
+                    } catch (IOException ioException) {
+                        log.error(ioException.toString());
+                        throw new DatabaseAnonymizerException(ioException.toString(), ioException);
                     } catch (SQLException sqle) {
                         log.error(sqle.toString());
-
-                    } finally {
-
-                        try {
-                            if (stmt != null) {
-                                stmt.close();
-                            }
-                            if (rs != null) {
-                                rs.close();
-                            }
-                        } catch (SQLException sqlex) {
-                            log.error(sqlex.toString());
-                        }
-                    }
+                    } 
                 }
                 log.info("Column [" + column.getName() + "]. End...");
             }

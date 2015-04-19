@@ -17,6 +17,43 @@
 
     <url>http://maven.apache.org</url>
 
+    <profiles>
+        <profile>
+            <id>column-discovery</id>
+            <properties>
+                <execAppName>discover</execAppName>
+                <execAppFlag>-c</execAppFlag>
+            </properties>
+        </profile>
+        <profile>
+            <id>data-discovery</id>
+            <properties>
+                <execAppName>discover</execAppName>
+                <execAppFlag>-d</execAppFlag>
+            </properties>
+        </profile>
+        <profile>
+            <id>anonymize</id>
+            <properties>
+                <execAppName>anonymize</execAppName>
+                <execAppFlag></execAppFlag>
+            </properties>
+        </profile>
+        <profile>
+            <id>generate</id>
+            <properties>
+                <execAppName>generate</execAppName>
+                <execAppFlag></execAppFlag>
+            </properties>
+        </profile>
+    </profiles>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.projectKey>DA</sonar.projectKey>
+        <execAppDir>${basedir}/exec-app-dir</execAppDir>
+    </properties>
+
     <build>
         <plugins>
             <!--
@@ -33,6 +70,29 @@
                     <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
                     <compilerArgument>-parameters</compilerArgument>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>com.strider.dataanonymizer.Anonymizer</argument>
+                        <argument>${execAppName}</argument>
+                        <argument>${execAppFlag}</argument>
+                    </arguments>
+                    <workingDirectory>${execAppDir}</workingDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -68,18 +128,25 @@
         </plugins>
     </build>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.projectKey>DA</sonar.projectKey>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency> 
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.186</version>
+            <scope>test</scope>
+        </dependency> 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

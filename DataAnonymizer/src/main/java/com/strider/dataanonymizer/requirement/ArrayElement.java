@@ -47,4 +47,9 @@ public class ArrayElement {
     public String getValue() {
         return this.value;
     }
+    
+    // Setter method
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

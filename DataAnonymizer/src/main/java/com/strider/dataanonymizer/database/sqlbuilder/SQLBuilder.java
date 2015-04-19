@@ -1,5 +1,5 @@
-/*
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+/* 
+ * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -18,23 +18,37 @@ package com.strider.dataanonymizer.database.sqlbuilder;
 
 import java.util.Properties;
 
-/**
- * @author Armenak Grigoryan
- */
-public class OracleSQLBuilder extends SQLBuilder{
-    
-    public OracleSQLBuilder(Properties databaseProperties) {
-        super(databaseProperties);
-    }
+import com.strider.dataanonymizer.utils.CommonUtils;
 
+/**
+ * Provides 'default' implementation which can be overridden.
+ * @author Akira Matsuo
+ */
+public abstract class SQLBuilder implements ISQLBuilder {
+    private final Properties databaseProperties;
+    
+    protected SQLBuilder(Properties databaseProperties) {
+        this.databaseProperties = databaseProperties;
+    }
+    
     @Override
     public String buildSelectWithLimit(String sqlString, int limit) {
         StringBuilder sql = new StringBuilder(sqlString);
         
         if (limit != 0) {
-            sql.append(" AND ").append( "rownum <= ").append(limit);
+            sql.append(" LIMIT ").append(limit);
         }
         return sql.toString();
     }
+
+    @Override
+    public String prefixSchema(String tableName) {
+        String schema = databaseProperties.getProperty("schema");
+        if (CommonUtils.isEmptyString(schema)) {
+            return tableName;
+        }
+        return schema + "." + tableName;
+    }
+    
     
 }

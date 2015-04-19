@@ -15,29 +15,26 @@
  * Lesser General Public License for more details.
  *
  */
+package com.strider.dataanonymizer.utils;
 
-package com.strider.dataanonymizer.database;
+import static org.junit.Assert.*;
 
-import java.util.Properties;
+
+import org.junit.Test;
+
 
 /**
- *
- * @author Armenak Grigoryan
- */
-public class DBConnectionFactory {
+* @author Akira Matsuo
+*/
+public class CommonUtilsTest {
     
-    public static IDBConnection createDBConnection(final Properties databaseProperties) 
-    throws DatabaseAnonymizerException {
+    @Test
+    public void isEmptyString() {
+        assertTrue(CommonUtils.isEmptyString(""));
+        assertTrue(CommonUtils.isEmptyString(null));
         
-        String vendor = databaseProperties.getProperty("vendor");
-        if (vendor.equalsIgnoreCase("mysql")){
-            return new MySQLDBConnection();
-        } else if (vendor.equalsIgnoreCase("mssql")){
-            return new MSSQLDBConnection();
-        } else if (vendor.equalsIgnoreCase("oracle")) {
-            return new OracleDBConnection();
-        }
-        
-        throw new IllegalArgumentException("Database " + vendor + " is not supported");
+        assertFalse(CommonUtils.isEmptyString(" "));
+        assertFalse(CommonUtils.isEmptyString("blah"));
     }
+
 }

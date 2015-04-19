@@ -62,5 +62,9 @@ public class ColumnMetaData {
     public String toString() {
         return this.tableName + "." + this.columnName;
     }
+    
+    public String toVerboseStr() {
+        return toString() + "(" + this.columnType + ")";
+    }
 }
 

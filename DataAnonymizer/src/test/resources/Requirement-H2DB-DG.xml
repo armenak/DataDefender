@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Requirement>
+    <Client>Test H2DB Client</Client>
+    <Version>1.0</Version>
+    <Tables>
+        <Table Name="ju_users" PKey="id">
+            <Columns>
+                <Column Name="fname" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="target/test-classes/dg-names.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+                <Column Name="lname" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Parameters>
+                        <Parameter Name="file" Value="target/test-classes/dg-names.txt" Type="String"/>
+                    </Parameters>
+                </Column>
+            </Columns>
+        </Table>
+    </Tables>
+</Requirement>

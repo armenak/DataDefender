@@ -18,67 +18,28 @@
 
 package com.strider.dataanonymizer.database;
 
-import static java.lang.Class.forName;
-import java.sql.Connection;
 import static java.sql.DriverManager.getConnection;
-import java.sql.SQLException;
+
+import java.sql.Connection;
 import java.util.Properties;
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  * MySQL database connection
  * @author Armenak Grigoryan
  */
 public class MySQLDBConnection extends DBConnection {
-
-    private static final Logger log = getLogger(MySQLDBConnection.class);
+    
+    public MySQLDBConnection(Properties properties) throws DatabaseAnonymizerException {
+        super(properties);
+    }
     
     /**
      * Establishes database connection
-     * @param properties
      * @return Connection
      * @throws DatabaseAnonymizerException 
      */
     @Override
-    public Connection connect(Properties properties) throws DatabaseAnonymizerException {
-
-        String driver   = properties.getProperty("driver");
-        String vendor   = properties.getProperty("vendor");
-        String url      = properties.getProperty("url");
-        String userName = properties.getProperty("username");
-        String password = properties.getProperty("password");
-        
-        log.debug("Database vendor: " + vendor);
-        log.debug("Using driver " + driver);
-        log.debug("Database URL: " + url);
-        log.debug("Logging in using username " + userName); 
-        
-        try {
-            log.info("Loading database driver");
-            forName(driver);
-        } catch (ClassNotFoundException cnfe) {
-            log.error(cnfe.toString());
-            throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
-        }
-        
-        Connection conn = null;
-        try {
-            log.info("Establishing database connection");
-            conn = getConnection(url, userName, password);
-            conn.setAutoCommit(false);
-        } catch (SQLException sqle) {
-            log.error(sqle.toString());
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException sql) {
-                    log.error(sql.toString());
-                }
-            }
-            throw new DatabaseAnonymizerException(sqle.toString(), sqle);
-        }
-        
-        return conn;
+    public Connection connect() throws DatabaseAnonymizerException {
+        return doConnect(() -> getConnection(this.url, this.userName, this.password));
     }
 }

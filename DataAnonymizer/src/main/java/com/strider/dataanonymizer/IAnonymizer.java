@@ -18,9 +18,11 @@
 
 package com.strider.dataanonymizer;
 
-import java.util.Collection;
-import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import java.util.Properties;
+import java.util.Set;
+
+import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
+import com.strider.dataanonymizer.database.IDBFactory;
 
 /**
  * Defines contract for all anonymizers
@@ -29,12 +31,12 @@ import java.util.Properties;
 public interface IAnonymizer {
     /**
      * Anonymizes data.
-     * @param databaseProperties
+     * @param dbFactory
      * @param anonymizerProperties
      * @param tables Optional list of tables to anonymize -
      *        if the collection is empty, all tables specified in requirements
      *        are anonymized.
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    void anonymize(Properties databaseProperties, Properties anonymizerProperties, Collection<String> tables) throws DatabaseAnonymizerException;    
+    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) throws DatabaseAnonymizerException;    
 }

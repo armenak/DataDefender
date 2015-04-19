@@ -169,4 +169,31 @@ public class Exclude {
         equals = "";
         excludeNull = "true";
     }
+
+    // Setter methods
+    public void setEquals(String equals) {
+        this.equals = equals;
+    }
+
+    public void setLike(String like) {
+        this.like = like;
+    }
+
+    public void setNotEquals(String notEquals) {
+        this.notEquals = notEquals;
+    }
+
+    public void setNotLike(String notLike) {
+        this.notLike = notLike;
+    }
+
+    public void setExcludeNull(String excludeNull) {
+        this.excludeNull = excludeNull;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    
 }

@@ -18,39 +18,39 @@
 
 package com.strider.dataanonymizer;
 
-import com.strider.dataanonymizer.database.DBConnectionFactory;
-import com.strider.dataanonymizer.database.IDBConnection;
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
-import com.strider.dataanonymizer.database.metadata.IMetaData;
-import com.strider.dataanonymizer.database.metadata.MetaDataFactory;
-import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
-import com.strider.dataanonymizer.database.sqlbuilder.SQLBuilderFactory;
-import com.strider.dataanonymizer.utils.CommonUtils;
-import com.strider.dataanonymizer.utils.SQLToJavaMapping;
+import static java.lang.Double.parseDouble;
+import static java.util.regex.Pattern.compile;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.Double.parseDouble;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
-import static java.util.regex.Pattern.compile;
+
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
+
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
+import com.strider.dataanonymizer.database.metadata.IMetaData;
+import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
+import com.strider.dataanonymizer.utils.CommonUtils;
+import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
 /**
  *
@@ -64,14 +64,13 @@ public class DataDiscoverer implements IDiscoverer {
     
     
     @Override
-    public void discover(Properties databaseProperties, Properties dataDiscoveryProperties, Collection<String> tables) 
+    public List<String> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
-        
         log.info("Data discovery in process");
 
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
-        IMetaData metaData = MetaDataFactory.fetchMetaData(databaseProperties);
+        IMetaData metaData = factory.fetchMetaData();
         List<ColumnMetaData> map = metaData.getMetaData();    
        
         InputStream modelInToken = null;
@@ -112,15 +111,13 @@ public class DataDiscoverer implements IDiscoverer {
         } catch (IOException ex) {
             log.error(ex.toString());
         }
-        
-        IDBConnection dbConnection = DBConnectionFactory.createDBConnection(databaseProperties);
-        Connection connection = dbConnection.connect(databaseProperties);        
-        
-        String schema = databaseProperties.getProperty("schema");    
+        ISQLBuilder sqlBuilder = factory.createSQLBuilder();
 
         // Start running NLP algorithms for each column and collct percentage
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        List<String> results = new ArrayList<>();
         
         for(ColumnMetaData pair: map) {
             if (SQLToJavaMapping.isString(pair.getColumnType())) {
@@ -139,24 +136,16 @@ public class DataDiscoverer implements IDiscoverer {
                         continue;
                     }
                 }
+                String table = sqlBuilder.prefixSchema(tableName);
+                int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
+                String query = sqlBuilder.buildSelectWithLimit(
+                    "SELECT " + columnName + 
+                    " FROM " + table + 
+                    " WHERE " + columnName  + " IS NOT NULL ", limit);
 
-                Statement stmt = null;
-                ResultSet resultSet = null;
-                try {
-                    stmt = connection.createStatement();
-                    String table = tableName;
-                    if (schema != null && !schema.equals("")) {
-                        table = schema + "." + tableName;
-                    }
-                    
-                    int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                    ISQLBuilder sqlBuilder = SQLBuilderFactory.createSQLBuilder(databaseProperties);
-                    String query = sqlBuilder.buildSelectWithLimit(
-                            "SELECT " + columnName + 
-                            " FROM " + table + 
-                            " WHERE " + columnName  + " IS NOT NULL ", limit);
-                    
-                    resultSet = stmt.executeQuery(query);
+                try (Statement stmt = factory.getConnection().createStatement();
+                    ResultSet resultSet = stmt.executeQuery(query);) {
+
                     while (resultSet.next()) {
                         String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
@@ -177,29 +166,20 @@ public class DataDiscoverer implements IDiscoverer {
                             //}
                         }
                     }
-                    resultSet.close();
-                    stmt.close();
                 } catch (SQLException sqle) {
-                    try {
-                        if (stmt != null) {
-                            stmt.close();
-                        }
-                        if (resultSet != null) {
-                            resultSet.close();
-                        }
-                    } catch (SQLException sql) {
-                        log.error(sql.toString());
-                    }
                     log.error(sqle.toString());
                 }
                 
                 double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
-                    String probability = new DecimalFormat("#.##").format(averageProbability);
-                    log.info(String.format("%20s %20s %20s", tableName, columnName, probability));
+                    String probability = decimalFormat.format(averageProbability);
+                    String result = String.format("%20s %20s %20s", tableName, columnName, probability);
+                    log.info(result);
+                    results.add(result);
                 }
             }
         }
+        return results;
     }
     
     private double calculateAverage(List <Double> values) {
