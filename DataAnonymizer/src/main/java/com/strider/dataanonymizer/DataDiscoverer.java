@@ -46,8 +46,8 @@ import opennlp.tools.util.Span;
 import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.IDBFactory;
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
@@ -64,14 +64,14 @@ public class DataDiscoverer implements IDiscoverer {
     
     
     @Override
-    public List<String> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
+    public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
 
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         
         IMetaData metaData = factory.fetchMetaData();
-        List<ColumnMetaData> map = metaData.getMetaData();    
+        List<MatchMetaData> map = metaData.getMetaData();    
        
         InputStream modelInToken = null;
         InputStream modelIn = null;        
@@ -117,12 +117,12 @@ public class DataDiscoverer implements IDiscoverer {
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        List<String> results = new ArrayList<>();
+        List<MatchMetaData> results = new ArrayList<>();
         
-        for(ColumnMetaData pair: map) {
-            if (SQLToJavaMapping.isString(pair.getColumnType())) {
-                String tableName = pair.getTableName();
-                String columnName = pair.getColumnName();           
+        for(MatchMetaData data: map) {
+            if (SQLToJavaMapping.isString(data.getColumnType())) {
+                String tableName = data.getTableName();
+                String columnName = data.getColumnName();
                 List<Double> probabilityList = new ArrayList<>();
                 
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
@@ -175,7 +175,7 @@ public class DataDiscoverer implements IDiscoverer {
                     String probability = decimalFormat.format(averageProbability);
                     String result = String.format("%20s %20s %20s", tableName, columnName, probability);
                     log.info(result);
-                    results.add(result);
+                    results.add(data);
                 }
             }
         }

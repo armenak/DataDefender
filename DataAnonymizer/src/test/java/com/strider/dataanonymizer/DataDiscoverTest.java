@@ -25,6 +25,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 import com.strider.dataanonymizer.database.H2DB;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 
 /**
  * @author Akira Matsuo
@@ -43,7 +44,7 @@ public class DataDiscoverTest extends H2DB {
     @Test
     public void testHappyPath() throws AnonymizerException { 
         IDiscoverer discoverer = new DataDiscoverer();
-        List<String> output = discoverer.discover(factory, sampleDProps, new HashSet<String>());
+        List<MatchMetaData> output = discoverer.discover(factory, sampleDProps, new HashSet<String>());
         assertTrue(output.isEmpty());
     }
 }

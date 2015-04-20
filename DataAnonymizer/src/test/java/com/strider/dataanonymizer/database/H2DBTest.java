@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 
 /**
  * Simple tests for h2 db in mysql-mode.
@@ -43,11 +43,11 @@ public class H2DBTest extends H2DB {
 
     @Test
     public void testMetaData() throws DatabaseAnonymizerException {
-        List<ColumnMetaData> meta = factory.fetchMetaData().getMetaData();
+        List<MatchMetaData> meta = factory.fetchMetaData().getMetaData();
         List<String> actual = meta.stream().filter(d -> d.getTableName().equals("ju_users"))
             .map(d -> d.toVerboseStr())
             .collect(Collectors.toList());
-        List<String> expected = Arrays.asList("ju_users.id(integer)", "ju_users.fname(varchar)", "ju_users.lname(varchar)");
+        List<String> expected = Arrays.asList("null.ju_users.id(integer)", "null.ju_users.fname(varchar)", "null.ju_users.lname(varchar)");
         assertTrue(expected.equals(actual));
     }
 

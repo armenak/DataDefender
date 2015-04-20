@@ -26,6 +26,7 @@ import java.util.Properties;
 import org.junit.Test;
 
 import com.strider.dataanonymizer.database.H2DB;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 
 /**
  * @author Akira Matsuo
@@ -40,22 +41,26 @@ public class ColumnDiscoverTest extends H2DB {
     @Test
     public void testWithColumns() throws AnonymizerException { 
         IDiscoverer discoverer = new ColumnDiscoverer();
-        List<String> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
-        assertTrue(Arrays.asList("ju_users.fname").equals(suspects));
+        List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
+        assertEquals(1, suspects.size());
+        assertEquals("ju_users.fname", suspects.get(0).toString());
+        assertEquals("null.ju_users.fname(varchar)", suspects.get(0).toVerboseStr());
     }
 
     @Test
     public void testWithTablesColumns() throws AnonymizerException { 
         IDiscoverer discoverer = new ColumnDiscoverer();
-        List<String> suspects = discoverer.discover(factory, sampleCProps, 
+        List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
             new HashSet<String>(Arrays.asList("ju_users")));
-        assertTrue(Arrays.asList("ju_users.fname").equals(suspects));
+        assertEquals(1, suspects.size());
+        assertEquals("ju_users.fname", suspects.get(0).toString());
+        assertEquals("null.ju_users.fname(varchar)", suspects.get(0).toVerboseStr());
     }
 
     @Test
     public void testWithBadTablesColumns() throws AnonymizerException { 
         IDiscoverer discoverer = new ColumnDiscoverer();
-        List<String> suspects = discoverer.discover(factory, sampleCProps, 
+        List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
             new HashSet<String>(Arrays.asList("il tavolo non esiste")));
         assertTrue(suspects.isEmpty());
     }
@@ -63,7 +68,7 @@ public class ColumnDiscoverTest extends H2DB {
     @Test
     public void testWithTablesBadColumns() throws AnonymizerException { 
         IDiscoverer discoverer = new ColumnDiscoverer();
-        List<String> suspects = discoverer.discover(factory, badCProps, 
+        List<MatchMetaData> suspects = discoverer.discover(factory, badCProps, 
             new HashSet<String>(Arrays.asList("ju_users")));
         assertTrue(suspects.isEmpty());
     }

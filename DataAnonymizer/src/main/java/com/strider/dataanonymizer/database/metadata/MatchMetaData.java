@@ -18,29 +18,30 @@
 
 package com.strider.dataanonymizer.database.metadata;
 
+import java.util.List;
+
 /**
- *
+ * Data object to hold all metadata for matching data in Discovery applications.
+ * Currently this object holds column and table metadata; ie, duplicating info.  
+ * But since the numbers of tables/columns will always be
+ * limited in size, don't really see an immediate need to refactor this.
  * @author Armenak Grigoryan
  */
-public class ColumnMetaData {
+public class MatchMetaData {
     private final String schemaName;
     private final String tableName;
+    private final List<String> pkeys;
     private final String columnName;
     private final String columnType;
 
-    public ColumnMetaData(final String schemaName, final String tableName, final String columnName, final String columnType) {
+    public MatchMetaData(final String schemaName, final String tableName, final List<String> pkeys,
+        final String columnName, final String columnType) {
         this.schemaName = schemaName;
         this.tableName  = tableName;
+        this.pkeys = pkeys;
         this.columnName = columnName;
         this.columnType = columnType;
     }   
-    
-    public ColumnMetaData(final String tableName, final String columnName, final String columnType) {
-        this.schemaName = null;
-        this.tableName  = tableName;
-        this.columnName = columnName;
-        this.columnType = columnType;
-    }
 
     public String getSchemaName() {
         return this.schemaName;
@@ -48,6 +49,10 @@ public class ColumnMetaData {
     
     public String getTableName() {
         return this.tableName;
+    }
+    
+    public List<String> getPkeys() {
+        return pkeys;
     }
 
     public String getColumnName() {
@@ -64,7 +69,7 @@ public class ColumnMetaData {
     }
     
     public String toVerboseStr() {
-        return toString() + "(" + this.columnType + ")";
+        return this.schemaName + "." + toString() + "(" + this.columnType + ")";
     }
 }
 

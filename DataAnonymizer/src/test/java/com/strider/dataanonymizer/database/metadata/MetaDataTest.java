@@ -49,6 +49,8 @@ public class MetaDataTest {
     @Mock
     private ResultSet mockTableRS;
     @Mock
+    private ResultSet mockPKRS;
+    @Mock
     private ResultSet mockColumnRS;
     @Mock
     private DatabaseMetaData mockMetaData;
@@ -86,7 +88,7 @@ public class MetaDataTest {
         when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
         
         TestMetaData metaData = new TestMetaData(testProperties, null);
-        List<ColumnMetaData> result = metaData.getMetaData();
+        List<MatchMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
         verify(mockTableRS, times(1)).next(); // should return false
@@ -98,11 +100,12 @@ public class MetaDataTest {
         when(mockConnection.getMetaData()).thenReturn(mockMetaData);
         when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
         when(mockMetaData.getColumns(null, schema, table, null)).thenReturn(mockColumnRS);
+        when(mockMetaData.getPrimaryKeys(null, schema, table)).thenReturn(mockPKRS);
         when(mockTableRS.getString(3)).thenReturn(table);
         when(mockTableRS.next()).thenReturn(true).thenReturn(false);
         
         TestMetaData metaData = new TestMetaData(testProperties, null);
-        List<ColumnMetaData> result = metaData.getMetaData();
+        List<MatchMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
         verify(mockColumnRS, times(1)).next(); // returns false
@@ -117,12 +120,13 @@ public class MetaDataTest {
         when(mockMetaData.getColumns(null, schema, table, null)).thenReturn(mockColumnRS);
         when(mockTableRS.getString(3)).thenReturn(table);
         when(mockTableRS.next()).thenReturn(true).thenReturn(false); // just one element
+        when(mockMetaData.getPrimaryKeys(null, schema, table)).thenReturn(mockPKRS);
         when(mockColumnRS.next()).thenReturn(true).thenReturn(false);
         when(mockColumnRS.getString(4)).thenReturn("cName");
         when(mockColumnRS.getString(6)).thenReturn(cType);
                 
         TestMetaData metaData = new TestMetaData(testProperties, null);
-        List<ColumnMetaData> result = metaData.getMetaData();
+        List<MatchMetaData> result = metaData.getMetaData();
         assertEquals(1, result.size());
         assertEquals(table, result.get(0).getTableName());
         assertEquals("cName", result.get(0).getColumnName());
@@ -139,10 +143,11 @@ public class MetaDataTest {
         when(mockMetaData.getColumns(null, schema, table, null)).thenReturn(mockColumnRS);
         when(mockTableRS.getString(3)).thenReturn(table);
         when(mockTableRS.next()).thenReturn(true).thenReturn(false); // just one element
+        when(mockMetaData.getPrimaryKeys(null, schema, table)).thenReturn(mockPKRS);
         when(mockColumnRS.next()).thenThrow(new SQLException());
         
         TestMetaData metaData = new TestMetaData(testProperties, null);
-        List<ColumnMetaData> result = metaData.getMetaData();
+        List<MatchMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
         verify(mockTableRS, times(1)).close();

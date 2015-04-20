@@ -14,6 +14,6 @@ import java.util.List;
  * @author armenak
  */
 public interface IMetaData {
-    public List<ColumnMetaData> getMetaData();
-    public List<ColumnMetaData> getMetaData(String columnType);
+    public List<MatchMetaData> getMetaData();
+    public List<MatchMetaData> getMetaData(String columnType);
 }

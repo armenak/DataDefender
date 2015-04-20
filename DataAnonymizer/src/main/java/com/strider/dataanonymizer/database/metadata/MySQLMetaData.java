@@ -31,11 +31,18 @@ public class MySQLMetaData extends MetaData {
     
     public MySQLMetaData(Properties databaseProperties, Connection connection) {
         super(databaseProperties, connection);
+        if (schema != null) { // don't want MatchMetaData to be populated w/ invalid schema property
+            throw new IllegalArgumentException("schema property not supported by MySQL-type DB's.");
+        }
     }
 
     @Override
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
         return md.getTables(null, null, "%", null);
+    }
+    @Override
+    protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
+        return md.getPrimaryKeys(null, null, tableName);
     }
     @Override
     protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {

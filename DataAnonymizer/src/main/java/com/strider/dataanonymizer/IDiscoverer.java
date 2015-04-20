@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 
 /**
  * Defines contract for all discoverers
@@ -42,5 +43,5 @@ public interface IDiscoverer {
      * @returns List of results introduced for testing purposes, may return different results in the future 
      * if we need to feed the results into other processes
      */
-    List<String> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
+    List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
 }

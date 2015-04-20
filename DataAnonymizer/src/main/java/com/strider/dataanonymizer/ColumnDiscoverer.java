@@ -21,7 +21,7 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.log4j.Logger.getLogger;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBFactory;
-import com.strider.dataanonymizer.database.metadata.ColumnMetaData;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
 
 /**
@@ -42,39 +42,42 @@ public class ColumnDiscoverer implements IDiscoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
-    public List<String> discover(IDBFactory factory, Properties columnProperties, Set<String> tables) 
+    public List<MatchMetaData> discover(IDBFactory factory, Properties columnProperties, Set<String> tables) 
     throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
         IMetaData metaData = factory.fetchMetaData();
-        List<ColumnMetaData> map = metaData.getMetaData();
+        List<MatchMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
         List<String> suspList = new ArrayList(columnProperties.keySet());
         suspList.remove("tables"); // removing 'special' tables property that's not a pattern
-        ArrayList<String> matches = new ArrayList<>();
+        ArrayList<MatchMetaData> matches = new ArrayList<>();
         for(String suspStr: suspList) {
             Pattern p = compile(suspStr);
             // Find out if database columns contain any of of the "suspicious" fields
-            for(ColumnMetaData pair: map) {
-                String tableName = pair.getTableName();
-                String columnName = pair.getColumnName();
+            for(MatchMetaData data: map) {
+                String tableName = data.getTableName();
+                String columnName = data.getColumnName();
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
                     continue;
                 }
                 if (p.matcher(columnName.toLowerCase()).matches()) {
-                    matches.add(tableName + "." + columnName);
-                }                            
-            }            
+                    System.out.println(data.toVerboseStr());
+                    matches.add(data);
+                }
+            }
         }
         
         // Report column names
         log.info("-----------------");        
         log.info("List of suspects:");
         log.info("-----------------");
-        Collections.sort(matches);        
-        for (String entry: matches) {
+        Comparator<MatchMetaData> compare = Comparator.comparing(MatchMetaData::getSchemaName)
+            .thenComparing(MatchMetaData::getTableName).thenComparing(MatchMetaData::getColumnName);
+        matches.sort(compare);
+        for (MatchMetaData entry: matches) {
             log.info(entry);
         }
         return matches;

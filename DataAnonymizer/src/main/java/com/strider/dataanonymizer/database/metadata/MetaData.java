@@ -40,7 +40,7 @@ public abstract class MetaData implements IMetaData {
     private static final Logger log = getLogger(MetaData.class);
     
     private final Properties databaseProperties;
-    private final String schema;
+    protected final String schema;
     private final Connection connection;
     protected String columnType;
 
@@ -52,7 +52,7 @@ public abstract class MetaData implements IMetaData {
     }
     
     @Override
-    public List<ColumnMetaData> getMetaData(String columnType) {
+    public List<MatchMetaData> getMetaData(String columnType) {
         this.columnType = columnType;
         return getMetaData();
     }
@@ -61,6 +61,9 @@ public abstract class MetaData implements IMetaData {
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
         return md.getTables(null, schema, null, new String[] {"TABLE"});
     }
+    protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
+        return md.getPrimaryKeys(null, schema, tableName);
+    }
     protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
         return md.getColumns(null, schema, tableName, null);
     }
@@ -68,26 +71,35 @@ public abstract class MetaData implements IMetaData {
         return columnRS.getString(4);
     }
 
-    
-    public List<ColumnMetaData> getMetaData() {
-        List<ColumnMetaData> map = new ArrayList<ColumnMetaData>();
+    public List<MatchMetaData> getMetaData() {
+        List<MatchMetaData> map = new ArrayList<MatchMetaData>();
         
         // Get the metadata from the the database
         try { 
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
+            
             String schema = databaseProperties.getProperty("schema");
             log.info("Fetching table names from schema " + schema);
             try (ResultSet tableRS = getTableRS(md)) {
                 while (tableRS.next()) {
                     String tableName = tableRS.getString(3);
                     log.info("Processing table " + tableName);
+                    List<String> pkeys = new ArrayList<>();
+                    try (ResultSet pkRS = getPKRS(md, tableName)) {
+                        while (pkRS.next()) {
+                            String pkey = pkRS.getString(4);
+                            log.info("PK: " + pkey);
+                            pkeys.add(pkey);
+                        }
+                    }
                     
-                    try (ResultSet columnRS = md.getColumns(null, schema, tableName, null)) {
+                    
+                    try (ResultSet columnRS = getColumnRS(md, tableName)) {
                         while (columnRS.next()) {
                             String columnName = getColumnName(columnRS);
                             String colType = getColumnType(columnRS);
-                            map.add(new ColumnMetaData(tableName, columnName, colType));
+                            map.add(new MatchMetaData(schema, tableName, pkeys, columnName, colType));
                         }
                     }
                 }
