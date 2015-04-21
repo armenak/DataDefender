@@ -106,7 +106,7 @@ public class RequirementUtils {
     }
     
     /**
-     * Create a requirement from sorted (by table) List of matching columns.
+     * Create a requirement from sorted (by (schema.)table) List of matching columns.
      * @param matches
      * @return
      */
@@ -115,6 +115,9 @@ public class RequirementUtils {
         Map<String, List<Column>> columns = new HashMap<>();
         for (MatchMetaData match : matches) {
             String tableName = match.getTableName();
+            if (match.getSchemaName() != null) {
+                tableName = match.getSchemaName() + "." + tableName;
+            }
             Table table = tables.get(tableName);
             if (table == null) { // new table
                 table = new Table();
