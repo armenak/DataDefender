@@ -33,15 +33,22 @@ public interface IDiscoverer {
     
     /**
      * Discovers data or data containers with data which can be be the subject 
-     * for data anonymization.
+     * for data anonymization.  Results found should be stored in matches member variable.
      * @param dbFactory
      * @param properties
      * @param tables Optional list of tables to anonymize -
      *        if the collection is empty, all tables specified in requirements
      *        are anonymized.
      * @throws com.strider.dataanonymizer.AnonymizerException
-     * @returns List of results introduced for testing purposes, may return different results in the future 
-     * if we need to feed the results into other processes
+     * @returns List of results introduced for testing purposes.
      */
     List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
+
+    /**
+     * Creates a sample requirement file from a list of sorted matches found by the discovery method.  
+     * The requirement file will most likely require customization (for example; anonymzation function) before you want to run the Anonymizer against it.
+     * @param fileName
+     * @throws AnonymizerException
+     */
+    void createRequirement(String fileName)throws AnonymizerException;
 }

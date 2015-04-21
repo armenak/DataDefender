@@ -122,7 +122,7 @@ public class Column {
         this.ignoreEmpty = ignoreEmpty;
     }
 
-    public void setParamters(List<Parameter> paramters) {
+    public void setParameters(List<Parameter> paramters) {
         this.paramters = paramters;
     }
 

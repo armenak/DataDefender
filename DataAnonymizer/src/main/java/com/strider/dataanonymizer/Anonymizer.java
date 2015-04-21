@@ -82,24 +82,29 @@ public class Anonymizer  {
                     IAnonymizer anonymizer = new DatabaseAnonymizer();
                     anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
                     break;
-                case "discover":
-                    if (line.hasOption('c')) {
-                        String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
-                        Properties columnProperties = loadProperties(columnPropertyFile);
-                        IDiscoverer discoverer = new ColumnDiscoverer();
-                        discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
-                    } else if (line.hasOption('d')) {
-                        String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
-                        Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                        IDiscoverer discoverer = new DataDiscoverer();
-                        discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
-                    }
-                    break;
                 case "generate":
                     IGenerator generator = new DataGenerator();
                     String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                     Properties generatorProperties = loadProperties(generatorPropertyFile);
                     generator.generate(dbFactory, generatorProperties);
+                    break;
+                case "discover":
+                    IDiscoverer discoverer = null;
+                    if (line.hasOption('c')) {
+                        String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
+                        Properties columnProperties = loadProperties(columnPropertyFile);
+                        discoverer = new ColumnDiscoverer();
+                        discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                    } else if (line.hasOption('d')) {
+                        String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
+                        discoverer = new DataDiscoverer();
+                        discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
+                    }
+                    if (line.hasOption('r')) {
+                        String requirementFileName = line.getOptionValue('R', "Sample-Requirement.xml");
+                        discoverer.createRequirement(requirementFileName);
+                    }
                     break;
                 default:
                     help(options);
@@ -133,14 +138,16 @@ public class Anonymizer  {
      */
     private static Options createOptions() {
         final Options options = new Options();
-        options.addOption("h", "help", false, "Display help");        
+        options.addOption("h", "help", false, "display help");
         options.addOption("A", "anonymizer-properties", true, "define anonymizer property file");
         options.addOption("c", "columns", false, "discover candidate column names for anonymization based on provided patterns");
         options.addOption("C", "column-properties", true, "define column property file");
         options.addOption("d", "data", false, "discover candidate column for anonymization based on semantic algorithms");
         options.addOption("D", "data-properties", true, "discover candidate column for anonymization based on semantic algorithms");
+        options.addOption("r", "requirement", false, "create discover and create requirement file");
+        options.addOption("R", "requirement-file", false, "define requirement file name");
         options.addOption("P", "database properties", true, "define database property file");
-        options.addOption("debug", false, "Enable debug output");
+        options.addOption("debug", false, "enable debug output");
         return options;
     }
  

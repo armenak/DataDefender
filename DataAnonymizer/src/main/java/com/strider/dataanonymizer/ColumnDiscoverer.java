@@ -21,7 +21,6 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.log4j.Logger.getLogger;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -31,19 +30,19 @@ import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBFactory;
-import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.metadata.IMetaData;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 
 /**
  * @author Armenak Grigoryan
  */
-public class ColumnDiscoverer implements IDiscoverer { 
+public class ColumnDiscoverer extends Discoverer { 
     
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties columnProperties, Set<String> tables) 
-    throws DatabaseAnonymizerException {
+        throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
         IMetaData metaData = factory.fetchMetaData();
@@ -53,7 +52,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         @SuppressWarnings({ "rawtypes", "unchecked" })
         List<String> suspList = new ArrayList(columnProperties.keySet());
         suspList.remove("tables"); // removing 'special' tables property that's not a pattern
-        ArrayList<MatchMetaData> matches = new ArrayList<>();
+        matches = new ArrayList<>();
         for(String suspStr: suspList) {
             Pattern p = compile(suspStr);
             // Find out if database columns contain any of of the "suspicious" fields
@@ -74,9 +73,7 @@ public class ColumnDiscoverer implements IDiscoverer {
         log.info("-----------------");        
         log.info("List of suspects:");
         log.info("-----------------");
-        Comparator<MatchMetaData> compare = Comparator.comparing(MatchMetaData::getSchemaName)
-            .thenComparing(MatchMetaData::getTableName).thenComparing(MatchMetaData::getColumnName);
-        matches.sort(compare);
+        matches.sort(MatchMetaData.compare());
         for (MatchMetaData entry: matches) {
             log.info(entry);
         }

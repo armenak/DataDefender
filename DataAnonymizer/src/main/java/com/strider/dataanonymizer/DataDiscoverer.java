@@ -56,7 +56,7 @@ import com.strider.dataanonymizer.utils.SQLToJavaMapping;
  *
  * @author Armenak Grigoryan
  */
-public class DataDiscoverer implements IDiscoverer {
+public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
 //    TODO: Uncomment back in if/when we need it
@@ -117,7 +117,7 @@ public class DataDiscoverer implements IDiscoverer {
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        List<MatchMetaData> results = new ArrayList<>();
+        matches = new ArrayList<>();
         
         for(MatchMetaData data: map) {
             if (SQLToJavaMapping.isString(data.getColumnType())) {
@@ -175,11 +175,11 @@ public class DataDiscoverer implements IDiscoverer {
                     String probability = decimalFormat.format(averageProbability);
                     String result = String.format("%20s %20s %20s", tableName, columnName, probability);
                     log.info(result);
-                    results.add(data);
+                    matches.add(data);
                 }
             }
         }
-        return results;
+        return matches;
     }
     
     private double calculateAverage(List <Double> values) {

@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer.database.metadata;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -70,6 +71,14 @@ public class MatchMetaData {
     
     public String toVerboseStr() {
         return this.schemaName + "." + toString() + "(" + this.columnType + ")";
+    }
+    
+    /**
+     * @return comparator used for sorting
+     */
+    public static Comparator<MatchMetaData> compare() {
+        return Comparator.comparing(MatchMetaData::getSchemaName)
+            .thenComparing(MatchMetaData::getTableName).thenComparing(MatchMetaData::getColumnName);
     }
 }
 
