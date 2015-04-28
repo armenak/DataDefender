@@ -48,9 +48,9 @@ All modes support an optional list of tables at the end to use for either discov
 
 Column Discovery
 --------------------
-In this mode DA attempts to query your database and identified columns that should be anonymized based on their names. To run in this mode type the following:
+In this mode DA attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
 
-    java -jar DataAnonymizer.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties>
+    java -jar DataAnonymizer.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
     
 Where:
     <db.properties>              - Path and file name of the file containing database connection properties 
@@ -58,13 +58,14 @@ Where:
 
     <columndiscovery.properties> - Path and file name of the file containing column discovery properties
                                    (see src/main/resources/columndiscovery.properties for an example)
+    <requirement_output_file>    - Optional name of sample requirement file to be created (-r must also be specified)
     
 
 Data Discovery
 ------------------
-To run DA in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.
+To run DA in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered by the DA.
 
-    java -jar DataAnonymizer.jar discover -d --data <db.properties> --data-discovery <datadiscovery.properties>
+    java -jar DataAnonymizer.jar discover -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
 
 Where:
     <db.properties>            - Path and file name of the file containing database connection properties 
@@ -72,6 +73,18 @@ Where:
 
     <datadiscovery.properties> - Path and file name of the file containing data discovery properties
                                 (see src/main/resources/datadiscovery.properties for an example)
+    <requirement_output_file>  - Optional name of sample requirement file to be created (-r must also be specified)
+
+Data Generator
+------------------
+The Data Generator is used to load table data into text files.  The text files are useful to modify and then feed into the annoymizer as input data.  The requirements file specified in the anonymizer-properties file define that tables and columns that will be processed.
+    java -jar DataAnonymizer.jar generate --data <db.properties> --anonymizer-properties <anonymizer.properties>
+
+Where:
+    <db.properties>             - Path and file name of the file containing database connection properties 
+                                (see src/main/resources/db.properties for an example)
+    <anonymizer.properties>     - Path and file name of the file containing anonymizer properties
+                             (see src/main/resources/anonymizer.properties for an example)
 
 Anonymizer
 ------------------
@@ -142,6 +155,7 @@ Ensure that:
 <h3>Execution</h3>
 
 A maven profile has been configured for each application, here are the Maven commands to run for the following programs:
+- data generator: mvn exec:exec -P generate
 - column discovery: mvn exec:exec -P column-discovery
 - data discovery: mvn exec:exec -P data-discovery
 - anonymizer: mvn exec:exec -P anonymize
