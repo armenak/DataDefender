@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Requirement>
-    <Client>Integrated Science</Client>
+    <Client>Test Client</Client>
     <Version>1.0</Version>
     <Table> 
         <name>test</name>
