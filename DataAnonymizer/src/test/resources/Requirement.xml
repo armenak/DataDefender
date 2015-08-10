@@ -30,6 +30,10 @@
                         <Parameter Name="length" Value="100" Type="int"/>                        
                     </Parameters>
                 </Column>
+                <Column Name="column5" ReturnType="String">
+                    <Function>com.strider.dataanonymizer.extensions.ExtentionExample.randomStudentNumber</Function>
+                </Column>                
+                
             </Columns>
         </Table>
         <Table Name="test_table2">
