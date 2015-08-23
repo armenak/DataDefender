@@ -31,8 +31,10 @@ public class MySQLMetaData extends MetaData {
     
     public MySQLMetaData(Properties databaseProperties, Connection connection) {
         super(databaseProperties, connection);
-        if (schema != null) { // don't want MatchMetaData to be populated w/ invalid schema property
-            throw new IllegalArgumentException("schema property not supported by MySQL-type DB's.");
+        // Prevent MatchMetaData to be populated with invalid schema property
+        // since schema property not supported by MySQL database.        
+        if (schema != null) {
+            schema = null;
         }
     }
 

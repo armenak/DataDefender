@@ -77,8 +77,9 @@ public class MatchMetaData {
      * @return comparator used for sorting
      */
     public static Comparator<MatchMetaData> compare() {
-        return Comparator.comparing(MatchMetaData::getSchemaName)
-            .thenComparing(MatchMetaData::getTableName).thenComparing(MatchMetaData::getColumnName);
+            return Comparator.comparing(MatchMetaData::getSchemaName)
+                              .thenComparing(MatchMetaData::getTableName)
+                              .thenComparing(MatchMetaData::getColumnName);            
     }
 }
 

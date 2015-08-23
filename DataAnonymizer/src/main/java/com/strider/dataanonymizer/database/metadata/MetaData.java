@@ -40,8 +40,9 @@ public abstract class MetaData implements IMetaData {
     private static final Logger log = getLogger(MetaData.class);
     
     private final Properties databaseProperties;
-    protected final String schema;
     private final Connection connection;
+    
+    protected String schema;    
     protected String columnType;
 
     
@@ -71,16 +72,17 @@ public abstract class MetaData implements IMetaData {
         return columnRS.getString(4);
     }
 
+    @Override
     public List<MatchMetaData> getMetaData() {
-        List<MatchMetaData> map = new ArrayList<MatchMetaData>();
+        List<MatchMetaData> map = new ArrayList<>();
         
         // Get the metadata from the the database
         try { 
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
             
-            String schema = databaseProperties.getProperty("schema");
-            log.info("Fetching table names from schema " + schema);
+            String schemaName = databaseProperties.getProperty("schema");
+            log.info("Fetching table names from schema " + schemaName);
             try (ResultSet tableRS = getTableRS(md)) {
                 while (tableRS.next()) {
                     String tableName = tableRS.getString(3);
@@ -89,7 +91,7 @@ public abstract class MetaData implements IMetaData {
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
                             String pkey = pkRS.getString(4);
-                            log.info("PK: " + pkey);
+                            log.debug("PK: " + pkey);
                             pkeys.add(pkey);
                         }
                     }
@@ -99,7 +101,7 @@ public abstract class MetaData implements IMetaData {
                         while (columnRS.next()) {
                             String columnName = getColumnName(columnRS);
                             String colType = getColumnType(columnRS);
-                            map.add(new MatchMetaData(schema, tableName, pkeys, columnName, colType));
+                            map.add(new MatchMetaData(schemaName, tableName, pkeys, columnName, colType));
                         }
                     }
                 }

@@ -53,10 +53,10 @@ public abstract class DBConnection implements IDBConnection {
         userName = properties.getProperty("username");
         password = properties.getProperty("password");
         
-        log.debug("Database vendor: " + vendor);
-        log.debug("Using driver " + driver);
-        log.debug("Database URL: " + url);
-        log.debug("Logging in using username " + userName); 
+        log.info("Database vendor: " + vendor);
+        log.info("Using driver " + driver);
+        log.info("Database URL: " + url);
+        log.info("Logging in using username " + userName); 
         
         try {
             log.info("Loading database driver");
