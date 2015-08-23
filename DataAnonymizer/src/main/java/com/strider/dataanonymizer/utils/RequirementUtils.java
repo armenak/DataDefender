@@ -115,7 +115,7 @@ public class RequirementUtils {
         Map<String, List<Column>> columns = new HashMap<>();
         for (MatchMetaData match : matches) {
             String tableName = match.getTableName();
-            if (match.getSchemaName() != null) {
+            if (match.getSchemaName() != null && !match.getSchemaName().equals("")) {
                 tableName = match.getSchemaName() + "." + tableName;
             }
             Table table = tables.get(tableName);
