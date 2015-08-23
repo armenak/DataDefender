@@ -82,9 +82,6 @@ public class DataDiscoverer extends Discoverer {
         NameFinderME nameFinder = null;
         
         try {
-        
-//            firstAndLastNames = CommonUtils.readStreamOfLines(dataDiscoveryProperties.getProperty("names"));
-
             modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
             modelIn = new FileInputStream(dataDiscoveryProperties.getProperty("english_ner_person"));            
             
@@ -125,7 +122,10 @@ public class DataDiscoverer extends Discoverer {
                 String columnName = data.getColumnName();
                 List<Double> probabilityList = new ArrayList<>();
                 
+                log.debug("Analyzing table [" + tableName + "]");
+                
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
+                    log.debug("Continue ...");
                     continue;
                 }
                 
@@ -136,13 +136,15 @@ public class DataDiscoverer extends Discoverer {
                         continue;
                     }
                 }
+                
                 String table = sqlBuilder.prefixSchema(tableName);
                 int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
                 String query = sqlBuilder.buildSelectWithLimit(
                     "SELECT " + columnName + 
                     " FROM " + table + 
                     " WHERE " + columnName  + " IS NOT NULL ", limit);
-
+                log.debug("Executing query against database: " + query);
+                
                 try (Statement stmt = factory.getConnection().createStatement();
                     ResultSet resultSet = stmt.executeQuery(query);) {
 
@@ -159,11 +161,6 @@ public class DataDiscoverer extends Discoverer {
                             for( int i = 0; i<nameSpans.length; i++) {
                                 probabilityList.add(spanProbs[i]);
                             }
-                            
-                            // Now let's try to find first or last name
-                            //if (firstAndLastNames.contains(sentence.toUpperCase())) {
-                            //    probabilityList.add(0.95);
-                            //}
                         }
                     }
                 } catch (SQLException sqle) {
