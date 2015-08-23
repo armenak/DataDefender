@@ -63,7 +63,6 @@ public class ColumnDiscoverer extends Discoverer {
                     continue;
                 }
                 if (p.matcher(columnName.toLowerCase()).matches()) {
-                    // System.out.println(data.toVerboseStr());
                     log.debug(data.toVerboseStr());
                     matches.add(data);
                 }

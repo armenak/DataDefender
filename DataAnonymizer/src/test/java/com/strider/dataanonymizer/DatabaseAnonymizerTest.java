@@ -26,11 +26,16 @@ import java.util.Properties;
 import org.junit.Test;
 
 import com.strider.dataanonymizer.database.H2DB;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * @author Akira Matsuo
  */
 public class DatabaseAnonymizerTest extends H2DB {
+    
+    private static final Logger log = getLogger(DatabaseAnonymizerTest.class);
+
     
     @SuppressWarnings("serial")
     final Properties sampleAProps = new Properties() {{ 
@@ -39,9 +44,9 @@ public class DatabaseAnonymizerTest extends H2DB {
     }};
 
     private void printLine(ResultSet rs) throws SQLException {
-        System.out.println("Print Line...");
+        log.debug("Print Line...");
         while (rs.next()) {
-            System.out.println(rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname"));
+            log.debug(rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname"));
         }
     }
     // Note: if this test fails w/ NoSuchMethodException and running in an IDE ensure that the -parameter is passed to compiler

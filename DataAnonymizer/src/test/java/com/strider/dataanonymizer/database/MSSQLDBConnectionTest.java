@@ -31,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.strider.dataanonymizer.utils.ISupplierWithException;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Using mock to test Connection.
@@ -38,6 +40,11 @@ import com.strider.dataanonymizer.utils.ISupplierWithException;
  */
 @RunWith(MockitoJUnitRunner.class)  
 public class MSSQLDBConnectionTest {
+    
+    
+    private static final Logger log = getLogger(MSSQLDBConnectionTest.class);
+    
+    
     @SuppressWarnings("serial")
     private Properties testProps = new Properties() {{
         setProperty("vendor", "mssql");
@@ -61,7 +68,7 @@ public class MSSQLDBConnectionTest {
             field.setAccessible(true);
             try { // not exactly a great test, but checks that supplier has parent's properties at least
                 String representation = ReflectionToStringBuilder.toString(field.get(supplier));
-                System.out.println(representation);
+                log.debug(representation);
                 assertTrue(representation.contains(
                     "[driver=java.util.List,vendor=mssql,url=invalid-url,userName=invalid-user,password=invalid-pass]"));
             } catch (IllegalArgumentException | IllegalAccessException e) {
