@@ -17,19 +17,23 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
-import static org.apache.log4j.Logger.getLogger;
-
+import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+import static org.apache.log4j.Logger.getLogger;
+import static org.apache.log4j.Logger.getLogger;
+import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
 /**
  * Class to hold common logic between different metadata implementations.
@@ -62,12 +66,15 @@ public abstract class MetaData implements IMetaData {
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
         return md.getTables(null, schema, null, new String[] {"TABLE"});
     }
+    
     protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
         return md.getPrimaryKeys(null, schema, tableName);
     }
+    
     protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
         return md.getColumns(null, schema, tableName, null);
     }
+    
     protected String getColumnName(ResultSet columnRS) throws SQLException {
         return columnRS.getString(4);
     }
@@ -82,11 +89,20 @@ public abstract class MetaData implements IMetaData {
             DatabaseMetaData md = connection.getMetaData();
             
             String schemaName = databaseProperties.getProperty("schema");
+            String skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
+            
             log.info("Fetching table names from schema " + schemaName);
             try (ResultSet tableRS = getTableRS(md)) {
                 while (tableRS.next()) {
                     String tableName = tableRS.getString(3);
+                    
+                    // Skip table if it is empty
+                    if ( (skipEmptyTables != null && skipEmptyTables.equals("true")) && (getRowNumber(tableName) == 0) ) {
+                        log.info("Skipping empty table " + tableName);
+                        continue;
+                    }
                     log.info("Processing table " + tableName);
+                    
                     List<String> pkeys = new ArrayList<>();
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
@@ -119,5 +135,20 @@ public abstract class MetaData implements IMetaData {
             colType = "String";
         }
         return colType;
+    }
+    
+    private int getRowNumber(String table) {
+        int rowNum = 0;
+                
+        try (Statement stmt = connection.createStatement();) {
+            try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + table);) {
+                rs.next();
+                rowNum = rs.getInt(1);
+            }
+        } catch (SQLException sqle) {
+            log.error(sqle.toString());
+        }
+        
+        return rowNum;
     }
 }

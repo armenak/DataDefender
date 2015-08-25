@@ -59,9 +59,6 @@ import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
-//    TODO: Uncomment back in if/when we need it
-//    private static List firstAndLastNames = new ArrayList();
-    
     
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
