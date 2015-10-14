@@ -283,16 +283,24 @@ public class CoreFunctions {
     
     /**
      * Returns email address sent as a parameter 
-     * @param params
+     * @param email
      * @return email address String 
      */
     public String staticEmail(String email) {
         return email;
     }        
+    
+    /**
+     * Returns empty string 
+     * @return "" 
+     */
+    public String setEmptyString() {
+        return "";
+    }            
 
     /**
      * Generates random postal code
-     * @param params
+     * @param file
      * @return String Random postal code
      * @throws IOException 
      */

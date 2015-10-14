@@ -257,7 +257,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
-//                        log.debug("    Name present? " + par.isNamePresent());
+                        //log.debug("    Name present? " + par.isNamePresent());
                         // Note: requires -parameter compiler flag
                         log.debug("    Real param: " + par.getName());
                         if (!paramValues.containsKey(par.getName())) {
