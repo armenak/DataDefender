@@ -1,9 +1,11 @@
-DataAnonymizer
-==============
+Data Discovery and Anonymizer toolkit
+=====================================
 
 Purpose
 -------
-While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content.
+While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
+
+Data anonymization allows the transfer of information between organizations, while reducing the risk of unintended disclosure, and in certain environments in a manner that enables evaluation and analytics post-anonymization. 
 
 Features
 --------
@@ -17,8 +19,8 @@ Prerequisites
 1. JDK 1.8+
 2. Maven 3+
 
-How to build DataAnonymizer
-------------------------------
+Data Discovery and Anonymizer toolkit
+—————————————————————————————————————
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataAnonymizer/
 3. mvn install
