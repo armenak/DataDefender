@@ -1,5 +1,5 @@
-Data Discovery and Anonymizer toolkit
-=====================================
+Data Discovery and Anonymization toolkit
+========================================
 
 Purpose
 -------
@@ -19,8 +19,8 @@ Prerequisites
 1. JDK 1.8+
 2. Maven 3+
 
-Data Discovery and Anonymizer toolkit
-—————————————————————————————————————
+Data Discovery and Anonymization toolkit
+————————————————————————————————————————
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataAnonymizer/
 3. mvn install
