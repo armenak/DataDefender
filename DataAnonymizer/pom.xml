@@ -13,6 +13,18 @@
             <id>armenak.grigoryan</id>
             <name>Armenak Grigoryan</name>
         </developer>
+        <developer>
+            <id>matthew.eaton</id>
+            <name>Matthew Eaton</name>
+        </developer>
+        <developer>
+            <id>akira.matsuo</id>
+            <name>Akira Matsuo</name>
+        </developer>          
+        <developer>
+            <id>zaahid.bateson</id>
+            <name>Zaahid Bateson</name>
+        </developer>              
     </developers>
 
     <url>http://maven.apache.org</url>
@@ -50,7 +62,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.projectKey>DA</sonar.projectKey>
+        <sonar.projectKey>DD</sonar.projectKey>
         <execAppDir>${basedir}/exec-app-dir</execAppDir>
     </properties>
 
@@ -103,7 +115,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>DataAnonymizer</finalName>
+                    <finalName>DataDefender</finalName>
                     <appendAssemblyId>false</appendAssemblyId>                  
                     <archive>
                         <manifest>
