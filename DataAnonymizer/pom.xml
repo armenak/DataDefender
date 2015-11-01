@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.strider</groupId>
-    <artifactId>DataAnonymizer</artifactId>
-    <version>0.1</version>
+    <artifactId>DataDefender</artifactId>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
-    <name>DataAnonymizer</name>
+    <name>DataDefender</name>
     <developers>
         <developer>
             <id>armenak.grigoryan</id>
