@@ -17,16 +17,15 @@
  */
 package com.strider.dataanonymizer;
 
+import com.strider.dataanonymizer.database.IDBFactory;
 import static com.strider.dataanonymizer.utils.AppProperties.loadProperties;
-import static org.apache.log4j.Logger.getLogger;
-
+import com.strider.dataanonymizer.utils.ApplicationLock;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -36,8 +35,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.dataanonymizer.database.IDBFactory;
 
 /**
  * Entry point to Data Anonymizer. 
@@ -51,7 +51,16 @@ public class Anonymizer  {
     private static final Logger log = getLogger(Anonymizer.class);
 
     public static void main(String[] args) throws ParseException, AnonymizerException {
-        log.info("Cli args: " + Arrays.toString(args));
+        
+        // Ensure we are not trying to run second instance of the same program
+        ApplicationLock al = new ApplicationLock("DataDefender");
+
+        if (al.isAppActive()) {
+            log.error("Another instance of this program is already active");
+            System.exit(1);    
+        }        
+        
+        log.info("Command-line arguments: " + Arrays.toString(args));
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
