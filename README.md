@@ -19,15 +19,15 @@ Prerequisites
 1. JDK 1.8+
 2. Maven 3+
 
-Data Discovery and Anonymization toolkit
-————————————————————————————————————————
+How to build Data Discovery and Masking toolkit
+-----------------------------------------------
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataAnonymizer/
 3. mvn install
 4. DataAnonymizer.jar will be located in "target" directory {dir}/DataAnonymizer/target/
 
 Contributing
--------------------------
+------------
 
 1. Fork it
 2. Create your feature branch (git checkout -b new-feature)
