@@ -1,15 +1,15 @@
-Data Discovery and Anonymization toolkit
-========================================
+Data Discovery and Masking toolkit
+==================================
 
 Purpose
 -------
 While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
 
-Data anonymization allows the transfer of information between organizations, while reducing the risk of unintended disclosure, and in certain environments in a manner that enables evaluation and analytics post-anonymization. 
+Data discovery identifies and analyzes data risks. Data masking allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
 
 Features
 --------
-1. identifies personal data (column and data discovery utilities).
+1. identifies sensitive personal data (column and data discovery utilities).
 2. creates custom plan (requirement document) to define what columns are to be anonymized.
 3. anonymizes the data based on custom data sources.
 4. Platform-independent. The tool supports common databases such as Oracle, MS SQL Server, DB2, MySQL, Postgres.
