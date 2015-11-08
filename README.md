@@ -1,26 +1,27 @@
-Data Discovery and Masking toolkit
-==================================
+Data Discovery and Anonymization toolkit
+========================================
 
 Purpose
 -------
 While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
 
-Data discovery identifies and analyzes data risks. Data masking allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
+Data discovery identifies and analyzes data risks. Data anonymization allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
 
 Features
 --------
-1. identifies sensitive personal data (column and data discovery utilities).
-2. creates custom plan (requirement document) to define what columns are to be anonymized.
-3. anonymizes the data based on custom data sources.
-4. Platform-independent. The tool supports common databases such as Oracle, MS SQL Server, DB2, MySQL, Postgres.
+1. Identifies sensitive personal data
+2. Creates plan (XML document) to define what columns and how should be anonymized
+3. Anonymizes the data
+4. Platform-independent
+5. Supports Oracle, MS SQL Server, DB2, MySQL, and Postgres
 
 Prerequisites
 ----------------
 1. JDK 1.8+
 2. Maven 3+
 
-How to build Data Discovery and Masking toolkit
------------------------------------------------
+How to build Data Discovery and Anonymization toolkit
+-----------------------------------------------------
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataAnonymizer/
 3. mvn install
@@ -36,15 +37,15 @@ Contributing
 5. Create new Pull Request
 
 
-How to run DataAnonymizer
-----------------------------
-DataAnaonymizer (DA) is primarily a command line tool. To run the DA first build the application as above (mvn install). This
+How to run Data Discovery and Anonymization toolkit
+---------------------------------------------------
+The toolkit is implemented as a command line program. To run it first build the application as above (mvn install). This
 will generate an executeable jar file in the "target" directory. Once this has been done you can get help by typing:
 
     java -jar DataAnonymizer.jar --help
     
-DA can be run in anonymizer mode, and two different discovery modes, column discovery and data discovery. In each of these modes you need to provide
-DA with a database property file. This tells DA which database to connect to and how to connect. The location of this property file it passed in to DA using the -P or --data switch.
+The toolkit can be run in anonymizer mode, and two different discovery modes (column discovery and data discovery). In each of these modes you need to provide
+the database property file which defines which database to connect to and how to connect. The location of this property file it passed in using the -P or --data switch.
 
 All modes support an optional list of tables at the end to use for either discover, or anonymization of a specific table or list of tables.
 
