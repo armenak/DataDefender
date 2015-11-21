@@ -26,9 +26,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
@@ -91,11 +93,22 @@ public abstract class MetaData implements IMetaData {
             String schemaName = databaseProperties.getProperty("schema");
             String skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
             
+            // Populate list of tables excluded from the analysis
+            List<String> excludeTablesList = new ArrayList<>();
+            String excludeTables = databaseProperties.getProperty("exclude-tables");
+            if (excludeTables != null && excludeTables != "") {
+                String[] tempArr=excludeTables.split(",");
+                excludeTablesList = Arrays.asList(tempArr);
+            }
+            
             log.info("Fetching table names from schema " + schemaName);
             try (ResultSet tableRS = getTableRS(md)) {
                 while (tableRS.next()) {
                     String tableName = tableRS.getString(3);
-                    
+                    if (excludeTablesList.contains(tableName)) {
+                        log.info("Excluding table " + tableName);
+                        continue;
+                    }
                     // Skip table if it is empty
                     if ( (skipEmptyTables != null && skipEmptyTables.equals("true")) && (getRowNumber(tableName) == 0) ) {
                         log.info("Skipping empty table " + tableName);
