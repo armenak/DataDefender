@@ -52,6 +52,7 @@ import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 
+
 /**
  *
  * @author Armenak Grigoryan
@@ -158,6 +159,10 @@ public class DataDiscoverer extends Discoverer {
                             for( int i = 0; i<nameSpans.length; i++) {
                                 probabilityList.add(spanProbs[i]);
                             }
+                            // From OpenNLP documentation
+                            //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
+                            // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
+                            nameFinder.clearAdaptiveData();    
                         }
                     }
                 } catch (SQLException sqle) {
