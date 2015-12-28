@@ -61,59 +61,44 @@ public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
     
+    private final static String PERSON_MODEL   = "person";
+    private final static String LOCATION_MODEL = "location";
+    private final static String DATE_MODEL     = "date";
+    private final static String TIME_MODEL     = "time";
+    private final static String MONEY_MODEL    = "money";    
+    
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
 
+        // Get the probability threshold from property file
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
+        log.info("Probability threshold = " + probabilityThreshold);
         
+        // Creatting Person model and running discovery
+        Model modelPerson = createModel(dataDiscoveryProperties, PERSON_MODEL);
+        matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);
+        
+        // Creatting Location model and running discovery
+        Model modelLocation = createModel(dataDiscoveryProperties, LOCATION_MODEL);
+        matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelLocation, probabilityThreshold);        
+               
+        return matches;
+    }
+    
+    private List<MatchMetaData> discoverAgainstSingleModel(IDBFactory factory, Properties dataDiscoveryProperties, 
+            Set<String> tables, Model model, double probabilityThreshold)
+    throws AnonymizerException {
         IMetaData metaData = factory.fetchMetaData();
-        List<MatchMetaData> map = metaData.getMetaData();    
-       
-        InputStream modelInToken = null;
-        InputStream modelIn = null;        
-        TokenizerModel modelToken = null;
-        Tokenizer tokenizer = null;
-        
-        TokenNameFinderModel model = null;
-        NameFinderME nameFinder = null;
-        
-        try {
-            modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
-            modelIn = new FileInputStream(dataDiscoveryProperties.getProperty("english_ner_person"));            
-            
-            modelToken = new TokenizerModel(modelInToken);
-            tokenizer = new TokenizerME(modelToken);            
-            
-            model = new TokenNameFinderModel(modelIn);
-            nameFinder = new NameFinderME(model);    
-            
-            modelInToken.close();
-            modelIn.close();
-        } catch (FileNotFoundException ex) {
-            log.error(ex.toString());
-            try {
-                if (modelInToken != null) {
-                    modelInToken.close();
-                }
-                if (modelIn != null) {
-                    modelIn.close();
-                }
-            } catch (IOException ioe) {
-                log.error(ioe.toString());
-            }
-        } catch (IOException ex) {
-            log.error(ex.toString());
-        }
-        ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-
-        // Start running NLP algorithms for each column and collct percentage
+        List<MatchMetaData> map = metaData.getMetaData();
+        // Start running NLP algorithms for each column and collect percentage
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         matches = new ArrayList<>();
-        
+
+        ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         for(MatchMetaData data: map) {
             if (SQLToJavaMapping.isString(data.getColumnType())) {
                 String tableName = data.getTableName();
@@ -150,19 +135,22 @@ public class DataDiscoverer extends Discoverer {
                         String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
                             // Convert sentence into tokens
-                            String tokens[] = tokenizer.tokenize(sentence);
+                            String tokens[] = model.getTokenizer().tokenize(sentence);
                             // Find names
-                            Span nameSpans[] = nameFinder.find(tokens);
+                            Span nameSpans[] = model.getNameFinder().find(tokens);
                             //find probabilities for names
-                            double[] spanProbs = nameFinder.probs(nameSpans);
+                            double[] spanProbs = model.getNameFinder().probs(nameSpans);
                             //display names
                             for( int i = 0; i<nameSpans.length; i++) {
+                                //log.debug("Span: "+nameSpans[i].toString());
+		    		//log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+		    		//log.debug("Probability is: "+spanProbs[i]);
                                 probabilityList.add(spanProbs[i]);
                             }
                             // From OpenNLP documentation
                             //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
                             // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
-                            nameFinder.clearAdaptiveData();    
+                            model.getNameFinder().clearAdaptiveData();    
                         }
                     }
                 } catch (SQLException sqle) {
@@ -170,15 +158,62 @@ public class DataDiscoverer extends Discoverer {
                 }
                 
                 double averageProbability = calculateAverage(probabilityList);
-                if ((averageProbability >= probabilityThreshold) && (averageProbability <= 0.99 )) {
+                if ((averageProbability >= probabilityThreshold)) {
                     String probability = decimalFormat.format(averageProbability);
-                    String result = String.format("%20s %20s %20s", tableName, columnName, probability);
+                    String result = String.format("%20s %20s %20s %20s", tableName, columnName, probability, model.getName());
                     log.info(result);
                     matches.add(data);
                 }
             }
         }
         return matches;
+    }
+    
+    /**
+     * Creates model POJO based on OpenNLP model
+     * 
+     * @param dataDiscoveryProperties
+     * @param modelType
+     * @return Model
+     */
+    private Model createModel(Properties dataDiscoveryProperties, String modelName) {
+        InputStream modelInToken = null;
+        InputStream modelIn = null;        
+        TokenizerModel modelToken = null;
+        Tokenizer tokenizer = null;
+        
+        TokenNameFinderModel model = null;
+        NameFinderME nameFinder = null;
+        
+        try {
+            modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
+            modelIn = new FileInputStream(dataDiscoveryProperties.getProperty(modelName));            
+            
+            modelToken = new TokenizerModel(modelInToken);
+            tokenizer = new TokenizerME(modelToken);            
+            
+            model = new TokenNameFinderModel(modelIn);
+            nameFinder = new NameFinderME(model);    
+            
+            modelInToken.close();
+            modelIn.close();
+        } catch (FileNotFoundException ex) {
+            log.error(ex.toString());
+            try {
+                if (modelInToken != null) {
+                    modelInToken.close();
+                }
+                if (modelIn != null) {
+                    modelIn.close();
+                }
+            } catch (IOException ioe) {
+                log.error(ioe.toString());
+            }
+        } catch (IOException ex) {
+            log.error(ex.toString());
+        }
+        
+        return new Model(tokenizer, nameFinder, modelName);
     }
     
     private double calculateAverage(List <Double> values) {

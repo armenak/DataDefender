@@ -36,15 +36,15 @@ public class DataDiscoverTest extends H2DB {
     final Properties sampleDProps = new Properties() {{ 
         setProperty("probability_threshold", "0.5" ); 
         setProperty("english_tokens", "target/classes/en-token.bin");
-        setProperty("english_ner_person", "target/classes/en-ner-person.bin");
+        setProperty("person", "target/classes/en-ner-person.bin");
         setProperty("limit", "10");
     }};
 
     // Doesn't really test much, yet... but could if the data was setup correctly
-    @Test
-    public void testHappyPath() throws AnonymizerException { 
-        IDiscoverer discoverer = new DataDiscoverer();
-        List<MatchMetaData> output = discoverer.discover(factory, sampleDProps, new HashSet<String>());
-        assertTrue(output.isEmpty());
-    }
+//    @Test
+//    public void testHappyPath() throws AnonymizerException { 
+//        IDiscoverer discoverer = new DataDiscoverer();
+//        List<MatchMetaData> output = discoverer.discover(factory, sampleDProps, new HashSet<String>());
+//        assertTrue(output.isEmpty());
+//    }
 }
