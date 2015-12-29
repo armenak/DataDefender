@@ -51,6 +51,7 @@ import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
+import java.lang.reflect.Array;
 
 
 /**
@@ -61,12 +62,8 @@ public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
     
-    private final static String PERSON_MODEL   = "person";
-    private final static String LOCATION_MODEL = "location";
-    private final static String DATE_MODEL     = "date";
-    private final static String TIME_MODEL     = "time";
-    private final static String MONEY_MODEL    = "money";    
-    
+    private static final String[] modelList = {"person", "location", "date", "time", "money"};
+        
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
@@ -76,14 +73,23 @@ public class DataDiscoverer extends Discoverer {
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         log.info("Probability threshold = " + probabilityThreshold);
         
-        // Creatting Person model and running discovery
-        Model modelPerson = createModel(dataDiscoveryProperties, PERSON_MODEL);
-        matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);
+        List<MatchMetaData> finalList = new ArrayList<>();
+        for (String model: modelList) {
+            log.info("Processing model " + model);
+            Model modelPerson = createModel(dataDiscoveryProperties, model);
+            matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);    
+            finalList.removeAll(matches);     
+            finalList.addAll(matches);
+            //finalList.retainAll(matches);
+        }
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
+        for(MatchMetaData data: finalList) {
+            String probability = decimalFormat.format(data.getAverageProbability());
+            String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
+            log.info(result);            
+        }                    
         
-        // Creatting Location model and running discovery
-        Model modelLocation = createModel(dataDiscoveryProperties, LOCATION_MODEL);
-        matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelLocation, probabilityThreshold);        
-               
         return matches;
     }
     
@@ -95,7 +101,6 @@ public class DataDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
         matches = new ArrayList<>();
 
         ISQLBuilder sqlBuilder = factory.createSQLBuilder();
@@ -134,6 +139,7 @@ public class DataDiscoverer extends Discoverer {
                     while (resultSet.next()) {
                         String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
+                            
                             // Convert sentence into tokens
                             String tokens[] = model.getTokenizer().tokenize(sentence);
                             // Find names
@@ -159,9 +165,8 @@ public class DataDiscoverer extends Discoverer {
                 
                 double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold)) {
-                    String probability = decimalFormat.format(averageProbability);
-                    String result = String.format("%20s %20s %20s %20s", tableName, columnName, probability, model.getName());
-                    log.info(result);
+                    data.setAverageProbability(averageProbability);
+                    data.setModel(model.getName());
                     matches.add(data);
                 }
             }
