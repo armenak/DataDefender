@@ -6,7 +6,7 @@ Table of content
 - [Purpose](#purpose)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [How to build Data Discovery and Anonymization toolkit](#how-to-build-data-discovery-and-anonymization-toolkit)
+- [Build from source](#build-from-source)
 - [Contributing](#contributing)
 - [How to run Data Discovery and Anonymization toolkit](#how-to-run-data-discovery-and-anonymization-toolkit)
 - [Column Discovery](#column-discovery)
@@ -38,8 +38,8 @@ Prerequisites
 1. JDK 1.8+
 2. Maven 3+
 
-How to build Data Discovery and Anonymization toolkit
------------------------------------------------------
+Build from source
+-----------------
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataAnonymizer/
 3. mvn install
