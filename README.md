@@ -8,7 +8,7 @@ Table of content
 - [Prerequisites](#prerequisites)
 - [Build from source](#build-from-source)
 - [Contributing](#contributing)
-- [How to run Data Discovery and Anonymization toolkit](#how-to-run-data-discovery-and-anonymization-toolkit)
+- [How to run](#how-to-run-data)
 - [Column Discovery](#column-discovery)
 - [Data Discovery](#data-discovery)
 - [Data Generator](#data-generator)
@@ -55,8 +55,8 @@ Contributing
 5. Create new Pull Request
 
 
-How to run Data Discovery and Anonymization toolkit
----------------------------------------------------
+How to run
+----------
 The toolkit is implemented as a command line program. To run it first build the application as above (mvn install). This
 will generate an executeable jar file in the "target" directory. Once this has been done you can get help by typing:
 
