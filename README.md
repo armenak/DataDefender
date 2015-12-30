@@ -1,25 +1,6 @@
 Data Discovery and Anonymization toolkit
 ========================================
 
-Table of Contents
-=================
-
-* [Purpose](#Purpose)
-* [Features](#)
-* [Prerequisites](#)
-* [How to build Data Discovery and Anonymization toolkit](#)
-* [Contributing](#)
-* [How to run Data Discovery and Anonymization toolkit](#)
-* [Column Discovery](#)
-* [Data Discovery](#)
-* [Data Generator](#)
-* [Anonymizer](#)
-* [Using 3rd-Party JDBC Drivers with Maven](#)
-* [Using Maven to execute Anonymizer](#)
-	- [Prerequisites](#)
-	- [Configuration](#)
-	- [Execution](#)
-
 Purpose
 -------
 While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
