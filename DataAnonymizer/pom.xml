@@ -64,6 +64,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.projectKey>DD</sonar.projectKey>
         <execAppDir>${basedir}/exec-app-dir</execAppDir>
+        
+  <!-- Sonar project properties, other properties are in m2/settings.xml -->
+      <sonar.java.source>1.8</sonar.java.source>    
+      <sonar.language>java</sonar.language>    
+      <sonar.projectKey>DA</sonar.projectKey>
+      <sonar.projectName>DataDefended</sonar.projectName>
+      <sonar.projectVersion>0.3</sonar.projectVersion>
+      <sonar.sources>src/main</sonar.sources>
+      <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+      <sonar.profile>SIS</sonar.profile> 
     </properties>
     
     <build>
@@ -135,7 +145,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.7.1</version>
             </plugin>
         </plugins>
     </build>
