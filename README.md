@@ -1,7 +1,7 @@
 Data Discovery and Anonymization toolkit
 ========================================
 
-- [Purpose](#)
+- [Purpose](#Purpose)
 - [Features](#)
 - [Prerequisites](#)
 - [How to build Data Discovery and Anonymization toolkit](#)
