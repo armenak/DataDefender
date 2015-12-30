@@ -3,8 +3,8 @@ Data Discovery and Anonymization toolkit
 
 Table of content
 ----------------
-* [Purpose](#Purpose)
-* [Contributing](#Contributing)
+* [Purpose](#purpose)
+* [Contributing](#contributing)
 
 Purpose
 -------
