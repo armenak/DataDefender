@@ -41,9 +41,9 @@ Prerequisites
 Build from source
 -----------------
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
-2. cd {dir}/DataAnonymizer/
+2. cd {dir}/DataDefender/
 3. mvn install
-4. DataAnonymizer.jar will be located in "target" directory {dir}/DataAnonymizer/target/
+4. DataDefender.jar will be located in "target" directory {dir}/DataDefender/target/
 
 Contributing
 ------------
@@ -60,7 +60,7 @@ How to run
 The toolkit is implemented as a command line program. To run it first build the application as above (mvn install). This
 will generate an executeable jar file in the "target" directory. Once this has been done you can get help by typing:
 
-    java -jar DataAnonymizer.jar --help
+    java -jar DataDefender.jar --help
     
 The toolkit can be run in anonymizer mode, and two different discovery modes (column discovery and data discovery). In each of these modes you need to provide
 the database property file which defines which database to connect to and how to connect. The location of this property file it passed in using the -P or --data switch.
@@ -71,7 +71,7 @@ Column Discovery
 --------------------
 In this mode DA attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
 
-    java -jar DataAnonymizer.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
+    java -jar DataDefender.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
     
 Where:
     <db.properties>              - Path and file name of the file containing database connection properties 
@@ -86,7 +86,7 @@ Data Discovery
 ------------------
 To run DA in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered by the DA.
 
-    java -jar DataAnonymizer.jar discover -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
+    java -jar DataDefender.jar discover -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
 
 Where:
     <db.properties>            - Path and file name of the file containing database connection properties 
@@ -99,7 +99,7 @@ Where:
 Data Generator
 ------------------
 The Data Generator is used to load table data into text files.  The text files are useful to modify and then feed into the annoymizer as input data.  The requirements file specified in the anonymizer-properties file define that tables and columns that will be processed.
-    java -jar DataAnonymizer.jar generate --data <db.properties> --anonymizer-properties <anonymizer.properties>
+    java -jar DataDefender.jar generate --data <db.properties> --anonymizer-properties <anonymizer.properties>
 
 Where:
     <db.properties>             - Path and file name of the file containing database connection properties 
@@ -111,7 +111,7 @@ Anonymizer
 ------------------
 In this mode, DA will anonymize the data in the database based on the requirements file specified in the anonymizer.properties file.  The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to src/main/resources/Requirement.xml.
 
-    java -jar DataAnonymizer.jar anonymize --data <db.properties> --anonymizer-properties <anonymizer.properties>
+    java -jar DataDefender.jar anonymize --data <db.properties> --anonymizer-properties <anonymizer.properties>
 
 Where:
     <db.properties>         - Path and file name of the file containing database connection properties 
@@ -122,7 +122,7 @@ Where:
 
 To run the anonymizer on specific tables, the table names can be passed at the end:
 
-    java -jar DataAnonymizer.jar anonymize -P db.properties -A anonymizer.properties myTable1 myTable2
+    java -jar DataDefender.jar anonymize -P db.properties -A anonymizer.properties myTable1 myTable2
 
 This would run the anonymizer for tables defined in the requirements XML file with the name myTable1 or myTable2 only.  Any other tables defined in the requirements would be ignored.
 
