@@ -3,7 +3,7 @@ Data Discovery and Anonymization toolkit
 
 Table of content
 ----------------
-* [Purpose](Purpose)
+* [Purpose](#Purpose)
 
 Purpose
 -------
