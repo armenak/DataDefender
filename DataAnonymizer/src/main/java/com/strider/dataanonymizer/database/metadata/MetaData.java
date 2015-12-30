@@ -20,8 +20,6 @@ package com.strider.dataanonymizer.database.metadata;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,10 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
-import static org.apache.log4j.Logger.getLogger;
-import static org.apache.log4j.Logger.getLogger;
-import static org.apache.log4j.Logger.getLogger;
 import static org.apache.log4j.Logger.getLogger;
 
 
@@ -114,7 +108,7 @@ public abstract class MetaData implements IMetaData {
                         log.info("Skipping empty table " + tableName);
                         continue;
                     }
-                    log.info("Processing table " + tableName);
+                    log.info("Table " + tableName);
                     
                     List<String> pkeys = new ArrayList<>();
                     try (ResultSet pkRS = getPKRS(md, tableName)) {

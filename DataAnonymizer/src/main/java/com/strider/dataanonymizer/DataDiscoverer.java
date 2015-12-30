@@ -21,6 +21,7 @@ package com.strider.dataanonymizer;
 import static java.lang.Double.parseDouble;
 import static java.util.regex.Pattern.compile;
 import static org.apache.log4j.Logger.getLogger;
+import org.apache.commons.collections.ListUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,7 +52,6 @@ import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
-import java.lang.reflect.Array;
 
 
 /**
@@ -62,7 +62,7 @@ public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
     
-    private static final String[] modelList = {"person", "location", "date", "time", "money"};
+    private static final String[] modelList = {"generic", "location", "date", "time", "money"};
         
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
@@ -75,16 +75,18 @@ public class DataDiscoverer extends Discoverer {
         
         List<MatchMetaData> finalList = new ArrayList<>();
         for (String model: modelList) {
+            log.info("********************************");
             log.info("Processing model " + model);
+            log.info("********************************");
             Model modelPerson = createModel(dataDiscoveryProperties, model);
-            matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);    
-            finalList.removeAll(matches);     
-            finalList.addAll(matches);
-            //finalList.retainAll(matches);
+            matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);
+            finalList = ListUtils.union(finalList, matches);            
         }
 
         DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
-        for(MatchMetaData data: finalList) {
+        log.info("List of suspects:");
+        log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
+        for(MatchMetaData data: finalList) {    
             String probability = decimalFormat.format(data.getAverageProbability());
             String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
             log.info(result);            
@@ -99,8 +101,6 @@ public class DataDiscoverer extends Discoverer {
         IMetaData metaData = factory.fetchMetaData();
         List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
-        log.info("List of suspects:");
-        log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));
         matches = new ArrayList<>();
 
         ISQLBuilder sqlBuilder = factory.createSQLBuilder();
