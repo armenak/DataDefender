@@ -3,8 +3,21 @@ Data Discovery and Anonymization toolkit
 
 Table of content
 ----------------
-* [Purpose](#purpose)
-* [Contributing](#contributing)
+- [Purpose](#purpose)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [How to build Data Discovery and Anonymization toolkit](#how to build Data Discovery and Anonymization toolkit)
+- [Contributing](#contributing)
+- [How to run Data Discovery and Anonymization toolkit](#)
+- [Column Discovery](#)
+- [Data Discovery](#)
+- [Data Generator](#)
+- [Anonymizer](#)
+- [Using 3rd-Party JDBC Drivers with Maven](#)
+- [Using Maven to execute Anonymizer](#)
+	- [Prerequisites](#)
+	- [Configuration](#)
+	- [Execution](#)
 
 Purpose
 -------
