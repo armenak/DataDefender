@@ -6,7 +6,7 @@ Table of content
 - [Purpose](#purpose)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [How to build Data Discovery and Anonymization toolkit](#how to build Data Discovery and Anonymization toolkit)
+- [How to build Data Discovery and Anonymization toolkit](#how-to-build-Data-Discovery-and-Anonymization-toolkit)
 - [Contributing](#contributing)
 - [How to run Data Discovery and Anonymization toolkit](#)
 - [Column Discovery](#)
