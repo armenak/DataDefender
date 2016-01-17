@@ -99,6 +99,7 @@ public abstract class MetaData implements IMetaData {
             try (ResultSet tableRS = getTableRS(md)) {
                 while (tableRS.next()) {
                     String tableName = tableRS.getString(3);
+                    log.debug(tableName);
                     if (excludeTablesList.contains(tableName)) {
                         log.info("Excluding table " + tableName);
                         continue;

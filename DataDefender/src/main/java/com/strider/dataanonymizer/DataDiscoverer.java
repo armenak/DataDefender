@@ -62,7 +62,7 @@ public class DataDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DataDiscoverer.class);
     
-    private static final String[] modelList = {"generic", "location", "date", "time", "money"};
+    private static String[] modelList = null;
         
     @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
@@ -71,7 +71,12 @@ public class DataDiscoverer extends Discoverer {
 
         // Get the probability threshold from property file
         double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
-        log.info("Probability threshold = " + probabilityThreshold);
+        log.info("Probability threshold [" + probabilityThreshold + "]");
+        
+        // Get list of models used in data discovery
+        String models = dataDiscoveryProperties.getProperty("probability_threshold");
+        modelList = models.split(",");
+        log.info("Model list [" + modelList.toString() + "]");
         
         List<MatchMetaData> finalList = new ArrayList<>();
         for (String model: modelList) {
@@ -191,7 +196,10 @@ public class DataDiscoverer extends Discoverer {
         NameFinderME nameFinder = null;
         
         try {
+            log.debug("Model name: " + modelName);
+            log.debug(dataDiscoveryProperties.toString());
             modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
+            log.debug(dataDiscoveryProperties.getProperty(modelName));
             modelIn = new FileInputStream(dataDiscoveryProperties.getProperty(modelName));            
             
             modelToken = new TokenizerModel(modelInToken);
