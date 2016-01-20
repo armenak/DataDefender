@@ -74,7 +74,7 @@ public class DataDiscoverer extends Discoverer {
         log.info("Probability threshold [" + probabilityThreshold + "]");
         
         // Get list of models used in data discovery
-        String models = dataDiscoveryProperties.getProperty("probability_threshold");
+        String models = dataDiscoveryProperties.getProperty("models");
         modelList = models.split(",");
         log.info("Model list [" + modelList.toString() + "]");
         
