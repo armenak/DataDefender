@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2016, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -39,7 +39,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 
 /**
- * Entry point to Data Anonymizer. 
+ * Entry point to Data Defender. 
  *  
  * This class will parse and analyze the parameters and execute appropriate 
  * service.
