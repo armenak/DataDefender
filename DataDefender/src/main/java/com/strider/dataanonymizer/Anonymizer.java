@@ -51,6 +51,8 @@ public class Anonymizer  {
 
     public static void main(String[] args) throws ParseException, AnonymizerException {
         
+        int x = 1+1;
+        
         // Ensure we are not trying to run second instance of the same program
         ApplicationLock al = new ApplicationLock("DataDefender");
 
