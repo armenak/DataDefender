@@ -201,6 +201,38 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param dbConn
      * @param row
      * @param column
+     * @return anonymized value
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */   
+    private String callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
+        throws SQLException,
+               NoSuchMethodException,
+               SecurityException,
+               IllegalAccessException,
+               IllegalArgumentException,
+               InvocationTargetException {
+        
+        // Check if function has parameters
+        List<Parameter> parms = column.getParameters();
+        if (parms != null) {
+            return callAnonymizingFunctionWithParameters(dbConn, row, column);
+        } else {
+            return callAnonymizingFunctionWithoutParameters(dbConn, row, column);
+        }
+        
+    }    
+    
+    /**
+     * Calls the anonymization function for the given Column, and returns its
+     * anonymized value.
+     * 
+     * @param dbConn
+     * @param row
+     * @param column
      * @return
      * @throws NoSuchMethodException
      * @throws SecurityException
@@ -208,7 +240,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private String callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
+    private String callAnonymizingFunctionWithParameters(Connection dbConn, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -318,6 +350,77 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         return "";
     }
+    
+    /**
+     * Calls the anonymization function for the given Column, and returns its
+     * anonymized value.
+     * 
+     * @param dbConn
+     * @param row
+     * @param column
+     * @return
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
+    private String callAnonymizingFunctionWithoutParameters(Connection dbConn, ResultSet row, Column column)
+        throws SQLException,
+               NoSuchMethodException,
+               SecurityException,
+               IllegalAccessException,
+               IllegalArgumentException,
+               InvocationTargetException {
+        
+        String columnValue = row.getString(column.getName());
+        String function = column.getFunction();
+        if (function == null || function.equals("")) {
+            log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
+            return "";
+        } 
+        
+        try {
+            String className = Utils.getClassName(function);
+            String methodName = Utils.getMethodName(function);
+            Class<?> clazz = Class.forName(className);
+            
+            CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
+            instance.setDatabaseConnection(dbConn);
+
+            Method[] methods = clazz.getMethods();
+            Method selectedMethod = null;
+            
+            methodLoop:
+            for (Method m : methods) {
+                if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
+                    
+                    log.debug("  Found method: " + m.getName());
+                    
+                    selectedMethod = m;
+                    break;
+                }
+            }
+            
+            if (selectedMethod == null) {
+                StringBuilder s = new StringBuilder("Anonymization method: ");
+                s.append(methodName).append(") was not found in class ").append(className);
+                throw new NoSuchMethodException(s.toString());
+            }
+            
+            log.debug("Anonymizing function: " + methodName);
+            Object anonymizedValue = selectedMethod.invoke(instance);
+            if (anonymizedValue == null) {
+                return null;
+            }
+            return anonymizedValue.toString();
+            
+        } catch (InstantiationException | ClassNotFoundException ex) {
+            log.error(ex.toString());
+        }
+        
+        return "";
+    }    
     
     /**
      * Returns true if the current column's value is excluded by the rulesets
