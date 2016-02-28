@@ -20,6 +20,8 @@ package com.strider.dataanonymizer.functions;
 
 
 import com.strider.dataanonymizer.extensions.BiographicFunctions;
+import java.text.ParseException;
+import java.util.Date;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 
@@ -64,4 +66,18 @@ public class BiographicFunctionsTest extends TestCase {
         assertTrue(functions.isValidSIN(sin));
 
     }
+    
+    /**
+     * Test of randomBirthDate method
+     */
+//    public void testRandomBirthDate() throws ParseException {
+//        log.debug("Generate BirthDate");
+//
+//        BiographicFunctions functions = new BiographicFunctions();
+//        Date birthDate = functions.randomBirthDate();
+//
+//        log.debug("Random birthdate = " + birthDate);
+//
+//        assertNotNull(birthDate);
+//    }    
 }

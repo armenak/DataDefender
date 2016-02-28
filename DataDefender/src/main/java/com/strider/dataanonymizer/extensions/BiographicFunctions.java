@@ -1,6 +1,6 @@
 /*
  * 
- * Copyright 2014, Armenak Grigoryan, Matthew Eaton, and individual contributors as indicated
+ * Copyright 2014-2016, Armenak Grigoryan, Matthew Eaton, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,13 @@
 package com.strider.dataanonymizer.extensions;
 
 import com.strider.dataanonymizer.functions.CoreFunctions;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Random;
+import org.apache.commons.cli.ParseException;
 
 /**
  * @author Matthew Eaton
@@ -51,6 +57,48 @@ public class BiographicFunctions extends CoreFunctions {
         return sin.toString();
 
     }
+    
+    /**
+     * Generates random 9-digit social insurance number
+     * @return String
+     * @throws org.apache.commons.cli.ParseException
+     */
+    public Date randomBirthDate() throws java.text.ParseException{
+
+        GregorianCalendar gc = new GregorianCalendar();
+        int year = randBetween(1900, 2016);
+        gc.set(GregorianCalendar.YEAR, year);
+        int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));
+        gc.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
+        
+        String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
+               prependZero((gc.get(GregorianCalendar.MONTH) + 1)) + "-" + 
+               gc.get(GregorianCalendar.YEAR);
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format.parse(birthDate);
+        } catch (java.text.ParseException pe) {
+            System.err.println(pe.toString());
+        }
+       
+        return date;
+
+    }
+    
+    private static String prependZero(int num) {
+        String dayStr;
+        if (num <=9) {
+            dayStr = "0" + String.valueOf(num);
+        } else {
+            dayStr = String.valueOf(num);
+        }
+        return dayStr;
+    }
+
+    private static int randBetween(int start, int end) {
+        return start + (int)Math.round(Math.random() * (end - start));
+    }    
 
     /**
      * Increment array of integers by 1, starting from end of array
