@@ -52,8 +52,10 @@ import com.strider.dataanonymizer.requirement.Key;
 import com.strider.dataanonymizer.requirement.Parameter;
 import com.strider.dataanonymizer.requirement.Requirement;
 import com.strider.dataanonymizer.requirement.Table;
+import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.LikeMatcher;
 import com.strider.dataanonymizer.utils.RequirementUtils;
+import java.sql.Date;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -208,7 +210,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */   
-    private String callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -240,7 +242,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private String callAnonymizingFunctionWithParameters(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionWithParameters(Connection dbConn, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -365,7 +367,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private String callAnonymizingFunctionWithoutParameters(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionWithoutParameters(Connection dbConn, ResultSet row, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -390,14 +392,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
             Method[] methods = clazz.getMethods();
             Method selectedMethod = null;
+            Object returnType = null;
             
             methodLoop:
             for (Method m : methods) {
-                if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
-                    
+                //if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
+                if (m.getName().equals(methodName)) {
                     log.debug("  Found method: " + m.getName());
-                    
                     selectedMethod = m;
+                    returnType = m.getReturnType();
                     break;
                 }
             }
@@ -413,7 +416,14 @@ public class DatabaseAnonymizer implements IAnonymizer {
             if (anonymizedValue == null) {
                 return null;
             }
-            return anonymizedValue.toString();
+            
+            if (returnType == String.class) {
+                return anonymizedValue.toString();
+            } else if (returnType == java.sql.Date.class) {
+                return anonymizedValue;
+            }
+            
+            
             
         } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
@@ -512,7 +522,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
              SecurityException,
              IllegalAccessException,
              IllegalArgumentException,
-             InvocationTargetException {
+             InvocationTargetException,
+             AnonymizerException {
         
         int fieldIndex = 0;
         Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
@@ -536,8 +547,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             anonymized.add(columnName);
-            String colValue = callAnonymizingFunctionFor(db, row, column);
-            updateStmt.setString(columnIndexes.get(columnName), colValue);
+            Object colValue = callAnonymizingFunctionFor(db, row, column);
+            if (colValue.getClass() == String.class) {
+                updateStmt.setString(columnIndexes.get(columnName), colValue.toString());
+            } else if (colValue.getClass() == Date.class) {
+                updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
+            }
         }
 
         int whereIndex = fieldIndex;
@@ -557,7 +572,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(int batchSize, Connection db, Table table) {
+    private void anonymizeTable(int batchSize, Connection db, Table table) 
+    throws AnonymizerException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
@@ -632,7 +648,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     @Override
     public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
-    throws DatabaseAnonymizerException{
+    throws DatabaseAnonymizerException, AnonymizerException{
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

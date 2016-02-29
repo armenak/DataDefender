@@ -21,17 +21,20 @@ package com.strider.dataanonymizer.extensions;
 import com.strider.dataanonymizer.functions.CoreFunctions;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Random;
-import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * @author Matthew Eaton
  */
 public class BiographicFunctions extends CoreFunctions {
 
+    private static Logger log = getLogger(BiographicFunctions.class);
+    
     public BiographicFunctions() {
     }
     
@@ -54,6 +57,9 @@ public class BiographicFunctions extends CoreFunctions {
         for (int digit : sinDigits) {
             sin.append(String.valueOf(digit));
         }
+        
+        log.debug("Generated SIN:[" + sin.toString() +"]");
+        
         return sin.toString();
 
     }
@@ -63,7 +69,7 @@ public class BiographicFunctions extends CoreFunctions {
      * @return String
      * @throws org.apache.commons.cli.ParseException
      */
-    public Date randomBirthDate() throws java.text.ParseException{
+    public java.sql.Date randomBirthDate() throws java.text.ParseException{
 
         GregorianCalendar gc = new GregorianCalendar();
         int year = randBetween(1900, 2016);
@@ -74,14 +80,13 @@ public class BiographicFunctions extends CoreFunctions {
         String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
                prependZero((gc.get(GregorianCalendar.MONTH) + 1)) + "-" + 
                gc.get(GregorianCalendar.YEAR);
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = format.parse(birthDate);
-        } catch (java.text.ParseException pe) {
-            System.err.println(pe.toString());
-        }
+        log.debug("BirthDate:[" + birthDate.toString() +"]");
+        
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        java.sql.Date date = new java.sql.Date(format.parse(birthDate).getTime());
        
+        log.debug("Generated BirthDate:[" + date.toString() +"]");
+
         return date;
 
     }

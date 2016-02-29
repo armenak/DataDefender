@@ -21,14 +21,23 @@ package com.strider.dataanonymizer.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.dataanonymizer.AnonymizerException;
 
 /**
  * @author Armenak Grigoryan
  */
 public class CommonUtils {
+    
+    private static Logger log = getLogger(CommonUtils.class);
     
     /**
      *
@@ -51,5 +60,20 @@ public class CommonUtils {
     
     public static boolean isEmptyString(String str) {
         return str == null || str.isEmpty();
+    }
+    
+    public static java.sql.Date stringToDate(String str, String format) 
+    throws AnonymizerException {
+	SimpleDateFormat formatter = new SimpleDateFormat(format);	
+        Date date = null;
+        java.sql.Date sqlDate = null;
+	try {
+            date = formatter.parse(str);
+            sqlDate = new java.sql.Date(date.getTime());
+	} catch (ParseException e) {
+            throw new AnonymizerException("Problem with parsing date", e);
+	}   
+        
+        return sqlDate;
     }
 }

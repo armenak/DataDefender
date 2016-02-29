@@ -38,5 +38,6 @@ public interface IAnonymizer {
      *        are anonymized.
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
-    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) throws DatabaseAnonymizerException;    
+    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
+    throws DatabaseAnonymizerException, AnonymizerException;    
 }
