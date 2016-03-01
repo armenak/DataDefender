@@ -186,4 +186,4 @@ A maven profile has been configured for each application, here are the Maven com
 <h3>Features and issues</h3>
 
 <h3>Code quality</h3>
-Two amazing tools - Empear http://empear.com/ and SonarQube http://www.sonarqube.org/ help contributors to this project maintain decent quality of code. Many thanks to their creators!
+Two amazing tools - Empear http://empear.com/ and SonarQube http://www.sonarqube.org/ help contributors of DataDefender maintain decent quality of code. Many thanks to their creators!
