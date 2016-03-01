@@ -21,7 +21,6 @@ package com.strider.dataanonymizer.extensions;
 import com.strider.dataanonymizer.functions.CoreFunctions;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.sql.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Random;
@@ -67,7 +66,7 @@ public class BiographicFunctions extends CoreFunctions {
     /**
      * Generates random 9-digit social insurance number
      * @return String
-     * @throws org.apache.commons.cli.ParseException
+     * @throws java.text.ParseException
      */
     public java.sql.Date randomBirthDate() throws java.text.ParseException{
 
@@ -134,14 +133,14 @@ public class BiographicFunctions extends CoreFunctions {
         for (int i=0; i<sinDigits.length; i++) {
             if ((i % 2) == 0) {
                 // multiple by 1
-                check = check + sinDigits[i];
+                check += sinDigits[i];
             } else {
                 // multiple by 2
                 int tempCheck = sinDigits[i] * 2;
                 if (tempCheck > 9) {
                     tempCheck = (tempCheck / 10) + (tempCheck % 10);
                 }
-                check = check + tempCheck;
+                check += tempCheck;
             }
         }
         return (check % 10) == 0;
