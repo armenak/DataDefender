@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.strider</groupId>
+    <groupId>com.datadefender</groupId>
     <artifactId>DataDefender</artifactId>
     <version>0.5</version>
     <packaging>jar</packaging>
@@ -70,7 +70,7 @@
       <sonar.language>java</sonar.language>    
       <sonar.projectKey>DA</sonar.projectKey>
       <sonar.projectName>DataDefended</sonar.projectName>
-      <sonar.projectVersion>0.3</sonar.projectVersion>
+      <sonar.projectVersion>0.5</sonar.projectVersion>
       <sonar.sources>src/main</sonar.sources>
       <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
       <sonar.profile>SIS</sonar.profile> 
