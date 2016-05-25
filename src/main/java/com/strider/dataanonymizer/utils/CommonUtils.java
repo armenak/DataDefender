@@ -71,6 +71,7 @@ public class CommonUtils {
             date = formatter.parse(str);
             sqlDate = new java.sql.Date(date.getTime());
 	} catch (ParseException e) {
+	    log.error("Problem with parsing date");
             throw new AnonymizerException("Problem with parsing date", e);
 	}   
         
