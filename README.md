@@ -1,5 +1,5 @@
-Sensitive Data Management: Data Discovery and Anonymization toolkit
-===================================================================
+Data Discovery and Anonymization toolkit
+========================================
 
 Table of content
 ----------------
