@@ -375,7 +375,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                IllegalArgumentException,
                InvocationTargetException {
         
-        String columnValue = row.getString(column.getName());
+        #String columnValue = row.getString(column.getName());
         String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
@@ -603,7 +603,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt = db.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
-            int batchCounter = 0, rowCount = 0;
+            int batchCounter = 0; 
+            int rowCount = 0;
             while (rs.next()) {
                 anonymizeRow(updateStmt, tableColumns, keyNames, db, rs);
                 batchCounter++;
