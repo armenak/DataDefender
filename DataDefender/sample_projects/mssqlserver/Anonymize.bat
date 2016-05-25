@@ -1,1 +1,0 @@
-java -cp "DataAnonymizer.jar;sqljdbc4.jar" com.strider.dataanonymizer.Anonymizer -a -P db.properties
