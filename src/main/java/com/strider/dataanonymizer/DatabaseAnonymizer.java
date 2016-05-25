@@ -375,7 +375,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                IllegalArgumentException,
                InvocationTargetException {
         
-        #String columnValue = row.getString(column.getName());
+        //String columnValue = row.getString(column.getName());
         String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
