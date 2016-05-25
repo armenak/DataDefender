@@ -1,7 +1,5 @@
 [![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html) 
 [![Build Status](https://travis-ci.org/armenak/DataDefender.svg?branch=master)](https://travis-ci.org/armenak/DataDefender)
-[![Code Climate](https://codeclimate.com/github/armenak/DataDefender/badges/gpa.svg)](https://codeclimate.com/github/armenak/DataDefender)
-[![Issue Count](https://codeclimate.com/github/armenak/DataDefender/badges/issue_count.svg)](https://codeclimate.com/github/armenak/DataDefender)
 
 Data Discovery and Anonymization toolkit
 ========================================
