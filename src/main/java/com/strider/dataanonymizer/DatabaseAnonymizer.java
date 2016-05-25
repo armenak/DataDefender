@@ -223,7 +223,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (parms != null) {
             return callAnonymizingFunctionWithParameters(dbConn, row, column);
         } else {
-            return callAnonymizingFunctionWithoutParameters(dbConn, row, column);
+            return callAnonymizingFunctionWithoutParameters(dbConn, column);
         }
         
     }    
@@ -367,7 +367,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithoutParameters(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionWithoutParameters(Connection dbConn, Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -375,7 +375,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                IllegalArgumentException,
                InvocationTargetException {
         
-        //String columnValue = row.getString(column.getName());
         String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
