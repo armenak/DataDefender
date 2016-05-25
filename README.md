@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/armenak/DataDefender.svg?branch=master)](https://travis-ci.org/armenak/DataDefender)
+
 Data Discovery and Anonymization toolkit
 ========================================
 
