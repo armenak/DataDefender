@@ -27,6 +27,8 @@ While performing the application development, testing, or maintenance, it is imp
 
 Data discovery identifies and analyzes data risks. Data anonymization allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
 
+This implementation of Data Discovery program is using [Apache OpenNLP](https://opennlp.apache.org/)
+
 Features
 --------
 1. Identifies sensitive personal data
