@@ -1,0 +1,1 @@
+Please download MSSQL JDBC driver. Due to licensing restrictions the driver cannot be stored in public repository.
