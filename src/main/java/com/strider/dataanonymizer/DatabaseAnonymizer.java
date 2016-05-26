@@ -441,7 +441,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return the columns value
      * @throws SQLException
      */
-    private boolean isExcludedColumn(Connection db, ResultSet row, Column column) throws SQLException {
+    private boolean isExcludedColumn(ResultSet row, Column column) throws SQLException {
         
         String columnName = column.getName();
         
@@ -538,7 +538,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 columnIndex = ++fieldIndex;
                 columnIndexes.put(columnName, columnIndex);
             }
-            if (isExcludedColumn(db, row, column)) {
+            if (isExcludedColumn(row, column)) {
                 String columnValue = row.getString(columnName);
                 updateStmt.setString(columnIndexes.get(columnName), columnValue);
                 log.debug("Excluding column: " + columnName + " with value: " + columnValue);
