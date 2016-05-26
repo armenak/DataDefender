@@ -422,7 +422,6 @@ public class CoreFunctions {
      * @throws IOException if an error occurs reading from the lipsum text file
      */
     public String lipsumSimilar(String text) throws IOException {
-        text = text.trim();
         String sParas = text.replaceAll("\r\n", "\n");
         int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {
