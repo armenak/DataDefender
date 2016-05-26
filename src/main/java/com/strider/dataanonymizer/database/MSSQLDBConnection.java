@@ -46,7 +46,7 @@ public class MSSQLDBConnection extends DBConnection {
     /**
      * Get connection url.  Package-level for testing purposes.
      */
-    String getURL() {
+    protected String getURL() {
         StringBuilder sqlServerURL = new StringBuilder(this.url);
         sqlServerURL.append(";user=").append(this.userName).append(";password=").append(this.password);
         return sqlServerURL.toString();
