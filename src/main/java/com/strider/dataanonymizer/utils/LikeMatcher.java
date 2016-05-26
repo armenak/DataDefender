@@ -40,9 +40,9 @@ public class LikeMatcher {
         String[] parts = pattern.split("((?<=[\\?\\_\\%])|(?=[\\?\\_\\%]))");
         StringBuilder reg = new StringBuilder("^");
         for (String part : parts) {
-            if (part.equals("%")) {
+            if ("%".equals(part)) {                
                 reg.append(".*?");
-            } else if (part.equals("?") || part.equals("_")) {
+            } else if ("?".equals(part) || "_".equals(part)) {
                 reg.append(".");
             } else {
                 reg.append(Pattern.quote(part.toLowerCase()));

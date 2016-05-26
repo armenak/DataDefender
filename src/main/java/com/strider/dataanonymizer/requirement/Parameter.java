@@ -69,7 +69,7 @@ public class Parameter {
     }
     
     private Object getArrayForValues(List<Object> list, String type) throws ClassNotFoundException {
-        if (type.equals("String")) {
+        if ("String".equals(type)) {
             type = "java.lang.String";
         }
         Class<?> c = ClassUtils.getClass(type);
@@ -123,7 +123,7 @@ public class Parameter {
             return Float.parseFloat(value);
         } else if (type.equals(double.class.getName())) {
             return Double.parseDouble(value);
-        } else if (type.equals(String.class.getName()) || type.equals("String")) {
+        } else if (type.equals(String.class.getName()) || "String".equals(type)) {
             return value;
         } else {
             Constructor<?> constr = Class.forName(type).getConstructor(String.class);
