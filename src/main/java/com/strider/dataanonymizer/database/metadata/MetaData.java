@@ -137,7 +137,7 @@ public abstract class MetaData implements IMetaData {
         return map;
     }
 
-    String getColumnType(ResultSet columnRS) throws SQLException {
+    protected String getColumnType(ResultSet columnRS) throws SQLException {
         String colType = columnRS.getString(6);
         if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
             colType = "String";
