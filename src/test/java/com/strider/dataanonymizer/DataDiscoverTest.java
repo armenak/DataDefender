@@ -16,13 +16,7 @@
  */
 package com.strider.dataanonymizer;
 
-import java.util.Properties;
 import com.strider.dataanonymizer.database.H2DB;
-import com.strider.dataanonymizer.database.metadata.MatchMetaData;
-import java.util.HashSet;
-import java.util.List;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 /**
  * @author Akira Matsuo
