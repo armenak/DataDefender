@@ -20,8 +20,6 @@ package com.strider.dataanonymizer.functions;
 
 
 import com.strider.dataanonymizer.extensions.BiographicFunctions;
-import java.text.ParseException;
-import java.util.Date;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 
