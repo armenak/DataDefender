@@ -52,6 +52,7 @@ import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.database.sqlbuilder.ISQLBuilder;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.SQLToJavaMapping;
+import java.util.Arrays;
 
 
 /**
@@ -76,7 +77,7 @@ public class DataDiscoverer extends Discoverer {
         // Get list of models used in data discovery
         String models = dataDiscoveryProperties.getProperty("models");
         modelList = models.split(",");
-        log.info("Model list [" + modelList.toString() + "]");
+        log.info("Model list [" + Arrays.toString(modelList) + "]");
         
         List<MatchMetaData> finalList = new ArrayList<>();
         for (String model: modelList) {

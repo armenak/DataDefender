@@ -41,9 +41,7 @@ import static org.apache.log4j.Logger.getLogger;
 @RunWith(MockitoJUnitRunner.class)  
 public class MSSQLDBConnectionTest {
     
-    
     private static final Logger log = getLogger(MSSQLDBConnectionTest.class);
-    
     
     @SuppressWarnings("serial")
     private Properties testProps = new Properties() {{
@@ -72,7 +70,7 @@ public class MSSQLDBConnectionTest {
                 assertTrue(representation.contains(
                     "[driver=java.util.List,vendor=mssql,url=invalid-url,userName=invalid-user,password=invalid-pass]"));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
+                log.error(e.toString());
             }
             return mockConnection;
         }

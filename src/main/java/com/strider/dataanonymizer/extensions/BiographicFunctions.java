@@ -76,7 +76,7 @@ public class BiographicFunctions extends CoreFunctions {
         String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
                prependZero((gc.get(GregorianCalendar.MONTH) + 1)) + "-" + 
                gc.get(GregorianCalendar.YEAR);
-        log.debug("BirthDate:[" + birthDate.toString() +"]");
+        log.debug("BirthDate:[" + birthDate +"]");
         
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         java.sql.Date date = new java.sql.Date(format.parse(birthDate).getTime());

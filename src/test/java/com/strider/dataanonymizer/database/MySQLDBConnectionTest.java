@@ -31,6 +31,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.strider.dataanonymizer.utils.ISupplierWithException;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Using mock to test Connection.
@@ -38,6 +40,9 @@ import com.strider.dataanonymizer.utils.ISupplierWithException;
  */
 @RunWith(MockitoJUnitRunner.class)  
 public class MySQLDBConnectionTest {
+    
+    private static final Logger log = getLogger(MySQLDBConnectionTest.class);
+    
     @SuppressWarnings("serial")
     private Properties testProps = new Properties() {{
         setProperty("vendor", "mysql");
@@ -64,7 +69,7 @@ public class MySQLDBConnectionTest {
                 assertTrue(representation.contains(
                     "[driver=java.util.List,vendor=mysql,url=invalid-url,userName=invalid-user,password=invalid-pass]"));
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
+                log.error(e.toString());
             }
             return mockConnection;
         }
