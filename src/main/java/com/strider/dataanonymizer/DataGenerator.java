@@ -50,10 +50,11 @@ public class DataGenerator  implements IGenerator {
 
     /**
      * Generate data to be used by anoymizer.
-     * @param databaseProperties Properties for database
+     * @param dbFactory
      * @param anonymizerProperties  Properties for anonymizer
      * @throws com.strider.dataanonymizer.database.DatabaseAnonymizerException
      */
+    @Override
     public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         // Now we collect data from the requirement
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
@@ -117,11 +118,6 @@ public class DataGenerator  implements IGenerator {
             count++;
         }
 
-        if (sourceFile.renameTo(new File(file + ".bak-" + count))) {
-            return true;
-        }
-
-        return false;
+        return sourceFile.renameTo(new File(file + ".bak-" + count));
     }
-
 }
