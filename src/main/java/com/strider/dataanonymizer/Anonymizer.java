@@ -183,7 +183,7 @@ public class Anonymizer  {
      * @param props application property file
      * @return The list of table names
      */
-    static Set<String> getTableNames(List<String> tableNames, Properties props) {
+    public static Set<String> getTableNames(List<String> tableNames, Properties props) {
         if (tableNames.isEmpty()) {
             String tableStr = props.getProperty("tables");
             if (tableStr == null) {

@@ -25,7 +25,7 @@ import com.strider.dataanonymizer.database.H2DB;
 public class DataDiscoverTest extends H2DB {
     
     @SuppressWarnings("serial")
-    final Properties sampleDProps = new Properties() {{ 
+    private final Properties sampleDProps = new Properties() {{ 
         setProperty("probability_threshold", "0.5" ); 
         setProperty("english_tokens", "target/classes/en-token.bin");
         setProperty("person", "target/classes/en-ner-person.bin");

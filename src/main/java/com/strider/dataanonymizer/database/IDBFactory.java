@@ -58,7 +58,7 @@ public interface IDBFactory extends ICloseableNoException {
             connection = createConnection();
         }
         
-        abstract Connection createConnection() throws DatabaseAnonymizerException;
+        public abstract Connection createConnection() throws DatabaseAnonymizerException;
         @Override
         public Connection getConnection() {
             return connection;

@@ -41,7 +41,7 @@ public class DataGeneratorTest extends H2DB {
     private static final String F_PATTERN = "dg-names";
     
     @SuppressWarnings("serial")
-    final Properties sampleAProps = new Properties() {{ 
+    private final Properties sampleAProps = new Properties() {{ 
         setProperty("requirement", TEST_DIR + "/Requirement-H2DB-DG.xml");
     }};
     
