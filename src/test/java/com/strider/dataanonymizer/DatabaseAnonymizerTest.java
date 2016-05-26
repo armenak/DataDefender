@@ -38,7 +38,7 @@ public class DatabaseAnonymizerTest extends H2DB {
 
     
     @SuppressWarnings("serial")
-    final Properties sampleAProps = new Properties() {{ 
+    private final Properties sampleAProps = new Properties() {{ 
         setProperty("batch_size", "10" ); 
         setProperty("requirement", "target/test-classes/Requirement-H2DB.xml");
     }};

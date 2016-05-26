@@ -39,9 +39,9 @@ import com.strider.dataanonymizer.utils.RequirementUtils;
 public class ColumnDiscoverTest extends H2DB {
     
     @SuppressWarnings("serial")
-    final Properties sampleCProps = new Properties() {{ setProperty("fname", "true" ); }};
+    private final Properties sampleCProps = new Properties() {{ setProperty("fname", "true" ); }};
     @SuppressWarnings("serial")
-    final Properties badCProps = new Properties() {{ setProperty("la colonna non esiste", "true" ); }};
+    private final Properties badCProps = new Properties() {{ setProperty("la colonna non esiste", "true" ); }};
 
     @Test
     public void testWithColumns() throws AnonymizerException { 
