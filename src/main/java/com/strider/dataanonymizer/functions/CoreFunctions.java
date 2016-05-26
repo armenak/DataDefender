@@ -69,9 +69,6 @@ public class CoreFunctions {
         }
     }    
     
-    public CoreFunctions() {
-    }
-    
     /**
      * Passes the active database connection.
      * 

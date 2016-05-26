@@ -27,11 +27,7 @@ import com.strider.dataanonymizer.functions.CoreFunctions;
  * @author Armenak Grigoryan
  */
 public class ExtentionExample extends CoreFunctions {
-    
-    public ExtentionExample() {
-    }
-    
-    
+        
     /**
      * Generates random 9-digit student number 
      * @return String

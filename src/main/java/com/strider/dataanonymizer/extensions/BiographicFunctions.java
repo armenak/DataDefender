@@ -34,9 +34,6 @@ public class BiographicFunctions extends CoreFunctions {
 
     private static Logger log = getLogger(BiographicFunctions.class);
     
-    public BiographicFunctions() {
-    }
-    
     /**
      * Generates random 9-digit social insurance number
      * @return String
