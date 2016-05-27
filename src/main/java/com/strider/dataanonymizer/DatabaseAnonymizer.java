@@ -346,7 +346,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             return anonymizedValue.toString();
             
-        } catch (InstantiationException | ClassNotFoundException ex) {
+        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         
@@ -424,7 +424,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             
             
-        } catch (InstantiationException | ClassNotFoundException ex) {
+        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         

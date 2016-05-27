@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer.functions;
 
+import com.strider.dataanonymizer.AnonymizerException;
 import static java.lang.Integer.parseInt;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -44,12 +45,12 @@ public class Utils {
      * 
      * @param fullMethodName Fully specified method name.
      * @return Method name.
-     * 
-     * @throws RuntimeException Parameter is an empty string.
+     * @throws com.strider.dataanonymizer.AnonymizerException
      */
-    public static String getMethodName(final String fullMethodName) {
+    public static String getMethodName(final String fullMethodName) throws AnonymizerException{
         if (fullMethodName.length() == 0) {
-            throw new RuntimeException("Please specify fully specified methid name in Requirement document");
+            throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
+            //throw new RuntimeException("Please specify fully specified methid name in Requirement document");
         }
 
         int index = fullMethodName.lastIndexOf(SEPARATOR);

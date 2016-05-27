@@ -37,7 +37,7 @@ public class ApplicationLock {
     private FileChannel channel;
     private FileLock lock;
     
-    private static Logger log = getLogger(ApplicationLock.class);
+    private static final Logger log = getLogger(ApplicationLock.class);
 
     /**
      * Constructor

@@ -18,6 +18,7 @@
 
 package com.strider.dataanonymizer.functions;
 
+import com.strider.dataanonymizer.AnonymizerException;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -66,7 +67,7 @@ public class UtilsTest extends TestCase {
     /**
      * Test of getMethodName method, of class Utils.
      */
-    public void testGetMethodName() {
+    public void testGetMethodName() throws AnonymizerException {
         String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
         String expResult = "CoreFunctions";
         
