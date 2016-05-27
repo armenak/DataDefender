@@ -90,7 +90,7 @@ public abstract class MetaData implements IMetaData {
             // Populate list of tables excluded from the analysis
             List<String> excludeTablesList = new ArrayList<>();
             String excludeTables = databaseProperties.getProperty("exclude-tables");
-            if (excludeTables != null && excludeTables != "") {
+            if (excludeTables != null && !"".equals(excludeTables)) {
                 String[] tempArr=excludeTables.split(",");
                 excludeTablesList = Arrays.asList(tempArr);
             }
