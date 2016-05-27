@@ -50,7 +50,6 @@ public class Utils {
     public static String getMethodName(final String fullMethodName) throws AnonymizerException{
         if (fullMethodName.length() == 0) {
             throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
-            //throw new RuntimeException("Please specify fully specified methid name in Requirement document");
         }
 
         int index = fullMethodName.lastIndexOf(SEPARATOR);
@@ -69,9 +68,9 @@ public class Utils {
      * 
      * @throws RuntimeException Parameter is an empty string.
      */
-    public static String getClassName(final String fullMethodName) {
+    public static String getClassName(final String fullMethodName) throws AnonymizerException {
         if (fullMethodName.length() == 0) {
-            throw new RuntimeException("Please specify fully specified methid name in Requirement document");
+            throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
         }
 
         int index = fullMethodName.lastIndexOf(SEPARATOR);

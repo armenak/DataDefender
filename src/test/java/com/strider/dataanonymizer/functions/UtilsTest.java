@@ -49,8 +49,9 @@ public class UtilsTest extends TestCase {
 
     /**
      * Test of getClassName method, of class Utils.
+     * @throws com.strider.dataanonymizer.AnonymizerException
      */
-    public void testGetClassName() {
+    public void testGetClassName() throws AnonymizerException {
         log.info("Executing testGetClassName ...");
         
         String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
@@ -66,6 +67,7 @@ public class UtilsTest extends TestCase {
     
     /**
      * Test of getMethodName method, of class Utils.
+     * @throws com.strider.dataanonymizer.AnonymizerException
      */
     public void testGetMethodName() throws AnonymizerException {
         String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
