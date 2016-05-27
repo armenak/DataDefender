@@ -55,7 +55,6 @@ import com.strider.dataanonymizer.requirement.Table;
 import com.strider.dataanonymizer.utils.CommonUtils;
 import com.strider.dataanonymizer.utils.LikeMatcher;
 import com.strider.dataanonymizer.utils.RequirementUtils;
-import java.sql.Date;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -549,7 +548,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             Object colValue = callAnonymizingFunctionFor(db, row, column);
             if (colValue.getClass() == String.class) {
                 updateStmt.setString(columnIndexes.get(columnName), colValue.toString());
-            } else if (colValue.getClass() == Date.class) {
+            } else if (colValue.getClass() == java.sql.Date.class) {
                 updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
             }
         }
