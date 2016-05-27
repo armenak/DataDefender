@@ -111,6 +111,7 @@ public class Anonymizer  {
                     }
                     if (line.hasOption('r')) {
                         String requirementFileName = line.getOptionValue('R', "Sample-Requirement.xml");
+                        discoverer = new DataDiscoverer();
                         discoverer.createRequirement(requirementFileName);
                     }
                     break;
