@@ -105,7 +105,11 @@ public abstract class MetaData implements IMetaData {
                         continue;
                     }
                     // Skip table if it is empty
-                    if ( (skipEmptyTables != null && skipEmptyTables.equals("true")) && (getRowNumber(tableName) == 0) ) {
+                    String schemaTableName = null;
+                    if (schemaName != null && !schemaName.equals("")) {
+                        schemaTableName = schemaName + "." + tableName;
+                    }
+                    if ( (skipEmptyTables != null && skipEmptyTables.equals("true")) && (getRowNumber(schemaTableName) == 0) ) {
                         log.info("Skipping empty table " + tableName);
                         continue;
                     }

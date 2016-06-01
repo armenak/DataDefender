@@ -40,7 +40,7 @@ public class MySQLMetaData extends MetaData {
 
     @Override
     protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
-        return md.getTables(null, null, "%", null);
+        return md.getTables(null, null, "%", new String[] {"TABLE"});
     }
     @Override
     protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
