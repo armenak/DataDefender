@@ -64,7 +64,6 @@ Contributors are encouraged to fork this repository and issue pull requests. If 
 4. Push to the branch (git push origin new-feature)
 5. Create new Pull Request
 
-
 How to run
 ----------
 The toolkit is implemented as a command line program. To run it first build the application as above (mvn install). This
@@ -192,6 +191,7 @@ A maven profile has been configured for each application, here are the Maven com
 - anonymizer: mvn exec:exec -P anonymize
 
 <h3>Features and issues</h3>
-Issues and future requests are tracked in JIRA https://armenak.atlassian.net/projects/DD/summary/statistics
+Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
+
 <h3>Code quality</h3>
 Two amazing tools - Empear http://empear.com/ and SonarQube http://www.sonarqube.org/ help contributors of DataDefender maintain decent quality of code. Many thanks to their creators!
