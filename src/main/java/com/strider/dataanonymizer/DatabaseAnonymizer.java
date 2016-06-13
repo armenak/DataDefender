@@ -120,7 +120,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param columns
      * @return 
      */
-    private PreparedStatement getSelectQueryStatement(Connection db, Table table, Collection<String> keys, Collection<String> columns) throws SQLException {
+    private PreparedStatement getSelectQueryStatement(IDBFactory dbFactory, Table table, Collection<String> keys, Collection<String> columns) throws SQLException {
         
         List<String> params = new LinkedList<>();
         StringBuilder query = new StringBuilder("SELECT DISTINCT ");
@@ -180,7 +180,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
         }
         
-        PreparedStatement stmt = db.prepareStatement(query.toString());
+        PreparedStatement stmt = dbFactory.getConnection().prepareStatement(query.toString());
+        if (dbFactory.getVendorName().equalsIgnoreCase("mysql")) {
+            stmt.setFetchSize(Integer.MIN_VALUE);
+        }
+        
         int paramIndex = 1;
         for (String param : params) {
             stmt.setString(paramIndex, param);
@@ -570,7 +574,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(int batchSize, Connection db, Table table) 
+    private void anonymizeTable(int batchSize, IDBFactory dbFactory, Table table) 
     throws AnonymizerException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
@@ -585,30 +589,30 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
-
+        
         // required in this scope for 'catch' block
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
         ResultSet rs = null;
+        Connection updateCon = dbFactory.getUpdateConnection();
         
         try {
 
-            db.setAutoCommit(false);
-            selectStmt = getSelectQueryStatement(db, table, keyNames, colNames);
+            selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
             String updateString = getUpdateQuery(table, colNames, keyNames);
-            updateStmt = db.prepareStatement(updateString);
+            updateStmt = updateCon.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
             int batchCounter = 0; 
             int rowCount = 0;
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, db, rs);
+                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();
-                    db.commit();
+                    updateCon.commit();
                     batchCounter = 0;
                 }
                 rowCount++;
@@ -616,7 +620,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.debug("Rows processed: " + rowCount);
             
             updateStmt.executeBatch();
-            db.commit();
+            updateCon.commit();
             selectStmt.close();
             updateStmt.close();
             rs.close();
@@ -651,12 +655,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
         int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
-
+        
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(Table reqTable : requirement.getTables()) {
             if (tables.isEmpty() || tables.contains(reqTable.getName())) {
-                anonymizeTable(batchSize, dbFactory.getConnection(), reqTable);
+                anonymizeTable(batchSize, dbFactory, reqTable);
             }
         }
     }
