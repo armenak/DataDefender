@@ -45,23 +45,37 @@ import com.strider.dataanonymizer.utils.ICloseableNoException;
 public interface IDBFactory extends ICloseableNoException {
     
     Connection getConnection();
+    Connection getUpdateConnection();
     IMetaData fetchMetaData() throws DatabaseAnonymizerException;
     ISQLBuilder createSQLBuilder();
+    String getVendorName();
     
     // Implements the common logic of get/closing of connections
     static abstract class DBFactory implements IDBFactory {
         private static final Logger log = getLogger(DBFactory.class);
         private final Connection connection;
+        protected Connection updateConnection;
+        private final String vendor;
 
-        DBFactory() throws DatabaseAnonymizerException {
+        DBFactory(String vendorName) throws DatabaseAnonymizerException {
             log.info("Connecting to database");
             connection = createConnection();
+            updateConnection = connection;
+            vendor = vendorName;
         }
         
         public abstract Connection createConnection() throws DatabaseAnonymizerException;
         @Override
         public Connection getConnection() {
             return connection;
+        }
+        @Override
+        public Connection getUpdateConnection() {
+            return updateConnection;
+        }
+        @Override
+        public String getVendorName() {
+            return vendor;
         }
         @Override
         public void close() {
@@ -85,7 +99,10 @@ public interface IDBFactory extends ICloseableNoException {
     static IDBFactory get(final Properties dbProps) throws DatabaseAnonymizerException {
         String vendor = dbProps.getProperty("vendor");
         if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
-            return new DBFactory() {
+            return new DBFactory(vendor) {
+                {
+                    updateConnection = createConnection();
+                }
                 @Override
                 public Connection createConnection() throws DatabaseAnonymizerException {
                     return new MySQLDBConnection(dbProps).connect();
@@ -100,7 +117,7 @@ public interface IDBFactory extends ICloseableNoException {
                 }
             };
         } else if ("mssql".equalsIgnoreCase(vendor)){
-            return new DBFactory() {
+            return new DBFactory(vendor) {
                 @Override
                 public Connection createConnection() throws DatabaseAnonymizerException {
                     return new MSSQLDBConnection(dbProps).connect();
@@ -115,7 +132,7 @@ public interface IDBFactory extends ICloseableNoException {
                 }
             };
         } else if ("oracle".equalsIgnoreCase(vendor)) {
-            return new DBFactory() {
+            return new DBFactory(vendor) {
                 @Override
                 public Connection createConnection() throws DatabaseAnonymizerException {
                     return new OracleDBConnection(dbProps).connect();
