@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSetMetaData;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -528,6 +530,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
              AnonymizerException {
         
         int fieldIndex = 0;
+        int nExcludedFields = 0;
         Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
         Set<String> anonymized = new HashSet<>(tableColumns.size());
 
@@ -536,22 +539,29 @@ public class DatabaseAnonymizer implements IAnonymizer {
             if (anonymized.contains(columnName)) {
                 continue;
             }
-            int columnIndex = 0;
             if (!columnIndexes.containsKey(columnName)) {
-                columnIndex = ++fieldIndex;
+                int columnIndex = ++fieldIndex;
                 columnIndexes.put(columnName, columnIndex);
             }
             if (isExcludedColumn(row, column)) {
                 String columnValue = row.getString(columnName);
                 updateStmt.setString(columnIndexes.get(columnName), columnValue);
                 log.debug("Excluding column: " + columnName + " with value: " + columnValue);
+                ++nExcludedFields;
                 continue;
             }
             
             anonymized.add(columnName);
             Object colValue = callAnonymizingFunctionFor(db, row, column);
             if (colValue.getClass() == String.class) {
-                updateStmt.setString(columnIndexes.get(columnName), colValue.toString());
+                ResultSetMetaData rsmd = row.getMetaData();
+                int columnIndex = fieldIndex + nExcludedFields;
+                int colSize = rsmd.getColumnDisplaySize(columnIndex);
+                String strValue = (String) colValue;
+                if (rsmd.getColumnClassName(columnIndex).equals(String.class.getName()) && strValue.length() > colSize) {
+                    strValue = strValue.substring(0, colSize);
+                }
+                updateStmt.setString(columnIndexes.get(columnName), strValue);
             } else if (colValue.getClass() == java.sql.Date.class) {
                 updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
             }
