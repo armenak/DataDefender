@@ -26,7 +26,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.ResultSetMetaData;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +45,7 @@ import org.apache.log4j.Logger;
 
 import com.strider.dataanonymizer.database.DatabaseAnonymizerException;
 import com.strider.dataanonymizer.database.IDBFactory;
+import com.strider.dataanonymizer.database.metadata.MatchMetaData;
 import com.strider.dataanonymizer.functions.CoreFunctions;
 import com.strider.dataanonymizer.functions.Utils;
 import com.strider.dataanonymizer.requirement.Column;
@@ -498,6 +498,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     /**
+     * Returns the passed colValue truncated to the column's size in the table.
+     * 
+     * @param colValue
+     * @param index
+     * @param columnMetaData
+     * @return
+     * @throws SQLException 
+     */
+    private String getTruncatedColumnValue(String colValue, int index, List<MatchMetaData> columnMetaData) throws SQLException {
+        MatchMetaData md = columnMetaData.get(index);
+        int colSize = md.getColumnSize();
+        String type = md.getColumnType();
+        if (type.equals("String") && colValue.length() > colSize) {
+            return colValue.substring(0, colSize);
+        }
+        return colValue;
+    }
+    
+    /**
      * Anonymizes a row of columns.
      * 
      * Sets query parameters on the passed updateStmt - this includes the key
@@ -508,6 +527,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param keyNames
      * @param db
      * @param row
+     * @param columnMetaData
      * @throws SQLException
      * @throws NoSuchMethodException
      * @throws SecurityException
@@ -520,7 +540,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         Collection<Column> tableColumns,
         Collection<String> keyNames,
         Connection db,
-        ResultSet row
+        ResultSet row,
+        List<MatchMetaData> columnMetaData
     ) throws SQLException,
              NoSuchMethodException,
              SecurityException,
@@ -530,7 +551,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
              AnonymizerException {
         
         int fieldIndex = 0;
-        int nExcludedFields = 0;
         Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
         Set<String> anonymized = new HashSet<>(tableColumns.size());
 
@@ -547,23 +567,24 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 String columnValue = row.getString(columnName);
                 updateStmt.setString(columnIndexes.get(columnName), columnValue);
                 log.debug("Excluding column: " + columnName + " with value: " + columnValue);
-                ++nExcludedFields;
                 continue;
             }
             
             anonymized.add(columnName);
             Object colValue = callAnonymizingFunctionFor(db, row, column);
-            if (colValue.getClass() == String.class) {
-                ResultSetMetaData rsmd = row.getMetaData();
-                int columnIndex = fieldIndex + nExcludedFields;
-                int colSize = rsmd.getColumnDisplaySize(columnIndex);
-                String strValue = (String) colValue;
-                if (rsmd.getColumnClassName(columnIndex).equals(String.class.getName()) && strValue.length() > colSize) {
-                    strValue = strValue.substring(0, colSize);
-                }
-                updateStmt.setString(columnIndexes.get(columnName), strValue);
+            if (colValue == null) {
+                updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
                 updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
+            } else {
+                updateStmt.setString(
+                    columnIndexes.get(columnName),
+                    getTruncatedColumnValue(
+                        (String) colValue,
+                        columnIndexes.get(columnName),
+                        columnMetaData
+                    )
+                );
             }
         }
 
@@ -611,14 +632,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
+            List<MatchMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
+            
             String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
             int batchCounter = 0; 
             int rowCount = 0;
+            
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs);
+                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, columnMetaData);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();

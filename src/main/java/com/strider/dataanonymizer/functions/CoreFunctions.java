@@ -202,7 +202,7 @@ public class CoreFunctions {
      * @return 
      */
     protected void generateStringListFromDb(String keyName, String query) throws SQLException {
-        if (!stringLists.containsKey(keyName)) {
+        if (!stringLists.containsKey(keyName + query.hashCode())) {
             log.info("*** reading from database column: " + keyName);
 			List<String> values = new ArrayList<String>();
             
@@ -217,7 +217,7 @@ public class CoreFunctions {
                 // TODO: throw a meaningful exception here
                 log.error("!!! Database column " + keyName + " did not return any values");
             }
-            stringLists.put(keyName, values);
+            stringLists.put(keyName + query.hashCode(), values);
         }
     }
     
@@ -232,13 +232,37 @@ public class CoreFunctions {
      * 
      * @param table the table name
      * @param column the column name
+     * @param excludeEmpty set to true to exclude empty values
      * @return the next item
      * @throws SQLException 
      */
-    public String randomColumnValue(String table, String column) throws SQLException {
+    public String randomColumnValue(String table, String column, boolean excludeEmpty) throws SQLException {
         String keyName = table + "." + column;
-        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s WHERE %s IS NOT NULL AND %s <> ''", column, table, column, column));
-        return getNextShuffledItemFor(keyName);
+        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        if (excludeEmpty) {
+            query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);
+        }
+        generateStringListFromDb(keyName, query);
+        return getNextShuffledItemFor(keyName + query.hashCode());
+    }
+    
+    /**
+     * Generates a randomized collection of column values and selects and
+     * returns one.
+     * 
+     * Same as calling randomColumnValue with excludeEmpty set to true (empty
+     * values are excluded).  For backwards compatibility this differs from
+     * the default 'randomColumnValue' exclusion policy and is therefore
+     * deprecated.
+     * 
+     * @param table the table name
+     * @param column the column name
+     * @return the next item
+     * @deprecated
+     * @throws SQLException 
+     */
+    public String randomColumnValue(String table, String column) throws SQLException {
+        return this.randomColumnValue(table, column, true);
     }
     
     /**
@@ -251,13 +275,38 @@ public class CoreFunctions {
      * @param table
      * @param column
      * @param value
+     * @param excludeEmpty
      * @return
      * @throws SQLException 
      */
-    public String mappedColumnShuffle(String table, String column, String value) throws SQLException {
+    public String mappedColumnShuffle(String table, String column, String value, boolean excludeEmpty) throws SQLException {
         String keyName = table + "." + column;
-        generateStringListFromDb(keyName, String.format("SELECT DISTINCT %s FROM %s", column, table));
-        return getPredictableShuffledValueFor(keyName, value);
+        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        if (excludeEmpty) {
+            query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);
+        }
+        generateStringListFromDb(keyName, query);
+        return getPredictableShuffledValueFor(keyName + query.hashCode(), value);
+    }
+    
+    /**
+     * Returns a 'predictable' shuffled value based on the passed value which is
+     * guaranteed to return the same random value for the same column value.
+     * 
+     * Same as calling mappedColumnShuffle with excludeEmpty set to false (empty
+     * values are NOT excluded).  For backwards compatibility this differs from
+     * the default 'randomColumnValue' exclusion policy and is therefore
+     * deprecated.
+     * 
+     * @param table
+     * @param column
+     * @param value
+     * @return
+     * @deprecated 
+     * @throws SQLException 
+     */
+    public String mappedColumnShuffle(String table, String column, String value) throws SQLException {
+        return this.mappedColumnShuffle(table, column, value, false);
     }
     
     public String randomFirstName(String file) throws IOException {

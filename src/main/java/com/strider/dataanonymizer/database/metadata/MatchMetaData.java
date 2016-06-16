@@ -34,16 +34,24 @@ public class MatchMetaData {
     private final List<String> pkeys;
     private final String columnName;
     private final String columnType;
+    private final int columnSize;
     private double averageProbability = 0;   
     private String model = "";
 
-    public MatchMetaData(final String schemaName, final String tableName, final List<String> pkeys,
-        final String columnName, final String columnType) {
+    public MatchMetaData(
+        String schemaName,
+        String tableName,
+        List<String> pkeys,
+        String columnName,
+        String columnType,
+        int columnSize
+    ) {
         this.schemaName = schemaName;
         this.tableName  = tableName;
         this.pkeys = pkeys;
         this.columnName = columnName;
         this.columnType = columnType;
+        this.columnSize = columnSize;
     }   
 
     public String getSchemaName() {
@@ -64,7 +72,11 @@ public class MatchMetaData {
 
     public String getColumnType() {
         return this.columnType;
-    }    
+    }
+    
+    public int getColumnSize() {
+        return this.columnSize;
+    }
     
     public void setAverageProbability(double averageProbability) {
         this.averageProbability = averageProbability;

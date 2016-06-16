@@ -5,6 +5,8 @@
  */
 package com.strider.dataanonymizer.database.metadata;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -16,4 +18,5 @@ import java.util.List;
 public interface IMetaData {
     public List<MatchMetaData> getMetaData();
     public List<MatchMetaData> getMetaData(String columnType);
+    public List<MatchMetaData> getMetaDataForRs(ResultSet rs) throws SQLException;
 }

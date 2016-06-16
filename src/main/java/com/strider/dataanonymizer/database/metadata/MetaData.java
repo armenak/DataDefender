@@ -21,6 +21,7 @@ import com.strider.dataanonymizer.utils.SQLToJavaMapping;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -129,7 +130,8 @@ public abstract class MetaData implements IMetaData {
                         while (columnRS.next()) {
                             String columnName = getColumnName(columnRS);
                             String colType = getColumnType(columnRS);
-                            map.add(new MatchMetaData(schemaName, tableName, pkeys, columnName, colType));
+                            int colSize = getColumnSize(columnRS);
+                            map.add(new MatchMetaData(schemaName, tableName, pkeys, columnName, colType, colSize));
                         }
                     }
                 }
@@ -140,6 +142,30 @@ public abstract class MetaData implements IMetaData {
         
         return map;
     }
+    
+    @Override
+    public List<MatchMetaData> getMetaDataForRs(ResultSet rs) throws SQLException {
+        List<MatchMetaData> map = new ArrayList<>();
+        
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
+            String colType = rsmd.getColumnTypeName(i);
+            if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
+                colType = "String";
+            }
+            map.add(
+                new MatchMetaData(
+                    rsmd.getSchemaName(i),
+                    rsmd.getTableName(i),
+                    null,
+                    rsmd.getColumnName(i),
+                    colType,
+                    rsmd.getColumnDisplaySize(i)
+                )
+            );
+        }
+        return map;
+    }
 
     protected String getColumnType(ResultSet columnRS) throws SQLException {
         String colType = columnRS.getString(6);
@@ -147,6 +173,10 @@ public abstract class MetaData implements IMetaData {
             colType = "String";
         }
         return colType;
+    }
+    
+    protected int getColumnSize(ResultSet columnRs) throws SQLException {
+        return columnRs.getInt(7);
     }
     
     private int getRowNumber(String table) {
