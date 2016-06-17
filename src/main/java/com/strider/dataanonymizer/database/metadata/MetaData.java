@@ -150,7 +150,7 @@ public abstract class MetaData implements IMetaData {
         ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
             String colType = rsmd.getColumnTypeName(i);
-            if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
+            if (SQLToJavaMapping.isString(colType)) {
                 colType = "String";
             }
             map.add(
