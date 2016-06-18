@@ -116,7 +116,7 @@ public class DataDiscoverer extends Discoverer {
                 String columnName = data.getColumnName();
                 List<Double> probabilityList = new ArrayList<>();
                 
-                log.debug("Analyzing table [" + tableName + "]");
+                log.info("Analyzing table [" + tableName + "]");
                 
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
                     log.debug("Continue ...");
