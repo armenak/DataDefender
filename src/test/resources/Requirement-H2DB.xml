@@ -6,13 +6,13 @@
         <Table Name="ju_users" PKey="id">
             <Columns>
                 <Column Name="fname" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomFirstName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="target/test-classes/names.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="lname" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomLastName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="target/test-classes/names.txt" Type="String"/>
                     </Parameters>

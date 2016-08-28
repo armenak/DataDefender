@@ -6,32 +6,32 @@
         <Table Name="test_table" PKey="id">
             <Columns>
                 <Column Name="column1" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomFirstName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="file1.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="column2" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomLastName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="file2.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="column3" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomEmail</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomEmail</Function>
                     <Parameters>
                         <Parameter Name="domainName" Value="ubc.ca" Type="String"/>
                     </Parameters>
                 </Column>                
                 <Column Name="column4" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomDescription</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomDescription</Function>
                     <Parameters>
                         <Parameter Name="num" Value="1" Type="int"/>
                         <Parameter Name="length" Value="100" Type="int"/>                        
                     </Parameters>
                 </Column>
                 <Column Name="column5" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.extensions.ExtentionExample.randomStudentNumber</Function>
+                    <Function>com.strider.datadefender.extensions.ExtentionExample.randomStudentNumber</Function>
                 </Column>                
                 
             </Columns>
@@ -43,13 +43,13 @@
             </PrimaryKey>
             <Columns>
                 <Column Name="column1" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomFirstName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomFirstName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="file1.txt" Type="String"/>
                     </Parameters>
                 </Column>
                 <Column Name="column2" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.randomLastName</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.randomLastName</Function>
                     <Parameters>
                         <Parameter Name="file" Value="file2.txt" Type="String"/>
                     </Parameters>
@@ -82,7 +82,7 @@
                     </Parameters>
                 </Column>
                 <Column Name="column3" ReturnType="String">
-                    <Function>com.strider.dataanonymizer.functions.CoreFunctions.nonExistentFunction</Function>
+                    <Function>com.strider.datadefender.functions.CoreFunctions.nonExistentFunction</Function>
                     <Parameters>
                         <Parameter Name="test" Type="int[]">
                             <Element Value="1"/>
