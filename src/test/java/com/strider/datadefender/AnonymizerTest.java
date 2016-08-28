@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender;
 
-import com.strider.datadefender.AnonymizerException;
-import com.strider.datadefender.Anonymizer;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -38,18 +36,18 @@ public class AnonymizerTest {
     public void testGetTableNames() throws AnonymizerException {
         String t1 = "tableOne";
         List<String> tableList = Arrays.asList(t1);
-        Set<String> tableNames = Anonymizer.getTableNames(tableList, new Properties());
+        Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
         assertEquals(1, tableNames.size());
         assertEquals("Handle table args.", t1.toLowerCase(), tableNames.iterator().next());
         
         Properties overrideProps = new Properties() {{
             setProperty("tables", "oneT twoT");
         }};
-        tableNames = Anonymizer.getTableNames(tableList, overrideProps);
+        tableNames = DataDefender.getTableNames(tableList, overrideProps);
         assertEquals(1, tableNames.size());
         assertEquals("Ignore props", t1.toLowerCase(), tableNames.iterator().next());
         
-        tableNames = Anonymizer.getTableNames(Collections.emptyList(), overrideProps);
+        tableNames = DataDefender.getTableNames(Collections.emptyList(), overrideProps);
         assertEquals(2, tableNames.size());
         assertArrayEquals("Props from file", new String[] {"onet", "twot"}, tableNames.toArray());
     }

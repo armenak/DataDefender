@@ -45,9 +45,9 @@ import static org.apache.log4j.Logger.getLogger;
  * service.
  *
  */
-public class Anonymizer  {
+public class DataDefender  {
  
-    private static final Logger log = getLogger(Anonymizer.class);
+    private static final Logger log = getLogger(DataDefender.class);
 
     public static void main(String[] args) throws ParseException, AnonymizerException {
         
