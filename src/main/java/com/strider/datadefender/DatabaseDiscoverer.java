@@ -59,9 +59,9 @@ import java.util.Arrays;
  *
  * @author Armenak Grigoryan
  */
-public class DataDiscoverer extends Discoverer {
+public class DatabaseDiscoverer extends Discoverer {
     
-    private static Logger log = getLogger(DataDiscoverer.class);
+    private static Logger log = getLogger(DatabaseDiscoverer.class);
     
     private static String[] modelList = null;
         

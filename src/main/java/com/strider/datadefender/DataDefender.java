@@ -106,7 +106,7 @@ public class DataDefender  {
                     } else if (line.hasOption('d')) {
                         String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                         Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                        discoverer = new DataDiscoverer();
+                        discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                     }
                     if (line.hasOption('r')) {
