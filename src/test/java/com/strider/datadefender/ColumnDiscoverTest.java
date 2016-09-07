@@ -48,7 +48,7 @@ public class ColumnDiscoverTest extends H2DB {
 
     @Test
     public void testWithColumns() throws AnonymizerException { 
-        IDiscoverer discoverer = new ColumnDiscoverer();
+        ColumnDiscoverer discoverer = new ColumnDiscoverer();
         List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
         assertEquals(1, suspects.size());
         assertEquals("ju_users.fname", suspects.get(0).toString());
@@ -57,7 +57,7 @@ public class ColumnDiscoverTest extends H2DB {
 
     @Test
     public void testWithTablesColumnsAndRequirements() throws AnonymizerException { 
-        IDiscoverer discoverer = new ColumnDiscoverer();
+        ColumnDiscoverer discoverer = new ColumnDiscoverer();
         List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
             new HashSet<String>(Arrays.asList("ju_users")));
         assertEquals(1, suspects.size());
@@ -79,7 +79,7 @@ public class ColumnDiscoverTest extends H2DB {
 
     @Test
     public void testWithBadTablesColumns() throws AnonymizerException { 
-        IDiscoverer discoverer = new ColumnDiscoverer();
+        ColumnDiscoverer discoverer = new ColumnDiscoverer();
         List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
             new HashSet<String>(Arrays.asList("il tavolo non esiste")));
         assertTrue(suspects.isEmpty());
@@ -87,7 +87,7 @@ public class ColumnDiscoverTest extends H2DB {
 
     @Test
     public void testWithTablesBadColumns() throws AnonymizerException { 
-        IDiscoverer discoverer = new ColumnDiscoverer();
+        ColumnDiscoverer discoverer = new ColumnDiscoverer();
         List<MatchMetaData> suspects = discoverer.discover(factory, badCProps, 
             new HashSet<String>(Arrays.asList("ju_users")));
         assertTrue(suspects.isEmpty());

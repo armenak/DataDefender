@@ -20,6 +20,7 @@ package com.strider.datadefender;
 import com.strider.datadefender.database.IDBFactory;
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import com.strider.datadefender.utils.ApplicationLock;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+import org.apache.tika.exception.TikaException;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -49,7 +52,7 @@ public class DataDefender  {
  
     private static final Logger log = getLogger(DataDefender.class);
 
-    public static void main(String[] args) throws ParseException, AnonymizerException {
+    public static void main(String[] args) throws ParseException, AnonymizerException, IOException, SAXException, TikaException {
         
         // Ensure we are not trying to run second instance of the same program
         ApplicationLock al = new ApplicationLock("DataDefender");
@@ -75,14 +78,21 @@ public class DataDefender  {
         } else {
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
+
+        String cmd = unparsedArgs.get(0); // get & remove command arg
+        unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
+        
+        if (cmd.equals("file-discover")) {
+            String fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
+            Properties fileDiscoveryProperties = loadProperties(fileDiscoveryPropertyFile);
+            FileDiscoverer discoverer = new FileDiscoverer();
+            discoverer.discover(fileDiscoveryProperties);  
+            return;
+        }
         
         String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = loadProperties(databasePropertyFile);
         try (IDBFactory dbFactory = IDBFactory.get(props);) {
-        
-            String cmd = unparsedArgs.get(0); // get & remove command arg
-            unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
-            
             switch (cmd) {
                 case "anonymize":
                     String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
@@ -96,22 +106,23 @@ public class DataDefender  {
                     Properties generatorProperties = loadProperties(generatorPropertyFile);
                     generator.generate(dbFactory, generatorProperties);
                     break;
-                case "discover":
-                    IDiscoverer discoverer = null;
+                case "database-discover":
                     if (line.hasOption('c')) {
                         String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                         Properties columnProperties = loadProperties(columnPropertyFile);
-                        discoverer = new ColumnDiscoverer();
+                        ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                        if (line.hasOption('r')) {
+                            discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
+                        }                        
                     } else if (line.hasOption('d')) {
                         String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                         Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                        discoverer = new DatabaseDiscoverer();
+                        DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
-                    }
-                    if (line.hasOption('r')) {
-                        String requirementFileName = line.getOptionValue('R', "Sample-Requirement.xml");
-                        discoverer.createRequirement(requirementFileName);
+                        if (line.hasOption('r')) {
+                            discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
+                        }                         
                     }
                     break;
                 default:
@@ -155,6 +166,7 @@ public class DataDefender  {
         options.addOption("r", "requirement", false, "create discover and create requirement file");
         options.addOption("R", "requirement-file", false, "define requirement file name");
         options.addOption("P", "database properties", true, "define database property file");
+        options.addOption("F", "file discovery properties", true, "define file discovery property file");
         options.addOption("debug", false, "enable debug output");
         return options;
     }

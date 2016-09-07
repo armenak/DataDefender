@@ -23,10 +23,6 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.log4j.Logger.getLogger;
 import org.apache.commons.collections.ListUtils;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -37,11 +33,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
 import org.apache.log4j.Logger;
@@ -65,7 +56,6 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private static String[] modelList = null;
         
-    @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
@@ -179,65 +169,4 @@ public class DatabaseDiscoverer extends Discoverer {
         }
         return matches;
     }
-    
-    /**
-     * Creates model POJO based on OpenNLP model
-     * 
-     * @param dataDiscoveryProperties
-     * @param modelType
-     * @return Model
-     */
-    private Model createModel(Properties dataDiscoveryProperties, String modelName) {
-        InputStream modelInToken = null;
-        InputStream modelIn = null;        
-        TokenizerModel modelToken = null;
-        Tokenizer tokenizer = null;
-        
-        TokenNameFinderModel model = null;
-        NameFinderME nameFinder = null;
-        
-        try {
-            log.debug("Model name: " + modelName);
-            log.debug(dataDiscoveryProperties.toString());
-            modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
-            log.debug(dataDiscoveryProperties.getProperty(modelName));
-            modelIn = new FileInputStream(dataDiscoveryProperties.getProperty(modelName));            
-            
-            modelToken = new TokenizerModel(modelInToken);
-            tokenizer = new TokenizerME(modelToken);            
-            
-            model = new TokenNameFinderModel(modelIn);
-            nameFinder = new NameFinderME(model);    
-            
-            modelInToken.close();
-            modelIn.close();
-        } catch (FileNotFoundException ex) {
-            log.error(ex.toString());
-            try {
-                if (modelInToken != null) {
-                    modelInToken.close();
-                }
-                if (modelIn != null) {
-                    modelIn.close();
-                }
-            } catch (IOException ioe) {
-                log.error(ioe.toString());
-            }
-        } catch (IOException ex) {
-            log.error(ex.toString());
-        }
-        
-        return new Model(tokenizer, nameFinder, modelName);
-    }
-    
-    private double calculateAverage(List <Double> values) {
-        Double sum = 0.0;
-        if(!values.isEmpty()) {
-            for (Double value : values) {
-                sum += value;
-            }
-            return sum / values.size();
-        }
-        return sum;
-    }    
 }

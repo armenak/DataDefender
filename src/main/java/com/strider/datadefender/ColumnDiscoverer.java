@@ -40,7 +40,6 @@ public class ColumnDiscoverer extends Discoverer {
     
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
-    @Override
     public List<MatchMetaData> discover(IDBFactory factory, Properties columnProperties, Set<String> tables) 
         throws DatabaseAnonymizerException {
      

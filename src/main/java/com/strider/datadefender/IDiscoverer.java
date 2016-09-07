@@ -42,8 +42,10 @@ public interface IDiscoverer {
      * @throws com.strider.datadefender.AnonymizerException
      * @returns List of results introduced for testing purposes.
      */
-    List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
+    //List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws AnonymizerException;
 
+    //List<MatchMetaData> discover(Properties dataDiscoveryProperties) throws AnonymizerException;    
+    
     /**
      * Creates a sample requirement file from a list of sorted matches found by the discovery method.  
      * The requirement file will most likely require customization (for example; anonymzation function) before you want to run the Anonymizer against it.

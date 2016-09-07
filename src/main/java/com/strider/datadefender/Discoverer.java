@@ -20,17 +20,34 @@ package com.strider.datadefender;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
+
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.utils.RequirementUtils;
+import static org.apache.log4j.Logger.getLogger;
+
 
 /**
  * Holds common logic for Discoverers.
  * @author Akira Matsuo
  */
-public abstract class Discoverer implements IDiscoverer {
+public abstract class Discoverer { //implements IDiscoverer {
     
     protected List<MatchMetaData> matches;
+    
+    private static Logger log = getLogger(Discoverer.class);
 
     public void createRequirement(String fileName) throws AnonymizerException {
         if (matches == null || matches.isEmpty()) {
@@ -39,4 +56,65 @@ public abstract class Discoverer implements IDiscoverer {
         Requirement requirement = RequirementUtils.create(matches);
         RequirementUtils.write(requirement, fileName);
     }
+    
+    public double calculateAverage(List <Double> values) {
+        Double sum = 0.0;
+        if(!values.isEmpty()) {
+            for (Double value : values) {
+                sum += value;
+            }
+            return sum / values.size();
+        }
+        return sum;
+    }    
+    
+    /**
+     * Creates model POJO based on OpenNLP model
+     * 
+     * @param dataDiscoveryProperties
+     * @param modelType
+     * @return Model
+     */
+    public  Model createModel(Properties dataDiscoveryProperties, String modelName) {
+        InputStream modelInToken = null;
+        InputStream modelIn = null;        
+        TokenizerModel modelToken = null;
+        Tokenizer tokenizer = null;
+        
+        TokenNameFinderModel model = null;
+        NameFinderME nameFinder = null;
+        
+        try {
+            log.debug("Model name: " + modelName);
+            log.debug(dataDiscoveryProperties.toString());
+            modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
+            log.debug(dataDiscoveryProperties.getProperty(modelName));
+            modelIn = new FileInputStream(dataDiscoveryProperties.getProperty(modelName));            
+            
+            modelToken = new TokenizerModel(modelInToken);
+            tokenizer = new TokenizerME(modelToken);            
+            
+            model = new TokenNameFinderModel(modelIn);
+            nameFinder = new NameFinderME(model);    
+            
+            modelInToken.close();
+            modelIn.close();
+        } catch (FileNotFoundException ex) {
+            log.error(ex.toString());
+            try {
+                if (modelInToken != null) {
+                    modelInToken.close();
+                }
+                if (modelIn != null) {
+                    modelIn.close();
+                }
+            } catch (IOException ioe) {
+                log.error(ioe.toString());
+            }
+        } catch (IOException ex) {
+            log.error(ex.toString());
+        }
+        
+        return new Model(tokenizer, nameFinder, modelName);
+    }    
 }
