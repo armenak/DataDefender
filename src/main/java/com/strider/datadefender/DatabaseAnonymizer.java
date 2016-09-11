@@ -163,7 +163,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             for (Exclude exc : exclusions) {
                 String neq = exc.getNotEqualsValue();
-                String nlk = exc.getNotLikeValue();
+                final String nlk = exc.getNotLikeValue();
                 String col = exc.getName();
                 
                 if (neq != null) {

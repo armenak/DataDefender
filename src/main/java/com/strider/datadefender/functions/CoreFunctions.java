@@ -114,9 +114,9 @@ public class CoreFunctions {
      * @param name
      * @return 
      */
-    private String getNextShuffledItemFor(String name) {
+    private String getNextShuffledItemFor(final String name) {
         if (stringIters.containsKey(name)) {
-            Iterator<String> iter = stringIters.get(name);
+            final Iterator<String> iter = stringIters.get(name);
             if (iter.hasNext()) {
                 return iter.next();
             }

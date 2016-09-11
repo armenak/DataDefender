@@ -124,8 +124,8 @@ public class DatabaseDiscoverer extends Discoverer {
                 }
                 
                 String table = sqlBuilder.prefixSchema(tableName);
-                int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                String query = sqlBuilder.buildSelectWithLimit(
+                final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
+                final String query = sqlBuilder.buildSelectWithLimit(
                     "SELECT " + columnName + 
                     " FROM " + table + 
                     " WHERE " + columnName  + " IS NOT NULL ", limit);

@@ -94,7 +94,7 @@ public class Column {
      * @return List<Exclude>
      */
     public List<Exclude> getExclusions() {
-        List<Exclude> lst = new ArrayList<>();
+        final List<Exclude> lst = new ArrayList<>();
         if (exclusions != null && !exclusions.isEmpty()) {
             lst.addAll(exclusions);
         }

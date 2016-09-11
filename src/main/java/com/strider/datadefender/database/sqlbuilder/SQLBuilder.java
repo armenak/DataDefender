@@ -43,12 +43,17 @@ public abstract class SQLBuilder implements ISQLBuilder {
 
     @Override
     public String prefixSchema(final String tableName) {
-        String schema = databaseProperties.getProperty("schema");
+        final String schema = databaseProperties.getProperty("schema");
+        String prefixAndTableName;
+        
         if (CommonUtils.isEmptyString(schema)) {
+            prefixAndTableName = tableName;
             return tableName;
+        } else {
+            prefixAndTableName = schema + "." + tableName;
         }
-        return schema + "." + tableName;
+         
+        return prefixAndTableName;
     }
-    
     
 }

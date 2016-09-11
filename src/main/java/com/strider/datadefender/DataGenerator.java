@@ -57,7 +57,7 @@ public class DataGenerator  implements IGenerator {
     @Override
     public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
         // Now we collect data from the requirement
-        Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
+        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
         // Iterate over the requirement and generate data sets
         log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
 

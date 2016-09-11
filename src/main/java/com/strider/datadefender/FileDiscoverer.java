@@ -82,7 +82,7 @@ public class FileDiscoverer extends Discoverer {
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
         for(FileMatchMetaData data: finalList) {    
             String probability = decimalFormat.format(data.getAverageProbability());
-            String result = String.format("%20s %20s %20s %20s", data.getDirectory(), data.getFileName(), probability, data.getModel());
+            final String result = String.format("%20s %20s %20s %20s", data.getDirectory(), data.getFileName(), probability, data.getModel());
             log.info(result);            
         }                    
         
