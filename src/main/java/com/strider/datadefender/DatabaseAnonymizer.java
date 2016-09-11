@@ -247,7 +247,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithParameters(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, final Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -255,8 +255,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
                IllegalArgumentException,
                InvocationTargetException {
         
-        String columnValue = row.getString(column.getName());
-        String function = column.getFunction();
+        final String columnValue = row.getString(column.getName());
+        final String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
             return "";
@@ -387,9 +387,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         } 
         
         try {
-            String className = Utils.getClassName(function);
-            String methodName = Utils.getMethodName(function);
-            Class<?> clazz = Class.forName(className);
+            final String className = Utils.getClassName(function);
+            final String methodName = Utils.getMethodName(function);
+            final Class<?> clazz = Class.forName(className);
             
             CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
@@ -460,7 +460,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 String eq = exc.getEqualsValue();
                 String lk = exc.getLikeValue();
                 String neq = exc.getNotEqualsValue();
-                String nlk = exc.getNotLikeValue();
+                final String nlk = exc.getNotLikeValue();
                 boolean nl = exc.isExcludeNulls();
                 if (name == null || name.length() == 0) {
                     name = columnName;
