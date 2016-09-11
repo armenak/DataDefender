@@ -60,13 +60,9 @@ public class CoreFunctions {
     private Connection db;
     
     static {        
-        try  {
-            log.info("*** Adding list of words into array");
-            addWordsIntoArray();
-            log.info("*** Array is populated with words from dictionary");
-        } catch (Exception ode) {
-            log.error("Error occurred while reading dictionary.txt file.\n" + ode.toString());
-        }
+        log.info("*** Adding list of words into array");
+        addWordsIntoArray();
+        log.info("*** Array is populated with words from dictionary");
     }    
     
     /**
@@ -78,7 +74,7 @@ public class CoreFunctions {
      * 
      * @param db the active database connection
      */
-    public void setDatabaseConnection(Connection db) {
+    public void setDatabaseConnection(final Connection db) {
         this.db = db;
     }
     
@@ -125,7 +121,7 @@ public class CoreFunctions {
         List<String> list = stringLists.get(name);
         Collections.shuffle(list);
         
-        Iterator<String> iter = list.iterator();
+        final Iterator<String> iter = list.iterator();
         stringIters.put(name, iter);
         return iter.next();
     }
@@ -140,7 +136,7 @@ public class CoreFunctions {
      * @param params
      * @return 
      */
-    private String getPredictableShuffledValueFor(String name, String value) {
+    private String getPredictableShuffledValueFor(final String name, final String value) {
         if (!predictableShuffle.containsKey(name)) {
             List<String> list = stringLists.get(name);
             List<String> shuffled = new ArrayList<>(list);
@@ -164,7 +160,7 @@ public class CoreFunctions {
         return map.get(value);
     }
     
-    public String generateStringFromPattern(String regex) {
+    public String generateStringFromPattern(final String regex) {
         Xeger instance = new Xeger(regex);
         return instance.generate();
     }
@@ -376,8 +372,8 @@ public class CoreFunctions {
      * @param length The maximum length of the string
      * @return 
      */
-    public String generateRandomString(int num, int length) {
-        Random random = new Random();
+    public String generateRandomString(final int num, final int length) {
+        final Random random = new Random();
         StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
             final int rand = random.nextInt(479617);
