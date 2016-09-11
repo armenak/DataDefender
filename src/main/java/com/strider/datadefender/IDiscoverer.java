@@ -18,13 +18,6 @@
 
 package com.strider.datadefender;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import com.strider.datadefender.database.IDBFactory;
-import com.strider.datadefender.database.metadata.MatchMetaData;
-
 /**
  * Defines contract for all discoverers
  * @author Armenak Grigoryan
