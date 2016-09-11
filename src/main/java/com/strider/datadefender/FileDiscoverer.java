@@ -20,31 +20,28 @@ package com.strider.datadefender;
 
 import static java.lang.Double.parseDouble;
 import static org.apache.log4j.Logger.getLogger;
-import org.apache.commons.collections.ListUtils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Arrays;
-
-import opennlp.tools.util.Span;
-
-import org.apache.log4j.Logger;
-
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
+
+import org.apache.commons.collections.ListUtils;
+import org.apache.log4j.Logger;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.SAXException;
 
+import opennlp.tools.util.Span;
+
+import com.strider.datadefender.file.metadata.FileMatchMetaData;
 
 /**
  *
