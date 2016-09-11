@@ -98,9 +98,12 @@ public class FileDiscoverer extends Discoverer {
         directoryList = directories.split(",");
         
         // Let's iterate over directories
+        File node;
+        Metadata metadata;
+        List<Double> probabilityList;
         for (String directory: directoryList) {
             
-            File node = new File(directory);
+            node = new File(directory);
             
             if (node.isDirectory()) {
                 String[] files = node.list();
@@ -111,7 +114,7 @@ public class FileDiscoverer extends Discoverer {
                     BodyContentHandler handler = new BodyContentHandler();
                     
                     AutoDetectParser parser = new AutoDetectParser();
-                    Metadata metadata = new Metadata();
+                    metadata = new Metadata();
                     String handlerString = "";
                     try (InputStream stream = new FileInputStream(directory + "/" + file)) {
                         if (stream != null) {
@@ -125,7 +128,7 @@ public class FileDiscoverer extends Discoverer {
                     Span nameSpans[] = model.getNameFinder().find(tokens);
                     double[] spanProbs = model.getNameFinder().probs(nameSpans);
                     //display names
-                    List<Double> probabilityList = new ArrayList<>();
+                    probabilityList = new ArrayList<>();
                     for( int i = 0; i < nameSpans.length; i++) {
                         log.info("Span: "+nameSpans[i].toString());
                         log.info("Covered text is: "+tokens[nameSpans[i].getStart()]);
