@@ -27,12 +27,12 @@ import com.strider.datadefender.utils.CommonUtils;
 public abstract class SQLBuilder implements ISQLBuilder {
     private final Properties databaseProperties;
     
-    protected SQLBuilder(Properties databaseProperties) {
+    protected SQLBuilder(final Properties databaseProperties) {
         this.databaseProperties = databaseProperties;
     }
     
     @Override
-    public String buildSelectWithLimit(String sqlString, int limit) {
+    public String buildSelectWithLimit(final String sqlString, final int limit) {
         StringBuilder sql = new StringBuilder(sqlString);
         
         if (limit != 0) {
@@ -42,7 +42,7 @@ public abstract class SQLBuilder implements ISQLBuilder {
     }
 
     @Override
-    public String prefixSchema(String tableName) {
+    public String prefixSchema(final String tableName) {
         String schema = databaseProperties.getProperty("schema");
         if (CommonUtils.isEmptyString(schema)) {
             return tableName;

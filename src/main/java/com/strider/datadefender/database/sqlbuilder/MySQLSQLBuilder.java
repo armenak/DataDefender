@@ -23,7 +23,7 @@ import java.util.Properties;
  */
 public class MySQLSQLBuilder extends SQLBuilder{
 
-    public MySQLSQLBuilder(Properties databaseProperties) {
+    public MySQLSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
 }

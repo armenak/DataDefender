@@ -29,7 +29,7 @@ import java.util.Properties;
  */
 public class MSSQLDBConnection extends DBConnection {
     
-    public MSSQLDBConnection(Properties properties) throws DatabaseAnonymizerException {
+    public MSSQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
         super(properties);
     }
     

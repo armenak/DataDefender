@@ -23,12 +23,12 @@ import java.util.Properties;
  */
 public class OracleSQLBuilder extends SQLBuilder{
     
-    public OracleSQLBuilder(Properties databaseProperties) {
+    public OracleSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
 
     @Override
-    public String buildSelectWithLimit(String sqlString, int limit) {
+    public String buildSelectWithLimit(final String sqlString, final int limit) {
         StringBuilder sql = new StringBuilder(sqlString);
         
         if (limit != 0) {

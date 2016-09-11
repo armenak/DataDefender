@@ -23,7 +23,7 @@ import java.util.Properties;
  */
 public class MSSQLSQLBuilder extends SQLBuilder{
     
-    public MSSQLSQLBuilder(Properties databaseProperties) {
+    public MSSQLSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
 }
