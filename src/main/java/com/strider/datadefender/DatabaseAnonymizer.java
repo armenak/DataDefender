@@ -510,7 +510,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         MatchMetaData md = columnMetaData.get(index);
         int colSize = md.getColumnSize();
         String type = md.getColumnType();
-        if (type.equals("String") && colValue.length() > colSize) {
+        if ("String".equals(type) && colValue.length() > colSize) {
             return colValue.substring(0, colSize);
         }
         return colValue;
