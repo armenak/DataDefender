@@ -100,11 +100,12 @@ public class DatabaseDiscoverer extends Discoverer {
         matches = new ArrayList<>();
 
         ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        List<Double> probabilityList;
         for(MatchMetaData data: map) {
             if (SQLToJavaMapping.isString(data.getColumnType())) {
                 String tableName = data.getTableName();
                 String columnName = data.getColumnName();
-                List<Double> probabilityList = new ArrayList<>();
+                probabilityList = new ArrayList<>();
                 
                 log.info("Analyzing table [" + tableName + "]");
                 
