@@ -65,7 +65,7 @@ import com.strider.datadefender.utils.RequirementUtils;
  */
 public class DatabaseAnonymizer implements IAnonymizer { 
     
-    private static Logger log = getLogger(DatabaseAnonymizer.class);
+    private static final Logger log = getLogger(DatabaseAnonymizer.class);
 
     
     /**
@@ -74,7 +74,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table
      * @param sColumns 
      */
-    private void fillColumnNames(Table table, Collection<String> sColumns) {
+    private void fillColumnNames(final Table table, Collection<String> sColumns) {
         for (Column column : table.getColumns()) {
             sColumns.add(column.getName());
         }
@@ -86,8 +86,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table
      * @return 
      */
-    private void fillPrimaryKeyNamesList(Table table, Collection<String> sKeys) {
-        List<Key> pKeys = table.getPrimaryKeys();
+    private void fillPrimaryKeyNamesList(final Table table, Collection<String> sKeys) {
+        final List<Key> pKeys = table.getPrimaryKeys();
         if (pKeys != null && pKeys.size() != 0) {
             for (Key key : pKeys) {
                 sKeys.add(key.getName());
@@ -106,7 +106,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param updatableKeys
      * @return the SQL statement
      */
-    private String getUpdateQuery(Table table, Collection<String> updateColumns, Collection<String> keys) {
+    private String getUpdateQuery(final Table table, final Collection<String> updateColumns, final Collection<String> keys) {
         StringBuilder sql = new StringBuilder("UPDATE ");
         sql.append(table.getName()).append(" SET ");
         sql.append(StringUtils.join(updateColumns, " = ?, ")).append(" = ?");
@@ -122,7 +122,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param columns
      * @return 
      */
-    private PreparedStatement getSelectQueryStatement(IDBFactory dbFactory, Table table, Collection<String> keys, Collection<String> columns) throws SQLException {
+    private PreparedStatement getSelectQueryStatement(final IDBFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
         
         List<String> params = new LinkedList<>();
         StringBuilder query = new StringBuilder("SELECT DISTINCT ");
