@@ -18,23 +18,10 @@
 
 package com.strider.datadefender.database.metadata;
 
-import com.strider.datadefender.database.metadata.MySQLMetaData;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
@@ -48,25 +35,25 @@ import com.strider.datadefender.database.DatabaseAnonymizerException;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MySQLMetaDataTest {
-    @Mock
-    private Connection mockConnection;
-    @Mock
-    private ResultSet mockTableRS;
-    @Mock
-    private ResultSet mockPKRS;
-    @Mock
-    private ResultSet mockColumnRS;
-    @Mock
-    private DatabaseMetaData mockMetaData;
+//    @Mock
+//    private Connection mockConnection;
+//    @Mock
+//    private ResultSet mockTableRS;
+//    @Mock
+//    private ResultSet mockPKRS;
+//    @Mock
+//    private ResultSet mockColumnRS;
+//    @Mock
+//    private DatabaseMetaData mockMetaData;
     
-    private String table = "test-table";
-    private Properties testProperties = new Properties();
+    //private String table = "test-table";
+    //private Properties testProperties = new Properties();
     
-    private class TestMSQLMetaData extends MySQLMetaData {
-        public TestMSQLMetaData(Properties databaseProperties) {
-            super(databaseProperties, mockConnection);
-        }
-    }
+//    private class TestMSQLMetaData extends MySQLMetaData {
+//        public TestMSQLMetaData(Properties databaseProperties) {
+//            super(databaseProperties, mockConnection);
+//        }
+//    }
     
     @Test
     public void testHappyPath() throws DatabaseAnonymizerException, SQLException {

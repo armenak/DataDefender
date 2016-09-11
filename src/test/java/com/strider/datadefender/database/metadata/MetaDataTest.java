@@ -18,8 +18,6 @@
 
 package com.strider.datadefender.database.metadata;
 
-import com.strider.datadefender.database.metadata.MetaData;
-import com.strider.datadefender.database.metadata.MatchMetaData;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

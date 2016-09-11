@@ -94,7 +94,6 @@ public class FileDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
         String[] directoryList = null;
-        List<FileMatchMetaData> data = new ArrayList();
         String directories = fileDiscoveryProperties.getProperty("directories");
         directoryList = directories.split(",");
         
