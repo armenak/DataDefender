@@ -48,15 +48,15 @@ public class MetaDataTest {
     private Connection mockConnection;
     @Mock
     private ResultSet mockTableRS;
-    @Mock
-    private ResultSet mockPKRS;
+//    @Mock
+//    private ResultSet mockPKRS;
     @Mock
     private ResultSet mockColumnRS;
     @Mock
     private DatabaseMetaData mockMetaData;
     
     private String schema = "test-schema";
-    private String table = "test-table";
+    //private String table = "test-table";
     private String cType = "test-cType";
     
     @SuppressWarnings("serial")
