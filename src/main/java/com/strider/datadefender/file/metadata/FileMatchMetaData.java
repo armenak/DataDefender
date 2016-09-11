@@ -19,7 +19,6 @@
 package com.strider.datadefender.file.metadata;
 
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Data object to hold all metadata for matching data in Discovery applications.
