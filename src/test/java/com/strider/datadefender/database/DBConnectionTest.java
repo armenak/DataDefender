@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.DBConnection;
 import static org.junit.Assert.*;
 
 import java.sql.Connection;
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)  
 public class DBConnectionTest {
     @SuppressWarnings("serial")
-    private Properties testProps = new Properties() {{
+    final private Properties testProps = new Properties() {{
         setProperty("vendor", "mysql");
         setProperty("driver", "java.util.List");
         setProperty("url", "invalid-url");

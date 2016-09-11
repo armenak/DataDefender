@@ -21,9 +21,9 @@ import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.tokenize.Tokenizer;
 
 public class Model {
-    private Tokenizer tokenizer;
-    private NameFinderME nameFinder;
-    private String name;
+    final private Tokenizer tokenizer;
+    final private NameFinderME nameFinder;
+    final private String name;
     
     public Model(Tokenizer tokenizer, NameFinderME nameFinder, String name) {
         this.name       = name;

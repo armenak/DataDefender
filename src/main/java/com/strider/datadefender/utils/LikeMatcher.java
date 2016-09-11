@@ -29,14 +29,14 @@ import java.util.regex.Pattern;
  */
 public class LikeMatcher {
     
-    private String regex;
+    final private String regex;
     
     /**
      * Initializes a LikeMatcher with the given pattern.
      * 
      * @param pattern the LIKE query pattern
      */
-    public LikeMatcher(String pattern) {
+    public LikeMatcher(final String pattern) {
         // splitting on '?', '_', and '%' with look-behind and look-ahead so they're included in the split array
         String[] parts = pattern.split("((?<=[\\?\\_\\%])|(?=[\\?\\_\\%]))");
         StringBuilder reg = new StringBuilder("^");

@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -29,13 +27,13 @@ public class IDBFactoryTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidNoProps() throws DatabaseAnonymizerException {
-        Properties invalidProps = new Properties();
+        final Properties invalidProps = new Properties();
         IDBFactory.get(invalidProps).getConnection();
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testInvalidProps() throws DatabaseAnonymizerException {
-        Properties invalidProps = new Properties();
+        final Properties invalidProps = new Properties();
         invalidProps.setProperty("vendor", "my-invalid-db");
         IDBFactory.get(invalidProps).getConnection();
     }

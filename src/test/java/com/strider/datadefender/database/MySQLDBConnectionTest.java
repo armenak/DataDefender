@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.MySQLDBConnection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -46,7 +44,7 @@ public class MySQLDBConnectionTest {
     private static final Logger log = getLogger(MySQLDBConnectionTest.class);
     
     @SuppressWarnings("serial")
-    private Properties testProps = new Properties() {{
+    final private Properties testProps = new Properties() {{
         setProperty("vendor", "mysql");
         setProperty("driver", "java.util.List");
         setProperty("url", "invalid-url");

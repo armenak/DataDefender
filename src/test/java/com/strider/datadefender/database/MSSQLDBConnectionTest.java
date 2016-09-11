@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.MSSQLDBConnection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -46,7 +44,7 @@ public class MSSQLDBConnectionTest {
     private static final Logger log = getLogger(MSSQLDBConnectionTest.class);
     
     @SuppressWarnings("serial")
-    private Properties testProps = new Properties() {{
+    final private Properties testProps = new Properties() {{
         setProperty("vendor", "mssql");
         setProperty("driver", "java.util.List");
         setProperty("url", "invalid-url");
