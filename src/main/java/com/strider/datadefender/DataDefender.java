@@ -96,20 +96,20 @@ public class DataDefender  {
         try (IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":
-                    String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    final String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                     Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
                     IAnonymizer anonymizer = new DatabaseAnonymizer();
                     anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
                     break;
                 case "generate":
                     IGenerator generator = new DataGenerator();
-                    String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
+                    final String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                     Properties generatorProperties = loadProperties(generatorPropertyFile);
                     generator.generate(dbFactory, generatorProperties);
                     break;
                 case "database-discover":
                     if (line.hasOption('c')) {
-                        String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
+                        final String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                         Properties columnProperties = loadProperties(columnPropertyFile);
                         ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
@@ -117,7 +117,7 @@ public class DataDefender  {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
                         }                        
                     } else if (line.hasOption('d')) {
-                        String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                         Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                         DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
