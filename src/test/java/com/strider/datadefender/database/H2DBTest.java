@@ -16,7 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

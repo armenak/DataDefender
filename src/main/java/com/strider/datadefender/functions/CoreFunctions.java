@@ -178,21 +178,22 @@ public class CoreFunctions {
      * 
      * @param file the file name
      * @return A random string from the file
+     * @throws java.io.IOException
      */
     public String randomStringFromFile(String file) throws IOException {
-		if (!stringLists.containsKey(file)) {
-			log.info("*** reading from " + file);
-			List<String> values = new ArrayList<String>();
-			try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        if (!stringLists.containsKey(file)) {
+            log.info("*** reading from " + file);
+            List<String> values = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     values.add(line);
                 }
             }
             stringLists.put(file, values);
-		}
+        }
 		
         return getNextShuffledItemFor(file);
-	}
+    }
     
     /**
      * Creates a string list of values by querying the database.
@@ -379,7 +380,7 @@ public class CoreFunctions {
         Random random = new Random();
         StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
-            int rand = random.nextInt(479617);
+            final int rand = random.nextInt(479617);
             randomString.append(words.get(rand)).append(" ");
         }
 

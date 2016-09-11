@@ -46,10 +46,10 @@ public class CommonUtils {
      * @throws java.io.IOException
      * @throws java.io.FileNotFoundException
      */
-    public static List<String> readStreamOfLines(String fileName) 
+    public static List<String> readStreamOfLines(final String fileName) 
     throws IOException, FileNotFoundException, FileNotFoundException {
-        List<String> names = new ArrayList<String>();
-        Scanner s = new Scanner(new File(fileName));
+        List<String> names = new ArrayList<>();
+        final Scanner s = new Scanner(new File(fileName));
         while (s.hasNext()){
             names.add(s.next());
         }
@@ -58,7 +58,7 @@ public class CommonUtils {
         return names;
    }    
     
-    public static boolean isEmptyString(String str) {
+    public static boolean isEmptyString(final String str) {
         return str == null || str.isEmpty();
     }
     

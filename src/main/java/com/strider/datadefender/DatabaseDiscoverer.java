@@ -123,7 +123,7 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
                 }
                 
-                String table = sqlBuilder.prefixSchema(tableName);
+                final String table = sqlBuilder.prefixSchema(tableName);
                 final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
                 final String query = sqlBuilder.buildSelectWithLimit(
                     "SELECT " + columnName + 

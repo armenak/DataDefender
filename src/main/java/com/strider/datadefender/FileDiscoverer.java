@@ -63,7 +63,7 @@ public class FileDiscoverer extends Discoverer {
         log.info("Probability threshold [" + probabilityThreshold + "]");
         
         // Get list of models used in data discovery
-        String models = dataDiscoveryProperties.getProperty("models");
+        final String models = dataDiscoveryProperties.getProperty("models");
         modelList = models.split(",");
         log.info("Model list [" + Arrays.toString(modelList) + "]");
         
@@ -94,7 +94,7 @@ public class FileDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
         String[] directoryList = null;
-        String directories = fileDiscoveryProperties.getProperty("directories");
+        final String directories = fileDiscoveryProperties.getProperty("directories");
         directoryList = directories.split(",");
         
         // Let's iterate over directories

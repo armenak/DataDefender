@@ -55,12 +55,12 @@ public class MetaDataTest {
     @Mock
     private DatabaseMetaData mockMetaData;
     
-    private String schema = "test-schema";
+    final private String schema = "test-schema";
     //private String table = "test-table";
-    private String cType = "test-cType";
+    final private String cType = "test-cType";
     
     @SuppressWarnings("serial")
-    private Properties testProperties = new Properties() {{
+    final private Properties testProperties = new Properties() {{
         setProperty("schema", schema);
     }};
     
