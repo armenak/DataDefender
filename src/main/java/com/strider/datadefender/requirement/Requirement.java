@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.requirement;
 
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Collections.unmodifiableList;
 
@@ -69,22 +70,25 @@ public class Requirement {
      * @return List
      */
     public List<Table> getTables() {
+        List<Table> tableList = null;
+        
         if (this.tables != null) {
-            return unmodifiableList(this.tables);
+            tableList = new ArrayList();
+            tableList = unmodifiableList(this.tables);
         }
-        return null;
+        return tableList;
     }
     
     // Setter methods
-    public void setClient(String client) {
+    public void setClient(final String client) {
         this.client = client;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(final String version) {
         this.version = version;
     }
 
-    public void setTables(List<Table> tables) {
+    public void setTables(final List<Table> tables) {
         this.tables = tables;
     }
 }
