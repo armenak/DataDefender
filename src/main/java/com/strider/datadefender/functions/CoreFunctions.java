@@ -200,19 +200,19 @@ public class CoreFunctions {
      * @param keyName
      * @param query
      * @return 
+     * @throws java.sql.SQLException 
      */
     protected void generateStringListFromDb(String keyName, String query) throws SQLException {
         if (!stringLists.containsKey(keyName + query.hashCode())) {
             log.info("*** reading from database column: " + keyName);
-			List<String> values = new ArrayList<String>();
+            List<String> values = new ArrayList<>();
             
-            Statement stmt = db.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                values.add(rs.getString(1));
+            try (Statement stmt = db.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+                while (rs.next()) {
+                    values.add(rs.getString(1));
+                }
             }
-            rs.close();
-            stmt.close();
+            
             if (values.isEmpty()) {
                 // TODO: throw a meaningful exception here
                 log.error("!!! Database column " + keyName + " did not return any values");
