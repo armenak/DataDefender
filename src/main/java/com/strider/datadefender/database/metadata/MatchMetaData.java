@@ -78,7 +78,7 @@ public class MatchMetaData {
         return this.columnSize;
     }
     
-    public void setAverageProbability(double averageProbability) {
+    public void setAverageProbability(final double averageProbability) {
         this.averageProbability = averageProbability;
     }
     
@@ -90,7 +90,7 @@ public class MatchMetaData {
         return this.model;
     }
 
-    public void setModel(String model) {
+    public void setModel(final String model) {
         this.model = model;
     }        
     

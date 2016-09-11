@@ -27,11 +27,11 @@ import com.strider.datadefender.AnonymizerException;
 public class DatabaseAnonymizerException extends AnonymizerException {
     private static final long serialVersionUID = 1L;
     
-    public DatabaseAnonymizerException(String msg) {
+    public DatabaseAnonymizerException(final String msg) {
         super(msg);
     }
 
-    public DatabaseAnonymizerException(String msg, Throwable t) {
+    public DatabaseAnonymizerException(final String msg, final Throwable t) {
         super(msg, t);
     }    
 }

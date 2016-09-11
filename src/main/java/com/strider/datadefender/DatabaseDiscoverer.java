@@ -92,8 +92,8 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
     
-    private List<MatchMetaData> discoverAgainstSingleModel(IDBFactory factory, Properties dataDiscoveryProperties, 
-            Set<String> tables, Model model, double probabilityThreshold)
+    private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties, 
+            final Set<String> tables, final Model model, final double probabilityThreshold)
     throws AnonymizerException {
         IMetaData metaData = factory.fetchMetaData();
         List<MatchMetaData> map = metaData.getMetaData();

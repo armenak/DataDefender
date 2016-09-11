@@ -46,7 +46,7 @@ public abstract class DBConnection implements IDBConnection {
      * @param properties
      * @throws DatabaseAnonymizerException
      */
-    public DBConnection(Properties properties) throws DatabaseAnonymizerException {
+    public DBConnection(final Properties properties) throws DatabaseAnonymizerException {
         driver   = properties.getProperty("driver");
         vendor   = properties.getProperty("vendor");
         url      = properties.getProperty("url");
@@ -73,7 +73,7 @@ public abstract class DBConnection implements IDBConnection {
      * @return
      * @throws DatabaseAnonymizerException
      */
-    protected Connection doConnect(ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
+    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
         Connection conn = null;
         try {
             log.info("Establishing database connection");

@@ -64,15 +64,15 @@ public abstract class MetaData implements IMetaData {
         return md.getTables(null, schema, null, new String[] {"TABLE"});
     }
     
-    protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
+    protected ResultSet getPKRS(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getPrimaryKeys(null, schema, tableName);
     }
     
-    protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
+    protected ResultSet getColumnRS(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getColumns(null, schema, tableName, null);
     }
     
-    protected String getColumnName(ResultSet columnRS) throws SQLException {
+    protected String getColumnName(final ResultSet columnRS) throws SQLException {
         return columnRS.getString(4);
     }
 
