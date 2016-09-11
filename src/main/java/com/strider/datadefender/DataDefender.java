@@ -82,7 +82,7 @@ public class DataDefender  {
         String cmd = unparsedArgs.get(0); // get & remove command arg
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
-        if (cmd.equals("file-discover")) {
+        if ("file-discover".equals(cmd)) {
             String fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
             Properties fileDiscoveryProperties = loadProperties(fileDiscoveryPropertyFile);
             FileDiscoverer discoverer = new FileDiscoverer();
