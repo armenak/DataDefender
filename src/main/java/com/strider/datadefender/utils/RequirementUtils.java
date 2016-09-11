@@ -113,6 +113,7 @@ public class RequirementUtils {
     public static Requirement create(List<MatchMetaData> matches) {
         Map<String, Table> tables = new HashMap<>();
         Map<String, List<Column>> columns = new HashMap<>();
+        Column column;
         for (MatchMetaData match : matches) {
             String tableName = match.getTableName();
             if (match.getSchemaName() != null && !match.getSchemaName().equals("")) {
@@ -134,7 +135,7 @@ public class RequirementUtils {
                 tables.put(tableName, table);
                 columns.put(tableName, new ArrayList<>());
             } // deal with columns
-            Column column = new Column();
+            column = new Column();
             column.setName(match.getColumnName());
             column.setReturnType(match.getColumnType());
             addDefaultParam(column);

@@ -30,11 +30,11 @@ package com.strider.datadefender;
 public class AnonymizerException extends Exception {
     private static final long serialVersionUID = 1L;
     
-    public AnonymizerException(String msg) {
+    public AnonymizerException(final String msg) {
         super(msg);
     }
 
-    public AnonymizerException(String msg, Throwable t) {
+    public AnonymizerException(final String msg, Throwable t) {
         super(msg, t);
     }
 }

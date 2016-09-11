@@ -90,7 +90,7 @@ public class DataDefender  {
             return;
         }
         
-        String databasePropertyFile = line.getOptionValue('P', "db.properties");
+        final String databasePropertyFile = line.getOptionValue('P', "db.properties");
         Properties props = loadProperties(databasePropertyFile);
         try (IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
