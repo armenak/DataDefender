@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -38,14 +39,14 @@ public class AnonymizerTest {
         List<String> tableList = Arrays.asList(t1);
         Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
         assertEquals(1, tableNames.size());
-        assertEquals("Handle table args.", t1.toLowerCase(), tableNames.iterator().next());
+        assertEquals("Handle table args.", t1.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
         
         Properties overrideProps = new Properties() {{
             setProperty("tables", "oneT twoT");
         }};
         tableNames = DataDefender.getTableNames(tableList, overrideProps);
         assertEquals(1, tableNames.size());
-        assertEquals("Ignore props", t1.toLowerCase(), tableNames.iterator().next());
+        assertEquals("Ignore props", t1.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
         
         tableNames = DataDefender.getTableNames(Collections.emptyList(), overrideProps);
         assertEquals(2, tableNames.size());

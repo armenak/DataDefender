@@ -17,6 +17,7 @@
  */
 package com.strider.datadefender.utils;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
@@ -45,7 +46,7 @@ public class LikeMatcher {
             } else if ("?".equals(part) || "_".equals(part)) {
                 reg.append(".");
             } else {
-                reg.append(Pattern.quote(part.toLowerCase()));
+                reg.append(Pattern.quote(part.toLowerCase(Locale.ENGLISH)));
             }
         }
         reg.append("$");
@@ -59,6 +60,6 @@ public class LikeMatcher {
      * @return
      */
     public boolean matches(String str) {
-        return str.toLowerCase().matches(regex);
+        return str.toLowerCase(Locale.ENGLISH).matches(regex);
     }
 }

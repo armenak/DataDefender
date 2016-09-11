@@ -32,6 +32,7 @@ import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
+import java.util.Locale;
 
 /**
  * @author Armenak Grigoryan
@@ -58,10 +59,10 @@ public class ColumnDiscoverer extends Discoverer {
             for(MatchMetaData data: map) {
                 String tableName = data.getTableName();
                 String columnName = data.getColumnName();
-                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
+                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
                     continue;
                 }
-                if (p.matcher(columnName.toLowerCase()).matches()) {
+                if (p.matcher(columnName.toLowerCase(Locale.ENGLISH)).matches()) {
                     log.debug(data.toVerboseStr());
                     matches.add(data);
                 }

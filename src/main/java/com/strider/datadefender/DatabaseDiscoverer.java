@@ -44,6 +44,7 @@ import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.SQLToJavaMapping;
 import java.util.Arrays;
+import java.util.Locale;
 
 
 /**
@@ -109,7 +110,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 
                 log.info("Analyzing table [" + tableName + "]");
                 
-                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase())) {
+                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
                     log.debug("Continue ...");
                     continue;
                 }

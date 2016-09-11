@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -204,7 +205,7 @@ public class DataDefender  {
             tableNames = Arrays.asList(tableStr.split(" "));
             log.info("Adding tables from property file.");
         }
-        Set<String> tables = tableNames.stream().map(s -> s.toLowerCase()).collect(Collectors.toSet());
+        Set<String> tables = tableNames.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
         log.info("Tables: " + Arrays.toString(tables.toArray()));
         return tables;
     }
