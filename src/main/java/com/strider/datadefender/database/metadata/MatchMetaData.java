@@ -35,7 +35,7 @@ public class MatchMetaData {
     private final String columnName;
     private final String columnType;
     private final int columnSize;
-    private double averageProbability = 0;   
+    private double averageProbability;   
     private String model = "";
 
     public MatchMetaData(

@@ -51,7 +51,7 @@ public class FileDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(FileDiscoverer.class);
     
-    private static String[] modelList = null;
+    private static String[] modelList;
     protected List<FileMatchMetaData> fileMatches;
         
     public List<FileMatchMetaData> discover(Properties dataDiscoveryProperties) 

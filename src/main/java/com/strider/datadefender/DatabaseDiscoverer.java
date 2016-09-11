@@ -54,7 +54,7 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private static Logger log = getLogger(DatabaseDiscoverer.class);
     
-    private static String[] modelList = null;
+    private static String[] modelList;
         
     public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
