@@ -47,7 +47,7 @@ public abstract class Discoverer { //implements IDiscoverer {
     
     protected List<MatchMetaData> matches;
     
-    private static Logger log = getLogger(Discoverer.class);
+    private static final Logger log = getLogger(Discoverer.class);
 
     public void createRequirement(final String fileName) throws AnonymizerException {
         if (matches == null || matches.isEmpty()) {
