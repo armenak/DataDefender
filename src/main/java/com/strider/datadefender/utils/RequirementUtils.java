@@ -127,7 +127,7 @@ public class RequirementUtils {
                 if (pks.size() == 1) { // only one pk
                     table.setPkey(pks.get(0));
                 } else { // multiple key pk
-                    List<Key> keys = pks.stream().map(pkName -> { 
+                    final List<Key> keys = pks.stream().map(pkName -> { 
                         Key key = new Key(); key.setName(pkName); return key; }).collect(Collectors.toList());
                     table.setPrimaryKeys(keys);
                 } 

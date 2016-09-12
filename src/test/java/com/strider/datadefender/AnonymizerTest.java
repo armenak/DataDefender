@@ -35,13 +35,13 @@ public class AnonymizerTest {
     @SuppressWarnings("serial")
     @Test
     public void testGetTableNames() throws AnonymizerException {
-        String t1 = "tableOne";
-        List<String> tableList = Arrays.asList(t1);
+        final String t1 = "tableOne";
+        final List<String> tableList = Arrays.asList(t1);
         Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
         assertEquals(1, tableNames.size());
         assertEquals("Handle table args.", t1.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
         
-        Properties overrideProps = new Properties() {{
+        final Properties overrideProps = new Properties() {{
             setProperty("tables", "oneT twoT");
         }};
         tableNames = DataDefender.getTableNames(tableList, overrideProps);

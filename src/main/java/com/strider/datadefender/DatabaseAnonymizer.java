@@ -283,11 +283,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             List<Object> fnArguments = new ArrayList<>(parms.size());
-            Method[] methods = clazz.getMethods();
+            final Method[] methods = clazz.getMethods();
             Method selectedMethod = null;
             
             methodLoop:
-            for (Method m : methods) {
+            for (final Method m : methods) {
                 if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
                     
                     log.debug("  Found method: " + m.getName());
@@ -336,7 +336,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 StringBuilder s = new StringBuilder("Anonymization method: ");
                 s.append(methodName).append(" with parameters matching (");
                 String comma = "";
-                for (Parameter p : parms) {
+                for (final Parameter p : parms) {
                     s.append(comma).append(p.getType()).append(" ").append(p.getName());
                     comma = ", ";
                 }
@@ -451,7 +451,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         boolean passedInclusion = false;
         
         if (exclusions != null) {
-            for (Exclude exc : exclusions) {
+            for (final Exclude exc : exclusions) {
                 String name = exc.getName();
                 String eq = exc.getEqualsValue();
                 String lk = exc.getLikeValue();

@@ -40,7 +40,7 @@ public class LikeMatcher {
         // splitting on '?', '_', and '%' with look-behind and look-ahead so they're included in the split array
         String[] parts = pattern.split("((?<=[\\?\\_\\%])|(?=[\\?\\_\\%]))");
         StringBuilder reg = new StringBuilder("^");
-        for (String part : parts) {
+        for (final String part : parts) {
             if ("%".equals(part)) {                
                 reg.append(".*?");
             } else if ("?".equals(part) || "_".equals(part)) {

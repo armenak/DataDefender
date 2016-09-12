@@ -74,7 +74,7 @@ public class DBConnectionTest {
     
     @Test
     public void testConnect() throws DatabaseAnonymizerException, SQLException {
-        TestDBConnection testDB = new TestDBConnection(testProps);
+        final TestDBConnection testDB = new TestDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
         // assert
         verify(mockConnection).setAutoCommit(false);

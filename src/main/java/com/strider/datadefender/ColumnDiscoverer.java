@@ -53,12 +53,12 @@ public class ColumnDiscoverer extends Discoverer {
         List<String> suspList = new ArrayList(columnProperties.keySet());
         suspList.remove("tables"); // removing 'special' tables property that's not a pattern
         matches = new ArrayList<>();
-        for(String suspStr: suspList) {
-            Pattern p = compile(suspStr);
+        for(final String suspStr: suspList) {
+            final Pattern p = compile(suspStr);
             // Find out if database columns contain any of of the "suspicious" fields
             for(MatchMetaData data: map) {
-                String tableName = data.getTableName();
-                String columnName = data.getColumnName();
+                final String tableName = data.getTableName();
+                final String columnName = data.getColumnName();
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
                     continue;
                 }

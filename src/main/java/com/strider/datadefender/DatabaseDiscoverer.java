@@ -83,7 +83,7 @@ public class DatabaseDiscoverer extends Discoverer {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
-        for(MatchMetaData data: finalList) {    
+        for(final MatchMetaData data: finalList) {    
             String probability = decimalFormat.format(data.getAverageProbability());
             String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
             log.info(result);            
