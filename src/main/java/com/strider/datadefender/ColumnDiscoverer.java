@@ -74,7 +74,7 @@ public class ColumnDiscoverer extends Discoverer {
         log.info("List of suspects:");
         log.info("-----------------");
         matches.sort(MatchMetaData.compare());
-        for (MatchMetaData entry: matches) {
+        for (final MatchMetaData entry: matches) {
             log.info(entry);
         }
         return matches;

@@ -499,7 +499,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return
      * @throws SQLException 
      */
-    private String getTruncatedColumnValue(String colValue, int index, List<MatchMetaData> columnMetaData) throws SQLException {
+    private String getTruncatedColumnValue(final String colValue, final int index, final List<MatchMetaData> columnMetaData) throws SQLException {
         MatchMetaData md = columnMetaData.get(index);
         int colSize = md.getColumnSize();
         String type = md.getColumnType();
@@ -529,12 +529,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws InvocationTargetException 
      */
     private void anonymizeRow(
-        PreparedStatement updateStmt,
-        Collection<Column> tableColumns,
-        Collection<String> keyNames,
-        Connection db,
-        ResultSet row,
-        List<MatchMetaData> columnMetaData
+        final PreparedStatement updateStmt,
+        final Collection<Column> tableColumns,
+        final Collection<String> keyNames,
+        final Connection db,
+        final ResultSet row,
+        final List<MatchMetaData> columnMetaData
     ) throws SQLException,
              NoSuchMethodException,
              SecurityException,
