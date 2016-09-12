@@ -43,7 +43,7 @@ public final class AppProperties {
      * @param fileName
      * @return Properties
      */
-    public static Properties loadPropertiesFromClassPath(String fileName) {
+    public static Properties loadPropertiesFromClassPath(final String fileName) {
         Properties props = new Properties();
         InputStream input = null;
  
@@ -70,7 +70,7 @@ public final class AppProperties {
         return props;
     }
  
-    public static Properties loadProperties(String fileName) throws AnonymizerException {
+    public static Properties loadProperties(final String fileName) throws AnonymizerException {
         Properties properties = new Properties();
         try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
             properties.load(in);

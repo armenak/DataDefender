@@ -44,7 +44,7 @@ public class ApplicationLock {
      * 
      * @param appName application name 
      */
-    public ApplicationLock(String appName) {
+    public ApplicationLock(final String appName) {
         this.appName = appName;
     }
 

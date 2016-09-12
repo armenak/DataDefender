@@ -215,7 +215,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */   
-    private Object callAnonymizingFunctionFor(Connection dbConn, ResultSet row, Column column)
+    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,

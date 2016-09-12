@@ -90,7 +90,7 @@ public class RequirementUtils {
      * @param fileName
      * @throws DatabaseAnonymizerException
      */
-    public static void write(Requirement requirement, String fileName) throws DatabaseAnonymizerException {
+    public static void write(final Requirement requirement, final String fileName) throws DatabaseAnonymizerException {
         log.info("Requirement.write() to file: " + fileName);
         File outFile = new File(fileName);
 

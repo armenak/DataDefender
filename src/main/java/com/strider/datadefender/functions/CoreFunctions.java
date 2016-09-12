@@ -176,7 +176,7 @@ public class CoreFunctions {
      * @return A random string from the file
      * @throws java.io.IOException
      */
-    public String randomStringFromFile(String file) throws IOException {
+    public String randomStringFromFile(final String file) throws IOException {
         if (!stringLists.containsKey(file)) {
             log.info("*** reading from " + file);
             List<String> values = new ArrayList<>();
@@ -199,7 +199,7 @@ public class CoreFunctions {
      * @return 
      * @throws java.sql.SQLException 
      */
-    protected void generateStringListFromDb(String keyName, String query) throws SQLException {
+    protected void generateStringListFromDb(final String keyName, final String query) throws SQLException {
         if (!stringLists.containsKey(keyName + query.hashCode())) {
             log.info("*** reading from database column: " + keyName);
             List<String> values = new ArrayList<>();
@@ -258,7 +258,7 @@ public class CoreFunctions {
      * @deprecated
      * @throws SQLException 
      */
-    public String randomColumnValue(String table, String column) throws SQLException {
+    public String randomColumnValue(final String table, final String column) throws SQLException {
         return this.randomColumnValue(table, column, true);
     }
     

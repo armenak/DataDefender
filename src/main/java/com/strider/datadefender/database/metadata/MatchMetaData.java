@@ -39,12 +39,12 @@ public class MatchMetaData {
     private String model = "";
 
     public MatchMetaData(
-        String schemaName,
-        String tableName,
-        List<String> pkeys,
-        String columnName,
-        String columnType,
-        int columnSize
+        final String schemaName,
+        final String tableName,
+        final List<String> pkeys,
+        final String columnName,
+        final String columnType,
+        final int columnSize
     ) {
         this.schemaName = schemaName;
         this.tableName  = tableName;

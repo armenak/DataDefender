@@ -124,7 +124,7 @@ public class BiographicFunctions extends CoreFunctions {
      * @param sinDigits Array of integers representing a sin
      * @return true if valid sin, false if not
      */
-    private boolean isValidSIN(int[] sinDigits) {
+    private boolean isValidSIN(final int[] sinDigits) {
         int check = 0;
 
         for (int i=0; i<sinDigits.length; i++) {

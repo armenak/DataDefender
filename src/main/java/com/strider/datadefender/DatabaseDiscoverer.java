@@ -57,7 +57,7 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private static String[] modelList;
         
-    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, Set<String> tables) 
+    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
 

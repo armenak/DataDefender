@@ -55,7 +55,7 @@ public class DataGenerator  implements IGenerator {
      * @throws com.strider.datadefender.database.DatabaseAnonymizerException
      */
     @Override
-    public void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException {
+    public void generate(final IDBFactory dbFactory, final Properties anonymizerProperties) throws DatabaseAnonymizerException {
         // Now we collect data from the requirement
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
         // Iterate over the requirement and generate data sets
@@ -107,7 +107,7 @@ public class DataGenerator  implements IGenerator {
      * @param file Path and name of file to rename
      * @return true if renamed successfully, false otherwise
      */
-    private boolean backupExistingFile(String file) {
+    private boolean backupExistingFile(final String file) {
         File sourceFile = new File(file);
         if (!sourceFile.exists()) {
             return true;

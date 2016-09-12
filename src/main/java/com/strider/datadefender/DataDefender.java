@@ -53,7 +53,7 @@ public class DataDefender  {
  
     private static final Logger log = getLogger(DataDefender.class);
 
-    public static void main(String[] args) throws ParseException, AnonymizerException, IOException, SAXException, TikaException {
+    public static void main(final String[] args) throws ParseException, AnonymizerException, IOException, SAXException, TikaException {
         
         // Ensure we are not trying to run second instance of the same program
         ApplicationLock al = new ApplicationLock("DataDefender");
@@ -196,7 +196,7 @@ public class DataDefender  {
      * @param props application property file
      * @return The list of table names
      */
-    public static Set<String> getTableNames(List<String> tableNames, Properties props) {
+    public static Set<String> getTableNames(List<String> tableNames, final Properties props) {
         if (tableNames.isEmpty()) {
             String tableStr = props.getProperty("tables");
             if (tableStr == null) {

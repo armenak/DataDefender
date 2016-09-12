@@ -49,7 +49,7 @@ public abstract class Discoverer { //implements IDiscoverer {
     
     private static Logger log = getLogger(Discoverer.class);
 
-    public void createRequirement(String fileName) throws AnonymizerException {
+    public void createRequirement(final String fileName) throws AnonymizerException {
         if (matches == null || matches.isEmpty()) {
             throw new AnonymizerException("No matches to create requirement from!");
         }
@@ -57,7 +57,7 @@ public abstract class Discoverer { //implements IDiscoverer {
         RequirementUtils.write(requirement, fileName);
     }
     
-    public double calculateAverage(List <Double> values) {
+    public double calculateAverage(final List <Double> values) {
         Double sum = 0.0;
         if(!values.isEmpty()) {
             for (Double value : values) {
@@ -72,13 +72,13 @@ public abstract class Discoverer { //implements IDiscoverer {
      * Creates model POJO based on OpenNLP model
      * 
      * @param dataDiscoveryProperties
-     * @param modelType
+     * @param modelName
      * @return Model
      */
-    public  Model createModel(Properties dataDiscoveryProperties, String modelName) {
+    public  Model createModel(final Properties dataDiscoveryProperties, final String modelName) {
         InputStream modelInToken = null;
         InputStream modelIn = null;        
-        TokenizerModel modelToken = null;
+        TokenizerModel modelToken;
         Tokenizer tokenizer = null;
         
         TokenNameFinderModel model = null;

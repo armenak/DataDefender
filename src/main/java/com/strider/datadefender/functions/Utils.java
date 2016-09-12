@@ -87,7 +87,7 @@ public class Utils {
      * @param str String that should represent integer
      * @return true if the string is integer, false otherwise
      */
-    public static boolean isInteger(String str) {
+    public static boolean isInteger(final String str) {
         try {
             parseInt(str);
             return true;
