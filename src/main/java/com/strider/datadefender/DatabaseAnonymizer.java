@@ -267,10 +267,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             final String methodName = Utils.getMethodName(function);
             final Class<?> clazz = Class.forName(className);
             
-            CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
+            final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
 
-            List<Parameter> parms = column.getParameters();
+            final List<Parameter> parms = column.getParameters();
             Map<String, Object> paramValues = new HashMap<>(parms.size());
             for (Parameter param : parms) {
                 if (param.getValue().equals("@@value@@")) {

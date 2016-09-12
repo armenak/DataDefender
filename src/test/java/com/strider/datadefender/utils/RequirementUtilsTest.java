@@ -53,19 +53,19 @@ public class RequirementUtilsTest extends TestCase {
     // Doesn't tests a reading a writing a simple requirement
     public void testSimpleWriteRead() throws Exception {
         // create
-        Requirement req = new Requirement();
+        final Requirement req = new Requirement();
         req.setClient("Unit test client.");
         req.setVersion("X.X");
         
-        Table table = new Table();
+        final Table table = new Table();
         table.setName("Table name");
         table.setPkey("pKey");
         
-        Column col = new Column();
+        final Column col = new Column();
         col.setName("cName");
         col.setFunction("some.function()");
         
-        Parameter param = new Parameter();
+        final Parameter param = new Parameter();
         param.setName("pName");
         param.setValue("pvalue/file.txt");
         param.setType("String");
@@ -82,11 +82,11 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("Unit test client.", requirement.getClient());
         assertEquals("X.X", requirement.getVersion());
         assertEquals(1, requirement.getTables().size());
-        Table t1 = requirement.getTables().get(0);
+        final Table t1 = requirement.getTables().get(0);
         assertEquals("Table name", t1.getName());
         assertEquals("pKey", t1.getPKey());
         assertEquals(1, t1.getColumns().size());
-        Column c1 = t1.getColumns().get(0);
+        final Column c1 = t1.getColumns().get(0);
         assertEquals("cName", c1.getName());
         assertEquals("some.function()", c1.getFunction());
         assertEquals(1, c1.getParameters().size());
@@ -108,11 +108,11 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("1.0", req.getVersion());
         assertEquals(2, req.getTables().size());
         
-        Table t1 = req.getTables().get(0);
+        final Table t1 = req.getTables().get(0);
         assertEquals("t1", t1.getName());
         assertEquals("pk", t1.getPKey());
         assertEquals(1, t1.getColumns().size());
-        Column c1 = t1.getColumns().get(0);
+        final Column c1 = t1.getColumns().get(0);
         assertEquals("col1", c1.getName());
         assertEquals("String", c1.getReturnType());
 
@@ -120,7 +120,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("com.strider.dataanonymizer.functions.CoreFunctions.randomStringFromFile", c1.getFunction());
         assertEquals(1, c1.getParameters().size());
         
-        Table t2 = req.getTables().get(1);
+        final Table t2 = req.getTables().get(1);
         assertEquals("t2", t2.getName());
         assertEquals(2, t2.getPrimaryKeys().size());
         assertEquals(2, t2.getColumns().size());
@@ -236,7 +236,7 @@ public class RequirementUtilsTest extends TestCase {
         ret = params.get(1).getTypeValue();
         assertNotNull(ret);
         
-        double[] dArr = (double[]) ret;
+        final double[] dArr = (double[]) ret;
         assertEquals(3, dArr.length);
         
         assertEquals(1.2, dArr[0]);

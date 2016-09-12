@@ -56,7 +56,7 @@ public class ColumnDiscoverer extends Discoverer {
         for(final String suspStr: suspList) {
             final Pattern p = compile(suspStr);
             // Find out if database columns contain any of of the "suspicious" fields
-            for(MatchMetaData data: map) {
+            for(final MatchMetaData data: map) {
                 final String tableName = data.getTableName();
                 final String columnName = data.getColumnName();
                 if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {

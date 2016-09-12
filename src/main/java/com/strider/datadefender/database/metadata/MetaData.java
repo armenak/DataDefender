@@ -83,17 +83,15 @@ public abstract class MetaData implements IMetaData {
         // Get the metadata from the the database
         try { 
             // Getting all tables name
-            DatabaseMetaData md = connection.getMetaData();
-            
+            final DatabaseMetaData md = connection.getMetaData();
             final String schemaName = databaseProperties.getProperty("schema");
             final String skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
             
             // Populate list of tables excluded from the analysis
             List<String> excludeTablesList = new ArrayList<>();
-            String excludeTables = databaseProperties.getProperty("exclude-tables");
+            final String excludeTables = databaseProperties.getProperty("exclude-tables");
             if (excludeTables != null && !"".equals(excludeTables)) {
-                String[] tempArr=excludeTables.split(",");
-                excludeTablesList = Arrays.asList(tempArr);
+                excludeTablesList = Arrays.asList(excludeTables.split(","));
             }
             
             log.info("Fetching table names from schema " + schemaName);

@@ -85,10 +85,10 @@ public abstract class H2DB {
     }
     
     protected void assertData(final ResultSet rs, final BiConsumer<String, String> cons) throws SQLException {
-        String[] asserts = new String[]{ "1: Claudio, Bravo", "2: Ugo, Bernasconi"};
+        final String[] asserts = new String[]{ "1: Claudio, Bravo", "2: Ugo, Bernasconi"};
         int i = 0;
         while(rs.next())  {
-            String line = rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname");
+            final String line = rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname");
             cons.accept(asserts[i], line);
             i++;
         }

@@ -43,11 +43,11 @@ public class H2DBTest extends H2DB {
 
     @Test
     public void testMetaData() throws DatabaseAnonymizerException {
-        List<MatchMetaData> meta = factory.fetchMetaData().getMetaData();
-        List<String> actual = meta.stream().filter(d -> d.getTableName().equals("ju_users"))
+        final List<MatchMetaData> meta = factory.fetchMetaData().getMetaData();
+        final List<String> actual = meta.stream().filter(d -> d.getTableName().equals("ju_users"))
             .map(d -> d.toVerboseStr())
             .collect(Collectors.toList());
-        List<String> expected = Arrays.asList("null.ju_users.id(integer)", "null.ju_users.fname(varchar)", "null.ju_users.lname(varchar)");
+        final List<String> expected = Arrays.asList("null.ju_users.id(integer)", "null.ju_users.fname(varchar)", "null.ju_users.lname(varchar)");
         assertTrue(expected.equals(actual));
     }
 

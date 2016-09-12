@@ -73,13 +73,13 @@ public class BiographicFunctions extends CoreFunctions {
         int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));
         gc.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
         
-        String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
+        final String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
                prependZero((gc.get(GregorianCalendar.MONTH) + 1)) + "-" + 
                gc.get(GregorianCalendar.YEAR);
         log.debug("BirthDate:[" + birthDate +"]");
         
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
-        java.sql.Date date = new java.sql.Date(format.parse(birthDate).getTime());
+        final DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        final java.sql.Date date = new java.sql.Date(format.parse(birthDate).getTime());
        
         log.debug("Generated BirthDate:[" + date.toString() +"]");
 

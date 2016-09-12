@@ -60,12 +60,12 @@ public class MSSQLDBConnectionTest {
         }
         @Override
         protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
-            Field[] allFields = supplier.getClass().getDeclaredFields();
+            final Field[] allFields = supplier.getClass().getDeclaredFields();
             assertEquals(1, allFields.length);
-            Field field = allFields[0];
+            final Field field = allFields[0];
             field.setAccessible(true);
             try { // not exactly a great test, but checks that supplier has parent's properties at least
-                String representation = ReflectionToStringBuilder.toString(field.get(supplier));
+                final String representation = ReflectionToStringBuilder.toString(field.get(supplier));
                 log.debug(representation);
                 assertTrue(representation.contains(
                     "[driver=java.util.List,vendor=mssql,url=invalid-url,userName=invalid-user,password=invalid-pass]"));
@@ -78,7 +78,7 @@ public class MSSQLDBConnectionTest {
     
     @Test
     public void testConnect() throws DatabaseAnonymizerException, SQLException {
-        TestMSSQLDBConnection testDB = new TestMSSQLDBConnection(testProps);
+        final TestMSSQLDBConnection testDB = new TestMSSQLDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
         assertEquals("invalid-url;user=invalid-user;password=invalid-pass", testDB.getURL());
     }

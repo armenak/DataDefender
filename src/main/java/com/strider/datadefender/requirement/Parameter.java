@@ -72,9 +72,9 @@ public class Parameter {
         if ("String".equals(type)) {
             type = "java.lang.String";
         }
-        Class<?> c = ClassUtils.getClass(type);
+        final Class<?> c = ClassUtils.getClass(type);
         if (c.isPrimitive()) {
-            Class<?> w = ClassUtils.primitiveToWrapper(c);
+            final Class<?> w = ClassUtils.primitiveToWrapper(c);
             Object array = Array.newInstance(w, list.size());
             array = list.toArray((Object[]) array);
             if (c == boolean.class) {
@@ -96,7 +96,7 @@ public class Parameter {
             }
             throw new IllegalArgumentException("Unhandled primitive type: " + c.getName());
         }
-        Object array = Array.newInstance(c, list.size());
+        final Object array = Array.newInstance(c, list.size());
         return list.toArray((Object[]) array);
     }
     

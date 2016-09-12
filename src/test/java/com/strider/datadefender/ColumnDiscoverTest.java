@@ -46,7 +46,7 @@ public class ColumnDiscoverTest extends H2DB {
     @Test
     public void testWithColumns() throws AnonymizerException { 
         ColumnDiscoverer discoverer = new ColumnDiscoverer();
-        List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
+        final List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
         assertEquals(1, suspects.size());
         assertEquals("ju_users.fname", suspects.get(0).toString());
         assertEquals("null.ju_users.fname(varchar)", suspects.get(0).toVerboseStr());

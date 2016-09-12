@@ -87,8 +87,8 @@ public class MetaDataTest {
         when(mockConnection.getMetaData()).thenReturn(mockMetaData);
         when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
         
-        TestMetaData metaData = new TestMetaData(testProperties, null);
-        List<MatchMetaData> result = metaData.getMetaData();
+        final TestMetaData metaData = new TestMetaData(testProperties, null);
+        final List<MatchMetaData> result = metaData.getMetaData();
         assertEquals(0, result.size());
         
         verify(mockTableRS, times(1)).next(); // should return false

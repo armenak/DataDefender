@@ -92,11 +92,11 @@ public class RequirementUtils {
      */
     public static void write(final Requirement requirement, final String fileName) throws DatabaseAnonymizerException {
         log.info("Requirement.write() to file: " + fileName);
-        File outFile = new File(fileName);
+        final File outFile = new File(fileName);
 
         try {
-            JAXBContext jc = newInstance(Requirement.class);
-            Marshaller marshaller = jc.createMarshaller();
+            final JAXBContext jc = newInstance(Requirement.class);
+            final Marshaller marshaller = jc.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.marshal(requirement, outFile);
         } catch (JAXBException je) {
@@ -111,8 +111,8 @@ public class RequirementUtils {
      * @return
      */
     public static Requirement create(final List<MatchMetaData> matches) {
-        Map<String, Table> tables = new HashMap<>();
-        Map<String, List<Column>> columns = new HashMap<>();
+        final Map<String, Table> tables = new HashMap<>();
+        final Map<String, List<Column>> columns = new HashMap<>();
         Column column;
         for (MatchMetaData match : matches) {
             String tableName = match.getTableName();
@@ -141,7 +141,7 @@ public class RequirementUtils {
             addDefaultParam(column);
             columns.get(tableName).add(column); // add column
         } // add columns to tables
-        for (Entry<String, List<Column>> entry: columns.entrySet()) {
+        for (final Entry<String, List<Column>> entry: columns.entrySet()) {
             tables.get(entry.getKey()).setColumns(entry.getValue());
         }
         
@@ -171,7 +171,7 @@ public class RequirementUtils {
      */
     public static Parameter getFileParameter(final List<Parameter> parameters) {
         if (parameters != null && !parameters.isEmpty()) {
-            for (Parameter parameter : parameters) {
+            for (final Parameter parameter : parameters) {
                 if (PARAM_NAME_FILE.equalsIgnoreCase(parameter.getName())) {
                     return parameter;
                 }
