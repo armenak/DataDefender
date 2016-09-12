@@ -32,14 +32,14 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class BiographicFunctions extends CoreFunctions {
 
-    private static Logger log = getLogger(BiographicFunctions.class);
+    private static final Logger log = getLogger(BiographicFunctions.class);
     
     /**
      * Generates random 9-digit social insurance number
      * @return String
      */
     public String randomSIN() {
-        Random random = new Random();
+        final Random random = new Random();
         int[] sinDigits = new int[9];
         for (int i = 0; i < sinDigits.length; i++) {
             sinDigits[i] = random.nextInt(9);
@@ -87,7 +87,7 @@ public class BiographicFunctions extends CoreFunctions {
 
     }
     
-    private static String prependZero(int num) {
+    private static String prependZero(final int num) {
         String dayStr;
         if (num <=9) {
             dayStr = "0" + String.valueOf(num);
@@ -97,7 +97,7 @@ public class BiographicFunctions extends CoreFunctions {
         return dayStr;
     }
 
-    private static int randBetween(int start, int end) {
+    private static int randBetween(final int start, final int end) {
         return start + (int)Math.round(Math.random() * (end - start));
     }    
 
@@ -148,7 +148,7 @@ public class BiographicFunctions extends CoreFunctions {
      * @param sin String representing a sin
      * @return true if valid sin, false if not
      */
-    public boolean isValidSIN(String sin) {
+    public boolean isValidSIN(final String sin) {
         if (sin == null || sin.length() != 9 ) {
             return false;
         }

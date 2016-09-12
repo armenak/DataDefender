@@ -43,11 +43,11 @@ public class MySQLMetaData extends MetaData {
         return md.getTables(null, null, "%", new String[] {"TABLE"});
     }
     @Override
-    protected ResultSet getPKRS(DatabaseMetaData md, String tableName) throws SQLException {
+    protected ResultSet getPKRS(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getPrimaryKeys(null, null, tableName);
     }
     @Override
-    protected ResultSet getColumnRS(final DatabaseMetaData md, String tableName) throws SQLException {
+    protected ResultSet getColumnRS(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getColumns(null, null, tableName, null);
     }
     @Override

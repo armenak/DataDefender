@@ -54,7 +54,7 @@ public class FileDiscoverer extends Discoverer {
     private static String[] modelList;
     protected List<FileMatchMetaData> fileMatches;
         
-    public List<FileMatchMetaData> discover(Properties dataDiscoveryProperties) 
+    public List<FileMatchMetaData> discover(final Properties dataDiscoveryProperties) 
     throws AnonymizerException, IOException, SAXException, TikaException {
         log.info("Data discovery in process");
 
@@ -89,7 +89,7 @@ public class FileDiscoverer extends Discoverer {
         return fileMatches;
     }
     
-    private List<FileMatchMetaData> discoverAgainstSingleModel(Properties fileDiscoveryProperties, Model model, double probabilityThreshold)
+    private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties, final Model model, final double probabilityThreshold)
     throws AnonymizerException, IOException, SAXException, TikaException {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();

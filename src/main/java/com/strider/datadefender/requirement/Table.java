@@ -106,23 +106,23 @@ public class Table {
     }
     
     // Setter methods
-    public void setPkey(String pkey) {
+    public void setPkey(final String pkey) {
         this.pkey = pkey;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setColumns(List<Column> columns) {
+    public void setColumns(final List<Column> columns) {
         this.columns = columns;
     }
 
-    public void setPrimaryKeys(List<Key> primaryKeys) {
+    public void setPrimaryKeys(final List<Key> primaryKeys) {
         this.primaryKeys = primaryKeys;
     }
 
-    public void setExclusions(List<Exclude> exclusions) {
+    public void setExclusions(final List<Exclude> exclusions) {
         this.exclusions = exclusions;
     }
 }

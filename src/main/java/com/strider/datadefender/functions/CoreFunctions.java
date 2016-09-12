@@ -233,7 +233,7 @@ public class CoreFunctions {
      * @return the next item
      * @throws SQLException 
      */
-    public String randomColumnValue(String table, String column, boolean excludeEmpty) throws SQLException {
+    public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
         String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
@@ -276,7 +276,7 @@ public class CoreFunctions {
      * @return
      * @throws SQLException 
      */
-    public String mappedColumnShuffle(String table, String column, String value, boolean excludeEmpty) throws SQLException {
+    public String mappedColumnShuffle(final String table, final String column, final String value, final boolean excludeEmpty) throws SQLException {
         String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
@@ -302,23 +302,23 @@ public class CoreFunctions {
      * @deprecated 
      * @throws SQLException 
      */
-    public String mappedColumnShuffle(String table, String column, String value) throws SQLException {
+    public String mappedColumnShuffle(final String table, final String column, final String value) throws SQLException {
         return this.mappedColumnShuffle(table, column, value, false);
     }
     
-    public String randomFirstName(String file) throws IOException {
+    public String randomFirstName(final String file) throws IOException {
 		return randomStringFromFile(file);
     }
     
-    public String randomLastName(String file) throws IOException {        
+    public String randomLastName(final String file) throws IOException {        
         return randomStringFromFile(file);
     }    
     
-    public String randomMiddleName(String file) throws IOException {        
+    public String randomMiddleName(final String file) throws IOException {        
         return randomStringFromFile(file);
     }        
     
-    public String randomEmail(String domainName) {
+    public String randomEmail(final String domainName) {
         StringBuilder email = new StringBuilder();
         email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
         return email.toString();
@@ -329,7 +329,7 @@ public class CoreFunctions {
      * @param email
      * @return email address String 
      */
-    public String staticEmail(String email) {
+    public String staticEmail(final String email) {
         return email;
     }        
     
@@ -347,19 +347,19 @@ public class CoreFunctions {
      * @return String Random postal code
      * @throws IOException 
      */
-    public String randomPostalCode(String file) throws IOException {
+    public String randomPostalCode(final String file) throws IOException {
         return randomStringFromFile(file);
     }
 
-    public String randomCity(String file) throws IOException {
+    public String randomCity(final String file) throws IOException {
         return randomStringFromFile(file);
     }
     
-    public String randomStreet(String file) throws IOException {
+    public String randomStreet(final String file) throws IOException {
         return randomStringFromFile(file);
     }    
     
-    public String randomState(String file)  throws IOException {
+    public String randomState(final String file)  throws IOException {
         return randomStringFromFile(file);
     }        
     
@@ -386,7 +386,7 @@ public class CoreFunctions {
         return randomString.toString();
     }
     
-    public String randomDescription(int num, int length) {
+    public String randomDescription(final int num, final int length) {
         return this.generateRandomString(num, length);
     }
     
@@ -445,7 +445,7 @@ public class CoreFunctions {
      * @return the paragraphs
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String lipsumParagraphs(int paragraphs) throws IOException {
+    public String lipsumParagraphs(final int paragraphs) throws IOException {
         List<String> lp = getLipsumParagraphs();
         Random rand = new Random();
         StringBuilder sb = new StringBuilder();
@@ -467,7 +467,7 @@ public class CoreFunctions {
      * @return the generated lorem ipsum text
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String lipsumSimilar(String text) throws IOException {
+    public String lipsumSimilar(final String text) throws IOException {
         String sParas = text.replaceAll("\r\n", "\n");
         int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {

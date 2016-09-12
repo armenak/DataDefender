@@ -100,7 +100,7 @@ public class Parameter {
         return list.toArray((Object[]) array);
     }
     
-    private Object getTypeValueOf(String type, String value)
+    private Object getTypeValueOf(final String type, final String value)
         throws ClassNotFoundException,
                NoSuchMethodException,
                InstantiationException,
@@ -169,19 +169,19 @@ public class Parameter {
     }
 
     // Setter methods
-    public void setElements(List<ArrayElement> elements) {
+    public void setElements(final List<ArrayElement> elements) {
         this.elements = elements;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 }

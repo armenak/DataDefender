@@ -372,13 +372,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithoutParameters(Connection dbConn, Column column)
-        throws SQLException,
-               NoSuchMethodException,
-               SecurityException,
-               IllegalAccessException,
-               IllegalArgumentException,
-               InvocationTargetException {
+    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column)
+    throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+           InvocationTargetException {
         
         String function = column.getFunction();
         if (function == null || function.equals("")) {
