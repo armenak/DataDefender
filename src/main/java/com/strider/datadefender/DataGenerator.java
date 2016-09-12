@@ -61,7 +61,7 @@ public class DataGenerator  implements IGenerator {
         // Iterate over the requirement and generate data sets
         log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
 
-        for(Table table : requirement.getTables()) {
+        for(final Table table : requirement.getTables()) {
             log.info("Table [" + table.getName() + "]. Start ...");
 
             // Iterate over columns to generate data set for each column
@@ -108,7 +108,7 @@ public class DataGenerator  implements IGenerator {
      * @return true if renamed successfully, false otherwise
      */
     private boolean backupExistingFile(final String file) {
-        File sourceFile = new File(file);
+        final File sourceFile = new File(file);
         if (!sourceFile.exists()) {
             return true;
         }

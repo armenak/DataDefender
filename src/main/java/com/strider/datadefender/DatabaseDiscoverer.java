@@ -62,7 +62,7 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
-        double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
+        final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         log.info("Probability threshold [" + probabilityThreshold + "]");
         
         // Get list of models used in data discovery

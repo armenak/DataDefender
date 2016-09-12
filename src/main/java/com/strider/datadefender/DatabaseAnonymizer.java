@@ -390,7 +390,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
 
-            Method[] methods = clazz.getMethods();
+            final Method[] methods = clazz.getMethods();
             Method selectedMethod = null;
             Object returnType = null;
             
@@ -443,7 +443,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         final String columnName = column.getName();
         
-        List<Exclude> exclusions = column.getExclusions();
+        final List<Exclude> exclusions = column.getExclusions();
         boolean hasInclusions = false;
         boolean passedInclusion = false;
         
@@ -451,8 +451,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             for (final Exclude exc : exclusions) {
                 String name = exc.getName();
                 final String eq = exc.getEqualsValue();
-                String lk = exc.getLikeValue();
-                String neq = exc.getNotEqualsValue();
+                final String lk = exc.getLikeValue();
+                final String neq = exc.getNotEqualsValue();
                 final String nlk = exc.getNotLikeValue();
                 boolean nl = exc.isExcludeNulls();
                 if (name == null || name.length() == 0) {
@@ -479,7 +479,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 }
                 if (nlk != null && nlk.length() != 0) {
                     hasInclusions = true;
-                    LikeMatcher matcher = new LikeMatcher(nlk);
+                    final LikeMatcher matcher = new LikeMatcher(nlk);
                     if (matcher.matches(testValue)) {
                         passedInclusion = true;
                     }
@@ -564,7 +564,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             anonymized.add(columnName);
-            Object colValue = callAnonymizingFunctionFor(db, row, column);
+            final Object colValue = callAnonymizingFunctionFor(db, row, column);
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
@@ -582,9 +582,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
 
         int whereIndex = fieldIndex;
-        for (String key : keyNames) {
-            String value = row.getString(key);
-            updateStmt.setString(++whereIndex, value);
+        for (final String key : keyNames) {
+            updateStmt.setString(++whereIndex, row.getString(key));
         }
 
         updateStmt.addBatch();
@@ -603,13 +602,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
-        List<Column> tableColumns = table.getColumns();
+        final List<Column> tableColumns = table.getColumns();
         // colNames is looked up with contains, and iterated over.  Using LinkedHashSet means
         // duplicate column names won't be added to the query, so a check in the column loop
         // below was created to ensure a reasonable warning message is logged if that happens.
-        Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
+        final Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
         // keyNames is only iterated over, so no need for a hash set
-        List<String> keyNames = new LinkedList<>();
+        final List<String> keyNames = new LinkedList<>();
         
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
@@ -618,7 +617,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
         ResultSet rs = null;
-        Connection updateCon = dbFactory.getUpdateConnection();
+        final Connection updateCon = dbFactory.getUpdateConnection();
         
         try {
 
