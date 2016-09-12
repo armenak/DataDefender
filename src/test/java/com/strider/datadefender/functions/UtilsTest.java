@@ -33,6 +33,10 @@ public class UtilsTest extends TestCase {
      */
     private static Logger log = getLogger(UtilsTest.class);    
     
+    private static final String FULL_CLASS_NAME  = "com.strider.dataanonymizer.functions.CoreFunctions";
+    private static final String EXPECTED_RESULTS_1 = "com.strider.dataanonymizer.functions";
+    private static final String EXPECTED_RESULTS_2 = "CoreFunctions";
+    
     public UtilsTest(final String testName) {
         super(testName);
     }
@@ -54,30 +58,24 @@ public class UtilsTest extends TestCase {
     public void testGetClassName() throws AnonymizerException {
         log.info("Executing testGetClassName ...");
         
-        final String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
-        final String expResult = "com.strider.dataanonymizer.functions";
-        
-        log.debug("Parameter: " + fullClassName);
-        log.debug("Expected result:" + expResult);
+        log.debug("Parameter: " + FULL_CLASS_NAME);
+        log.debug("Expected result:" + EXPECTED_RESULTS_1);
 
-        final String result = Utils.getClassName(fullClassName);
+        final String result = Utils.getClassName(FULL_CLASS_NAME);
         
-        assertEquals(expResult, result);
+        assertEquals(EXPECTED_RESULTS_1, result);
     }
     
     /**
      * Test of getMethodName method, of class Utils.
      * @throws com.strider.datadefender.AnonymizerException
      */
-    public void testGetMethodName() throws AnonymizerException {
-        final String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
-        final String expResult = "CoreFunctions";
-        
-        log.debug("Parameter: " + fullClassName);
-        log.debug("Expected result:" + expResult);
+    public void testGetMethodName() throws AnonymizerException {        
+        log.debug("Parameter: " + FULL_CLASS_NAME);
+        log.debug("Expected result:" + EXPECTED_RESULTS_2);
 
-        final String result = Utils.getMethodName(fullClassName);
+        final String result = Utils.getMethodName(FULL_CLASS_NAME);
         
-        assertEquals(expResult, result);
+        assertEquals(EXPECTED_RESULTS_2, result);
     }    
 }

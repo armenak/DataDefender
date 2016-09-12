@@ -29,6 +29,10 @@ import static org.apache.log4j.Logger.getLogger;
 public class XegerTest extends TestCase {
     private static Logger log = getLogger(XegerTest.class);
     
+    private static final String REGEXP_1 = "[ab]{4,6}c";
+    private static final String REGEXP_2 = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
+
+    
     public XegerTest(final String testName) {
         super(testName);
     }
@@ -48,12 +52,11 @@ public class XegerTest extends TestCase {
      */
     public void testGenerate() {
         log.debug("Generate string");
-        final String regex = "[ab]{4,6}c";
-        final Xeger instance = new Xeger(regex);
+        final Xeger instance = new Xeger(REGEXP_1);
         
         for (int i = 0; i < 100; i++) {
-            String text = instance.generate();
-            assertTrue(text.matches(regex));
+            final String text = instance.generate();
+            assertTrue(text.matches(REGEXP_1));
         }
     }
     
@@ -62,11 +65,11 @@ public class XegerTest extends TestCase {
      */
     public void testGenerateSIN() {
         log.debug("Generate SIN");
-        final String regex = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
-        final Xeger instance = new Xeger(regex);
+        
+        final Xeger instance = new Xeger(REGEXP_2);
         final String text = instance.generate();
         log.debug(text);
-        assertTrue(text.matches(regex));
+        assertTrue(text.matches(REGEXP_2));
     }    
     
 }

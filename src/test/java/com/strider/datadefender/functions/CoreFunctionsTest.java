@@ -34,7 +34,9 @@ public class CoreFunctionsTest extends TestCase {
     
     private static Logger log = getLogger(XegerTest.class);
     
-    public CoreFunctionsTest(String testName) {
+    private final static String regExpPattern = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
+    
+    public CoreFunctionsTest(final String testName) {
         super(testName);
     }
     
@@ -53,11 +55,10 @@ public class CoreFunctionsTest extends TestCase {
      */
     public void testGenerateStringFromPattern() {
         log.debug("Generate SIN");
-        final String regex = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
-        final Xeger instance = new Xeger(regex);
+        final Xeger instance = new Xeger(regExpPattern);
         final String text = instance.generate();
         log.debug(text);
-        assertTrue(text.matches(regex));
+        assertTrue(text.matches(regExpPattern));
     }
     
     public void testLipsumParagraphs() throws Exception {
