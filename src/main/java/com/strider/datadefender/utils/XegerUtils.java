@@ -29,9 +29,9 @@ public class XegerUtils {
      * @param random The object used as the randomizer.
      * @return A random number in the given range.
      */
-    public final static int getRandomInt(int min, int max, Random random) {
-        int dif = max - min;
-        float number = random.nextFloat();              // 0 <= number < 1
+    public final static int getRandomInt(final int min, final int max, final Random random) {
+        final int dif = max - min;
+        final float number = random.nextFloat();              // 0 <= number < 1
         return min + Math.round(number * dif);
     }    
 }

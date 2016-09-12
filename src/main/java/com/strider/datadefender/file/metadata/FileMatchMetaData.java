@@ -30,13 +30,10 @@ import java.util.Comparator;
 public class FileMatchMetaData {
     private final String directory;
     private final String fileName;
-    private double averageProbability = 0;   
+    private double averageProbability;   
     private String model = "";
 
-    public FileMatchMetaData(
-        String directory,
-        String fileName
-    ) {
+    public FileMatchMetaData(final String directory, final String fileName) {
         this.directory = directory;
         this.fileName  = fileName;
     }   
@@ -49,7 +46,7 @@ public class FileMatchMetaData {
         return this.fileName;
     }
     
-    public void setAverageProbability(double averageProbability) {
+    public void setAverageProbability(final double averageProbability) {
         this.averageProbability = averageProbability;
     }
     
@@ -61,7 +58,7 @@ public class FileMatchMetaData {
         return this.model;
     }
 
-    public void setModel(String model) {
+    public void setModel(final String model) {
         this.model = model;
     }        
     
