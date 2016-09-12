@@ -23,5 +23,5 @@ package com.strider.datadefender.utils;
  */
 public interface ICloseableNoException extends AutoCloseable {
     @Override 
-    public void close();
+    void close();
 }

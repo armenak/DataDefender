@@ -16,7 +16,7 @@ import java.util.List;
  * @author armenak
  */
 public interface IMetaData {
-    public List<MatchMetaData> getMetaData();
-    public List<MatchMetaData> getMetaData(String columnType);
-    public List<MatchMetaData> getMetaDataForRs(ResultSet rs) throws SQLException;
+    List<MatchMetaData> getMetaData();
+    List<MatchMetaData> getMetaData(String columnType);
+    List<MatchMetaData> getMetaDataForRs(ResultSet rs) throws SQLException;
 }

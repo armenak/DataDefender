@@ -47,20 +47,20 @@ public abstract class MetaData implements IMetaData {
     protected String columnType;
 
     
-    public MetaData(Properties databaseProperties, Connection connection) {
+    public MetaData(final Properties databaseProperties, final Connection connection) {
         this.databaseProperties = databaseProperties;
         this.schema = databaseProperties.getProperty("schema");
         this.connection = connection;
     }
     
     @Override
-    public List<MatchMetaData> getMetaData(String columnType) {
+    public List<MatchMetaData> getMetaData(final String columnType) {
         this.columnType = columnType;
         return getMetaData();
     }
 
     // protected methods that allow subclasses to customize behaviour
-    protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
+    protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
         return md.getTables(null, schema, null, new String[] {"TABLE"});
     }
     
@@ -144,7 +144,7 @@ public abstract class MetaData implements IMetaData {
     }
     
     @Override
-    public List<MatchMetaData> getMetaDataForRs(ResultSet rs) throws SQLException {
+    public List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException {
         List<MatchMetaData> map = new ArrayList<>();
         
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -175,11 +175,11 @@ public abstract class MetaData implements IMetaData {
         return colType;
     }
     
-    protected int getColumnSize(ResultSet columnRs) throws SQLException {
+    protected int getColumnSize(final ResultSet columnRs) throws SQLException {
         return columnRs.getInt(7);
     }
     
-    private int getRowNumber(String table) {
+    private int getRowNumber(final String table) {
         int rowNum = 0;
                 
         try (Statement stmt = connection.createStatement();) {

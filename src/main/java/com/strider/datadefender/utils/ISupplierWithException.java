@@ -23,8 +23,9 @@ package com.strider.datadefender.utils;
  *
  * @param <T>
  * Much like a java.util.Supplier but throws an exception.
+ * @param <E>
  */
 @FunctionalInterface
 public interface ISupplierWithException<T, E extends Exception> {
-    public T get() throws E;
+    T get() throws E;
 }

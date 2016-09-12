@@ -34,7 +34,7 @@ public class AnonymizerException extends Exception {
         super(msg);
     }
 
-    public AnonymizerException(final String msg, Throwable t) {
+    public AnonymizerException(final String msg, final Throwable t) {
         super(msg, t);
     }
 }

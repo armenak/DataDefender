@@ -26,5 +26,5 @@ package com.strider.datadefender.utils;
  */
 @FunctionalInterface
 public interface IConsumerWithException<T, E extends Exception> {
-    public void accept(T obj) throws E;
+    void accept(T obj) throws E;
 }

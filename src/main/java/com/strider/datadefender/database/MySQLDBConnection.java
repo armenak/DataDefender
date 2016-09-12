@@ -29,7 +29,7 @@ import java.util.Properties;
  */
 public class MySQLDBConnection extends DBConnection {
     
-    public MySQLDBConnection(Properties properties) throws DatabaseAnonymizerException {
+    public MySQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
         super(properties);
     }
     

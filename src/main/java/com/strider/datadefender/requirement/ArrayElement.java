@@ -49,7 +49,7 @@ public class ArrayElement {
     }
     
     // Setter method
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 }

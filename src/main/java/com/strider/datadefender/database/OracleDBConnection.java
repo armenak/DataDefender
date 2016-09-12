@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 public class OracleDBConnection extends MySQLDBConnection {
 
-    public OracleDBConnection(Properties properties) throws DatabaseAnonymizerException {
+    public OracleDBConnection(final Properties properties) throws DatabaseAnonymizerException {
         super(properties);
     }
 }

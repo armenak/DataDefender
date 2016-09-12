@@ -50,7 +50,7 @@ public class Key {
     }
     
     // Setter method
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 }

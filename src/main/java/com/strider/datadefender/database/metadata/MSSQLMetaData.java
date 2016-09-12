@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 public class MSSQLMetaData extends MetaData {
 
-    public MSSQLMetaData(Properties databaseProperties, Connection connection) {
+    public MSSQLMetaData(final Properties databaseProperties, final Connection connection) {
         super(databaseProperties, connection);
     }
 }

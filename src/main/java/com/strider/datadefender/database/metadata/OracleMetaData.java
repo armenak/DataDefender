@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 public class OracleMetaData extends MSSQLMetaData {
     
-    public OracleMetaData(final Properties databaseProperties, Connection connection) {
+    public OracleMetaData(final Properties databaseProperties, final Connection connection) {
         super(databaseProperties, connection);
     }
 }

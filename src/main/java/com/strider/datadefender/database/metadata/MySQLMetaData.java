@@ -29,7 +29,7 @@ import java.util.Properties;
  */
 public class MySQLMetaData extends MetaData {
     
-    public MySQLMetaData(Properties databaseProperties, Connection connection) {
+    public MySQLMetaData(final Properties databaseProperties, final Connection connection) {
         super(databaseProperties, connection);
         // Prevent MatchMetaData to be populated with invalid schema property
         // since schema property not supported by MySQL database.        
@@ -39,7 +39,7 @@ public class MySQLMetaData extends MetaData {
     }
 
     @Override
-    protected ResultSet getTableRS(DatabaseMetaData md) throws SQLException {
+    protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
         return md.getTables(null, null, "%", new String[] {"TABLE"});
     }
     @Override
@@ -47,11 +47,11 @@ public class MySQLMetaData extends MetaData {
         return md.getPrimaryKeys(null, null, tableName);
     }
     @Override
-    protected ResultSet getColumnRS(DatabaseMetaData md, String tableName) throws SQLException {
+    protected ResultSet getColumnRS(final DatabaseMetaData md, String tableName) throws SQLException {
         return md.getColumns(null, null, tableName, null);
     }
     @Override
-    protected String getColumnName(ResultSet columnRS) throws SQLException {
+    protected String getColumnName(final ResultSet columnRS) throws SQLException {
         return columnRS.getString("COLUMN_NAME");
     }
 }

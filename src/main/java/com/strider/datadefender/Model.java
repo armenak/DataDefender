@@ -25,7 +25,7 @@ public class Model {
     final private NameFinderME nameFinder;
     final private String name;
     
-    public Model(Tokenizer tokenizer, NameFinderME nameFinder, String name) {
+    public Model(final Tokenizer tokenizer, final NameFinderME nameFinder, final String name) {
         this.name       = name;
         this.tokenizer  = tokenizer;
         this.nameFinder = nameFinder;
