@@ -126,10 +126,12 @@ public abstract class MetaData implements IMetaData {
                     
                     try (ResultSet columnRS = getColumnRS(md, tableName)) {
                         while (columnRS.next()) {
-                            String columnName = getColumnName(columnRS);
-                            String colType = getColumnType(columnRS);
-                            int colSize = getColumnSize(columnRS);
-                            map.add(new MatchMetaData(schemaName, tableName, pkeys, columnName, colType, colSize));
+                            map.add(new MatchMetaData(schemaName, 
+                                    tableName, 
+                                    pkeys, 
+                                    getColumnName(columnRS), 
+                                    getColumnType(columnRS), 
+                                    getColumnSize(columnRS)));
                         }
                     }
                 }
@@ -145,7 +147,7 @@ public abstract class MetaData implements IMetaData {
     public List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException {
         List<MatchMetaData> map = new ArrayList<>();
         
-        ResultSetMetaData rsmd = rs.getMetaData();
+        final ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
             String colType = rsmd.getColumnTypeName(i);
             if (SQLToJavaMapping.isString(colType)) {

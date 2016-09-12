@@ -71,7 +71,7 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info("Model list [" + Arrays.toString(modelList) + "]");
         
         List<MatchMetaData> finalList = new ArrayList<>();
-        for (String model: modelList) {
+        for (final String model: modelList) {
             log.info("********************************");
             log.info("Processing model " + model);
             log.info("********************************");
@@ -100,12 +100,12 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
 
-        ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Double> probabilityList;
-        for(MatchMetaData data: map) {
+        for(final MatchMetaData data: map) {
             if (SQLToJavaMapping.isString(data.getColumnType())) {
-                String tableName = data.getTableName();
-                String columnName = data.getColumnName();
+                final String tableName = data.getTableName();
+                final String columnName = data.getColumnName();
                 probabilityList = new ArrayList<>();
                 
                 log.info("Analyzing table [" + tableName + "]");
@@ -115,9 +115,9 @@ public class DatabaseDiscoverer extends Discoverer {
                     continue;
                 }
                 
-                String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
+                final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
                 if (!CommonUtils.isEmptyString(tableNamePattern)) {
-                    Pattern p = compile(tableNamePattern);
+                    final Pattern p = compile(tableNamePattern);
                     if (!p.matcher(tableName).matches()) {
                         continue;
                     }

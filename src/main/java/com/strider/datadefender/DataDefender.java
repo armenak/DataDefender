@@ -67,6 +67,7 @@ public class DataDefender  {
 
         final Options options = createOptions();
         final CommandLine line = getCommandLine(options, args);
+        
         @SuppressWarnings("unchecked")
         List<String> unparsedArgs = line.getArgList();
         
@@ -80,7 +81,7 @@ public class DataDefender  {
             LogManager.getRootLogger().setLevel(Level.INFO);
         }
 
-        String cmd = unparsedArgs.get(0); // get & remove command arg
+        final String cmd = unparsedArgs.get(0); // get & remove command arg
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
         if ("file-discover".equals(cmd)) {
@@ -93,33 +94,33 @@ public class DataDefender  {
         
         final String databasePropertyFile = line.getOptionValue('P', "db.properties");
         final Properties props = loadProperties(databasePropertyFile);
-        try (IDBFactory dbFactory = IDBFactory.get(props);) {
+        try (final IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":
                     final String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                    Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
-                    IAnonymizer anonymizer = new DatabaseAnonymizer();
+                    final Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
+                    final IAnonymizer anonymizer = new DatabaseAnonymizer();
                     anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
                     break;
                 case "generate":
-                    IGenerator generator = new DataGenerator();
+                    final IGenerator generator = new DataGenerator();
                     final String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
-                    Properties generatorProperties = loadProperties(generatorPropertyFile);
+                    final Properties generatorProperties = loadProperties(generatorPropertyFile);
                     generator.generate(dbFactory, generatorProperties);
                     break;
                 case "database-discover":
                     if (line.hasOption('c')) {
                         final String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
-                        Properties columnProperties = loadProperties(columnPropertyFile);
-                        ColumnDiscoverer discoverer = new ColumnDiscoverer();
+                        final Properties columnProperties = loadProperties(columnPropertyFile);
+                        final ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
                         if (line.hasOption('r')) {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
                         }                        
                     } else if (line.hasOption('d')) {
                         final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
-                        Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
-                        DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
+                        final Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
+                        final DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                         if (line.hasOption('r')) {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));

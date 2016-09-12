@@ -124,8 +124,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      */
     private PreparedStatement getSelectQueryStatement(final IDBFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
         
-        List<String> params = new LinkedList<>();
-        StringBuilder query = new StringBuilder("SELECT DISTINCT ");
+        final List<String> params = new LinkedList<>();
+        final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
         query.append(StringUtils.join(keys, ", ")).append(", ");
         query.append(StringUtils.join(columns, ", "));
         query.append(" FROM ").append(table.getName());
@@ -133,11 +133,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
         List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
             String separator = " WHERE (";
-            for (Exclude exc : exclusions) {
-                String eq = exc.getEqualsValue();
-                String lk = exc.getLikeValue();
-                boolean nl = exc.isExcludeNulls();
-                String col = exc.getName();
+            for (final Exclude exc : exclusions) {
+                final String eq = exc.getEqualsValue();
+                final String lk = exc.getLikeValue();
+                final boolean nl = exc.isExcludeNulls();
+                final String col = exc.getName();
 
                 if (col != null && col.length() != 0) {
                     if (eq != null) {
@@ -161,10 +161,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 separator = ") AND (";
             }
             
-            for (Exclude exc : exclusions) {
-                String neq = exc.getNotEqualsValue();
+            for (final Exclude exc : exclusions) {
+                final String neq = exc.getNotEqualsValue();
                 final String nlk = exc.getNotLikeValue();
-                String col = exc.getName();
+                final String col = exc.getName();
                 
                 if (neq != null) {
                     query.append(separator).append(col).append(" = ?");
@@ -182,7 +182,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
         }
         
-        PreparedStatement stmt = dbFactory.getConnection().prepareStatement(query.toString());
+        final PreparedStatement stmt = dbFactory.getConnection().prepareStatement(query.toString());
         if (dbFactory.getVendorName().equalsIgnoreCase("mysql")) {
             stmt.setFetchSize(Integer.MIN_VALUE);
         }
@@ -224,7 +224,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                InvocationTargetException {
         
         // Check if function has parameters
-        List<Parameter> parms = column.getParameters();
+        final List<Parameter> parms = column.getParameters();
         if (parms != null) {
             return callAnonymizingFunctionWithParameters(dbConn, row, column);
         } else {
@@ -295,7 +295,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     
                     final java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
-                    for (java.lang.reflect.Parameter par : mParams) {
+                    for (final java.lang.reflect.Parameter par : mParams) {
                         //log.debug("    Name present? " + par.isNamePresent());
                         // Note: requires -parameter compiler flag
                         log.debug("    Real param: " + par.getName());
@@ -345,7 +345,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
-            Object anonymizedValue = selectedMethod.invoke(instance, fnArguments.toArray());
+            final Object anonymizedValue = selectedMethod.invoke(instance, fnArguments.toArray());
             if (anonymizedValue == null) {
                 return null;
             }
@@ -387,7 +387,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             final String methodName = Utils.getMethodName(function);
             final Class<?> clazz = Class.forName(className);
             
-            CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
+            final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
 
             Method[] methods = clazz.getMethods();
@@ -395,7 +395,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             Object returnType = null;
             
             methodLoop:
-            for (Method m : methods) {
+            for (final Method m : methods) {
                 //if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
                 if (m.getName().equals(methodName)) {
                     log.debug("  Found method: " + m.getName());
@@ -406,13 +406,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             if (selectedMethod == null) {
-                StringBuilder s = new StringBuilder("Anonymization method: ");
+                final StringBuilder s = new StringBuilder("Anonymization method: ");
                 s.append(methodName).append(") was not found in class ").append(className);
                 throw new NoSuchMethodException(s.toString());
             }
             
             log.debug("Anonymizing function: " + methodName);
-            Object anonymizedValue = selectedMethod.invoke(instance);
+            final Object anonymizedValue = selectedMethod.invoke(instance);
             if (anonymizedValue == null) {
                 return null;
             }
@@ -422,9 +422,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } else if (returnType == java.sql.Date.class) {
                 return anonymizedValue;
             }
-            
-            
-            
         } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
