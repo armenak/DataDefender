@@ -162,7 +162,7 @@ public class RequirementUtilsTest extends TestCase {
         int columnNo = 0;
         for (final Column column : requirement.getTables().get(0).getColumns()) {
             if ("column1".equals(column.getName()) || "column2".equals(column.getName())) {
-                Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
+                final Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
                 assertNotNull(parameter);
                 assertEquals(RequirementUtils.PARAM_NAME_FILE, parameter.getName());
             } else {

@@ -49,8 +49,8 @@ public class BiographicFunctions extends CoreFunctions {
             sinDigits = increment(sinDigits);
         }
 
-        StringBuilder sin = new StringBuilder(9);
-        for (int digit : sinDigits) {
+        final StringBuilder sin = new StringBuilder(9);
+        for (final int digit : sinDigits) {
             sin.append(String.valueOf(digit));
         }
         

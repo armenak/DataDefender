@@ -376,7 +376,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
            InvocationTargetException {
         
-        String function = column.getFunction();
+        final String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
             return "";
@@ -465,7 +465,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 } else if (eq != null && eq.equals(testValue)) {
                     return true;
                 } else if (lk != null && lk.length() != 0) {
-                    LikeMatcher matcher = new LikeMatcher(lk);
+                    final LikeMatcher matcher = new LikeMatcher(lk);
                     if (matcher.matches(testValue)) {
                         return true;
                     }
@@ -500,9 +500,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws SQLException 
      */
     private String getTruncatedColumnValue(final String colValue, final int index, final List<MatchMetaData> columnMetaData) throws SQLException {
-        MatchMetaData md = columnMetaData.get(index);
-        int colSize = md.getColumnSize();
-        String type = md.getColumnType();
+        final MatchMetaData md = columnMetaData.get(index);
+        final int colSize = md.getColumnSize();
+        final String type = md.getColumnType();
         if ("String".equals(type) && colValue.length() > colSize) {
             return colValue.substring(0, colSize);
         }
@@ -544,20 +544,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
              AnonymizerException {
         
         int fieldIndex = 0;
-        Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
-        Set<String> anonymized = new HashSet<>(tableColumns.size());
+        final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
+        final Set<String> anonymized = new HashSet<>(tableColumns.size());
 
-        for (Column column : tableColumns) {
-            String columnName = column.getName();
+        for (final Column column : tableColumns) {
+            final String columnName = column.getName();
             if (anonymized.contains(columnName)) {
                 continue;
             }
             if (!columnIndexes.containsKey(columnName)) {
-                int columnIndex = ++fieldIndex;
+                final int columnIndex = ++fieldIndex;
                 columnIndexes.put(columnName, columnIndex);
             }
             if (isExcludedColumn(row, column)) {
-                String columnValue = row.getString(columnName);
+                final String columnValue = row.getString(columnName);
                 updateStmt.setString(columnIndexes.get(columnName), columnValue);
                 log.debug("Excluding column: " + columnName + " with value: " + columnValue);
                 continue;

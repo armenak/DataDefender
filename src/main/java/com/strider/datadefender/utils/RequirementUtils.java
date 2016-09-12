@@ -156,7 +156,7 @@ public class RequirementUtils {
     private static void addDefaultParam(final Column column) {
         column.setFunction("com.strider.dataanonymizer.functions.CoreFunctions.randomStringFromFile");
         final List<Parameter> params = new ArrayList<>();
-        Parameter param = new Parameter();
+        final Parameter param = new Parameter();
         param.setName("file");
         param.setValue("default-file.txt");
         param.setType("String");

@@ -138,7 +138,7 @@ public class CoreFunctions {
      */
     private String getPredictableShuffledValueFor(final String name, final String value) {
         if (!predictableShuffle.containsKey(name)) {
-            List<String> list = stringLists.get(name);
+            final List<String> list = stringLists.get(name);
             final List<String> shuffled = new ArrayList<>(list);
             Collections.shuffle(shuffled);
 
@@ -277,7 +277,7 @@ public class CoreFunctions {
      * @throws SQLException 
      */
     public String mappedColumnShuffle(final String table, final String column, final String value, final boolean excludeEmpty) throws SQLException {
-        String keyName = table + "." + column;
+        final String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
             query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);
@@ -446,9 +446,9 @@ public class CoreFunctions {
      * @throws IOException if an error occurs reading from the lipsum text file
      */
     public String lipsumParagraphs(final int paragraphs) throws IOException {
-        List<String> lp = getLipsumParagraphs();
-        Random rand = new Random();
-        StringBuilder sb = new StringBuilder();
+        final List<String> lp = getLipsumParagraphs();
+        final Random rand = new Random();
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0, start = rand.nextInt(lp.size()); i < paragraphs; ++i, ++start) {
             sb.append(lp.get(start % lp.size())).append("\r\n\r\n");
         }
@@ -472,7 +472,7 @@ public class CoreFunctions {
         final int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {
             StringBuilder sb = new StringBuilder();
-            for (String para : sParas.split("\n")) {
+            for (final String para : sParas.split("\n")) {
                 if (para.trim().isEmpty()) {
                     sb.append("\r\n");
                     continue;

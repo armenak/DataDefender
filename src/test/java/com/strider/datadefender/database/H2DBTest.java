@@ -53,7 +53,7 @@ public class H2DBTest extends H2DB {
 
     @Test
     public void testSQLBuilder() {
-        String sql = factory.createSQLBuilder().buildSelectWithLimit("SELECT * FROM blah", 1);
+        final String sql = factory.createSQLBuilder().buildSelectWithLimit("SELECT * FROM blah", 1);
         assertEquals("SELECT * FROM blah LIMIT 1", sql);
     }
 }

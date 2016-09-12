@@ -78,7 +78,7 @@ public abstract class MetaData implements IMetaData {
 
     @Override
     public List<MatchMetaData> getMetaData() {
-        List<MatchMetaData> map = new ArrayList<>();
+        final List<MatchMetaData> map = new ArrayList<>();
         
         // Get the metadata from the the database
         try { 
