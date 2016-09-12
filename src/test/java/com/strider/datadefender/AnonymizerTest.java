@@ -32,21 +32,22 @@ import org.junit.Test;
  */
 public class AnonymizerTest {
     
+    private static final String TABLE_ONE = "tableOne";
+    
     @SuppressWarnings("serial")
     @Test
     public void testGetTableNames() throws AnonymizerException {
-        final String t1 = "tableOne";
-        final List<String> tableList = Arrays.asList(t1);
+        final List<String> tableList = Arrays.asList(TABLE_ONE);
         Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
         assertEquals(1, tableNames.size());
-        assertEquals("Handle table args.", t1.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
+        assertEquals("Handle table args.", TABLE_ONE.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
         
         final Properties overrideProps = new Properties() {{
             setProperty("tables", "oneT twoT");
         }};
         tableNames = DataDefender.getTableNames(tableList, overrideProps);
         assertEquals(1, tableNames.size());
-        assertEquals("Ignore props", t1.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
+        assertEquals("Ignore props", TABLE_ONE.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
         
         tableNames = DataDefender.getTableNames(Collections.emptyList(), overrideProps);
         assertEquals(2, tableNames.size());

@@ -74,7 +74,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table
      * @param sColumns 
      */
-    private void fillColumnNames(final Table table, Collection<String> sColumns) {
+    private void fillColumnNames(final Table table, final Collection<String> sColumns) {
         for (Column column : table.getColumns()) {
             sColumns.add(column.getName());
         }
@@ -86,7 +86,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table
      * @return 
      */
-    private void fillPrimaryKeyNamesList(final Table table, Collection<String> sKeys) {
+    private void fillPrimaryKeyNamesList(final Table table, final Collection<String> sKeys) {
         final List<Key> pKeys = table.getPrimaryKeys();
         if (pKeys != null && pKeys.size() != 0) {
             for (Key key : pKeys) {
@@ -439,7 +439,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return the columns value
      * @throws SQLException
      */
-    private boolean isExcludedColumn(ResultSet row, Column column) throws SQLException {
+    private boolean isExcludedColumn(final ResultSet row, final Column column) throws SQLException {
         
         final String columnName = column.getName();
         
