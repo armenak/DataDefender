@@ -71,7 +71,7 @@ public class RequirementUtils {
         log.info("Requirement.load() file: " + requirementFile);
 
         try {
-            JAXBContext jc = newInstance(Requirement.class);
+            final JAXBContext jc = newInstance(Requirement.class);
             final Unmarshaller unmarshaller = jc.createUnmarshaller();
             requirement = (Requirement) unmarshaller.unmarshal(new FileInputStream(new File(requirementFile)));
         } catch (JAXBException je) {

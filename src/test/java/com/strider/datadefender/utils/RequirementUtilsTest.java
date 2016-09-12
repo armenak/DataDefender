@@ -138,7 +138,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("test_table", requirement.getTables().get(0).getName());
 
         int columnNo = 0;
-        for (Column column : requirement.getTables().get(0).getColumns()) {
+        for (final Column column : requirement.getTables().get(0).getColumns()) {
             assertEquals(("column" + ++columnNo), column.getName());
         }
         

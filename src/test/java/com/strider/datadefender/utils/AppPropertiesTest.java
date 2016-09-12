@@ -39,8 +39,8 @@ public class AppPropertiesTest {
 
     @Test
     public void testLoadPropertiesValid() throws AnonymizerException {
-        String path = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
-        Properties props = loadProperties(path);
+        final String path = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
+        final Properties props = loadProperties(path);
         assertNotNull(props);
         assertEquals("yyy", props.get("xxx"));
     }

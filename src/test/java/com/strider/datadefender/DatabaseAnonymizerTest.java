@@ -55,7 +55,7 @@ public class DatabaseAnonymizerTest extends H2DB {
     public void testHappyPath() throws AnonymizerException, SQLException { 
         consumeQuery(this::assertInitialData);
         
-        IAnonymizer anonymizer = new DatabaseAnonymizer();
+        final IAnonymizer anonymizer = new DatabaseAnonymizer();
         anonymizer.anonymize(factory, sampleAProps, new HashSet<String>());
         
         consumeQuery(this::printLine);

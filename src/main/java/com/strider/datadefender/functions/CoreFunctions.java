@@ -151,10 +151,10 @@ public class CoreFunctions {
             predictableShuffle.put(name, smap);
         }
         
-        Map<String, String> map = predictableShuffle.get(name);
+        final Map<String, String> map = predictableShuffle.get(name);
         if (!map.containsKey(value)) {
-            String[] vals = map.values().toArray(new String[map.size()]);
-            int index = (int) Math.abs((long) value.hashCode()) % vals.length;
+            final String[] vals = map.values().toArray(new String[map.size()]);
+            final int index = (int) Math.abs((long) value.hashCode()) % vals.length;
             return vals[index];
         }
         return map.get(value);
@@ -404,7 +404,7 @@ public class CoreFunctions {
      */
     public String lipsumSentences(final int min, final int max) throws IOException {
         List<String> lp = getLipsumParagraphs();
-        Random rand = new Random();
+        final Random rand = new Random();
         StringBuilder sb = new StringBuilder();
         
         final int nSentences = max - rand.nextInt((max + 1) - min);
@@ -468,8 +468,8 @@ public class CoreFunctions {
      * @throws IOException if an error occurs reading from the lipsum text file
      */
     public String lipsumSimilar(final String text) throws IOException {
-        String sParas = text.replaceAll("\r\n", "\n");
-        int nParas = StringUtils.countMatches(sParas, "\n");
+        final String sParas = text.replaceAll("\r\n", "\n");
+        final int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {
             StringBuilder sb = new StringBuilder();
             for (String para : sParas.split("\n")) {
@@ -481,7 +481,7 @@ public class CoreFunctions {
             }
             return sb.toString().trim();
         }
-        int nSent = StringUtils.countMatches(text.replaceAll("\\.{2,}", "."), ".");
+        final int nSent = StringUtils.countMatches(text.replaceAll("\\.{2,}", "."), ".");
         return lipsumSentences(Math.max(1, nSent - 1), Math.max(1, nSent + 1));
     }
  

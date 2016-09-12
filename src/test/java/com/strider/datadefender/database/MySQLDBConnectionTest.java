@@ -60,12 +60,12 @@ public class MySQLDBConnectionTest {
         }
         @Override
         protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
-            Field[] allFields = supplier.getClass().getDeclaredFields();
+            final Field[] allFields = supplier.getClass().getDeclaredFields();
             assertEquals(1, allFields.length);
             Field field = allFields[0];
             field.setAccessible(true);
             try { // not exactly a great test, but checks that supplier has parent's properties at least
-                String representation = ReflectionToStringBuilder.toString(field.get(supplier));
+                final String representation = ReflectionToStringBuilder.toString(field.get(supplier));
                 assertTrue(representation.contains(
                     "[driver=java.util.List,vendor=mysql,url=invalid-url,userName=invalid-user,password=invalid-pass]"));
             } catch (IllegalArgumentException | IllegalAccessException e) {

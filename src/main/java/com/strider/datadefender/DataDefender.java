@@ -199,14 +199,14 @@ public class DataDefender  {
      */
     public static Set<String> getTableNames(List<String> tableNames, final Properties props) {
         if (tableNames.isEmpty()) {
-            String tableStr = props.getProperty("tables");
+            final String tableStr = props.getProperty("tables");
             if (tableStr == null) {
                 return Collections.emptySet();
             }
             tableNames = Arrays.asList(tableStr.split(" "));
             log.info("Adding tables from property file.");
         }
-        Set<String> tables = tableNames.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
+        final Set<String> tables = tableNames.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
         log.info("Tables: " + Arrays.toString(tables.toArray()));
         return tables;
     }

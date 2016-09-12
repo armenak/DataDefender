@@ -441,7 +441,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      */
     private boolean isExcludedColumn(ResultSet row, Column column) throws SQLException {
         
-        String columnName = column.getName();
+        final String columnName = column.getName();
         
         List<Exclude> exclusions = column.getExclusions();
         boolean hasInclusions = false;
@@ -450,7 +450,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (exclusions != null) {
             for (final Exclude exc : exclusions) {
                 String name = exc.getName();
-                String eq = exc.getEqualsValue();
+                final String eq = exc.getEqualsValue();
                 String lk = exc.getLikeValue();
                 String neq = exc.getNotEqualsValue();
                 final String nlk = exc.getNotLikeValue();

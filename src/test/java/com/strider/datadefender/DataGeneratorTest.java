@@ -16,9 +16,6 @@
  */
 package com.strider.datadefender;
 
-import com.strider.datadefender.DataGenerator;
-import com.strider.datadefender.IGenerator;
-import com.strider.datadefender.AnonymizerException;
 import static org.junit.Assert.assertArrayEquals;
 
 import java.io.File;
@@ -57,7 +54,7 @@ public class DataGeneratorTest extends H2DB {
     public void testHappyPath() throws AnonymizerException, SQLException, IOException { 
         consumeQuery(this::assertInitialData);
         
-        IGenerator generator = new DataGenerator();
+        final IGenerator generator = new DataGenerator();
         generator.generate(factory, sampleAProps);
 
         // dg-names.txt will contain last names

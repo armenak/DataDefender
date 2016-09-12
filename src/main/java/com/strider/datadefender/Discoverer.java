@@ -53,14 +53,13 @@ public abstract class Discoverer { //implements IDiscoverer {
         if (matches == null || matches.isEmpty()) {
             throw new AnonymizerException("No matches to create requirement from!");
         }
-        Requirement requirement = RequirementUtils.create(matches);
-        RequirementUtils.write(requirement, fileName);
+        RequirementUtils.write(RequirementUtils.create(matches), fileName);
     }
     
     public double calculateAverage(final List <Double> values) {
         Double sum = 0.0;
         if(!values.isEmpty()) {
-            for (Double value : values) {
+            for (final Double value : values) {
                 sum += value;
             }
             return sum / values.size();
