@@ -85,8 +85,8 @@ public abstract class MetaData implements IMetaData {
             // Getting all tables name
             DatabaseMetaData md = connection.getMetaData();
             
-            String schemaName = databaseProperties.getProperty("schema");
-            String skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
+            final String schemaName = databaseProperties.getProperty("schema");
+            final String skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
             
             // Populate list of tables excluded from the analysis
             List<String> excludeTablesList = new ArrayList<>();
@@ -167,7 +167,7 @@ public abstract class MetaData implements IMetaData {
         return map;
     }
 
-    protected String getColumnType(ResultSet columnRS) throws SQLException {
+    protected String getColumnType(final ResultSet columnRS) throws SQLException {
         String colType = columnRS.getString(6);
         if (this.columnType != null && SQLToJavaMapping.isString(colType)) {
             colType = "String";

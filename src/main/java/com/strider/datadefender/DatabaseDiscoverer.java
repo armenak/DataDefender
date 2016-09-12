@@ -135,15 +135,15 @@ public class DatabaseDiscoverer extends Discoverer {
                     ResultSet resultSet = stmt.executeQuery(query);) {
 
                     while (resultSet.next()) {
-                        String sentence = resultSet.getString(1);
+                        final String sentence = resultSet.getString(1);
                         if (sentence != null && !sentence.isEmpty()) {
                             
                             // Convert sentence into tokens
-                            String tokens[] = model.getTokenizer().tokenize(sentence);
+                            final String tokens[] = model.getTokenizer().tokenize(sentence);
                             // Find names
-                            Span nameSpans[] = model.getNameFinder().find(tokens);
+                            final Span nameSpans[] = model.getNameFinder().find(tokens);
                             //find probabilities for names
-                            double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                            final double[] spanProbs = model.getNameFinder().probs(nameSpans);
                             //display names
                             for( int i = 0; i<nameSpans.length; i++) {
                                 //log.debug("Span: "+nameSpans[i].toString());

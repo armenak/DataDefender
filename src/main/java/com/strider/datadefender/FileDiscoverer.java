@@ -59,7 +59,7 @@ public class FileDiscoverer extends Discoverer {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
-        double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
+        final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         log.info("Probability threshold [" + probabilityThreshold + "]");
         
         // Get list of models used in data discovery
@@ -77,11 +77,11 @@ public class FileDiscoverer extends Discoverer {
             finalList = ListUtils.union(finalList, fileMatches);            
         }
 
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
+        final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
         for(FileMatchMetaData data: finalList) {    
-            String probability = decimalFormat.format(data.getAverageProbability());
+            final String probability = decimalFormat.format(data.getAverageProbability());
             final String result = String.format("%20s %20s %20s %20s", data.getDirectory(), data.getFileName(), probability, data.getModel());
             log.info(result);            
         }                    
@@ -106,14 +106,14 @@ public class FileDiscoverer extends Discoverer {
             node = new File(directory);
             
             if (node.isDirectory()) {
-                String[] files = node.list();
+                final String[] files = node.list();
                 for (String file: files) {
                     // Detect file type
                     log.info("Analyzing " + directory + "/" + file);
                     
-                    BodyContentHandler handler = new BodyContentHandler();
+                    final BodyContentHandler handler = new BodyContentHandler();
                     
-                    AutoDetectParser parser = new AutoDetectParser();
+                    final AutoDetectParser parser = new AutoDetectParser();
                     metadata = new Metadata();
                     String handlerString = "";
                     try (InputStream stream = new FileInputStream(directory + "/" + file)) {
@@ -124,9 +124,9 @@ public class FileDiscoverer extends Discoverer {
                     }                    
                     
                     log.info("Content: " + handlerString);
-                    String tokens[] = model.getTokenizer().tokenize(handler.toString());
-                    Span nameSpans[] = model.getNameFinder().find(tokens);
-                    double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                    final String tokens[] = model.getTokenizer().tokenize(handler.toString());
+                    final Span nameSpans[] = model.getNameFinder().find(tokens);
+                    final double[] spanProbs = model.getNameFinder().probs(nameSpans);
                     //display names
                     probabilityList = new ArrayList<>();
                     for( int i = 0; i < nameSpans.length; i++) {
@@ -137,7 +137,7 @@ public class FileDiscoverer extends Discoverer {
                     }      
                     model.getNameFinder().clearAdaptiveData(); 
                     
-                    double averageProbability = calculateAverage(probabilityList);
+                    final double averageProbability = calculateAverage(probabilityList);
                     if ((averageProbability >= probabilityThreshold)) {
                         FileMatchMetaData result = new FileMatchMetaData(directory, file);
                         result.setAverageProbability(averageProbability);

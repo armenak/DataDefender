@@ -17,7 +17,6 @@
  */
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.utils.LikeMatcher;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -31,7 +30,7 @@ public class LikeMatcherTest extends TestCase {
     
     public void testMatchingAtEnd() {
         log.debug("Testing match at end of string");
-        LikeMatcher matcher = new LikeMatcher("za%");
+        final LikeMatcher matcher = new LikeMatcher("za%");
         assertTrue(matcher.matches("Zaahid"));
         assertTrue(matcher.matches("ZAA"));
         assertTrue(matcher.matches("za"));
@@ -41,7 +40,7 @@ public class LikeMatcherTest extends TestCase {
     
     public void testMatchingAtBeginning() {
         log.debug("Testing match begginning of string");
-        LikeMatcher matcher = new LikeMatcher("%hid");
+        final LikeMatcher matcher = new LikeMatcher("%hid");
         assertTrue(matcher.matches("ZaahiD"));
         assertTrue(matcher.matches("aaHID"));
         assertTrue(matcher.matches("HID"));
@@ -51,7 +50,7 @@ public class LikeMatcherTest extends TestCase {
     
     public void testMultiMatcher() {
         log.debug("Testing match with multiple %'s");
-        LikeMatcher matcher = new LikeMatcher("Z%h%d");
+        final LikeMatcher matcher = new LikeMatcher("Z%h%d");
         assertTrue(matcher.matches("ZaahiD"));
         assertTrue(matcher.matches("ZaHID"));
         assertTrue(matcher.matches("Zhd"));
@@ -61,7 +60,7 @@ public class LikeMatcherTest extends TestCase {
     
     public void testSingleCharMatcher() {
         log.debug("Testing match with '?' and '_'");
-        LikeMatcher matcher = new LikeMatcher("Z_?h?d");
+        final LikeMatcher matcher = new LikeMatcher("Z_?h?d");
         assertTrue(matcher.matches("ZaahiD"));
         assertFalse(matcher.matches("ZaHID"));
         assertFalse(matcher.matches("Zhd"));
@@ -70,7 +69,7 @@ public class LikeMatcherTest extends TestCase {
     
     public void testMixedMatcher() {
         log.debug("Testing match with a mix of '%', '?', and '_'");
-        LikeMatcher matcher = new LikeMatcher("%Z_?h?d%");
+        final LikeMatcher matcher = new LikeMatcher("%Z_?h?d%");
         assertTrue(matcher.matches("ZaahiD"));
         assertFalse(matcher.matches("ZaHID"));
         assertFalse(matcher.matches("Zhd"));

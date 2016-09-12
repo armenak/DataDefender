@@ -17,7 +17,6 @@
  */
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.utils.RequirementUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +42,7 @@ public class RequirementUtilsTest extends TestCase {
     private void load() throws Exception {
         load(getClass().getResource("/Requirement.xml").getFile());
     }
-    private void load(String fname) throws Exception {
+    private void load(final String fname) throws Exception {
         requirement = RequirementUtils.load(fname);
         assertNotNull(requirement);
     }
@@ -72,7 +71,7 @@ public class RequirementUtilsTest extends TestCase {
         table.setColumns(Arrays.asList(col));
         req.setTables(Arrays.asList(table));
         
-        String fName = "target/test-classes/utest-req-write.xml";
+        final String fName = "target/test-classes/utest-req-write.xml";
         // write
         RequirementUtils.write(req, fName);
         
@@ -89,7 +88,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("cName", c1.getName());
         assertEquals("some.function()", c1.getFunction());
         assertEquals(1, c1.getParameters().size());
-        Parameter p1 = c1.getParameters().get(0);
+        final Parameter p1 = c1.getParameters().get(0);
         assertEquals("pName", p1.getName());
         assertEquals("pvalue/file.txt", p1.getValue());
         assertEquals("String", p1.getType());

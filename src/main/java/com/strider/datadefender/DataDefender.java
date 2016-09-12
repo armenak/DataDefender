@@ -92,7 +92,7 @@ public class DataDefender  {
         }
         
         final String databasePropertyFile = line.getOptionValue('P', "db.properties");
-        Properties props = loadProperties(databasePropertyFile);
+        final Properties props = loadProperties(databasePropertyFile);
         try (IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":

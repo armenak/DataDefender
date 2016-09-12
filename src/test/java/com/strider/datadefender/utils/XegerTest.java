@@ -18,7 +18,6 @@
 
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.utils.Xeger;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -30,7 +29,7 @@ import static org.apache.log4j.Logger.getLogger;
 public class XegerTest extends TestCase {
     private static Logger log = getLogger(XegerTest.class);
     
-    public XegerTest(String testName) {
+    public XegerTest(final String testName) {
         super(testName);
     }
     
@@ -49,8 +48,9 @@ public class XegerTest extends TestCase {
      */
     public void testGenerate() {
         log.debug("Generate string");
-        String regex = "[ab]{4,6}c";
-        Xeger instance = new Xeger(regex);
+        final String regex = "[ab]{4,6}c";
+        final Xeger instance = new Xeger(regex);
+        
         for (int i = 0; i < 100; i++) {
             String text = instance.generate();
             assertTrue(text.matches(regex));
@@ -62,9 +62,9 @@ public class XegerTest extends TestCase {
      */
     public void testGenerateSIN() {
         log.debug("Generate SIN");
-        String regex = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
-        Xeger instance = new Xeger(regex);
-        String text = instance.generate();
+        final String regex = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
+        final Xeger instance = new Xeger(regex);
+        final String text = instance.generate();
         log.debug(text);
         assertTrue(text.matches(regex));
     }    

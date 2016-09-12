@@ -303,9 +303,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             continue methodLoop;
                         }
                         
-                        Object value = paramValues.get(par.getName());
+                        final Object value = paramValues.get(par.getName());
                         Class<?> fnParamType = par.getType();
-                        Class<?> confParamType = (value == null) ? fnParamType : value.getClass();
+                        final Class<?> confParamType = (value == null) ? fnParamType : value.getClass();
                         
                         if (fnParamType.isPrimitive() && value == null) {
                             continue methodLoop;
