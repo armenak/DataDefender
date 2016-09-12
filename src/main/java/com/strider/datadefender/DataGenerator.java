@@ -77,7 +77,7 @@ public class DataGenerator  implements IGenerator {
                         throw new DatabaseAnonymizerException("Unable to rename existing data set file " + fileParameter.getValue());
                     }
                     
-                    StringBuilder sql = new StringBuilder(100);
+                    final StringBuilder sql = new StringBuilder(100);
                     sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
                     try (Statement stmt = dbFactory.getConnection().createStatement();
                         ResultSet rs = stmt.executeQuery(sql.toString());

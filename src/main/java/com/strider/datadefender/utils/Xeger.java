@@ -62,7 +62,7 @@ public class Xeger {
      * @return String
      */
     public String generate() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         generate(builder, automaton.getInitialState());
         return builder.toString();
     }

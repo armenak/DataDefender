@@ -151,7 +151,7 @@ public class Parameter {
                 return null;
             }
             String arrayType = typeName.substring(0, typeName.length() - 2);
-            List<Object> arr = new ArrayList<>(elements.size());
+            final List<Object> arr = new ArrayList<>(elements.size());
             for (ArrayElement el : elements) {
                 arr.add(getTypeValueOf(arrayType, el.getValue()));
             }

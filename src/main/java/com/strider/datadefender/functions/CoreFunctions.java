@@ -89,8 +89,8 @@ public class CoreFunctions {
      */
     private List<String> getLipsumParagraphs() throws IOException {
         if (lipsumParagraphs.isEmpty()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(CoreFunctions.class.getClassLoader().getResourceAsStream("lipsum.txt")));
-            StringBuilder sb = new StringBuilder();
+            final BufferedReader br = new BufferedReader(new InputStreamReader(CoreFunctions.class.getClassLoader().getResourceAsStream("lipsum.txt")));
+            final StringBuilder sb = new StringBuilder();
             for (String line; (line = br.readLine()) != null; ) {
                 if (line.trim().length() == 0) {
                     lipsumParagraphs.add(sb.toString());
@@ -118,7 +118,7 @@ public class CoreFunctions {
             }
         }
         
-        List<String> list = stringLists.get(name);
+        final List<String> list = stringLists.get(name);
         Collections.shuffle(list);
         
         final Iterator<String> iter = list.iterator();
@@ -234,7 +234,7 @@ public class CoreFunctions {
      * @throws SQLException 
      */
     public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
-        String keyName = table + "." + column;
+        final String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
             query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);
@@ -374,7 +374,7 @@ public class CoreFunctions {
      */
     public String generateRandomString(final int num, final int length) {
         final Random random = new Random();
-        StringBuilder randomString = new StringBuilder();
+        final StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
             final int rand = random.nextInt(479617);
             randomString.append(words.get(rand)).append(" ");
@@ -405,7 +405,7 @@ public class CoreFunctions {
     public String lipsumSentences(final int min, final int max) throws IOException {
         List<String> lp = getLipsumParagraphs();
         final Random rand = new Random();
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         
         final int nSentences = max - rand.nextInt((max + 1) - min);
         String separator = "";

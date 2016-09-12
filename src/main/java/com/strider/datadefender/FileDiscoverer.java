@@ -80,7 +80,7 @@ public class FileDiscoverer extends Discoverer {
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
-        for(FileMatchMetaData data: finalList) {    
+        for(final FileMatchMetaData data: finalList) {    
             final String probability = decimalFormat.format(data.getAverageProbability());
             final String result = String.format("%20s %20s %20s %20s", data.getDirectory(), data.getFileName(), probability, data.getModel());
             log.info(result);            
@@ -101,7 +101,7 @@ public class FileDiscoverer extends Discoverer {
         File node;
         Metadata metadata;
         List<Double> probabilityList;
-        for (String directory: directoryList) {
+        for (final String directory: directoryList) {
             
             node = new File(directory);
             
@@ -139,7 +139,7 @@ public class FileDiscoverer extends Discoverer {
                     
                     final double averageProbability = calculateAverage(probabilityList);
                     if ((averageProbability >= probabilityThreshold)) {
-                        FileMatchMetaData result = new FileMatchMetaData(directory, file);
+                        final FileMatchMetaData result = new FileMatchMetaData(directory, file);
                         result.setAverageProbability(averageProbability);
                         result.setModel(model.getName());
                         fileMatches.add(result);

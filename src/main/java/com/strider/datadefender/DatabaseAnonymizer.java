@@ -107,7 +107,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return the SQL statement
      */
     private String getUpdateQuery(final Table table, final Collection<String> updateColumns, final Collection<String> keys) {
-        StringBuilder sql = new StringBuilder("UPDATE ");
+        final StringBuilder sql = new StringBuilder("UPDATE ");
         sql.append(table.getName()).append(" SET ");
         sql.append(StringUtils.join(updateColumns, " = ?, ")).append(" = ?");
         sql.append(" WHERE " ).append(StringUtils.join(keys, " = ? AND ")).append(" = ?");
@@ -271,7 +271,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             instance.setDatabaseConnection(dbConn);
 
             final List<Parameter> parms = column.getParameters();
-            Map<String, Object> paramValues = new HashMap<>(parms.size());
+            final Map<String, Object> paramValues = new HashMap<>(parms.size());
             for (Parameter param : parms) {
                 if (param.getValue().equals("@@value@@")) {
                     paramValues.put(param.getName(), columnValue);
@@ -282,7 +282,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 }
             }
             
-            List<Object> fnArguments = new ArrayList<>(parms.size());
+            final List<Object> fnArguments = new ArrayList<>(parms.size());
             final Method[] methods = clazz.getMethods();
             Method selectedMethod = null;
             
@@ -333,7 +333,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             if (selectedMethod == null) {
-                StringBuilder s = new StringBuilder("Anonymization method: ");
+                final StringBuilder s = new StringBuilder("Anonymization method: ");
                 s.append(methodName).append(" with parameters matching (");
                 String comma = "";
                 for (final Parameter p : parms) {
@@ -458,7 +458,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 if (name == null || name.length() == 0) {
                     name = columnName;
                 }
-                String testValue = row.getString(name);
+                final String testValue = row.getString(name);
 
                 if (nl && testValue == null) {
                     return true;

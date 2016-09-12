@@ -160,13 +160,13 @@ public class RequirementUtilsTest extends TestCase {
         load();
 
         int columnNo = 0;
-        for (Column column : requirement.getTables().get(0).getColumns()) {
+        for (final Column column : requirement.getTables().get(0).getColumns()) {
             if ("column1".equals(column.getName()) || "column2".equals(column.getName())) {
                 Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
                 assertNotNull(parameter);
                 assertEquals(RequirementUtils.PARAM_NAME_FILE, parameter.getName());
             } else {
-                Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
+                final Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
                 assertNull(parameter);
             }
             assertEquals(("column" + ++columnNo), column.getName());

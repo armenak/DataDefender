@@ -33,7 +33,7 @@ public abstract class SQLBuilder implements ISQLBuilder {
     
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
-        StringBuilder sql = new StringBuilder(sqlString);
+        final StringBuilder sql = new StringBuilder(sqlString);
         
         if (limit != 0) {
             sql.append(" LIMIT ").append(limit);

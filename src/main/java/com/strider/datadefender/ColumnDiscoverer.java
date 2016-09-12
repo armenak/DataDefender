@@ -45,12 +45,12 @@ public class ColumnDiscoverer extends Discoverer {
         throws DatabaseAnonymizerException {
      
         log.info("Column discovery in process");
-        IMetaData metaData = factory.fetchMetaData();
-        List<MatchMetaData> map = metaData.getMetaData();
+        final IMetaData metaData = factory.fetchMetaData();
+        final List<MatchMetaData> map = metaData.getMetaData();
         
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
-        List<String> suspList = new ArrayList(columnProperties.keySet());
+        final List<String> suspList = new ArrayList(columnProperties.keySet());
         suspList.remove("tables"); // removing 'special' tables property that's not a pattern
         matches = new ArrayList<>();
         for(final String suspStr: suspList) {

@@ -75,12 +75,12 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("********************************");
             log.info("Processing model " + model);
             log.info("********************************");
-            Model modelPerson = createModel(dataDiscoveryProperties, model);
+            final Model modelPerson = createModel(dataDiscoveryProperties, model);
             matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);
             finalList = ListUtils.union(finalList, matches);            
         }
 
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
+        final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
         for(final MatchMetaData data: finalList) {    
@@ -95,8 +95,8 @@ public class DatabaseDiscoverer extends Discoverer {
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties, 
             final Set<String> tables, final Model model, final double probabilityThreshold)
     throws AnonymizerException {
-        IMetaData metaData = factory.fetchMetaData();
-        List<MatchMetaData> map = metaData.getMetaData();
+        final IMetaData metaData = factory.fetchMetaData();
+        final List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
 
@@ -161,7 +161,7 @@ public class DatabaseDiscoverer extends Discoverer {
                     log.error(sqle.toString());
                 }
                 
-                double averageProbability = calculateAverage(probabilityList);
+                final double averageProbability = calculateAverage(probabilityList);
                 if ((averageProbability >= probabilityThreshold)) {
                     data.setAverageProbability(averageProbability);
                     data.setModel(model.getName());

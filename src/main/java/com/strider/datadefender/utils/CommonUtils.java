@@ -64,11 +64,11 @@ public class CommonUtils {
     
     public static java.sql.Date stringToDate(final String str, final String format) 
     throws AnonymizerException {
-	SimpleDateFormat formatter = new SimpleDateFormat(format);	
-        Date date;
+	final SimpleDateFormat formatter = new SimpleDateFormat(format);	
         java.sql.Date sqlDate = null;
+        
 	try {
-            date = formatter.parse(str);
+            final Date date = formatter.parse(str);
             sqlDate = new java.sql.Date(date.getTime());
 	} catch (ParseException e) {
 	    log.error("Problem with parsing date");

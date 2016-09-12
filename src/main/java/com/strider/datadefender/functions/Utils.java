@@ -73,7 +73,7 @@ public class Utils {
             throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
         }
 
-        int index = fullMethodName.lastIndexOf(SEPARATOR);
+        final int index = fullMethodName.lastIndexOf(SEPARATOR);
         if (index != -1) {
             return fullMethodName.substring(0,index);
         }
