@@ -57,7 +57,7 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private static String[] modelList;
         
-    public List<MatchMetaData> discover(IDBFactory factory, Properties dataDiscoveryProperties, Set<String> tables) 
+    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, Set<String> tables) 
     throws AnonymizerException {
         log.info("Data discovery in process");
 
@@ -66,7 +66,7 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info("Probability threshold [" + probabilityThreshold + "]");
         
         // Get list of models used in data discovery
-        String models = dataDiscoveryProperties.getProperty("models");
+        final String models = dataDiscoveryProperties.getProperty("models");
         modelList = models.split(",");
         log.info("Model list [" + Arrays.toString(modelList) + "]");
         

@@ -126,7 +126,7 @@ public class Parameter {
         } else if (type.equals(String.class.getName()) || "String".equals(type)) {
             return value;
         } else {
-            Constructor<?> constr = Class.forName(type).getConstructor(String.class);
+            final Constructor<?> constr = Class.forName(type).getConstructor(String.class);
             return constr.newInstance(value);
         }
     }

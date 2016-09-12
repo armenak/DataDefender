@@ -161,7 +161,7 @@ public class CoreFunctions {
     }
     
     public String generateStringFromPattern(final String regex) {
-        Xeger instance = new Xeger(regex);
+        final Xeger instance = new Xeger(regex);
         return instance.generate();
     }
     
@@ -402,16 +402,16 @@ public class CoreFunctions {
      * @return the generated sentences.
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String lipsumSentences(int min, int max) throws IOException {
+    public String lipsumSentences(final int min, final int max) throws IOException {
         List<String> lp = getLipsumParagraphs();
         Random rand = new Random();
         StringBuilder sb = new StringBuilder();
         
-        int nSentences = max - rand.nextInt((max + 1) - min);
+        final int nSentences = max - rand.nextInt((max + 1) - min);
         String separator = "";
         mainLoop:
         for (int i = 0, start = rand.nextInt(lp.size()); i < nSentences; ++start) {
-            String para = lp.get(start % lp.size());
+            final String para = lp.get(start % lp.size());
             String[] sentences = para.split("\\.");
             for (String s : sentences) {
                 s = s.trim().replaceAll("\\s+", " ");

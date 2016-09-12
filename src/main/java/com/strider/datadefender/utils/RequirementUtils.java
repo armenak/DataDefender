@@ -123,7 +123,7 @@ public class RequirementUtils {
             if (table == null) { // new table
                 table = new Table();
                 table.setName(tableName);
-                List<String> pks = match.getPkeys();
+                final List<String> pks = match.getPkeys();
                 if (pks.size() == 1) { // only one pk
                     table.setPkey(pks.get(0));
                 } else { // multiple key pk

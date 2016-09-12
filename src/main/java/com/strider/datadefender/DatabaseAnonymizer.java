@@ -263,9 +263,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         } 
         
         try {
-            String className = Utils.getClassName(function);
-            String methodName = Utils.getMethodName(function);
-            Class<?> clazz = Class.forName(className);
+            final String className = Utils.getClassName(function);
+            final String methodName = Utils.getMethodName(function);
+            final Class<?> clazz = Class.forName(className);
             
             CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
@@ -293,7 +293,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     log.debug("  Found method: " + m.getName());
                     log.debug("  Match w/: " + paramValues);
                     
-                    java.lang.reflect.Parameter[] mParams = m.getParameters();
+                    final java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
                     for (java.lang.reflect.Parameter par : mParams) {
                         //log.debug("    Name present? " + par.isNamePresent());

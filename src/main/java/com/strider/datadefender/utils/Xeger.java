@@ -67,8 +67,8 @@ public class Xeger {
         return builder.toString();
     }
 
-    private void generate(StringBuilder builder, State state) {
-        List<Transition> transitions = state.getSortedTransitions(true);
+    private void generate(final StringBuilder builder, final State state) {
+        final List<Transition> transitions = state.getSortedTransitions(true);
         if (transitions.isEmpty()) {
             assert state.isAccept();
             return;
@@ -84,8 +84,8 @@ public class Xeger {
         generate(builder, transition.getDest());
     }
 
-    private void appendChoice(StringBuilder builder, Transition transition) {
-        char c = (char) XegerUtils.getRandomInt(transition.getMin(), transition.getMax(), random);
+    private void appendChoice(final StringBuilder builder, final Transition transition) {
+        final char c = (char) XegerUtils.getRandomInt(transition.getMin(), transition.getMax(), random);
         builder.append(c);
     }
 
