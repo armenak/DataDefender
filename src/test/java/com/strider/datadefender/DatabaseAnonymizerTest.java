@@ -43,7 +43,7 @@ public class DatabaseAnonymizerTest extends H2DB {
         setProperty("requirement", "target/test-classes/Requirement-H2DB.xml");
     }};
 
-    private void printLine(ResultSet rs) throws SQLException {
+    private void printLine(final ResultSet rs) throws SQLException {
         log.debug("Print Line...");
         while (rs.next()) {
             log.debug(rs.getInt("id") + ": " + rs.getString("fname") + ", " + rs.getString("lname"));

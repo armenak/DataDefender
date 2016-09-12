@@ -16,8 +16,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.Connection;
@@ -75,18 +73,18 @@ public abstract class H2DB {
     }
     
     // Helper methods to assist in testing data
-    protected void consumeQuery(IConsumerWithException<ResultSet, SQLException> cons) throws SQLException {
+    protected void consumeQuery(final IConsumerWithException<ResultSet, SQLException> cons) throws SQLException {
         try (Statement stmt = con.createStatement(); 
             ResultSet rs = stmt.executeQuery("SELECT * FROM ju_users");) {
             cons.accept(rs);
         }
     }
     
-    protected void assertInitialData(ResultSet rs) throws SQLException {
+    protected void assertInitialData(final ResultSet rs) throws SQLException {
         assertData(rs, (expected, actual) -> assertEquals(expected, actual));
     }
     
-    protected void assertData(ResultSet rs, BiConsumer<String, String> cons) throws SQLException {
+    protected void assertData(final ResultSet rs, final BiConsumer<String, String> cons) throws SQLException {
         String[] asserts = new String[]{ "1: Claudio, Bravo", "2: Ugo, Bernasconi"};
         int i = 0;
         while(rs.next())  {

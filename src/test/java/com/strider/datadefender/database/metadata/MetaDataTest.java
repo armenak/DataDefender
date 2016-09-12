@@ -65,7 +65,7 @@ public class MetaDataTest {
     }};
     
     private class TestMetaData extends MetaData {
-        public TestMetaData(Properties databaseProperties, String columnType) {
+        public TestMetaData(final Properties databaseProperties, final String columnType) {
             super(databaseProperties, mockConnection);
             this.columnType = columnType;
         }

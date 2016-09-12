@@ -62,10 +62,10 @@ public class CommonUtils {
         return str == null || str.isEmpty();
     }
     
-    public static java.sql.Date stringToDate(String str, String format) 
+    public static java.sql.Date stringToDate(final String str, final String format) 
     throws AnonymizerException {
 	SimpleDateFormat formatter = new SimpleDateFormat(format);	
-        Date date = null;
+        Date date;
         java.sql.Date sqlDate = null;
 	try {
             date = formatter.parse(str);

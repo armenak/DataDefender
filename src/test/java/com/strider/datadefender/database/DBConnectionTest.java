@@ -47,7 +47,7 @@ public class DBConnectionTest {
     private Connection mockConnection; 
     // testing class
     private class TestDBConnection extends DBConnection {
-        public TestDBConnection(Properties properties) throws DatabaseAnonymizerException {
+        public TestDBConnection(final Properties properties) throws DatabaseAnonymizerException {
             super(properties);
         }
         @Override
@@ -68,7 +68,7 @@ public class DBConnectionTest {
 
     @Test
     public void testCtor() throws DatabaseAnonymizerException {
-        TestDBConnection testDB = new TestDBConnection(testProps);
+        final TestDBConnection testDB = new TestDBConnection(testProps);
         testDB.runAsserts();
     }
     

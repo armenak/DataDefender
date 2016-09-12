@@ -18,7 +18,6 @@
 
 package com.strider.datadefender.functions;
 
-import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.AnonymizerException;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
@@ -34,7 +33,7 @@ public class UtilsTest extends TestCase {
      */
     private static Logger log = getLogger(UtilsTest.class);    
     
-    public UtilsTest(String testName) {
+    public UtilsTest(final String testName) {
         super(testName);
     }
     
@@ -55,13 +54,13 @@ public class UtilsTest extends TestCase {
     public void testGetClassName() throws AnonymizerException {
         log.info("Executing testGetClassName ...");
         
-        String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
-        String expResult = "com.strider.dataanonymizer.functions";
+        final String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
+        final String expResult = "com.strider.dataanonymizer.functions";
         
         log.debug("Parameter: " + fullClassName);
         log.debug("Expected result:" + expResult);
 
-        String result = Utils.getClassName(fullClassName);
+        final String result = Utils.getClassName(fullClassName);
         
         assertEquals(expResult, result);
     }
@@ -71,13 +70,13 @@ public class UtilsTest extends TestCase {
      * @throws com.strider.datadefender.AnonymizerException
      */
     public void testGetMethodName() throws AnonymizerException {
-        String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
-        String expResult = "CoreFunctions";
+        final String fullClassName = "com.strider.dataanonymizer.functions.CoreFunctions";
+        final String expResult = "CoreFunctions";
         
         log.debug("Parameter: " + fullClassName);
         log.debug("Expected result:" + expResult);
 
-        String result = Utils.getMethodName(fullClassName);
+        final String result = Utils.getMethodName(fullClassName);
         
         assertEquals(expResult, result);
     }    

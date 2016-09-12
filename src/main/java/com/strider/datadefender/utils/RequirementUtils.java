@@ -110,7 +110,7 @@ public class RequirementUtils {
      * @param matches
      * @return
      */
-    public static Requirement create(List<MatchMetaData> matches) {
+    public static Requirement create(final List<MatchMetaData> matches) {
         Map<String, Table> tables = new HashMap<>();
         Map<String, List<Column>> columns = new HashMap<>();
         Column column;
@@ -169,7 +169,7 @@ public class RequirementUtils {
      * @param parameters List of column parameters
      * @return File parameter object
      */
-    public static Parameter getFileParameter(List<Parameter> parameters) {
+    public static Parameter getFileParameter(final List<Parameter> parameters) {
         if (parameters != null && !parameters.isEmpty()) {
             for (Parameter parameter : parameters) {
                 if (PARAM_NAME_FILE.equalsIgnoreCase(parameter.getName())) {

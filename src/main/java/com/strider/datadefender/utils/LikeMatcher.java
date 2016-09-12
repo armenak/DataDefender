@@ -59,7 +59,7 @@ public class LikeMatcher {
      * @param str the string to test against
      * @return
      */
-    public boolean matches(String str) {
+    public boolean matches(final String str) {
         return str.toLowerCase(Locale.ENGLISH).matches(regex);
     }
 }

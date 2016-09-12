@@ -34,7 +34,7 @@ public class BiographicFunctionsTest extends TestCase {
 
     private static Logger log = getLogger(BiographicFunctionsTest.class);
 
-    public BiographicFunctionsTest(String testName) {
+    public BiographicFunctionsTest(final String testName) {
         super(testName);
     }
     
@@ -54,8 +54,8 @@ public class BiographicFunctionsTest extends TestCase {
     public void testRandomSIN() {
         log.debug("Generate SIN");
 
-        BiographicFunctions functions = new BiographicFunctions();
-        String sin = functions.randomSIN();
+        final BiographicFunctions functions = new BiographicFunctions();
+        final String sin = functions.randomSIN();
 
         log.debug("Random SIN = " + sin);
 

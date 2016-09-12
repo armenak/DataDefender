@@ -41,7 +41,7 @@ public class Xeger {
      * @param random The object that will randomize the way the String is generated. (Not <code>null</code>.)
      * @throws IllegalArgumentException If the regular expression is invalid.
      */
-    public Xeger(String regex, Random random) {
+    public Xeger(final String regex, final Random random) {
         assert regex != null;
         assert random != null;
         this.automaton = new RegExp(regex).toAutomaton();
@@ -53,7 +53,7 @@ public class Xeger {
      * implicityly.
      * @param regex
      */
-    public Xeger(String regex) {
+    public Xeger(final String regex) {
         this(regex, new Random());
     }
 

@@ -55,11 +55,11 @@ public class MySQLDBConnectionTest {
     private Connection mockConnection; 
     // testing class
     private class TestMySQLDBConnection extends MySQLDBConnection {
-        public TestMySQLDBConnection(Properties properties) throws DatabaseAnonymizerException {
+        public TestMySQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
             super(properties);
         }
         @Override
-        protected Connection doConnect(ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
+        protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
             Field[] allFields = supplier.getClass().getDeclaredFields();
             assertEquals(1, allFields.length);
             Field field = allFields[0];

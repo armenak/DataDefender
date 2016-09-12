@@ -68,7 +68,7 @@ public class Parameter {
         return this.value;
     }
     
-    private Object getArrayForValues(List<Object> list, String type) throws ClassNotFoundException {
+    private Object getArrayForValues(final List<Object> list, String type) throws ClassNotFoundException {
         if ("String".equals(type)) {
             type = "java.lang.String";
         }
