@@ -56,7 +56,7 @@ public class DataDefender  {
     public static void main(final String[] args) throws ParseException, AnonymizerException, IOException, SAXException, TikaException {
         
         // Ensure we are not trying to run second instance of the same program
-        ApplicationLock al = new ApplicationLock("DataDefender");
+        final ApplicationLock al = new ApplicationLock("DataDefender");
 
         if (al.isAppActive()) {
             log.error("Another instance of this program is already active");

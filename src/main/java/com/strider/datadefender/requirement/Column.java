@@ -99,7 +99,7 @@ public class Column {
             lst.addAll(exclusions);
         }
         if (ignoreEmpty != null && ignoreEmpty.equals("true")) {
-            Exclude exc = new Exclude();
+            final Exclude exc = new Exclude();
             exc.setIgnoreEmpty();
             lst.add(exc);
         }

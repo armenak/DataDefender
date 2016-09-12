@@ -68,9 +68,9 @@ public class BiographicFunctions extends CoreFunctions {
     public java.sql.Date randomBirthDate() throws java.text.ParseException{
 
         GregorianCalendar gc = new GregorianCalendar();
-        int year = randBetween(1900, 2016);
+        final int year = randBetween(1900, 2016);
         gc.set(GregorianCalendar.YEAR, year);
-        int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));
+        final int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));
         gc.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
         
         final String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 

@@ -107,7 +107,7 @@ public class FileDiscoverer extends Discoverer {
             
             if (node.isDirectory()) {
                 final String[] files = node.list();
-                for (String file: files) {
+                for (final String file: files) {
                     // Detect file type
                     log.info("Analyzing " + directory + "/" + file);
                     

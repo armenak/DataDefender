@@ -65,8 +65,8 @@ public class DataGenerator  implements IGenerator {
             log.info("Table [" + table.getName() + "]. Start ...");
 
             // Iterate over columns to generate data set for each column
-            for (Column column : table.getColumns()) {
-                Parameter fileParameter = RequirementUtils.getFileParameter(column.getParameters());
+            for (final Column column : table.getColumns()) {
+                final Parameter fileParameter = RequirementUtils.getFileParameter(column.getParameters());
                 log.info("Column [" + column.getName() + "]. Start...");
 
                 if (fileParameter != null) {

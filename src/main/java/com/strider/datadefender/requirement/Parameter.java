@@ -150,7 +150,7 @@ public class Parameter {
             if (elements == null) {
                 return null;
             }
-            String arrayType = typeName.substring(0, typeName.length() - 2);
+            final String arrayType = typeName.substring(0, typeName.length() - 2);
             final List<Object> arr = new ArrayList<>(elements.size());
             for (ArrayElement el : elements) {
                 arr.add(getTypeValueOf(arrayType, el.getValue()));

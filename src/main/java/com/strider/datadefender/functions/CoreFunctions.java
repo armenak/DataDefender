@@ -139,12 +139,12 @@ public class CoreFunctions {
     private String getPredictableShuffledValueFor(final String name, final String value) {
         if (!predictableShuffle.containsKey(name)) {
             List<String> list = stringLists.get(name);
-            List<String> shuffled = new ArrayList<>(list);
+            final List<String> shuffled = new ArrayList<>(list);
             Collections.shuffle(shuffled);
 
             Map<String, String> smap = new HashMap<>();
-            Iterator<String> lit = list.iterator();
-            Iterator<String> sit = shuffled.iterator();
+            final Iterator<String> lit = list.iterator();
+            final Iterator<String> sit = shuffled.iterator();
             while (lit.hasNext()) {
                 smap.put(lit.next(), sit.next());
             }
@@ -403,7 +403,7 @@ public class CoreFunctions {
      * @throws IOException if an error occurs reading from the lipsum text file
      */
     public String lipsumSentences(final int min, final int max) throws IOException {
-        List<String> lp = getLipsumParagraphs();
+        final List<String> lp = getLipsumParagraphs();
         final Random rand = new Random();
         final StringBuilder sb = new StringBuilder();
         
