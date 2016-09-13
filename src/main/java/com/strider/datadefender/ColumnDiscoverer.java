@@ -70,12 +70,16 @@ public class ColumnDiscoverer extends Discoverer {
         }
         
         // Report column names
-        log.info("-----------------");        
-        log.info("List of suspects:");
-        log.info("-----------------");
-        matches.sort(MatchMetaData.compare());
-        for (final MatchMetaData entry: matches) {
-            log.info(entry);
+        if (matches != null || matches.isEmpty()) {
+            log.info("-----------------");        
+            log.info("List of suspects:");
+            log.info("-----------------");
+            matches.sort(MatchMetaData.compare());
+            for (final MatchMetaData entry: matches) {
+                log.info(entry);
+            }
+        } else {
+            log.info("No suspects have been found. Please refine your criteria.");
         }
         return matches;
     }
