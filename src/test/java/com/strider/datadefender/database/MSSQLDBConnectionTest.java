@@ -44,7 +44,7 @@ public class MSSQLDBConnectionTest {
     private static final Logger log = getLogger(MSSQLDBConnectionTest.class);
     
     @SuppressWarnings("serial")
-    final private Properties testProps = new Properties() {{
+    final static private Properties testProps = new Properties() {{
         setProperty("vendor", "mssql");
         setProperty("driver", "java.util.List");
         setProperty("url", "invalid-url");

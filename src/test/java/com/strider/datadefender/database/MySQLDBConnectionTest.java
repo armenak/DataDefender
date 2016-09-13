@@ -44,7 +44,7 @@ public class MySQLDBConnectionTest {
     private static final Logger log = getLogger(MySQLDBConnectionTest.class);
     
     @SuppressWarnings("serial")
-    final private Properties testProps = new Properties() {{
+    final static private Properties testProps = new Properties() {{
         setProperty("vendor", "mysql");
         setProperty("driver", "java.util.List");
         setProperty("url", "invalid-url");
