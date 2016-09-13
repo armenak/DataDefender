@@ -110,7 +110,7 @@
                     <arguments>
                         <argument>-classpath</argument>
                         <classpath/>
-                        <argument>com.strider.dataanonymizer.Anonymizer</argument>
+                        <argument>com.strider.datadefender.DataDefender</argument>
                         <argument>${execAppName}</argument>
                         <argument>${execAppFlag}</argument>
                     </arguments>
@@ -129,7 +129,7 @@
                     <appendAssemblyId>false</appendAssemblyId>                  
                     <archive>
                         <manifest>
-                            <mainClass>com.strider.dataanonymizer.Anonymizer</mainClass>
+                            <mainClass>com.strider.datadefender.DataDefender</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
