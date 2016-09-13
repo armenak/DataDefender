@@ -34,7 +34,6 @@ import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 
 import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.utils.RequirementUtils;
 import static org.apache.log4j.Logger.getLogger;
 
