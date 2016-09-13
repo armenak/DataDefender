@@ -86,7 +86,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
-        log.info(String.format("%20s %20s %20s", "Table*", "Column*", "Probability*"));        
+        log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));        
         for(final MatchMetaData data: finalList) {    
             final String probability = decimalFormat.format(data.getAverageProbability());
             final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
@@ -139,11 +139,23 @@ public class DatabaseDiscoverer extends Discoverer {
                 ResultSet resultSet = stmt.executeQuery(query);) {
 
                 while (resultSet.next()) {
+                    if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
+                        continue;
+                    }
+                    
+                    if (model.getName().equals("location") &&
+                        data.getColumnType().contains("INT")) {
+                        continue;
+                    }
+                    
                     final String sentence = resultSet.getString(1);
                     if (sentence != null && !sentence.isEmpty()) {
                         
                         String processingValue;
-                        if (data.getColumnType().equals("DATE")) {
+                        if (data.getColumnType().equals("DATE") || 
+                            data.getColumnType().equals("TIMESTAMP") ||
+                            data.getColumnType().equals("DATETIME")
+                           ) {
                             DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
                             DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
                             java.util.Date date = originalFormat.parse(sentence);
@@ -152,12 +164,12 @@ public class DatabaseDiscoverer extends Discoverer {
                             processingValue = sentence;
                         }
                         
-                        log.debug(sentence);
+                        //log.debug(sentence);
                         // Convert sentence into tokens
                         final String tokens[] = model.getTokenizer().tokenize(processingValue);
-                        for (int i=0; i<tokens.length;i++) {
-                            log.debug("tolen: " + tokens[i]);    
-                        }
+                        //for (int i=0; i<tokens.length;i++) {
+                        //    log.debug("tolen: " + tokens[i]);    
+                        //}
                         
                         // Find names
                         final Span nameSpans[] = model.getNameFinder().find(tokens);
@@ -166,9 +178,9 @@ public class DatabaseDiscoverer extends Discoverer {
                         final double[] spanProbs = model.getNameFinder().probs(nameSpans);
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            log.debug("Span: "+nameSpans[i].toString());
-                            log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                            log.debug("Probability is: "+spanProbs[i]);
+                            //log.debug("Span: "+nameSpans[i].toString());
+                            //log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                            //log.debug("Probability is: "+spanProbs[i]);
                             probabilityList.add(spanProbs[i]);
                         }
                         // From OpenNLP documentation
