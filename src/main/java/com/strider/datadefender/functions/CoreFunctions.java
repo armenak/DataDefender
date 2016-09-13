@@ -142,7 +142,7 @@ public class CoreFunctions {
             final List<String> shuffled = new ArrayList<>(list);
             Collections.shuffle(shuffled);
 
-            Map<String, String> smap = new HashMap<>();
+            final Map<String, String> smap = new HashMap<>();
             final Iterator<String> lit = list.iterator();
             final Iterator<String> sit = shuffled.iterator();
             while (lit.hasNext()) {
@@ -179,7 +179,7 @@ public class CoreFunctions {
     public String randomStringFromFile(final String file) throws IOException {
         if (!stringLists.containsKey(file)) {
             log.info("*** reading from " + file);
-            List<String> values = new ArrayList<>();
+            final List<String> values = new ArrayList<>();
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     values.add(line);
@@ -319,7 +319,7 @@ public class CoreFunctions {
     }        
     
     public String randomEmail(final String domainName) {
-        StringBuilder email = new StringBuilder();
+        final StringBuilder email = new StringBuilder();
         email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
         return email.toString();
     }    
@@ -412,7 +412,7 @@ public class CoreFunctions {
         mainLoop:
         for (int i = 0, start = rand.nextInt(lp.size()); i < nSentences; ++start) {
             final String para = lp.get(start % lp.size());
-            String[] sentences = para.split("\\.");
+            final String[] sentences = para.split("\\.");
             for (String s : sentences) {
                 s = s.trim().replaceAll("\\s+", " ");
                 if (s.isEmpty()) {
@@ -471,7 +471,7 @@ public class CoreFunctions {
         final String sParas = text.replaceAll("\r\n", "\n");
         final int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             for (final String para : sParas.split("\n")) {
                 if (para.trim().isEmpty()) {
                     sb.append("\r\n");
@@ -486,7 +486,7 @@ public class CoreFunctions {
     }
  
     public String randomPhoneNumber() {
-        Random rand = new Random();
+        final Random rand = new Random();
         final int num1 = (rand.nextInt(7) + 1) * 100 + (rand.nextInt(8) * 10) + rand.nextInt(8);
         final int num2 = rand.nextInt(743);
         final int num3 = rand.nextInt(10000);

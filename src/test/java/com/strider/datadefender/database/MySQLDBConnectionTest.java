@@ -62,7 +62,7 @@ public class MySQLDBConnectionTest {
         protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
             final Field[] allFields = supplier.getClass().getDeclaredFields();
             assertEquals(1, allFields.length);
-            Field field = allFields[0];
+            final Field field = allFields[0];
             field.setAccessible(true);
             try { // not exactly a great test, but checks that supplier has parent's properties at least
                 final String representation = ReflectionToStringBuilder.toString(field.get(supplier));
@@ -77,7 +77,7 @@ public class MySQLDBConnectionTest {
     
     @Test
     public void testConnect() throws DatabaseAnonymizerException, SQLException {
-        TestMySQLDBConnection testDB = new TestMySQLDBConnection(testProps);
+        final TestMySQLDBConnection testDB = new TestMySQLDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
     }
 }

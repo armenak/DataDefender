@@ -597,7 +597,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(int batchSize, IDBFactory dbFactory, Table table) 
+    private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
     throws AnonymizerException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
@@ -626,7 +626,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             final List<MatchMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
             
-            String updateString = getUpdateQuery(table, colNames, keyNames);
+            final String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
             log.debug("Update SQL: " + updateString);
             
@@ -676,7 +676,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     @Override
-    public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
+    public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties, final Set<String> tables) 
     throws DatabaseAnonymizerException, AnonymizerException{
 
         final int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));

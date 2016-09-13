@@ -117,7 +117,7 @@ public abstract class MetaData implements IMetaData {
                     List<String> pkeys = new ArrayList<>();
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
-                            String pkey = pkRS.getString(4);
+                            final String pkey = pkRS.getString(4);
                             log.debug("PK: " + pkey);
                             pkeys.add(pkey);
                         }
@@ -145,7 +145,7 @@ public abstract class MetaData implements IMetaData {
     
     @Override
     public List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException {
-        List<MatchMetaData> map = new ArrayList<>();
+        final List<MatchMetaData> map = new ArrayList<>();
         
         final ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i <= rsmd.getColumnCount(); ++i) {

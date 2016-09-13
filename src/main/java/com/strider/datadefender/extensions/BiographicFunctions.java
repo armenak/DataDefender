@@ -67,7 +67,7 @@ public class BiographicFunctions extends CoreFunctions {
      */
     public java.sql.Date randomBirthDate() throws java.text.ParseException{
 
-        GregorianCalendar gc = new GregorianCalendar();
+        final GregorianCalendar gc = new GregorianCalendar();
         final int year = randBetween(1900, 2016);
         gc.set(GregorianCalendar.YEAR, year);
         final int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));

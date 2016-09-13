@@ -152,7 +152,7 @@ public class Parameter {
             }
             final String arrayType = typeName.substring(0, typeName.length() - 2);
             final List<Object> arr = new ArrayList<>(elements.size());
-            for (ArrayElement el : elements) {
+            for (final ArrayElement el : elements) {
                 arr.add(getTypeValueOf(arrayType, el.getValue()));
             }
             return getArrayForValues(arr, arrayType);
