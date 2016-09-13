@@ -44,12 +44,12 @@ public class LikeMatcher {
             if ("%".equals(part)) {                
                 reg.append(".*?");
             } else if ("?".equals(part) || "_".equals(part)) {
-                reg.append(".");
+                reg.append('.');
             } else {
                 reg.append(Pattern.quote(part.toLowerCase(Locale.ENGLISH)));
             }
         }
-        reg.append("$");
+        reg.append('$');
         this.regex = reg.toString();
     }
     
