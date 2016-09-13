@@ -21,6 +21,7 @@ import com.strider.datadefender.database.IDBFactory;
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import com.strider.datadefender.utils.ApplicationLock;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -198,6 +199,8 @@ public class DataDefender  {
      * @return The list of table names
      */
     public static Set<String> getTableNames(List<String> tableNames, final Properties props) {
+        //List<String> tableNamesTmp = new ArrayList();
+        
         if (tableNames.isEmpty()) {
             final String tableStr = props.getProperty("tables");
             if (tableStr == null) {

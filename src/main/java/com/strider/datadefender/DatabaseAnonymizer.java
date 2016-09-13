@@ -255,7 +255,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
                IllegalArgumentException,
                InvocationTargetException {
         
-        final String columnValue = row.getString(column.getName());
         final String function = column.getFunction();
         if (function == null || function.equals("")) {
             log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
@@ -272,6 +271,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
             final List<Parameter> parms = column.getParameters();
             final Map<String, Object> paramValues = new HashMap<>(parms.size());
+            final String columnValue = row.getString(column.getName());
+
             for (Parameter param : parms) {
                 if (param.getValue().equals("@@value@@")) {
                     paramValues.put(param.getName(), columnValue);
@@ -316,7 +317,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                             }
                             fnParamType = ClassUtils.primitiveToWrapper(fnParamType);
                         }
-                        if (fnParamType != confParamType) {
+                        if (!fnParamType.equals(confParamType)) {
                             continue methodLoop;
                         }
                         fnArguments.add(value);
