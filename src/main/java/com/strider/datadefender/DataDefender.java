@@ -84,7 +84,7 @@ public class DataDefender  {
         final String cmd = unparsedArgs.get(0); // get & remove command arg
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
-        if ("file-discover".equals(cmd)) {
+        if ("file-discovery".equals(cmd)) {
             final String fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
             final Properties fileDiscoveryProperties = loadProperties(fileDiscoveryPropertyFile);
             final FileDiscoverer discoverer = new FileDiscoverer();
@@ -108,7 +108,7 @@ public class DataDefender  {
                     final Properties generatorProperties = loadProperties(generatorPropertyFile);
                     generator.generate(dbFactory, generatorProperties);
                     break;
-                case "database-discover":
+                case "database-discovery":
                     if (line.hasOption('c')) {
                         final String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                         final Properties columnProperties = loadProperties(columnPropertyFile);
