@@ -32,7 +32,7 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class CoreFunctionsTest extends TestCase {
     
-    private static Logger log = getLogger(XegerTest.class);
+    private static final Logger log = getLogger(XegerTest.class);
     
     private final static String regExpPattern = "[0-9]{3}-[0-9]{3}-[0-9]{3}";
     

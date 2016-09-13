@@ -46,7 +46,7 @@ import com.strider.datadefender.utils.RequirementUtils;
  */
 public class DataGenerator  implements IGenerator {
 
-    private static Logger log = getLogger(DataGenerator.class);
+    private static final Logger log = getLogger(DataGenerator.class);
 
     /**
      * Generate data to be used by anoymizer.

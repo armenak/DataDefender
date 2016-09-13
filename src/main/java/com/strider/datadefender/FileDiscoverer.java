@@ -49,7 +49,7 @@ import com.strider.datadefender.file.metadata.FileMatchMetaData;
  */
 public class FileDiscoverer extends Discoverer {
     
-    private static Logger log = getLogger(FileDiscoverer.class);
+    private static final Logger log = getLogger(FileDiscoverer.class);
     
     private static String[] modelList;
     protected List<FileMatchMetaData> fileMatches;

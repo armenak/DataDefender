@@ -36,7 +36,7 @@ import com.strider.datadefender.AnonymizerException;
  */
 public final class AppProperties {
     
-    private static Logger log = getLogger(AppProperties.class);
+    private static final Logger log = getLogger(AppProperties.class);
 
     /**
      * Load property file

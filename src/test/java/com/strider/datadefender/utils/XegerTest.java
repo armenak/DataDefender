@@ -27,7 +27,7 @@ import static org.apache.log4j.Logger.getLogger;
  * @author strider
  */
 public class XegerTest extends TestCase {
-    private static Logger log = getLogger(XegerTest.class);
+    private static final Logger log = getLogger(XegerTest.class);
     
     private static final String REGEXP_1 = "[ab]{4,6}c";
     private static final String REGEXP_2 = "[0-9]{3}-[0-9]{3}-[0-9]{3}";

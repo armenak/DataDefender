@@ -32,7 +32,7 @@ import static org.apache.log4j.Logger.getLogger;
  */
 public class BiographicFunctionsTest extends TestCase {
 
-    private static Logger log = getLogger(BiographicFunctionsTest.class);
+    private static final Logger log = getLogger(BiographicFunctionsTest.class);
 
     public BiographicFunctionsTest(final String testName) {
         super(testName);

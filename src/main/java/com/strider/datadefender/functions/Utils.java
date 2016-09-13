@@ -37,7 +37,7 @@ public class Utils {
     /**
      * Initializes logger
      */
-    private static Logger log = getLogger(Utils.class);
+    private static final Logger log = getLogger(Utils.class);
 
     
     /**

@@ -53,7 +53,7 @@ import java.util.Locale;
  */
 public class DatabaseDiscoverer extends Discoverer {
     
-    private static Logger log = getLogger(DatabaseDiscoverer.class);
+    private static final Logger log = getLogger(DatabaseDiscoverer.class);
     
     private static String[] modelList;
         

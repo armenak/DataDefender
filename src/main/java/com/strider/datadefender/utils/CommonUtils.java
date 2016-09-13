@@ -37,7 +37,7 @@ import com.strider.datadefender.AnonymizerException;
  */
 public class CommonUtils {
     
-    private static Logger log = getLogger(CommonUtils.class);
+    private static final Logger log = getLogger(CommonUtils.class);
     
     /**
      *

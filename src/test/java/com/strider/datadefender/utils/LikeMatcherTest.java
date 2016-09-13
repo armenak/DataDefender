@@ -26,7 +26,7 @@ import static org.apache.log4j.Logger.getLogger;
  * @author Zaahid Bateson
  */
 public class LikeMatcherTest extends TestCase {
-    private static Logger log = getLogger(LikeMatcherTest.class);
+    private static final Logger log = getLogger(LikeMatcherTest.class);
     
     public void testMatchingAtEnd() {
         log.debug("Testing match at end of string");

@@ -31,7 +31,7 @@ public class UtilsTest extends TestCase {
     /**
      * Initializes logger
      */
-    private static Logger log = getLogger(UtilsTest.class);    
+    private static final Logger log = getLogger(UtilsTest.class);    
     
     private static final String FULL_CLASS_NAME  = "com.strider.dataanonymizer.functions.CoreFunctions";
     private static final String EXPECTED_RESULTS_1 = "com.strider.dataanonymizer.functions";

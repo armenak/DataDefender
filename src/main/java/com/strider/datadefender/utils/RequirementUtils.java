@@ -52,7 +52,7 @@ import com.strider.datadefender.requirement.Table;
  */
 public class RequirementUtils {
 
-    private static Logger log = getLogger(RequirementUtils.class);
+    private static final Logger log = getLogger(RequirementUtils.class);
 
     /**
      * Requirement file parameter name
