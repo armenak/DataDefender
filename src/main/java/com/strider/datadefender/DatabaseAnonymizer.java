@@ -107,8 +107,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return the SQL statement
      */
     private String getUpdateQuery(final Table table, final Collection<String> updateColumns, final Collection<String> keys) {
-        final StringBuilder sql = new StringBuilder("UPDATE ");
-        sql.append(table.getName()).
+        final StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE ").
+            append(table.getName()).
             append(" SET ").
             append(StringUtils.join(updateColumns, " = ?, ")).
             append(" = ?").
@@ -344,7 +345,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 s.append(methodName).append(" with parameters matching (");
                 String comma = "";
                 for (final Parameter p : parms) {
-                    s.append(comma).append(p.getType()).append(" ").append(p.getName());
+                    s.append(comma).append(p.getType()).append(' ').append(p.getName());
                     comma = ", ";
                 }
                 s.append(") was not found in class ").append(className);
