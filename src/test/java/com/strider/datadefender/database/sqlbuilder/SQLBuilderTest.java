@@ -17,10 +17,6 @@
 
 package com.strider.datadefender.database.sqlbuilder;
 
-import com.strider.datadefender.database.sqlbuilder.OracleSQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.MSSQLSQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.MySQLSQLBuilder;
 import static org.junit.Assert.*;
 
 import java.util.Properties;

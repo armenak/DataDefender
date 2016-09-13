@@ -89,7 +89,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private void fillPrimaryKeyNamesList(final Table table, final Collection<String> sKeys) {
         final List<Key> pKeys = table.getPrimaryKeys();
         if (pKeys != null && pKeys.size() != 0) {
-            for (Key key : pKeys) {
+            for (final Key key : pKeys) {
                 sKeys.add(key.getName());
             }
         } else {
@@ -130,7 +130,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         query.append(StringUtils.join(columns, ", "));
         query.append(" FROM ").append(table.getName());
         
-        List<Exclude> exclusions = table.getExclusions();
+        final List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
             String separator = " WHERE (";
             for (final Exclude exc : exclusions) {
@@ -454,7 +454,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 final String lk = exc.getLikeValue();
                 final String neq = exc.getNotEqualsValue();
                 final String nlk = exc.getNotLikeValue();
-                boolean nl = exc.isExcludeNulls();
+                final boolean nl = exc.isExcludeNulls();
                 if (name == null || name.length() == 0) {
                     name = columnName;
                 }
@@ -624,7 +624,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
-            List<MatchMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
+            final List<MatchMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
             
             String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
@@ -679,12 +679,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
     public void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
     throws DatabaseAnonymizerException, AnonymizerException{
 
-        int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
-        Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
+        final int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
+        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
         
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-        for(Table reqTable : requirement.getTables()) {
+        for(final Table reqTable : requirement.getTables()) {
             if (tables.isEmpty() || tables.contains(reqTable.getName())) {
                 anonymizeTable(batchSize, dbFactory, reqTable);
             }

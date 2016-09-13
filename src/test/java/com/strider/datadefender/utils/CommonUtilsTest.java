@@ -17,7 +17,6 @@
  */
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.utils.CommonUtils;
 import static org.junit.Assert.*;
 
 

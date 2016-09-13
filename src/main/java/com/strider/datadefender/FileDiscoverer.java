@@ -72,7 +72,7 @@ public class FileDiscoverer extends Discoverer {
             log.info("********************************");
             log.info("Processing model " + model);
             log.info("********************************");
-            Model modelPerson = createModel(dataDiscoveryProperties, model);
+            final Model modelPerson = createModel(dataDiscoveryProperties, model);
             fileMatches = discoverAgainstSingleModel(dataDiscoveryProperties, modelPerson, probabilityThreshold);
             finalList = ListUtils.union(finalList, fileMatches);            
         }
