@@ -89,7 +89,7 @@ Column Discovery
 ----------------
 In this mode the tool attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
 
-    java -jar DataDefender.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
+    java -jar DataDefender.jar database-discovery -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
     
 Where:
     <db.properties>              - Path and file name of the file containing database connection properties 
@@ -102,9 +102,9 @@ Where:
 
 Data Discovery
 ------------------
-To run DA in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered by the DA.
+To run the tool in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered by the DA.
 
-    java -jar DataDefender.jar discover -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
+    java -jar DataDefender.jar database-discovery -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
 
 Where:
     <db.properties>            - Path and file name of the file containing database connection properties 

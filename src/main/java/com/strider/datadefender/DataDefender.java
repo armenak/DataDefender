@@ -180,7 +180,7 @@ public class DataDefender  {
      */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("DataAnonymizer anonymize|discover|generate [options] [table1 [table2 [...]]]", options);
+        formatter.printHelp("DataAnonymizer anonymize|database-discovery|file-discovery|generate [options] [table1 [table2 [...]]]", options);
     }
     
     /**
