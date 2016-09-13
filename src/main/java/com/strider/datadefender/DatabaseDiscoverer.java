@@ -103,72 +103,71 @@ public class DatabaseDiscoverer extends Discoverer {
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Double> probabilityList;
         for(final MatchMetaData data: map) {
-            if (SQLToJavaMapping.isString(data.getColumnType())) {
-                final String tableName = data.getTableName();
-                final String columnName = data.getColumnName();
-                probabilityList = new ArrayList<>();
-                
-                log.info("Analyzing table [" + tableName + "]");
-                
-                if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
-                    log.debug("Continue ...");
+            final String tableName = data.getTableName();
+            final String columnName = data.getColumnName();
+            probabilityList = new ArrayList<>();
+
+            log.info("Analyzing table [" + tableName + "]");
+
+            if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
+                log.debug("Continue ...");
+                continue;
+            }
+
+            final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
+            if (!CommonUtils.isEmptyString(tableNamePattern)) {
+                final Pattern p = compile(tableNamePattern);
+                if (!p.matcher(tableName).matches()) {
                     continue;
                 }
-                
-                final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
-                if (!CommonUtils.isEmptyString(tableNamePattern)) {
-                    final Pattern p = compile(tableNamePattern);
-                    if (!p.matcher(tableName).matches()) {
-                        continue;
-                    }
-                }
-                
-                final String table = sqlBuilder.prefixSchema(tableName);
-                final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-                final String query = sqlBuilder.buildSelectWithLimit(
-                    "SELECT " + columnName + 
-                    " FROM " + table + 
-                    " WHERE " + columnName  + " IS NOT NULL ", limit);
-                log.debug("Executing query against database: " + query);
-                
-                try (Statement stmt = factory.getConnection().createStatement();
-                    ResultSet resultSet = stmt.executeQuery(query);) {
+            }
 
-                    while (resultSet.next()) {
-                        final String sentence = resultSet.getString(1);
-                        if (sentence != null && !sentence.isEmpty()) {
-                            
-                            // Convert sentence into tokens
-                            final String tokens[] = model.getTokenizer().tokenize(sentence);
-                            // Find names
-                            final Span nameSpans[] = model.getNameFinder().find(tokens);
-                            //find probabilities for names
-                            final double[] spanProbs = model.getNameFinder().probs(nameSpans);
-                            //display names
-                            for( int i = 0; i<nameSpans.length; i++) {
-                                //log.debug("Span: "+nameSpans[i].toString());
-		    		//log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-		    		//log.debug("Probability is: "+spanProbs[i]);
-                                probabilityList.add(spanProbs[i]);
-                            }
-                            // From OpenNLP documentation
-                            //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
-                            // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
-                            model.getNameFinder().clearAdaptiveData();    
+            final String table = sqlBuilder.prefixSchema(tableName);
+            final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
+            final String query = sqlBuilder.buildSelectWithLimit(
+                "SELECT " + columnName + 
+                " FROM " + table + 
+                " WHERE " + columnName  + " IS NOT NULL ", limit);
+            log.debug("Executing query against database: " + query);
+
+            try (Statement stmt = factory.getConnection().createStatement();
+                ResultSet resultSet = stmt.executeQuery(query);) {
+
+                while (resultSet.next()) {
+                    final String sentence = resultSet.getString(1);
+                    if (sentence != null && !sentence.isEmpty()) {
+
+                        // Convert sentence into tokens
+                        final String tokens[] = model.getTokenizer().tokenize(sentence);
+                        // Find names
+                        final Span nameSpans[] = model.getNameFinder().find(tokens);
+                        //find probabilities for names
+                        final double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                        //display names
+                        for( int i = 0; i<nameSpans.length; i++) {
+                            //log.debug("Span: "+nameSpans[i].toString());
+                            //log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                            //log.debug("Probability is: "+spanProbs[i]);
+                            probabilityList.add(spanProbs[i]);
                         }
+                        // From OpenNLP documentation
+                        //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
+                        // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
+                        model.getNameFinder().clearAdaptiveData();    
                     }
-                } catch (SQLException sqle) {
-                    log.error(sqle.toString());
                 }
-                
-                final double averageProbability = calculateAverage(probabilityList);
-                if ((averageProbability >= probabilityThreshold)) {
-                    data.setAverageProbability(averageProbability);
-                    data.setModel(model.getName());
-                    matches.add(data);
-                }
+            } catch (SQLException sqle) {
+                log.error(sqle.toString());
+            }
+
+            final double averageProbability = calculateAverage(probabilityList);
+            if ((averageProbability >= probabilityThreshold)) {
+                data.setAverageProbability(averageProbability);
+                data.setModel(model.getName());
+                matches.add(data);
             }
         }
+        
         return matches;
     }
 }

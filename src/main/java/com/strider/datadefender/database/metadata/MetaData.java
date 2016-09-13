@@ -125,7 +125,9 @@ public abstract class MetaData implements IMetaData {
                     
                     
                     try (ResultSet columnRS = getColumnRS(md, tableName)) {
+                        log.debug(tableName);
                         while (columnRS.next()) {
+                            log.debug(getColumnName(columnRS));
                             map.add(new MatchMetaData(schemaName, 
                                     tableName, 
                                     pkeys, 
