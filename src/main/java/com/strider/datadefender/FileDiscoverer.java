@@ -123,7 +123,7 @@ public class FileDiscoverer extends Discoverer {
                         }
                     }                    
                     
-                    log.info("Content: " + handlerString);
+                    log.debug("Content: " + handlerString);
                     final String tokens[] = model.getTokenizer().tokenize(handler.toString());
                     final Span nameSpans[] = model.getNameFinder().find(tokens);
                     final double[] spanProbs = model.getNameFinder().probs(nameSpans);
