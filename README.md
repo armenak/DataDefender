@@ -13,6 +13,7 @@ Table of content
 - [Build from source](#build-from-source)
 - [Contributing](#contributing)
 - [How to run](#how-to-run-data)
+- [File Discovery](#file-discovery)
 - [Column Discovery](#column-discovery)
 - [Data Discovery](#data-discovery)
 - [Data Generator](#data-generator)
@@ -71,14 +72,22 @@ will generate an executeable jar file in the "target" directory. Once this has b
 
     java -jar DataDefender.jar --help
     
-The toolkit can be run in anonymizer mode, and two different discovery modes (column discovery and data discovery). In each of these modes you need to provide
+The toolkit can be run in anonymizer mode, and three different discovery modes (file, column, and database discovery). For column and database discovery modes you need to provide
 the database property file which defines which database to connect to and how to connect. The location of this property file it passed in using the -P or --data switch.
 
 All modes support an optional list of tables at the end to use for either discover, or anonymization of a specific table or list of tables.
 
+File Discovery
+--------------
+File discovery will attempt to find a sensitive personal information in binary and text files located on the file system.
+
+Sample project can be found here: https://github.com/armenak/DataDefender/tree/master/sample_projects/file_discovery
+
+In order to run File Discovery, please use filediscovery.properties file created in the sample project and adjust it for your needs. Specifically, probability threshold and the directory where files that needs to be scanned will need to be modified.
+
 Column Discovery
---------------------
-In this mode DA attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
+----------------
+In this mode the tool attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
 
     java -jar DataDefender.jar discover -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
     
