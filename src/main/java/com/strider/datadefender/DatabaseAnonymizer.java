@@ -108,9 +108,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
      */
     private String getUpdateQuery(final Table table, final Collection<String> updateColumns, final Collection<String> keys) {
         final StringBuilder sql = new StringBuilder("UPDATE ");
-        sql.append(table.getName()).append(" SET ");
-        sql.append(StringUtils.join(updateColumns, " = ?, ")).append(" = ?");
-        sql.append(" WHERE " ).append(StringUtils.join(keys, " = ? AND ")).append(" = ?");
+        sql.append(table.getName()).
+            append(" SET ").
+            append(StringUtils.join(updateColumns, " = ?, ")).
+            append(" = ?").
+            append(" WHERE " ).
+            append(StringUtils.join(keys, " = ? AND ")).
+            append(" = ?");
         return sql.toString();
     }
     
