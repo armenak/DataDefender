@@ -62,7 +62,7 @@ public abstract class H2DB {
         con.commit();
     }
     @AfterClass
-    public static void tearDownDB() throws Exception {
+    public static void tearDownDB() throws SQLException {
         try (Statement stmt = con.createStatement()) {
             stmt.executeUpdate("DROP TABLE ju_users");
         } finally { // manually close connection

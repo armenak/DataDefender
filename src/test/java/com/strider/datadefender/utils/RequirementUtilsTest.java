@@ -17,6 +17,7 @@
  */
 package com.strider.datadefender.utils;
 
+import com.strider.datadefender.database.DatabaseAnonymizerException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,10 +43,10 @@ public class RequirementUtilsTest extends TestCase {
     private static final String STRING_TYPE = "String";
 
     // Setup load-related tests
-    private void load() throws Exception {
+    private void load() throws DatabaseAnonymizerException {
         load(getClass().getResource("/Requirement.xml").getFile());
     }
-    private void load(final String fname) throws Exception {
+    private void load(final String fname) throws DatabaseAnonymizerException {
         requirement = RequirementUtils.load(fname);
         assertNotNull(requirement);
     }
