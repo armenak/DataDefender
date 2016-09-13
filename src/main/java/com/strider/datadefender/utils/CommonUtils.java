@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.AnonymizerException;
+import java.util.Locale;
 
 /**
  * @author Armenak Grigoryan
@@ -64,7 +65,7 @@ public class CommonUtils {
     
     public static java.sql.Date stringToDate(final String str, final String format) 
     throws AnonymizerException {
-	final SimpleDateFormat formatter = new SimpleDateFormat(format);	
+	final SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);	
         java.sql.Date sqlDate = null;
         
 	try {

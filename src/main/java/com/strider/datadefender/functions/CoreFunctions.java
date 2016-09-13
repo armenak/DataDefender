@@ -320,7 +320,7 @@ public class CoreFunctions {
     
     public String randomEmail(final String domainName) {
         final StringBuilder email = new StringBuilder();
-        email.append(generateRandomString(1,43).trim()).append("@").append(domainName);
+        email.append(generateRandomString(1,43).trim()).append('@').append(domainName);
         return email.toString();
     }    
     
@@ -377,7 +377,7 @@ public class CoreFunctions {
         final StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
             final int rand = random.nextInt(479617);
-            randomString.append(words.get(rand)).append(" ");
+            randomString.append(words.get(rand)).append(' ');
         }
 
         if (randomString.length() > length) {
@@ -416,11 +416,11 @@ public class CoreFunctions {
             for (String s : sentences) {
                 s = s.trim().replaceAll("\\s+", " ");
                 if (s.isEmpty()) {
-                    sb.append(".");
+                    sb.append('.');
                     continue;
                 }
                 
-                sb.append(separator).append(s).append(".");
+                sb.append(separator).append(s).append('.');
                 separator = " ";
                 ++i;
                 
