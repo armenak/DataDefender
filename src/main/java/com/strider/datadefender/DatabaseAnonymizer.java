@@ -130,9 +130,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
         
         final List<String> params = new LinkedList<>();
         final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
-        query.append(StringUtils.join(keys, ", ")).append(", ");
-        query.append(StringUtils.join(columns, ", "));
-        query.append(" FROM ").append(table.getName());
+        query.append(StringUtils.join(keys, ", ")).
+              append(", ").
+              append(StringUtils.join(columns, ", ")).
+              append(" FROM ").
+              append(table.getName());
         
         final List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
