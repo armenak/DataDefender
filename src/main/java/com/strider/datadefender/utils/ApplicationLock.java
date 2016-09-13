@@ -14,7 +14,7 @@
 
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.AnonymizerException;
+import com.strider.datadefender.DataDefenderException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,9 +53,9 @@ public class ApplicationLock {
      * Otherwise returns false.
      * 
      * @return boolean
-     * @throws AnonymizerException 
+     * @throws com.strider.datadefender.DataDefenderException
      */
-    public boolean isAppActive() throws AnonymizerException {
+    public boolean isAppActive() throws DataDefenderException {
         try {
             file = new File
                  (System.getProperty("user.home"), appName + ".tmp");
@@ -85,43 +85,34 @@ public class ApplicationLock {
                             log.debug("Closing lock file");
                             closeLock();
                             deleteFile();
-                        } catch (AnonymizerException ae) {
+                        } catch (DataDefenderException ae) {
                             log.error("Problem closing file lock");
                         }
                     }
                 });
             return false;
-        }
-        catch (FileNotFoundException | AnonymizerException e) {
-            try {
-                closeLock();
-                return true;
-             } catch (AnonymizerException ae) {  
-                throw new AnonymizerException("Problem releasing file lock", ae);
-            }
+        } catch (FileNotFoundException fnfe) {
+            closeLock();
+            return true;
         }
     }
 
-    private void closeLock() throws AnonymizerException {
+    private void closeLock() throws DataDefenderException {
         try { 
             lock.release();  
         } catch (IOException e) {  
-            throw new AnonymizerException("Problem releasing file lock", e);
+            throw new DataDefenderException("Problem releasing file lock", e);
         }
         
         try { 
             channel.close(); 
         } catch (IOException e) {  
-            throw new AnonymizerException("Problem closing channel", e);
+            throw new DataDefenderException("Problem closing channel", e);
         }
     }
 
-    private void deleteFile() throws AnonymizerException {
-        try { 
-            file.delete(); 
-        } catch (Exception e) { 
-            throw new AnonymizerException("Problem deleting lock file", e);
-        }
+    private void deleteFile() {
+        file.delete(); 
     }    
     
 }
