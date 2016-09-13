@@ -53,7 +53,7 @@ public class DataDefender  {
  
     private static final Logger log = getLogger(DataDefender.class);
 
-    public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException {
+    public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException, java.text.ParseException {
         
         // Ensure we are not trying to run second instance of the same program
         final ApplicationLock al = new ApplicationLock("DataDefender");

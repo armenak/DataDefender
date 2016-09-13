@@ -43,6 +43,10 @@ import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.SQLToJavaMapping;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -58,7 +62,7 @@ public class DatabaseDiscoverer extends Discoverer {
     private static String[] modelList;
         
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables) 
-    throws AnonymizerException {
+    throws AnonymizerException, ParseException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -94,7 +98,7 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties, 
             final Set<String> tables, final Model model, final double probabilityThreshold)
-    throws AnonymizerException {
+    throws AnonymizerException, ParseException {
         final IMetaData metaData = factory.fetchMetaData();
         final List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
@@ -105,6 +109,7 @@ public class DatabaseDiscoverer extends Discoverer {
         for(final MatchMetaData data: map) {
             final String tableName = data.getTableName();
             final String columnName = data.getColumnName();
+            log.debug(data.getColumnType());
             probabilityList = new ArrayList<>();
 
             log.info("Analyzing table [" + tableName + "]");
@@ -136,18 +141,34 @@ public class DatabaseDiscoverer extends Discoverer {
                 while (resultSet.next()) {
                     final String sentence = resultSet.getString(1);
                     if (sentence != null && !sentence.isEmpty()) {
-
+                        
+                        String processingValue;
+                        if (data.getColumnType().equals("DATE")) {
+                            DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
+                            DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
+                            java.util.Date date = originalFormat.parse(sentence);
+                            processingValue = targetFormat.format(date);                          
+                        } else {
+                            processingValue = sentence;
+                        }
+                        
+                        log.debug(sentence);
                         // Convert sentence into tokens
-                        final String tokens[] = model.getTokenizer().tokenize(sentence);
+                        final String tokens[] = model.getTokenizer().tokenize(processingValue);
+                        for (int i=0; i<tokens.length;i++) {
+                            log.debug("tolen: " + tokens[i]);    
+                        }
+                        
                         // Find names
                         final Span nameSpans[] = model.getNameFinder().find(tokens);
+                        
                         //find probabilities for names
                         final double[] spanProbs = model.getNameFinder().probs(nameSpans);
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            //log.debug("Span: "+nameSpans[i].toString());
-                            //log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                            //log.debug("Probability is: "+spanProbs[i]);
+                            log.debug("Span: "+nameSpans[i].toString());
+                            log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                            log.debug("Probability is: "+spanProbs[i]);
                             probabilityList.add(spanProbs[i]);
                         }
                         // From OpenNLP documentation
