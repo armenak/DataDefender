@@ -28,10 +28,12 @@ import static org.apache.log4j.Logger.getLogger;
 public class LikeMatcherTest extends TestCase {
     private static final Logger log = getLogger(LikeMatcherTest.class);
     
+    private static final String TEST_NAME = "ZaahiD";
+    
     public void testMatchingAtEnd() {
         log.debug("Testing match at end of string");
         final LikeMatcher matcher = new LikeMatcher("za%");
-        assertTrue(matcher.matches("Zaahid"));
+        assertTrue(matcher.matches(TEST_NAME));
         assertTrue(matcher.matches("ZAA"));
         assertTrue(matcher.matches("za"));
         assertFalse(matcher.matches("Not Zaahid"));
@@ -41,7 +43,7 @@ public class LikeMatcherTest extends TestCase {
     public void testMatchingAtBeginning() {
         log.debug("Testing match begginning of string");
         final LikeMatcher matcher = new LikeMatcher("%hid");
-        assertTrue(matcher.matches("ZaahiD"));
+        assertTrue(matcher.matches(TEST_NAME));
         assertTrue(matcher.matches("aaHID"));
         assertTrue(matcher.matches("HID"));
         assertFalse(matcher.matches("Zaahid is not here"));
