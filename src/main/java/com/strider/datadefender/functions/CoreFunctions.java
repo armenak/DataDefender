@@ -202,7 +202,7 @@ public class CoreFunctions {
     protected void generateStringListFromDb(final String keyName, final String query) throws SQLException {
         if (!stringLists.containsKey(keyName + query.hashCode())) {
             log.info("*** reading from database column: " + keyName);
-            List<String> values = new ArrayList<>();
+            final List<String> values = new ArrayList<>();
             
             try (Statement stmt = db.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
                 while (rs.next()) {

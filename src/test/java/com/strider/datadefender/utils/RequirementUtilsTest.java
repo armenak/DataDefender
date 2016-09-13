@@ -36,7 +36,7 @@ import com.strider.datadefender.requirement.Table;
  * @author Matthew Eaton
  */
 public class RequirementUtilsTest extends TestCase {
-    private Requirement requirement = null;
+    private Requirement requirement;
     
     private static final String TEST_FILE_NAME = "target/test-classes/utest-req-write.xml";
 
