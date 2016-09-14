@@ -30,7 +30,9 @@ Purpose
 -------
 While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
 
-Data discovery identifies and analyzes data risks. Data anonymization allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
+Database and file discovery identifies and analyzes data risks. Data anonymization allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
+
+The complete source code is available, so you can inspect it and perform security audits if necessary.
 
 This implementation of Data Discovery program is using [Apache OpenNLP](https://opennlp.apache.org/)
 
