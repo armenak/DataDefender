@@ -111,7 +111,7 @@ public class FileDiscoverer extends Discoverer {
                     // Detect file type
                     log.info("Analyzing " + directory + "/" + file);
                     
-                    final BodyContentHandler handler = new BodyContentHandler();
+                    final BodyContentHandler handler = new BodyContentHandler(-1);
                     
                     final AutoDetectParser parser = new AutoDetectParser();
                     metadata = new Metadata();
