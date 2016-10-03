@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 import opennlp.tools.util.Span;
 
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
+import com.strider.datadefender.utils.CommonUtils;
 
 /**
  *
@@ -94,8 +95,11 @@ public class FileDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
         String[] directoryList = null;
+        String[] exclusionList = null;
         final String directories = fileDiscoveryProperties.getProperty("directories");
+        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
         directoryList = directories.split(",");
+        exclusionList = exclusions.split(",");
         
         // Let's iterate over directories
         File node;
@@ -110,6 +114,15 @@ public class FileDiscoverer extends Discoverer {
                 for (final String file: files) {
                     // Detect file type
                     log.info("Analyzing " + directory + "/" + file);
+                    
+                    // Detect file extenstion
+                    
+                    String ext = CommonUtils.getFileExtension(new File(directory + "/" + file));  
+                    log.info("Extension " + ext);
+                    if (Arrays.asList(exclusionList).contains(ext)) {
+                        log.info("Extention " + ext + " in in exclusion list");
+                        continue;
+                    }
                     
                     final BodyContentHandler handler = new BodyContentHandler(-1);
                     

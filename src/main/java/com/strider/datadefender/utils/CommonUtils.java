@@ -27,11 +27,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.AnonymizerException;
-import java.util.Locale;
 
 /**
  * @author Armenak Grigoryan
@@ -78,4 +79,13 @@ public class CommonUtils {
         
         return sqlDate;
     }
+    
+    public static String getFileExtension(File file) {
+        String fileName = file.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        } else { 
+            return "";
+        }
+    }    
 }
