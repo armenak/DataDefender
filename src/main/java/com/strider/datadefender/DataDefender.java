@@ -21,6 +21,7 @@ import com.strider.datadefender.database.IDBFactory;
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import com.strider.datadefender.utils.ApplicationLock;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -84,7 +85,13 @@ public class DataDefender  {
         final String cmd = unparsedArgs.get(0); // get & remove command arg
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
+        List errors = new ArrayList();
         if ("file-discovery".equals(cmd)) {
+            errors = PropertyCheck.check(cmd, ' ');
+            if (errors.size() >0) {
+                displayErrors(errors);
+                return;
+            }
             final String fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
             final Properties fileDiscoveryProperties = loadProperties(fileDiscoveryPropertyFile);
             final FileDiscoverer discoverer = new FileDiscoverer();
@@ -94,15 +101,31 @@ public class DataDefender  {
         
         final String databasePropertyFile = line.getOptionValue('P', "db.properties");
         final Properties props = loadProperties(databasePropertyFile);
+        errors = PropertyCheck.checkDtabaseProperties();
+        if (errors.size() >0) {
+            displayErrors(errors);
+            return;
+        }
+            
         try (final IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":
+                    errors = PropertyCheck.check(cmd, ' ');
+                    if (errors.size() >0) {
+                        displayErrors(errors);
+                        return;
+                    }
                     final String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                     final Properties anonymizerProperties = loadProperties(anonymizerPropertyFile);
                     final IAnonymizer anonymizer = new DatabaseAnonymizer();
                     anonymizer.anonymize(dbFactory, anonymizerProperties, getTableNames(unparsedArgs, anonymizerProperties));
                     break;
                 case "generate":
+                    errors = PropertyCheck.check(cmd, ' ');
+                    if (errors.size() >0) {
+                        displayErrors(errors);
+                        return;
+                    }
                     final IGenerator generator = new DataGenerator();
                     final String generatorPropertyFile = line.getOptionValue('A', "anonymizer.properties");
                     final Properties generatorProperties = loadProperties(generatorPropertyFile);
@@ -110,6 +133,11 @@ public class DataDefender  {
                     break;
                 case "database-discovery":
                     if (line.hasOption('c')) {
+                        errors = PropertyCheck.check(cmd, 'c');    
+                        if (errors.size() >0) {
+                            displayErrors(errors);
+                            return;
+                        }
                         final String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
                         final Properties columnProperties = loadProperties(columnPropertyFile);
                         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
@@ -118,7 +146,11 @@ public class DataDefender  {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
                         }                        
                     } else if (line.hasOption('d')) {
-                        final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        errors = PropertyCheck.check(cmd, 'd');    
+                        if (errors.size() >0) {
+                            displayErrors(errors);
+                            return;
+                        }                        final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                         final Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                         final DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
@@ -211,5 +243,11 @@ public class DataDefender  {
         final Set<String> tables = tableNames.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
         log.info("Tables: " + Arrays.toString(tables.toArray()));
         return tables;
+    }
+    
+    private static void displayErrors(List<String> errors) {
+        for (String err: errors) {
+            log.info(err);
+        }
     }
 }

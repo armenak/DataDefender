@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import com.strider.datadefender.AnonymizerException;
+import com.strider.datadefender.DataDefenderException;
 
 
 /**
@@ -32,13 +32,13 @@ import com.strider.datadefender.AnonymizerException;
 */
 public class AppPropertiesTest {
     
-    @Test(expected=AnonymizerException.class)
-    public void testLoadPropertiesNoFile() throws AnonymizerException {
+    @Test(expected=DataDefenderException.class)
+    public void testLoadPropertiesNoFile() throws DataDefenderException {
         loadProperties("/do/not/exist.properties");
     }
 
     @Test
-    public void testLoadPropertiesValid() throws AnonymizerException {
+    public void testLoadPropertiesValid() throws DataDefenderException {
         final String path = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
         final Properties props = loadProperties(path);
         assertNotNull(props);

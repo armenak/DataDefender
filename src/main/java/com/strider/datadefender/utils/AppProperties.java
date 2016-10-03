@@ -19,6 +19,7 @@
 package com.strider.datadefender.utils;
 
 import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,9 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
-import com.strider.datadefender.AnonymizerException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  *
@@ -70,13 +69,13 @@ public final class AppProperties {
         return props;
     }
  
-    public static Properties loadProperties(final String fileName) throws AnonymizerException {
+    public static Properties loadProperties(final String fileName) throws DataDefenderException {
         final Properties properties = new Properties();
         try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
             properties.load(in);
             return properties;
         } catch (IOException e) {
-            throw new AnonymizerException("ERROR: Unable to load " + fileName, e);
+            throw new DataDefenderException("ERROR: Unable to load " + fileName, e);
         }
     }
 }

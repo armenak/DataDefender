@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/armenak/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
+                <exec.args>-classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/strider/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/Users/armenak/work/strider/DataDefender</exec.workingdir>
             </properties>
@@ -25,7 +25,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/armenak/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/strider/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>/Users/armenak/work/strider/DataDefender</exec.workingdir>
@@ -41,7 +41,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/armenak/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
+                <exec.args>-classpath %classpath com.strider.datadefender.DataDefender database-discovery -d -D /Users/armenak/work/strider/DataDefender/src/main/resources/datadiscovery.properties -P /Users/strider/work/strider/DataDefender/src/main/resources/db.properties -debug</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/Users/armenak/work/strider/DataDefender</exec.workingdir>
             </properties>
