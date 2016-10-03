@@ -80,12 +80,12 @@ public class CommonUtils {
         return sqlDate;
     }
     
-    public static String getFileExtension(File file) {
-        String fileName = file.getName();
-        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-            return fileName.substring(fileName.lastIndexOf(".")+1);
-        } else { 
-            return "";
-        }
+    public static String getFileExtension(final File file) {
+        final String fileName = file.getName();
+        String ret = "";
+        if(fileName.lastIndexOf('.') != -1 && fileName.lastIndexOf('.') != 0) {
+            ret = fileName.substring(fileName.lastIndexOf('.')+1);
+        } 
+        return ret;
     }    
 }

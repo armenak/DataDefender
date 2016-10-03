@@ -43,6 +43,7 @@ import opennlp.tools.util.Span;
 
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
+import java.util.Collections;
 
 /**
  *
@@ -55,6 +56,7 @@ public class FileDiscoverer extends Discoverer {
     private static String[] modelList;
     protected List<FileMatchMetaData> fileMatches;
         
+    @SuppressWarnings("unchecked")
     public List<FileMatchMetaData> discover(final Properties dataDiscoveryProperties) 
     throws AnonymizerException, IOException, SAXException, TikaException {
         log.info("Data discovery in process");
@@ -87,7 +89,7 @@ public class FileDiscoverer extends Discoverer {
             log.info(result);            
         }                    
         
-        return fileMatches;
+        return Collections.unmodifiableList(fileMatches);
     }
     
     private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties, final Model model, final double probabilityThreshold)
@@ -117,7 +119,7 @@ public class FileDiscoverer extends Discoverer {
                     
                     // Detect file extenstion
                     
-                    String ext = CommonUtils.getFileExtension(new File(directory + "/" + file));  
+                    final String ext = CommonUtils.getFileExtension(new File(directory + "/" + file));  
                     log.info("Extension " + ext);
                     if (Arrays.asList(exclusionList).contains(ext)) {
                         log.info("Extention " + ext + " in in exclusion list");

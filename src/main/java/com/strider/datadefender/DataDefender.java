@@ -245,8 +245,8 @@ public class DataDefender  {
         return tables;
     }
     
-    private static void displayErrors(List<String> errors) {
-        for (String err: errors) {
+    private static void displayErrors(final List<String> errors) {
+        for (final String err: errors) {
             log.info(err);
         }
     }

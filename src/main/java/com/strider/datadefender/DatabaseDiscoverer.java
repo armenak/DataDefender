@@ -42,8 +42,6 @@ import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
-import com.strider.datadefender.utils.SQLToJavaMapping;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -156,9 +154,9 @@ public class DatabaseDiscoverer extends Discoverer {
                             data.getColumnType().equals("TIMESTAMP") ||
                             data.getColumnType().equals("DATETIME")
                            ) {
-                            DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
-                            DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
-                            java.util.Date date = originalFormat.parse(sentence);
+                            final DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
+                            final DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
+                            final java.util.Date date = originalFormat.parse(sentence);
                             processingValue = targetFormat.format(date);                          
                         } else {
                             processingValue = sentence;

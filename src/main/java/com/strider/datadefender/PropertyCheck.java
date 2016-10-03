@@ -37,12 +37,12 @@ public class PropertyCheck {
     @SuppressWarnings("unchecked")
     
     public static List checkDtabaseProperties() throws DataDefenderException {
-        List errors = new ArrayList<>();
+        final List<String> errors = new ArrayList<>();
 
         final Properties dbProperties = loadProperties("db.properties");
 
         for (int i=0; i<databaseProperties.length; i++ ) {
-            String property = dbProperties.getProperty(databaseProperties[i]);
+            final String property = dbProperties.getProperty(databaseProperties[i]);
             if (property == null || "".equals(property)) {
                 errors.add("Property " + databaseProperties[i] + " is not defined");
             }
@@ -50,7 +50,7 @@ public class PropertyCheck {
         return errors;
     }
     
-    public static List check(String utiity, char option) throws DataDefenderException {
+    public static List check(final String utiity, final char option) throws DataDefenderException {
         
         List errors = new ArrayList<>();
         if ("file-discovery".equals(utiity)) {
@@ -66,7 +66,7 @@ public class PropertyCheck {
             final Properties properties = loadProperties("anonymyzer.properties");
             
             for (int i=0; i<dataAnonymizerProperties.length; i++ ) {
-                String property = properties.getProperty(dataAnonymizerProperties[i]);
+                final String property = properties.getProperty(dataAnonymizerProperties[i]);
                 if (property == null || "".equals(property)) {
                     errors.add("Property " + dataAnonymizerProperties[i] + " is not defined");
                 }
@@ -81,7 +81,7 @@ public class PropertyCheck {
                 final Properties properties = loadProperties("datadiscovery.properties");
 
                 for (int i=0; i<dataDiscoveryProperties.length; i++ ) {
-                    String property = properties.getProperty(dataDiscoveryProperties[i]);
+                    final String property = properties.getProperty(dataDiscoveryProperties[i]);
                     if (property == null || "".equals(property)) {
                         errors.add("Property " + dataDiscoveryProperties[i] + " is not defined");
                     }
