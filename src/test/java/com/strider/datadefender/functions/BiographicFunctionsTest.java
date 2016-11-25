@@ -51,11 +51,11 @@ public class BiographicFunctionsTest extends TestCase {
     /**
      * Test of randomSIN method
      */
-    public void testRandomSIN() {
+    public void testRandomStringSIN() {
         log.debug("Generate SIN");
 
         final BiographicFunctions functions = new BiographicFunctions();
-        final String sin = functions.randomSIN();
+        final String sin = functions.randomStringSIN();
 
         log.debug("Random SIN = " + sin);
 
