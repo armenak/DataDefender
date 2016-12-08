@@ -38,7 +38,7 @@ public class BiographicFunctions extends CoreFunctions {
      * Generates random 9-digit social insurance number
      * @return String
      */
-    public String randomSIN() {
+    public String randomStringSIN() {
         final Random random = new Random();
         int[] sinDigits = new int[9];
         for (int i = 0; i < sinDigits.length; i++) {
@@ -59,6 +59,32 @@ public class BiographicFunctions extends CoreFunctions {
         return sin.toString();
 
     }
+    
+    /**
+     * Generates random 9-digit social insurance number
+     * @return String
+     */
+    public int randomNumericSIN() {
+        final Random random = new Random();
+        int[] sinDigits = new int[9];
+        for (int i = 0; i < sinDigits.length; i++) {
+            sinDigits[i] = random.nextInt(9);
+        }
+
+        while (!isValidSIN(sinDigits)) {
+            sinDigits = increment(sinDigits);
+        }
+
+        final StringBuilder sin = new StringBuilder(9);
+        for (final int digit : sinDigits) {
+            sin.append(String.valueOf(digit));
+        }
+        
+        log.debug("Generated SIN:[" + sin.toString() +"]");
+        
+        return Integer.valueOf(sin.toString());
+
+    }    
     
     /**
      * Generates random 9-digit social insurance number

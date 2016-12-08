@@ -63,7 +63,7 @@ public class PropertyCheck {
                 }
             }
         } else if ("anonymize".equals(utiity)) {
-            final Properties properties = loadProperties("anonymyzer.properties");
+            final Properties properties = loadProperties("anonymizer.properties");
             
             for (int i=0; i<dataAnonymizerProperties.length; i++ ) {
                 final String property = properties.getProperty(dataAnonymizerProperties[i]);
