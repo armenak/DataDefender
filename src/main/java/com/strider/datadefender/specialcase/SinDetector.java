@@ -25,14 +25,13 @@ import static org.apache.log4j.Logger.getLogger;
  *
  * @author strider
  */
-public class SinDetector {
+public class SinDetector implements SpecialCase {
     private static final Logger log = getLogger(SinDetector.class);
     
     public static MatchMetaData detectSin(MatchMetaData data, String text) {
         if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")) {
             BiographicFunctions bf = new BiographicFunctions();
             if ( ( text.matches("[0-9]+") && text.length() == 9) && bf.isValidSIN(text)) {
-                log.info("Valid SIN " + text);
                 data.setModel("sin");
                 data.setAverageProbability(1);
                 return data;

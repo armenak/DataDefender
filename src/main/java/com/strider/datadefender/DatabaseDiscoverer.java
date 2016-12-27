@@ -42,13 +42,24 @@ import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.extensions.BiographicFunctions;
+import com.strider.datadefender.functions.CoreFunctions;
+import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.requirement.Column;
+import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.specialcase.SinDetector;
+import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import org.apache.commons.lang3.ClassUtils;
 
 
 /**
@@ -104,7 +115,13 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
         MatchMetaData specialCaseData = null;
-        boolean specialCase = true;
+        boolean specialCase = false;
+        
+        
+        final String[] specialCaseFunctions = dataDiscoveryProperties.getProperty("extentions").split(",");
+        if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
+            specialCase = true;
+        }
         
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Double> probabilityList;
@@ -153,7 +170,14 @@ public class DatabaseDiscoverer extends Discoverer {
                     final String sentence = resultSet.getString(1);
                     
                     if (specialCase) {
-                        specialCaseData = SinDetector.detectSin(data, sentence);
+                        try {
+                            for (int i=0; i<specialCaseFunctions.length; i++) {
+                                specialCaseData = (MatchMetaData)callExtention(specialCaseFunctions[i], data, sentence);
+                            }
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
+                            log.error(e.toString());
+                        }
+                        
                     }
                     
                     if (sentence != null && !sentence.isEmpty()) {
@@ -207,14 +231,47 @@ public class DatabaseDiscoverer extends Discoverer {
             }
             
             // Special processing
-            log.info("specialCaseData is null " + (specialCaseData == null));
-            log.info("specialCase is true" + specialCase);
             if (specialCase && specialCaseData != null) {
-                log.info(specialCaseData.getModel());
                 matches.add(specialCaseData);
             }
         }
         
         return matches;
     }
+    
+    private Object callExtention(final String function, MatchMetaData data, String text)
+        throws SQLException,
+               NoSuchMethodException,
+               SecurityException,
+               IllegalAccessException,
+               IllegalArgumentException,
+               InvocationTargetException {
+        
+        if (function == null || function.equals("")) {
+            log.warn("Function " + function + " is not defined");
+            return null;
+        } 
+        
+        Object value = null;
+        
+        try {
+            final String className = Utils.getClassName(function);
+            final String methodName = Utils.getMethodName(function);
+            final Class<?> clazz = Class.forName(className);
+            final Method method = Class.forName(className).getMethod(methodName, new Class[]{MatchMetaData.class, String.class});
+            
+            final SpecialCase instance = (SpecialCase) Class.forName(className).newInstance();
+
+            final Map<String, Object> paramValues = new HashMap<>(2);
+            paramValues.put("metadata", data);
+            paramValues.put("text", text);            
+            
+            value = method.invoke(instance, data, text);
+            
+        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+            log.error(ex.toString());
+        }
+        
+        return value;
+    }  
 }
