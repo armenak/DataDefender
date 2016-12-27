@@ -41,6 +41,8 @@ import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import com.strider.datadefender.extensions.BiographicFunctions;
+import com.strider.datadefender.specialcase.SinDetector;
 import com.strider.datadefender.utils.CommonUtils;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -101,7 +103,9 @@ public class DatabaseDiscoverer extends Discoverer {
         final List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
-
+        MatchMetaData specialCaseData = null;
+        boolean specialCase = true;
+        
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Double> probabilityList;
         for(final MatchMetaData data: map) {
@@ -147,9 +151,13 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
                     
                     final String sentence = resultSet.getString(1);
+                    
+                    if (specialCase) {
+                        specialCaseData = SinDetector.detectSin(data, sentence);
+                    }
+                    
                     if (sentence != null && !sentence.isEmpty()) {
-                        
-                        String processingValue;
+                        String processingValue = "";
                         if (data.getColumnType().equals("DATE") || 
                             data.getColumnType().equals("TIMESTAMP") ||
                             data.getColumnType().equals("DATETIME")
@@ -157,7 +165,7 @@ public class DatabaseDiscoverer extends Discoverer {
                             final DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
                             final DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
                             final java.util.Date date = originalFormat.parse(sentence);
-                            processingValue = targetFormat.format(date);                          
+                            processingValue = targetFormat.format(date);
                         } else {
                             processingValue = sentence;
                         }
@@ -196,6 +204,14 @@ public class DatabaseDiscoverer extends Discoverer {
                 data.setAverageProbability(averageProbability);
                 data.setModel(model.getName());
                 matches.add(data);
+            }
+            
+            // Special processing
+            log.info("specialCaseData is null " + (specialCaseData == null));
+            log.info("specialCase is true" + specialCase);
+            if (specialCase && specialCaseData != null) {
+                log.info(specialCaseData.getModel());
+                matches.add(specialCaseData);
             }
         }
         

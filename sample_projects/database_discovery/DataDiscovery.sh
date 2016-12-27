@@ -1,1 +1,1 @@
-java -jar DataDefender.jar database-discovery -d
+java -jar DataDefender.jar database-discovery -d 
