@@ -2,3 +2,5 @@
 nbactions.xml
 *.log
 nb-configuration.xml
+sample_projects/database_discovery/logs/anonymizer.log.2
+sample_projects/database_discovery/logs/anonymizer.log.3
