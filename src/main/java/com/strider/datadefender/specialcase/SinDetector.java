@@ -19,15 +19,12 @@ package com.strider.datadefender.specialcase;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.utils.CommonUtils;
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
  * @author strider
  */
 public class SinDetector implements SpecialCase {
-    private static final Logger log = getLogger(SinDetector.class);
     
     public static MatchMetaData detectSin(MatchMetaData data, String text) {
         if (CommonUtils.isEmptyString(text)) {
@@ -35,7 +32,7 @@ public class SinDetector implements SpecialCase {
         }
         
         if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")) {
-            BiographicFunctions bf = new BiographicFunctions();
+            final BiographicFunctions bf = new BiographicFunctions();
             if (data.getColumnType().equals("VARCHAR")) {
                 text = text.replaceAll("\\D+", "");
             }

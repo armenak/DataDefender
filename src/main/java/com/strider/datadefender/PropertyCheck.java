@@ -52,7 +52,7 @@ public class PropertyCheck {
     
     public static List check(final String utiity, final char option) throws DataDefenderException {
         
-        List errors = new ArrayList<>();
+        final List errors = new ArrayList<>();
         if ("file-discovery".equals(utiity)) {
             final Properties properties = loadProperties("filediscovery.properties");
             

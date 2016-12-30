@@ -33,13 +33,13 @@ public class Score {
     
     private static final List<Integer> averageScore = new ArrayList<>();
     
-    public int columnScore(int rowCount) {
-        int score = 0;
+    public int columnScore(final int rowCount) {
         
         if (rowCount == 0) {
             return 0;
         }
         
+        int score = 0;
         if (rowCount > 0 && rowCount <= 100) {
             score = SCORE_LOW;
         } else if ( rowCount > 100 && rowCount <= 1000 ) {
@@ -57,7 +57,7 @@ public class Score {
         float averageDataStoreScore = 0;
         int tmp = 0;
         
-        for (int score: averageScore) {
+        for (final int score: averageScore) {
             tmp += score;
         }
         

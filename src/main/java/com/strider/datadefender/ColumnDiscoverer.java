@@ -87,7 +87,7 @@ public class ColumnDiscoverer extends Discoverer {
             log.info("List of suspects:");
             log.info("-----------------");
             uniqueMatches.sort(MatchMetaData.compare());
-            Score score = new Score();
+            final Score score = new Score();
             for (final MatchMetaData entry: uniqueMatches) {
 
                 final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
@@ -129,7 +129,7 @@ public class ColumnDiscoverer extends Discoverer {
                 log.info( CommonUtils.fixedLengthString('-', entry.toString().length() + 9));
                 log.info("Number of rows in the table: " + rowCount);
                 log.info("Sample data");
-                for (String sampleData: sampleDataList) {
+                for (final String sampleData: sampleDataList) {
                     log.info(sampleData);
                 }
                 log.info("Score: " + score.columnScore(rowCount) );

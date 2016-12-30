@@ -54,6 +54,7 @@ public class DataDefender  {
  
     private static final Logger log = getLogger(DataDefender.class);
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException, java.text.ParseException {
         
         // Ensure we are not trying to run second instance of the same program
@@ -100,13 +101,12 @@ public class DataDefender  {
         }
         
         final String databasePropertyFile = line.getOptionValue('P', "db.properties");
-        final Properties props = loadProperties(databasePropertyFile);
         errors = PropertyCheck.checkDtabaseProperties();
         if (errors.size() >0) {
             displayErrors(errors);
             return;
         }
-            
+        final Properties props = loadProperties(databasePropertyFile);            
         try (final IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":

@@ -41,14 +41,14 @@ public class SINGenerator {
     // <START:medicine> potassium clavulanate <END>. They work together to kill certain types of bacteria and are used to treat certain types of bacterial infections
     public static void main(String[] args) throws Exception {
         
-        BiographicFunctions bf = new BiographicFunctions();
-        CoreFunctions cf = new CoreFunctions();
-        PrintWriter writer = new PrintWriter(OUTOUT_FILE, "UTF-8");
+        final BiographicFunctions bf = new BiographicFunctions();
+        final CoreFunctions cf = new CoreFunctions();
+        final PrintWriter writer = new PrintWriter(OUTOUT_FILE, "UTF-8");
         
         for (int i=0; i<=LINES; i++) {
             StringBuilder sb = new StringBuilder();
-            sb.append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE)).append(SPACE);
-            sb.append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE));
+            sb.append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE)).append(SPACE).
+            append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE));
             writer.println(sb.toString());
         } 
         writer.flush();

@@ -41,17 +41,11 @@ import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
-import com.strider.datadefender.extensions.BiographicFunctions;
-import com.strider.datadefender.functions.CoreFunctions;
 import com.strider.datadefender.functions.Utils;
-import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Parameter;
-import com.strider.datadefender.specialcase.SinDetector;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,7 +53,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.apache.commons.lang3.ClassUtils;
 
 
 /**
@@ -72,6 +65,7 @@ public class DatabaseDiscoverer extends Discoverer {
     
     private static String[] modelList;
         
+    @SuppressWarnings("unchecked")
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables) 
     throws AnonymizerException, ParseException {
         log.info("Data discovery in process");
@@ -188,7 +182,7 @@ public class DatabaseDiscoverer extends Discoverer {
                             data.getColumnType().equals("DATETIME")
                            ) {
                             final DateFormat originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
-                            final DateFormat targetFormat = new SimpleDateFormat("MMM d, yy");
+                            final DateFormat targetFormat = new SimpleDateFormat("MMM d, yy", Locale.ENGLISH);
                             final java.util.Date date = originalFormat.parse(sentence);
                             processingValue = targetFormat.format(date);
                         } else {
@@ -259,7 +253,6 @@ public class DatabaseDiscoverer extends Discoverer {
         try {
             final String className = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
-            final Class<?> clazz = Class.forName(className);
             final Method method = Class.forName(className).getMethod(methodName, new Class[]{MatchMetaData.class, String.class});
             
             final SpecialCase instance = (SpecialCase) Class.forName(className).newInstance();
