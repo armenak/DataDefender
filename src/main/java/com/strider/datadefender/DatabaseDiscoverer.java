@@ -168,11 +168,12 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
                     
                     final String sentence = resultSet.getString(1);
-                    
                     if (specialCase) {
                         try {
                             for (int i=0; i<specialCaseFunctions.length; i++) {
-                                specialCaseData = (MatchMetaData)callExtention(specialCaseFunctions[i], data, sentence);
+                                if (sentence != null && !sentence.equals("")) {
+                                    specialCaseData = (MatchMetaData)callExtention(specialCaseFunctions[i], data, sentence);
+                                }
                             }
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
                             log.error(e.toString());
@@ -233,6 +234,7 @@ public class DatabaseDiscoverer extends Discoverer {
             // Special processing
             if (specialCase && specialCaseData != null) {
                 matches.add(specialCaseData);
+                specialCaseData = null;
             }
         }
         
