@@ -34,6 +34,7 @@ import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.utils.Score;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -86,6 +87,7 @@ public class ColumnDiscoverer extends Discoverer {
             log.info("List of suspects:");
             log.info("-----------------");
             uniqueMatches.sort(MatchMetaData.compare());
+            Score score = new Score();
             for (final MatchMetaData entry: uniqueMatches) {
 
                 final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
@@ -130,7 +132,9 @@ public class ColumnDiscoverer extends Discoverer {
                 for (String sampleData: sampleDataList) {
                     log.info(sampleData);
                 }
+                log.info("Score: " + score.columnScore(rowCount) );
             }
+            log.info("Overall score: " + score.dataStoreScore());
         } else {
             log.info("No suspects have been found. Please refine your criteria.");
         }
