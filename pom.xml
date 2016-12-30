@@ -4,7 +4,7 @@
 
     <groupId>com.datadefender</groupId>
     <artifactId>DataDefender</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
 
     <name>DataDefender</name>
