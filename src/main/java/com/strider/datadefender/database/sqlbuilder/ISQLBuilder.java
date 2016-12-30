@@ -22,7 +22,7 @@ package com.strider.datadefender.database.sqlbuilder;
  */
 public interface ISQLBuilder {
     String buildSelectWithLimit(String sqlString, int limit);
-    // May not be the best place for this logic... consider moving if a more appropriate place exists
+    
     /**
      * Prefix table name with schema is present.
      * @param tableName

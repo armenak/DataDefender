@@ -32,6 +32,12 @@ import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import com.strider.datadefender.utils.CommonUtils;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 /**
@@ -47,6 +53,7 @@ public class ColumnDiscoverer extends Discoverer {
         log.info("Column discovery in process");
         final IMetaData metaData = factory.fetchMetaData();
         final List<MatchMetaData> map = metaData.getMetaData();
+        List<MatchMetaData> uniqueMatches = null;
         
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -69,18 +76,64 @@ public class ColumnDiscoverer extends Discoverer {
             }
         }
         
+        log.info("Preparing report ...");
         // Report column names
+                
         if (matches != null || matches.isEmpty()) {
+            uniqueMatches = new ArrayList<>(new LinkedHashSet<>(matches));
+
             log.info("-----------------");        
             log.info("List of suspects:");
             log.info("-----------------");
-            matches.sort(MatchMetaData.compare());
-            for (final MatchMetaData entry: matches) {
-                log.info(entry);
+            uniqueMatches.sort(MatchMetaData.compare());
+            for (final MatchMetaData entry: uniqueMatches) {
+
+                final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+                final String table = sqlBuilder.prefixSchema(entry.getTableName());
+
+                // Getting number of records in the table                
+                final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, 0);
+                log.debug("Executing query against database: " + queryCount);
+                
+                int rowCount = 0;
+                try (Statement stmt = factory.getConnection().createStatement();
+                    ResultSet resultSet = stmt.executeQuery(queryCount); ) 
+                {
+                    resultSet.next();
+                    rowCount = resultSet.getInt(1);
+                } catch (SQLException sqle) {
+                    log.error(sqle.toString());
+                }
+            
+                // Getting 5 sample values                
+                final String querySample = sqlBuilder.buildSelectWithLimit(
+                    "SELECT " + entry.getColumnName() + 
+                    " FROM " + table + 
+                    " WHERE " + entry.getColumnName()   + " IS NOT NULL ", 5);                
+                    log.debug("Executing query against database: " + querySample);
+                
+                final List<String> sampleDataList = new ArrayList<String>();
+                try (Statement stmt = factory.getConnection().createStatement();
+                     ResultSet resultSet = stmt.executeQuery(querySample);) {
+                    while (resultSet.next()) {
+                       sampleDataList.add(resultSet.getString(1)); 
+                    }                    
+                } catch (SQLException sqle) {
+                    log.error(sqle.toString());
+                }
+            
+                // Output
+                log.info("Column: " + entry);
+                log.info( CommonUtils.fixedLengthString('-', entry.toString().length() + 9));
+                log.info("Number of rows in the table: " + rowCount);
+                log.info("Sample data");
+                for (String sampleData: sampleDataList) {
+                    log.info(sampleData);
+                }
             }
         } else {
             log.info("No suspects have been found. Please refine your criteria.");
         }
-        return matches;
+        return uniqueMatches;
     }
 }

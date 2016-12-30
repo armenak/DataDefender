@@ -88,4 +88,13 @@ public class CommonUtils {
         } 
         return ret;
     }    
+    
+    public static String fixedLengthString(char fillChar, int count){
+        // creates a string of 'x' repeating characters
+        char[] chars = new char[count];
+        while (count>0) {
+            chars[--count] = fillChar;
+        }
+        return new String(chars);
+    }    
 }
