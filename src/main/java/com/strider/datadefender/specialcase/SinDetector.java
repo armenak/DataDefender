@@ -26,7 +26,7 @@ import com.strider.datadefender.utils.CommonUtils;
  */
 public class SinDetector implements SpecialCase {
     
-    public static MatchMetaData detectSin(MatchMetaData data, String text) {
+    public static MatchMetaData detectSin(final MatchMetaData data, String text) {
         if (CommonUtils.isEmptyString(text)) {
             return null;
         }

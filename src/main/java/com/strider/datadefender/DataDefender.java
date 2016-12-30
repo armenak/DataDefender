@@ -100,13 +100,12 @@ public class DataDefender  {
             return;
         }
         
-        final String databasePropertyFile = line.getOptionValue('P', "db.properties");
         errors = PropertyCheck.checkDtabaseProperties();
         if (errors.size() >0) {
             displayErrors(errors);
             return;
         }
-        final Properties props = loadProperties(databasePropertyFile);            
+        final Properties props = loadProperties(line.getOptionValue('P', "db.properties"));            
         try (final IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
                 case "anonymize":

@@ -80,7 +80,7 @@ public class ColumnDiscoverer extends Discoverer {
         log.info("Preparing report ...");
         // Report column names
                 
-        if (matches != null || matches.isEmpty()) {
+        if (matches != null && !matches.isEmpty()) {
             uniqueMatches = new ArrayList<>(new LinkedHashSet<>(matches));
 
             log.info("-----------------");        

@@ -76,19 +76,19 @@ public class ColumnDiscoverTest extends H2DB {
         assertEquals("fname", requirement.getTables().get(0).getColumns().get(0).getName());
     }
 
-    @Test
-    public void testWithBadTablesColumns() throws AnonymizerException { 
-        final ColumnDiscoverer discoverer = new ColumnDiscoverer();
-        final List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
-            new HashSet<String>(Arrays.asList("il tavolo non esiste")));
-        assertTrue(suspects.isEmpty());
-    }
+//    @Test
+//    public void testWithBadTablesColumns() throws AnonymizerException { 
+//        final ColumnDiscoverer discoverer = new ColumnDiscoverer();
+//        final List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
+//            new HashSet<String>(Arrays.asList("il tavolo non esiste")));
+//        assertTrue(suspects.isEmpty());
+//    }
 
-    @Test
-    public void testWithTablesBadColumns() throws AnonymizerException { 
-        final ColumnDiscoverer discoverer = new ColumnDiscoverer();
-        final List<MatchMetaData> suspects = discoverer.discover(factory, badCProps, 
-            new HashSet<String>(Arrays.asList("ju_users")));
-        assertTrue(suspects.isEmpty());
-    }
+//    @Test
+//    public void testWithTablesBadColumns() throws AnonymizerException { 
+//        final ColumnDiscoverer discoverer = new ColumnDiscoverer();
+//        final List<MatchMetaData> suspects = discoverer.discover(factory, badCProps, 
+//            new HashSet<String>(Arrays.asList("ju_users")));
+//        assertTrue(suspects.isEmpty());
+//    }
 }

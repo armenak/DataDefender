@@ -46,7 +46,7 @@ public class SINGenerator {
         final PrintWriter writer = new PrintWriter(OUTOUT_FILE, "UTF-8");
         
         for (int i=0; i<=LINES; i++) {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE)).append(SPACE).
             append(START_TAG).append(SPACE).append(bf.randomStringSIN()).append(SPACE).append(END_TAG).append(SPACE).append(cf.randomStringFromFile(RANDOM_FILE));
             writer.println(sb.toString());

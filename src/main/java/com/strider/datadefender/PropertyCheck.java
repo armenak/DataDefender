@@ -50,6 +50,7 @@ public class PropertyCheck {
         return errors;
     }
     
+    @SuppressWarnings("unchecked")
     public static List check(final String utiity, final char option) throws DataDefenderException {
         
         final List errors = new ArrayList<>();
@@ -57,7 +58,7 @@ public class PropertyCheck {
             final Properties properties = loadProperties("filediscovery.properties");
             
             for (int i=0; i<fileDiscoveryProperties.length; i++ ) {
-                String property = properties.getProperty(fileDiscoveryProperties[i]);
+                final String property = properties.getProperty(fileDiscoveryProperties[i]);
                 if (property == null || "".equals(property)) {
                     errors.add("Property " + fileDiscoveryProperties[i] + " is not defined");
                 }
