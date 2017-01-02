@@ -32,12 +32,9 @@ import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 
@@ -82,57 +79,31 @@ public class ColumnDiscoverer extends Discoverer {
                 
         if (matches != null && !matches.isEmpty()) {
             uniqueMatches = new ArrayList<>(new LinkedHashSet<>(matches));
-
+            
             log.info("-----------------");        
             log.info("List of suspects:");
             log.info("-----------------");
             uniqueMatches.sort(MatchMetaData.compare());
             final Score score = new Score();
             for (final MatchMetaData entry: uniqueMatches) {
-
-                final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-                final String table = sqlBuilder.prefixSchema(entry.getTableName());
-
-                // Getting number of records in the table                
-                final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, 0);
-                log.debug("Executing query against database: " + queryCount);
                 
-                int rowCount = 0;
-                try (Statement stmt = factory.getConnection().createStatement();
-                    ResultSet resultSet = stmt.executeQuery(queryCount); ) 
-                {
-                    resultSet.next();
-                    rowCount = resultSet.getInt(1);
-                } catch (SQLException sqle) {
-                    log.error(sqle.toString());
-                }
-            
+                // Row count
+                int rowCount = ReportUtil.rowCount(factory, entry.getTableName());
+                
                 // Getting 5 sample values                
-                final String querySample = sqlBuilder.buildSelectWithLimit(
-                    "SELECT " + entry.getColumnName() + 
-                    " FROM " + table + 
-                    " WHERE " + entry.getColumnName()   + " IS NOT NULL ", 5);                
-                    log.debug("Executing query against database: " + querySample);
+                final List<String> sampleDataList = ReportUtil.sampleData(factory, entry.getTableName(), entry.getColumnName());
                 
-                final List<String> sampleDataList = new ArrayList<String>();
-                try (Statement stmt = factory.getConnection().createStatement();
-                     ResultSet resultSet = stmt.executeQuery(querySample);) {
-                    while (resultSet.next()) {
-                       sampleDataList.add(resultSet.getString(1)); 
-                    }                    
-                } catch (SQLException sqle) {
-                    log.error(sqle.toString());
-                }
-            
                 // Output
-                log.info("Column: " + entry);
-                log.info( CommonUtils.fixedLengthString('-', entry.toString().length() + 9));
+                log.info("Column                     : " + entry);
+                log.info( CommonUtils.fixedLengthString('=', entry.toString().length() + 30));
                 log.info("Number of rows in the table: " + rowCount);
+                log.info("Score                      : " + score.columnScore(rowCount) );                
                 log.info("Sample data");
+                log.info( CommonUtils.fixedLengthString('-', 11));
                 for (final String sampleData: sampleDataList) {
                     log.info(sampleData);
                 }
-                log.info("Score: " + score.columnScore(rowCount) );
+                log.info("" );               
             }
             log.info("Overall score: " + score.dataStoreScore());
         } else {

@@ -33,14 +33,12 @@ public class Score {
     
     private static final List<Integer> averageScore = new ArrayList<>();
     
-    public int columnScore(final int rowCount) {
-        
-        if (rowCount == 0) {
-            return 0;
-        }
+    public String columnScore(final int rowCount) {
         
         int score = 0;
-        if (rowCount > 0 && rowCount <= 100) {
+        if (rowCount == 0) {
+            score = 0;
+        } else if (rowCount > 0 && rowCount <= 100) {
             score = SCORE_LOW;
         } else if ( rowCount > 100 && rowCount <= 1000 ) {
             score = SCORE_MEDIUM;
@@ -50,10 +48,10 @@ public class Score {
         
         averageScore.add(score);
         
-        return score;
+        return getScoreDefinition(score);
     }
     
-    public int dataStoreScore() {
+    public String dataStoreScore() {
         float averageDataStoreScore = 0;
         int tmp = 0;
         
@@ -65,6 +63,22 @@ public class Score {
             averageDataStoreScore = tmp/averageScore.size();
         }
         
-        return Math.round(averageDataStoreScore);
+        return getScoreDefinition(Math.round(averageDataStoreScore));
+    }
+    
+    public String getScoreDefinition(int score) {
+        String scoreDefinition = "";
+        
+        if (score == 1) {
+            scoreDefinition = "Low";
+        } else if (score == 2) {
+            scoreDefinition = "Medium";            
+        } else if (score == 3) {
+            scoreDefinition = "High";                        
+        } else {
+            scoreDefinition = "Undefined"; 
+        }
+        
+        return scoreDefinition;
     }
 }

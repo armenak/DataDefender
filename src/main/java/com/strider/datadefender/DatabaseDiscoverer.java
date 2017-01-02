@@ -42,8 +42,10 @@ import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.utils.Score;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
@@ -91,12 +93,31 @@ public class DatabaseDiscoverer extends Discoverer {
 
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
         log.info("List of suspects:");
-        log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));        
+        log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
+        final Score score = new Score();
         for(final MatchMetaData data: finalList) {    
-            final String probability = decimalFormat.format(data.getAverageProbability());
-            final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
-            log.info(result);            
+            // Row count
+            int rowCount = ReportUtil.rowCount(factory, data.getTableName());
+            // Getting 5 sample values                
+            final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());            
+            
+            // Output
+            log.info("Column                      : " + data.toString());
+            log.info( CommonUtils.fixedLengthString('=', data.toString().length() + 30));
+            log.info("Number of rows in the table : " + rowCount);
+            log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
+            log.info("Model                       : " + data.getModel());
+            log.info("Score                       : " + score.columnScore(rowCount) );               
+            log.info("Sample data");
+            log.info( CommonUtils.fixedLengthString('-', 11));
+            for (final String sampleData: sampleDataList) {
+                log.info(sampleData);
+            }
+            log.info("" );               
+            //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
+            //log.info(result);            
         }                    
+        log.info("Overall score: " + score.dataStoreScore());
         
         return matches;
     }
