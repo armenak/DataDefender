@@ -95,6 +95,7 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
         final Score score = new Score();
+        int highRiskColumns = 0;
         for(final MatchMetaData data: finalList) {    
             // Row count
             int rowCount = ReportUtil.rowCount(factory, data.getTableName());
@@ -113,11 +114,30 @@ public class DatabaseDiscoverer extends Discoverer {
             for (final String sampleData: sampleDataList) {
                 log.info(sampleData);
             }
-            log.info("" );               
+            log.info("" );
+            if (score.columnScore(rowCount).equals("High")) {
+                highRiskColumns++;
+            }
             //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
             //log.info(result);            
         }                    
         log.info("Overall score: " + score.dataStoreScore());
+        log.info("");
+        if (finalList != null && finalList.size() > 0) {
+            log.info("============================================");
+            int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
+            if (finalList.size() > threshold_count) {
+                log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
+            } else {
+                log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+            }
+            int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
+            if (highRiskColumns > threshold_highrisk) {
+                log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");                
+            } else {
+                log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");                                
+            }
+        }
         
         return matches;
     }
