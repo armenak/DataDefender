@@ -18,6 +18,8 @@
 
 package com.strider.datadefender.database.metadata;
 
+import com.strider.datadefender.Probability;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class MatchMetaData {
     private final int columnSize;
     private double averageProbability;   
     private String model = "";
+    private List<Probability> probabilityList = new ArrayList<>();
 
     public MatchMetaData(
         final String schemaName,
@@ -101,6 +104,14 @@ public class MatchMetaData {
     
     public String toVerboseStr() {
         return this.schemaName + "." + toString() + "(" + this.columnType + ")";
+    }
+    
+    public void setProbabilityList(List<Probability> probabilityList) {
+        this.probabilityList = probabilityList;
+    }
+    
+    public List<Probability> getProbabilityList() {
+        return this.probabilityList;
     }
     
     /**

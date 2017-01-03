@@ -106,7 +106,7 @@ public class FileDiscoverer extends Discoverer {
         // Let's iterate over directories
         File node;
         Metadata metadata;
-        List<Double> probabilityList;
+        List<Probability> probabilityList;
         for (final String directory: directoryList) {
             
             node = new File(directory);
@@ -148,7 +148,7 @@ public class FileDiscoverer extends Discoverer {
                         log.info("Span: "+nameSpans[i].toString());
                         log.info("Covered text is: "+tokens[nameSpans[i].getStart()]);
                         log.info("Probability is: "+spanProbs[i]);
-                        probabilityList.add(spanProbs[i]);
+                        probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                     }      
                     model.getNameFinder().clearAdaptiveData(); 
                     

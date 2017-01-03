@@ -55,11 +55,11 @@ public abstract class Discoverer { //implements IDiscoverer {
         RequirementUtils.write(RequirementUtils.create(matches), fileName);
     }
     
-    public double calculateAverage(final List <Double> values) {
+    public double calculateAverage(final List <Probability> values) {
         Double sum = 0.0;
         if(!values.isEmpty()) {
-            for (final Double value : values) {
-                sum += value;
+            for (final Probability value : values) {
+                sum += value.getProbabilityValue();
             }
             return sum / values.size();
         }

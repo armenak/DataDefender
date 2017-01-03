@@ -52,7 +52,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 
@@ -111,10 +114,32 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("Score                       : " + score.columnScore(rowCount) );               
             log.info("Sample data");
             log.info( CommonUtils.fixedLengthString('-', 11));
-            for (final String sampleData: sampleDataList) {
-                log.info(sampleData);
+            
+            //data.getProbabilityList().sort(Probability.compare());
+            
+            List<Probability> probabilityList = data.getProbabilityList();
+            
+//            probabilityList = new ArrayList<>(new LinkedHashSet<>(probabilityList));
+            Collections.sort(probabilityList, 
+                Comparator.comparingDouble(Probability::getProbabilityValue).reversed());    
+            
+            int y=0;
+            if (data.getProbabilityList().size() >= 5) {
+                y = 5;
+            } else {
+                y = data.getProbabilityList().size();
             }
+            
+            for (int i=0; i<y; i++) {
+                Probability p = data.getProbabilityList().get(i);
+                log.info(p.getSentence() + ":" + p.getProbabilityValue());
+            }
+            
+            //for (final String sampleData: sampleDataList) {
+            //    log.info(sampleData);
+            //}
             log.info("" );
+            
             if (score.columnScore(rowCount).equals("High")) {
                 highRiskColumns++;
             }
@@ -159,7 +184,7 @@ public class DatabaseDiscoverer extends Discoverer {
         }
         
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-        List<Double> probabilityList;
+        List<Probability> probabilityList;
         for(final MatchMetaData data: map) {
             final String tableName = data.getTableName();
             final String columnName = data.getColumnName();
@@ -191,7 +216,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
-
+                
                 while (resultSet.next()) {
                     if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
                         continue;
@@ -233,23 +258,24 @@ public class DatabaseDiscoverer extends Discoverer {
                         //log.debug(sentence);
                         // Convert sentence into tokens
                         final String tokens[] = model.getTokenizer().tokenize(processingValue);
-                        //for (int i=0; i<tokens.length;i++) {
-                        //    log.debug("tolen: " + tokens[i]);    
-                        //}
                         
                         // Find names
                         final Span nameSpans[] = model.getNameFinder().find(tokens);
                         
                         //find probabilities for names
                         final double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                        
+                        // Collect top X tokens with highest probability
+                        
+                        
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            //log.debug("Span: "+nameSpans[i].toString());
-                            //log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                            //log.debug("Probability is: "+spanProbs[i]);
-                            probabilityList.add(spanProbs[i]);
+                            log.debug("Span: "+nameSpans[i].toString());
+                            log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                            log.debug("Probability is: "+spanProbs[i]);
+                            probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                         }
-                        // From OpenNLP documentation
+                        // From OpenNLP documentation:
                         //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
                         // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
                         model.getNameFinder().clearAdaptiveData();    
@@ -263,6 +289,7 @@ public class DatabaseDiscoverer extends Discoverer {
             if ((averageProbability >= probabilityThreshold)) {
                 data.setAverageProbability(averageProbability);
                 data.setModel(model.getName());
+                data.setProbabilityList(probabilityList);
                 matches.add(data);
             }
             
@@ -276,6 +303,19 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
     
+    /**
+     * Calls a function defined as an extention
+     * @param function
+     * @param data
+     * @param text
+     * @return
+     * @throws SQLException
+     * @throws NoSuchMethodException
+     * @throws SecurityException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     private Object callExtention(final String function, MatchMetaData data, String text)
         throws SQLException,
                NoSuchMethodException,
