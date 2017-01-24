@@ -21,6 +21,8 @@ import com.strider.datadefender.database.IDBFactory;
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import com.strider.datadefender.utils.ApplicationLock;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +58,8 @@ public class DataDefender  {
 
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException, java.text.ParseException {
+        
+        long startTime = System.currentTimeMillis();
         
         // Ensure we are not trying to run second instance of the same program
         final ApplicationLock al = new ApplicationLock("DataDefender");
@@ -163,6 +167,12 @@ public class DataDefender  {
                     break;
             }
         }
+        
+        long endTime   = System.currentTimeMillis();
+        
+        NumberFormat formatter = new DecimalFormat("#0.00000");
+        log.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");        
+        log.info("DataDefender completed ");
     }
     
     /**
