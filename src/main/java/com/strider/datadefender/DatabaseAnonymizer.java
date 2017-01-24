@@ -117,7 +117,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(StringUtils.join(keys, " = ? AND ")).
             append(" = ?");
         
-        log.info(sql.toString());
+        log.debug(sql.toString());
         return sql.toString();
     }
     
@@ -423,12 +423,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             log.debug("Anonymizing function: " + methodName);
             final Object anonymizedValue = selectedMethod.invoke(instance);
-            log.info("anonymizedValue " + anonymizedValue);
+            log.debug("anonymizedValue " + anonymizedValue);
             if (anonymizedValue == null) {
                 return null;
             }
             
-            log.info(returnType.toString());
+            log.debug(returnType.toString());
             if (returnType == String.class) {
                 return anonymizedValue.toString();
             } else if (returnType == java.sql.Date.class) {
@@ -579,8 +579,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             anonymized.add(columnName);
             final Object colValue = callAnonymizingFunctionFor(db, row, column);
-            log.info("colValue = " + colValue);
-            log.info("type= " + colValue.getClass());
+            log.debug("colValue = " + colValue);
+            log.debug("type= " + colValue.getClass());
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
