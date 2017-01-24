@@ -116,6 +116,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(" WHERE " ).
             append(StringUtils.join(keys, " = ? AND ")).
             append(" = ?");
+        
+        log.info(sql.toString());
         return sql.toString();
     }
     
@@ -421,13 +423,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             log.debug("Anonymizing function: " + methodName);
             final Object anonymizedValue = selectedMethod.invoke(instance);
+            log.info("anonymizedValue " + anonymizedValue);
             if (anonymizedValue == null) {
                 return null;
             }
             
+            log.info(returnType.toString());
             if (returnType == String.class) {
                 return anonymizedValue.toString();
             } else if (returnType == java.sql.Date.class) {
+                return anonymizedValue;
+            } else if (returnType.toString().equals("int")) {
                 return anonymizedValue;
             }
         } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
@@ -573,10 +579,14 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             anonymized.add(columnName);
             final Object colValue = callAnonymizingFunctionFor(db, row, column);
+            log.info("colValue = " + colValue);
+            log.info("type= " + colValue.getClass());
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
                 updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
+            } else if (colValue.getClass() == java.lang.Integer.class) {
+                updateStmt.setInt(columnIndexes.get(columnName), (int) colValue);
             } else {
                 updateStmt.setString(
                     columnIndexes.get(columnName),
@@ -636,7 +646,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             final String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
-            log.debug("Update SQL: " + updateString);
             
             int batchCounter = 0; 
             int rowCount = 0;
