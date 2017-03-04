@@ -17,8 +17,6 @@
  */
 package com.strider.datadefender;
 
-import java.util.Comparator;
-
 /**
  *
  * @author strider
@@ -27,7 +25,7 @@ public class Probability {
     private final String sentence;
     private final Double probabilityValue;
     
-    public Probability(String sentence, Double probabilityValue) {
+    public Probability(final String sentence, final Double probabilityValue) {
         this.sentence = sentence;
         this.probabilityValue = probabilityValue;
     }

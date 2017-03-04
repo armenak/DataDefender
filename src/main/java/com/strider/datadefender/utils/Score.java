@@ -66,7 +66,7 @@ public class Score {
         return getScoreDefinition(Math.round(averageDataStoreScore));
     }
     
-    public String getScoreDefinition(int score) {
+    public String getScoreDefinition(final int score) {
         String scoreDefinition = "";
         
         if (score == 1) {

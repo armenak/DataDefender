@@ -106,7 +106,7 @@ public class MatchMetaData {
         return this.schemaName + "." + toString() + "(" + this.columnType + ")";
     }
     
-    public void setProbabilityList(List<Probability> probabilityList) {
+    public void setProbabilityList(final List<Probability> probabilityList) {
         this.probabilityList = probabilityList;
     }
     

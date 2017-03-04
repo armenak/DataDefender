@@ -55,7 +55,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 
@@ -101,7 +100,7 @@ public class DatabaseDiscoverer extends Discoverer {
         int highRiskColumns = 0;
         for(final MatchMetaData data: finalList) {    
             // Row count
-            int rowCount = ReportUtil.rowCount(factory, data.getTableName());
+            final int rowCount = ReportUtil.rowCount(factory, data.getTableName());
             // Getting 5 sample values                
             final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());            
             
@@ -117,7 +116,7 @@ public class DatabaseDiscoverer extends Discoverer {
             
             //data.getProbabilityList().sort(Probability.compare());
             
-            List<Probability> probabilityList = data.getProbabilityList();
+            final List<Probability> probabilityList = data.getProbabilityList();
             
 //            probabilityList = new ArrayList<>(new LinkedHashSet<>(probabilityList));
             Collections.sort(probabilityList, 
@@ -131,7 +130,7 @@ public class DatabaseDiscoverer extends Discoverer {
             }
             
             for (int i=0; i<y; i++) {
-                Probability p = data.getProbabilityList().get(i);
+                final Probability p = data.getProbabilityList().get(i);
                 log.info(p.getSentence() + ":" + p.getProbabilityValue());
             }
             
@@ -150,13 +149,13 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info("");
         if (finalList != null && finalList.size() > 0) {
             log.info("============================================");
-            int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
+            final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
             if (finalList.size() > threshold_count) {
                 log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
             } else {
                 log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
             }
-            int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
+            final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
             if (highRiskColumns > threshold_highrisk) {
                 log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");                
             } else {

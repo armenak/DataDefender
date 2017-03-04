@@ -19,13 +19,11 @@ package com.strider.datadefender.report;
 
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
-import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -37,7 +35,7 @@ public class ReportUtil {
     
     private static final Logger log = getLogger(ReportUtil.class);
 
-    public static int rowCount(final IDBFactory factory, String tableName) {
+    public static int rowCount(final IDBFactory factory, final String tableName) {
         
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         final String table = sqlBuilder.prefixSchema(tableName);
@@ -59,9 +57,8 @@ public class ReportUtil {
         return rowCount;
     }
     
-    public static List<String> sampleData(final IDBFactory factory, String tableName, String columnName) {
+    public static List<String> sampleData(final IDBFactory factory, final String tableName, final String columnName) {
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-        final String table = sqlBuilder.prefixSchema(tableName);        
         
         final String querySample = sqlBuilder.buildSelectWithLimit(
             "SELECT " + columnName + 

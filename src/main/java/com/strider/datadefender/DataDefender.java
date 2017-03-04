@@ -59,7 +59,7 @@ public class DataDefender  {
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException, java.text.ParseException {
         
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         
         // Ensure we are not trying to run second instance of the same program
         final ApplicationLock al = new ApplicationLock("DataDefender");
@@ -168,9 +168,9 @@ public class DataDefender  {
             }
         }
         
-        long endTime   = System.currentTimeMillis();
+        final long endTime   = System.currentTimeMillis();
         
-        NumberFormat formatter = new DecimalFormat("#0.00000");
+        final NumberFormat formatter = new DecimalFormat("#0.00000");
         log.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");        
         log.info("DataDefender completed ");
     }
