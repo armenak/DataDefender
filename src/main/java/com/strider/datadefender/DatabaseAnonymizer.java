@@ -224,7 +224,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */   
-    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column)
+    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -235,9 +235,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         // Check if function has parameters
         final List<Parameter> parms = column.getParameters();
         if (parms != null) {
-            return callAnonymizingFunctionWithParameters(dbConn, row, column);
+            return callAnonymizingFunctionWithParameters(dbConn, row, column, vendor);
         } else {
-            return callAnonymizingFunctionWithoutParameters(dbConn, column);
+            return callAnonymizingFunctionWithoutParameters(dbConn, column, vendor);
         }
         
     }    
@@ -256,7 +256,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, final Column column)
+    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, final Column column, String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -277,7 +277,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
             instance.setDatabaseConnection(dbConn);
-
+            instance.setVendor(vendor);
+            
             final List<Parameter> parms = column.getParameters();
             final Map<String, Object> paramValues = new HashMap<>(parms.size());
             final String columnValue = row.getString(column.getName());
@@ -382,7 +383,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column)
+    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column, String vendor)
     throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
            InvocationTargetException {
         
@@ -421,7 +422,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 throw new NoSuchMethodException(s.toString());
             }
             
-            log.debug("Anonymizing function: " + methodName);
+            log.debug("Anonymizing function name: " + methodName);
             final Object anonymizedValue = selectedMethod.invoke(instance);
             log.debug("anonymizedValue " + anonymizedValue);
             if (anonymizedValue == null) {
@@ -548,7 +549,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Collection<String> keyNames,
         final Connection db,
         final ResultSet row,
-        final List<MatchMetaData> columnMetaData
+        final List<MatchMetaData> columnMetaData,
+        final String vendor
     ) throws SQLException,
              NoSuchMethodException,
              SecurityException,
@@ -578,7 +580,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             anonymized.add(columnName);
-            final Object colValue = callAnonymizingFunctionFor(db, row, column);
+            final Object colValue = callAnonymizingFunctionFor(db, row, column, vendor);
             log.debug("colValue = " + colValue);
             log.debug("type= " + colValue.getClass());
             if (colValue == null) {
@@ -651,7 +653,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             int rowCount = 0;
             
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, columnMetaData);
+                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, columnMetaData, dbFactory.getVendorName());
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();
@@ -663,10 +665,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.debug("Rows processed: " + rowCount);
             
             updateStmt.executeBatch();
+            log.debug("Batch executed");
             updateCon.commit();
+            log.debug("Commit");
             selectStmt.close();
             updateStmt.close();
             rs.close();
+            log.debug("Closing open resources");
             
         } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             log.error(ex.toString());
