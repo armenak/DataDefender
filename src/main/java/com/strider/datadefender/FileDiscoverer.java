@@ -132,7 +132,11 @@ public class FileDiscoverer extends Discoverer {
                     metadata = new Metadata();
                     String handlerString = "";
                     try  {
+<<<<<<< HEAD
                     final InputStream stream = new FileInputStream(directory + "/" + file);
+=======
+                    InputStream stream = new FileInputStream(directory + "/" + file);
+>>>>>>> MSSQLLimitFix
                         if (stream != null) {
                             parser.parse(stream, handler, metadata);
                             handlerString =  handler.toString();
@@ -140,7 +144,15 @@ public class FileDiscoverer extends Discoverer {
                     }
                     catch (IOException e) {
                       log.info("Unable to read " + directory + "/" + file + ". Ignoring...");
+<<<<<<< HEAD
                       }
+=======
+<<<<<<< HEAD
+                      } 
+=======
+                      }
+>>>>>>> FileDiscoverySubdirectories
+>>>>>>> MSSQLLimitFix
 
                     log.debug("Content: " + handlerString);
                     final String tokens[] = model.getTokenizer().tokenize(handler.toString());

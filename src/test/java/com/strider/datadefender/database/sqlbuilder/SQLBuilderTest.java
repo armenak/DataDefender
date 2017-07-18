@@ -38,23 +38,23 @@ public class SQLBuilderTest {
     @Test
     public void testLimit() {
         ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
-        assertEquals(" LIMIT 1", builder.buildSelectWithLimit("", 1));
+        assertEquals("SELECT TOP 1 ", builder.buildSelectWithLimit("SELECT ", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
-        
+
         builder = new MySQLSQLBuilder(noSchema);
         assertEquals(" LIMIT 1", builder.buildSelectWithLimit("", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
-        
+
         builder = new OracleSQLBuilder(noSchema);
         assertEquals(" AND rownum <= 1", builder.buildSelectWithLimit("", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
     }
-    
+
     @Test
     public void testSchemaPrefix() {
         ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
         assertEquals(table, builder.prefixSchema(table));
-        
+
         builder = new MSSQLSQLBuilder(withSchema);
         assertEquals(schema + "." + table, builder.prefixSchema(table));
     }
