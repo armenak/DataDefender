@@ -28,8 +28,7 @@ public class MSSQLSQLBuilder extends SQLBuilder{
         super(databaseProperties);
     }
 
-    @Override
-<<<<<<< HEAD
+@Override
 public String buildSelectWithLimit(final String sqlString, final int limit) {
       final StringBuilder sql = new StringBuilder(sqlString);
       final String limitTOP = String.format("TOP %d ", limit);
@@ -40,16 +39,3 @@ public String buildSelectWithLimit(final String sqlString, final int limit) {
       return sql.toString();
   }
 }
-=======
-      public String buildSelectWithLimit(final String sqlString, final int limit) {
-          StringBuilder sql = new StringBuilder(sqlString);
-          String limitTOP = String.format("TOP %d ", limit);
-
-          if (limit != 0) {
-            sql.insert(7, limitTOP);
-          }
-          return sql.toString();
-      }
-
-  }
->>>>>>> MSSQLLimitFix
