@@ -22,8 +22,19 @@ import java.util.Properties;
  * @author Armenak Grigoryan
  */
 public class MSSQLSQLBuilder extends SQLBuilder{
-    
+
     public MSSQLSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
+
+    @Override
+public String buildSelectWithLimit(final String sqlString, final int limit) {
+      final StringBuilder sql = new StringBuilder(sqlString);
+      final String limitTOP = String.format("TOP %d ", limit);
+
+      if (limit != 0) {
+        sql.insert(7, limitTOP);
+      }
+      return sql.toString();
+  }
 }
