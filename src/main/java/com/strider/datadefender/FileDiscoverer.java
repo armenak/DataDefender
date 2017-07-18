@@ -140,7 +140,11 @@ public class FileDiscoverer extends Discoverer {
                     }
                     catch (IOException e) {
                       log.info("Unable to read " + directory + "/" + file + ". Ignoring...");
+<<<<<<< HEAD
                       } 
+=======
+                      }
+>>>>>>> FileDiscoverySubdirectories
 
                     log.debug("Content: " + handlerString);
                     final String tokens[] = model.getTokenizer().tokenize(handler.toString());
