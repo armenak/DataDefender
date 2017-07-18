@@ -132,7 +132,7 @@ public class FileDiscoverer extends Discoverer {
                     metadata = new Metadata();
                     String handlerString = "";
                     try  {
-                    InputStream stream = new FileInputStream(directory + "/" + file);
+                    final InputStream stream = new FileInputStream(directory + "/" + file);
                         if (stream != null) {
                             parser.parse(stream, handler, metadata);
                             handlerString =  handler.toString();
