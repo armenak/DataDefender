@@ -52,11 +52,11 @@ public class SQLBuilderTest {
 
     @Test
     public void testSchemaPrefix() {
-        ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
-        assertEquals(table, builder.prefixSchema(table));
+      ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
+      assertEquals("[" + table + "]", builder.prefixSchema(table));
 
-        builder = new MSSQLSQLBuilder(withSchema);
-        assertEquals(schema + "." + table, builder.prefixSchema(table));
+      builder = new MSSQLSQLBuilder(withSchema);
+      assertEquals("[" + schema + "].[" + table + "]", builder.prefixSchema(table));
     }
 
 }

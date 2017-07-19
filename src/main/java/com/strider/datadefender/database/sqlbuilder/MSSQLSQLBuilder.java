@@ -38,5 +38,17 @@ public class MSSQLSQLBuilder extends SQLBuilder{
           }
           return sql.toString();
       }
+      @Override
+    public String prefixSchema(final String tableName) {
+        final String schema = databaseProperties.getProperty("schema");
+        String prefixAndTableName;
+
+        // Add [] in order to espace special characters and reserved SQL keywords (Example: table with name Order) in SQLServer.
+        if (CommonUtils.isEmptyString(schema)) {
+            prefixAndTableName = "[" + tableName + "]";
+            return prefixAndTableName;
+        } else {
+            prefixAndTableName = "[" + schema + "]" + ".[" + tableName+"]";
+        }
 
   }
