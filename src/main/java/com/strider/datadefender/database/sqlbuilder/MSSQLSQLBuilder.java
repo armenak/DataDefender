@@ -14,9 +14,11 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender.database.sqlbuilder;
+ package com.strider.datadefender.database.sqlbuilder;
 
-import java.util.Properties;
+ import java.util.Properties;
+
+ import com.strider.datadefender.utils.CommonUtils;
 
 /**
  * @author Armenak Grigoryan
