@@ -38,6 +38,7 @@ public class MSSQLSQLBuilder extends SQLBuilder{
           }
           return sql.toString();
       }
+
       @Override
     public String prefixSchema(final String tableName) {
         final String schema = databaseProperties.getProperty("schema");
@@ -50,5 +51,5 @@ public class MSSQLSQLBuilder extends SQLBuilder{
         } else {
             prefixAndTableName = "[" + schema + "]" + ".[" + tableName+"]";
         }
-
+      }
   }
