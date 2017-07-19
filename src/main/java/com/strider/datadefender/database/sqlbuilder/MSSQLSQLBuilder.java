@@ -14,9 +14,11 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender.database.sqlbuilder;
+ package com.strider.datadefender.database.sqlbuilder;
 
-import java.util.Properties;
+ import java.util.Properties;
+
+ import com.strider.datadefender.utils.CommonUtils;
 
 /**
  * @author Armenak Grigoryan
@@ -38,4 +40,20 @@ public String buildSelectWithLimit(final String sqlString, final int limit) {
       }
       return sql.toString();
   }
-}
+
+  @Override
+  public String prefixSchema(final String tableName) {
+          final String schema = databaseProperties.getProperty("schema");
+          String prefixAndTableName;
+
+          // Add [] in order to espace special characters and reserved SQL keywords (Example: table with name Order) in SQLServer.
+          if (CommonUtils.isEmptyString(schema)) {
+              prefixAndTableName = "[" + tableName + "]";
+              return prefixAndTableName;
+          } else {
+              prefixAndTableName = "[" + schema + "]" + ".[" + tableName+"]";
+          }
+
+          return prefixAndTableName;
+      }
+  }
