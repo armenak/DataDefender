@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -64,25 +64,25 @@ import java.util.Map;
  * @author Armenak Grigoryan
  */
 public class DatabaseDiscoverer extends Discoverer {
-    
+
     private static final Logger log = getLogger(DatabaseDiscoverer.class);
-    
+
     private static String[] modelList;
-        
+
     @SuppressWarnings("unchecked")
-    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables) 
+    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables)
     throws AnonymizerException, ParseException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
         log.info("Probability threshold [" + probabilityThreshold + "]");
-        
+
         // Get list of models used in data discovery
         final String models = dataDiscoveryProperties.getProperty("models");
         modelList = models.split(",");
         log.info("Model list [" + Arrays.toString(modelList) + "]");
-        
+
         List<MatchMetaData> finalList = new ArrayList<>();
         for (final String model: modelList) {
             log.info("********************************");
@@ -90,61 +90,61 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("********************************");
             final Model modelPerson = createModel(dataDiscoveryProperties, model);
             matches = discoverAgainstSingleModel(factory, dataDiscoveryProperties, tables, modelPerson, probabilityThreshold);
-            finalList = ListUtils.union(finalList, matches);            
+            finalList = ListUtils.union(finalList, matches);
         }
 
-        final DecimalFormat decimalFormat = new DecimalFormat("#.##");                    
+        final DecimalFormat decimalFormat = new DecimalFormat("#.##");
         log.info("List of suspects:");
         log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
         final Score score = new Score();
         int highRiskColumns = 0;
-        for(final MatchMetaData data: finalList) {    
+        for(final MatchMetaData data: finalList) {
             // Row count
             final int rowCount = ReportUtil.rowCount(factory, data.getTableName());
-            // Getting 5 sample values                
-            final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());            
-            
+            // Getting 5 sample values
+            // final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());
+
             // Output
             log.info("Column                      : " + data.toString());
             log.info( CommonUtils.fixedLengthString('=', data.toString().length() + 30));
             log.info("Number of rows in the table : " + rowCount);
             log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
             log.info("Model                       : " + data.getModel());
-            log.info("Score                       : " + score.columnScore(rowCount) );               
+            log.info("Score                       : " + score.columnScore(rowCount) );
             log.info("Sample data");
             log.info( CommonUtils.fixedLengthString('-', 11));
-            
+
             //data.getProbabilityList().sort(Probability.compare());
-            
+
             final List<Probability> probabilityList = data.getProbabilityList();
-            
+
 //            probabilityList = new ArrayList<>(new LinkedHashSet<>(probabilityList));
-            Collections.sort(probabilityList, 
-                Comparator.comparingDouble(Probability::getProbabilityValue).reversed());    
-            
+            Collections.sort(probabilityList,
+                Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
+
             int y=0;
             if (data.getProbabilityList().size() >= 5) {
                 y = 5;
             } else {
                 y = data.getProbabilityList().size();
             }
-            
+
             for (int i=0; i<y; i++) {
                 final Probability p = data.getProbabilityList().get(i);
                 log.info(p.getSentence() + ":" + p.getProbabilityValue());
             }
-            
+
             //for (final String sampleData: sampleDataList) {
             //    log.info(sampleData);
             //}
             log.info("" );
-            
+
             if (score.columnScore(rowCount).equals("High")) {
                 highRiskColumns++;
             }
             //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
-            //log.info(result);            
-        }                    
+            //log.info(result);
+        }
         log.info("Overall score: " + score.dataStoreScore());
         log.info("");
         if (finalList != null && finalList.size() > 0) {
@@ -157,16 +157,16 @@ public class DatabaseDiscoverer extends Discoverer {
             }
             final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
             if (highRiskColumns > threshold_highrisk) {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");                
+                log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
             } else {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");                                
+                log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
             }
         }
-        
+
         return matches;
     }
-    
-    private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties, 
+
+    private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties,
             final Set<String> tables, final Model model, final double probabilityThreshold)
     throws AnonymizerException, ParseException {
         final IMetaData metaData = factory.fetchMetaData();
@@ -175,13 +175,13 @@ public class DatabaseDiscoverer extends Discoverer {
         matches = new ArrayList<>();
         MatchMetaData specialCaseData = null;
         boolean specialCase = false;
-        
-        
+
+
         final String[] specialCaseFunctions = dataDiscoveryProperties.getProperty("extentions").split(",");
         if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
             specialCase = true;
         }
-        
+
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
         for(final MatchMetaData data: map) {
@@ -208,24 +208,24 @@ public class DatabaseDiscoverer extends Discoverer {
             final String table = sqlBuilder.prefixSchema(tableName);
             final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
             final String query = sqlBuilder.buildSelectWithLimit(
-                "SELECT " + columnName + 
-                " FROM " + table + 
+                "SELECT " + columnName +
+                " FROM " + table +
                 " WHERE " + columnName  + " IS NOT NULL ", limit);
             log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
-                
+
                 while (resultSet.next()) {
                     if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
                         continue;
                     }
-                    
+
                     if (model.getName().equals("location") &&
                         data.getColumnType().contains("INT")) {
                         continue;
                     }
-                    
+
                     final String sentence = resultSet.getString(1);
                     if (specialCase) {
                         try {
@@ -237,12 +237,12 @@ public class DatabaseDiscoverer extends Discoverer {
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
                             log.error(e.toString());
                         }
-                        
+
                     }
-                    
+
                     if (sentence != null && !sentence.isEmpty()) {
                         String processingValue = "";
-                        if (data.getColumnType().equals("DATE") || 
+                        if (data.getColumnType().equals("DATE") ||
                             data.getColumnType().equals("TIMESTAMP") ||
                             data.getColumnType().equals("DATETIME")
                            ) {
@@ -253,20 +253,20 @@ public class DatabaseDiscoverer extends Discoverer {
                         } else {
                             processingValue = sentence;
                         }
-                        
+
                         //log.debug(sentence);
                         // Convert sentence into tokens
                         final String tokens[] = model.getTokenizer().tokenize(processingValue);
-                        
+
                         // Find names
                         final Span nameSpans[] = model.getNameFinder().find(tokens);
-                        
+
                         //find probabilities for names
                         final double[] spanProbs = model.getNameFinder().probs(nameSpans);
-                        
+
                         // Collect top X tokens with highest probability
-                        
-                        
+
+
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
                             log.debug("Span: "+nameSpans[i].toString());
@@ -275,9 +275,9 @@ public class DatabaseDiscoverer extends Discoverer {
                             probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                         }
                         // From OpenNLP documentation:
-                        //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators. 
-                        // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents. 
-                        model.getNameFinder().clearAdaptiveData();    
+                        //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators.
+                        // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents.
+                        model.getNameFinder().clearAdaptiveData();
                     }
                 }
             } catch (SQLException sqle) {
@@ -291,17 +291,17 @@ public class DatabaseDiscoverer extends Discoverer {
                 data.setProbabilityList(probabilityList);
                 matches.add(data);
             }
-            
+
             // Special processing
             if (specialCase && specialCaseData != null) {
                 matches.add(specialCaseData);
                 specialCaseData = null;
             }
         }
-        
+
         return matches;
     }
-    
+
     /**
      * Calls a function defined as an extention
      * @param function
@@ -313,7 +313,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws SecurityException
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
+     * @throws InvocationTargetException
      */
     private Object callExtention(final String function, MatchMetaData data, String text)
         throws SQLException,
@@ -322,31 +322,31 @@ public class DatabaseDiscoverer extends Discoverer {
                IllegalAccessException,
                IllegalArgumentException,
                InvocationTargetException {
-        
+
         if (function == null || function.equals("")) {
             log.warn("Function " + function + " is not defined");
             return null;
-        } 
-        
+        }
+
         Object value = null;
-        
+
         try {
             final String className = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
             final Method method = Class.forName(className).getMethod(methodName, new Class[]{MatchMetaData.class, String.class});
-            
+
             final SpecialCase instance = (SpecialCase) Class.forName(className).newInstance();
 
             final Map<String, Object> paramValues = new HashMap<>(2);
             paramValues.put("metadata", data);
-            paramValues.put("text", text);            
-            
+            paramValues.put("text", text);
+
             value = method.invoke(instance, data, text);
-            
+
         } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
-        
+
         return value;
-    }  
+    }
 }
