@@ -76,6 +76,8 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
+        final String calculate_score = dataDiscoveryProperties.getProperty("score_calculation");
+
         log.info("Probability threshold [" + probabilityThreshold + "]");
 
         // Get list of models used in data discovery
@@ -98,19 +100,31 @@ public class DatabaseDiscoverer extends Discoverer {
         log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
         final Score score = new Score();
         int highRiskColumns = 0;
+        int rowCount=0;
         for(final MatchMetaData data: finalList) {
             // Row count
-            final int rowCount = ReportUtil.rowCount(factory, data.getTableName());
+            if (calculate_score.equals("yes")) {
+              log.debug("Skipping table rowcount...");
+              rowCount = ReportUtil.rowCount(factory, data.getTableName());
+            }
+
             // Getting 5 sample values
             // final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());
 
             // Output
             log.info("Column                      : " + data.toString());
             log.info( CommonUtils.fixedLengthString('=', data.toString().length() + 30));
-            log.info("Number of rows in the table : " + rowCount);
+
             log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
             log.info("Model                       : " + data.getModel());
-            log.info("Score                       : " + score.columnScore(rowCount) );
+            if (calculate_score.equals("yes")) {
+            log.info("Number of rows in the table : " + rowCount);
+            log.info("Score                       : " + score.columnScore(rowCount));
+            } else {
+            log.info("Number of rows in the table : N/A");
+            log.info("Score                       : N/A");
+            }
+
             log.info("Sample data");
             log.info( CommonUtils.fixedLengthString('-', 11));
 
@@ -134,19 +148,21 @@ public class DatabaseDiscoverer extends Discoverer {
                 log.info(p.getSentence() + ":" + p.getProbabilityValue());
             }
 
-            //for (final String sampleData: sampleDataList) {
-            //    log.info(sampleData);
-            //}
             log.info("" );
-
+          // Score calculation is evaluated with score_calculation parameter
+          if (calculate_score.equals("yes")) {
             if (score.columnScore(rowCount).equals("High")) {
                 highRiskColumns++;
             }
+          }
             //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
             //log.info(result);
         }
+        // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
+        if (calculate_score.equals("yes")) {
         log.info("Overall score: " + score.dataStoreScore());
         log.info("");
+
         if (finalList != null && finalList.size() > 0) {
             log.info("============================================");
             final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
@@ -161,7 +177,11 @@ public class DatabaseDiscoverer extends Discoverer {
             } else {
                 log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
             }
-        }
+          }
+      }
+      else {
+      log.info("Overall score: N/A");
+      }
 
         return matches;
     }
@@ -190,7 +210,7 @@ public class DatabaseDiscoverer extends Discoverer {
             log.debug(data.getColumnType());
             probabilityList = new ArrayList<>();
 
-            log.info("Analyzing table [" + tableName + "]");
+            log.info("Analyzing table [" + tableName + "].["+ columnName+ "]");
 
             if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
                 log.debug("Continue ...");
