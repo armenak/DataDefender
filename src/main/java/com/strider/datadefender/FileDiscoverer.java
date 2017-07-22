@@ -100,6 +100,8 @@ public class FileDiscoverer extends Discoverer {
       fileMatches = new ArrayList<>();
       String[] directoryList = null;
       String[] exclusionList = null;
+      String file = null;
+      String recursivedir = null;
       final String directories = fileDiscoveryProperties.getProperty("directories");
       final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
       directoryList = directories.split(",");
@@ -114,21 +116,14 @@ public class FileDiscoverer extends Discoverer {
       for (final String directory: directoryList) {
 
           node = new File(directory);
-          List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
+          final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
-          for (File fich : files) {
-                String file = fich.getName().toString();
-                String recursivedir = fich.getParent().toString();
+          for (final File fich : files) {
+                file = fich.getName().toString();
+                recursivedir = fich.getParent().toString();
 
                   log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                  final String ext = CommonUtils.getFileExtension(fich);
 
-                  // @Luis Marques - too verbose and performance hit.
-                  //log.info("Extension " + ext);
-                  //if (Arrays.asList(exclusionList).contains(ext)) {
-                  //    log.info("Extention " + ext + " in in exclusion list");
-                  //    continue;
-                  //}
 
                   final BodyContentHandler handler = new BodyContentHandler(-1);
 
@@ -136,7 +131,7 @@ public class FileDiscoverer extends Discoverer {
                   metadata = new Metadata();
                   String handlerString = "";
                   try  {
-                  InputStream stream = new FileInputStream(fich.getCanonicalPath());
+                  final InputStream stream = new FileInputStream(fich.getCanonicalPath());
                       if (stream != null) {
                           parser.parse(stream, handler, metadata);
                           handlerString =  handler.toString();
