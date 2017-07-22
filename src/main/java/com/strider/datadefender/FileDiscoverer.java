@@ -100,8 +100,6 @@ public class FileDiscoverer extends Discoverer {
       fileMatches = new ArrayList<>();
       String[] directoryList = null;
       String[] exclusionList = null;
-      String file = null;
-      String recursivedir = null;
       final String directories = fileDiscoveryProperties.getProperty("directories");
       final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
       directoryList = directories.split(",");
@@ -119,11 +117,17 @@ public class FileDiscoverer extends Discoverer {
           final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
           for (final File fich : files) {
-                file = fich.getName().toString();
-                recursivedir = fich.getParent().toString();
+                  final String file = fich.getName().toString();
+                  final String recursivedir = fich.getParent().toString();
 
                   log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
+                  final String ext = CommonUtils.getFileExtension(fich);
+
+                    if (Arrays.asList(exclusionList).contains(ext)) {
+                      // less verbose - Ignored types on the top
+                        continue;
+                    }
 
                   final BodyContentHandler handler = new BodyContentHandler(-1);
 
