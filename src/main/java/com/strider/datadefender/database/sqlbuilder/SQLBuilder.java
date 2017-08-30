@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -25,16 +25,17 @@ import com.strider.datadefender.utils.CommonUtils;
  * @author Akira Matsuo
  */
 public abstract class SQLBuilder implements ISQLBuilder {
-    private final Properties databaseProperties;
-    
+    /* changed to public to allow use o databaseProperties object in MSSQLSQLBuilder.java */
+    public final Properties databaseProperties;
+
     protected SQLBuilder(final Properties databaseProperties) {
         this.databaseProperties = databaseProperties;
     }
-    
+
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
         final StringBuilder sql = new StringBuilder(sqlString);
-        
+
         if (limit != 0) {
             sql.append(" LIMIT ").append(limit);
         }
@@ -45,15 +46,15 @@ public abstract class SQLBuilder implements ISQLBuilder {
     public String prefixSchema(final String tableName) {
         final String schema = databaseProperties.getProperty("schema");
         String prefixAndTableName;
-        
+
         if (CommonUtils.isEmptyString(schema)) {
             prefixAndTableName = tableName;
             return tableName;
         } else {
             prefixAndTableName = schema + "." + tableName;
         }
-         
+
         return prefixAndTableName;
     }
-    
+
 }
