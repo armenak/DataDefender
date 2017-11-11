@@ -1,4 +1,4 @@
-Contributing
+# Contributing
 
 You can contribute by clicking the star button and using this software!
 
