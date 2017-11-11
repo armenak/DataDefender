@@ -59,14 +59,7 @@ Build from source
 
 Contributing
 ------------
-You can contribute by clicking the star button and using this software!
-
-Contributors are encouraged to fork this repository and issue pull requests. If you would like to contribute, please
-1. Fork it
-2. Create your feature branch (git checkout -b new-feature)
-3. Commit your changes (git commit -am 'Add new feature')
-4. Push to the branch (git push origin new-feature)
-5. Create new Pull Request
+We encourage you to contribute to DataDefender! Please check out the [Contribution guidelines for this project](CONTRIBUTING.md). 
 
 How to run
 ----------
