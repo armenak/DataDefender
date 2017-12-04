@@ -31,7 +31,7 @@ public class MSSQLSQLBuilder extends SQLBuilder{
     }
 
     @Override
-      public String buildSelectWithLimit(final String sqlString, final int limit) {
+    public String buildSelectWithLimit(final String sqlString, final int limit) {
           final StringBuilder sql = new StringBuilder(sqlString);
           final String limitTOP = String.format("TOP %d ", limit);
 

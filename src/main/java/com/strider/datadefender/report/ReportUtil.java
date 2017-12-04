@@ -38,10 +38,12 @@ public class ReportUtil {
     public static int rowCount(final IDBFactory factory, final String tableName) {
         
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        final int limit = 100;
+
         final String table = sqlBuilder.prefixSchema(tableName);
 
         // Getting number of records in the table                
-        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, 0);
+        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, limit);
         log.debug("Executing query against database: " + queryCount);
 
         int rowCount = 0;
