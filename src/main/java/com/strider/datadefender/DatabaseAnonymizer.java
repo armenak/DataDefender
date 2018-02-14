@@ -190,8 +190,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 query.append(")");
             }
         }
-        
-        final PreparedStatement stmt = dbFactory.getConnection().prepareStatement(query.toString());
+
+        final PreparedStatement stmt = dbFactory.getConnection().prepareStatement(
+                query.toString(),
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_UPDATABLE
+        );
         if (dbFactory.getVendorName().equalsIgnoreCase("mysql")) {
             stmt.setFetchSize(Integer.MIN_VALUE);
         }
