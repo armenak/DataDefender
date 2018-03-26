@@ -95,81 +95,88 @@ public class FileDiscoverer extends Discoverer {
     }
 
     private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties, final Model model, final double probabilityThreshold)
-  throws AnonymizerException, IOException, SAXException, TikaException {
-      // Start running NLP algorithms for each column and collect percentage
-      fileMatches = new ArrayList<>();
-      String[] directoryList = null;
-      String[] exclusionList = null;
-      final String directories = fileDiscoveryProperties.getProperty("directories");
-      final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
-      directoryList = directories.split(",");
-      exclusionList = exclusions.split(",");
+    throws AnonymizerException, IOException, SAXException, TikaException {
+        // Start running NLP algorithms for each column and collect percentage
+        fileMatches = new ArrayList<>();
+        String[] directoryList = null;
+        String[] exclusionList = null;
+        final String directories = fileDiscoveryProperties.getProperty("directories");
+        log.info("Directories to analyze: " + directories);
+        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
 
-      // Let's iterate over directories
-      File node;
-      Metadata metadata;
-      List<Probability> probabilityList;
-      log.info("File types not considered for analysis: " + exclusions);
+        if (directories == null || directories.equals("")) {
+            log.error("directories property is empty in firediscovery.properties file");
+            throw new AnonymizerException("directories property is empty in firediscovery.properties file");
+        }
+        directoryList = directories.split(",");
+      
+        if (exclusions == null || exclusions.equals("")) {      
+            log.info("exclusions property is empty in firediscovery.properties file");
+        } else {
+            exclusionList = exclusions.split(",");
+            log.info("File types not considered for analysis: " + exclusions);
+        }
 
-      for (final String directory: directoryList) {
+        // Let's iterate over directories
+        File node;
+        Metadata metadata;
+        List<Probability> probabilityList;
 
-          node = new File(directory);
-          final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
+        for (final String directory: directoryList) {
+            node = new File(directory);
+            final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
-          for (final File fich : files) {
-                  final String file = fich.getName().toString();
-                  final String recursivedir = fich.getParent().toString();
+            for (final File fich : files) {
+                final String file = fich.getName().toString();
+                final String recursivedir = fich.getParent().toString();
 
-                  log.info("Analyzing [" + fich.getCanonicalPath() + "]");
+                log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
-                  final String ext = CommonUtils.getFileExtension(fich);
+                final String ext = CommonUtils.getFileExtension(fich);
 
-                    if (Arrays.asList(exclusionList).contains(ext)) {
-                      // less verbose - Ignored types on the top
-                        continue;
+                if (exclusionList != null && Arrays.asList(exclusionList).contains(ext)) {
+                   // less verbose - Ignored types on the top
+                   continue;
+                }
+
+                final BodyContentHandler handler = new BodyContentHandler(-1);
+
+                final AutoDetectParser parser = new AutoDetectParser();
+                metadata = new Metadata();
+                String handlerString = "";
+                try  {
+                    final InputStream stream = new FileInputStream(fich.getCanonicalPath());
+                    if (stream != null) {
+                        parser.parse(stream, handler, metadata);
+                        handlerString =  handler.toString();
                     }
-
-                  final BodyContentHandler handler = new BodyContentHandler(-1);
-
-                  final AutoDetectParser parser = new AutoDetectParser();
-                  metadata = new Metadata();
-                  String handlerString = "";
-                  try  {
-                  final InputStream stream = new FileInputStream(fich.getCanonicalPath());
-                      if (stream != null) {
-                          parser.parse(stream, handler, metadata);
-                          handlerString =  handler.toString();
-                      }
-                  }
-                  catch (IOException e) {
+                } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() +".Ignoring...");
-                    }
+                }
 
+                log.debug("Content: " + handlerString);
+                final String tokens[] = model.getTokenizer().tokenize(handler.toString());
+                final Span nameSpans[] = model.getNameFinder().find(tokens);
+                final double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                //display names
+                probabilityList = new ArrayList<>();
+                for( int i = 0; i < nameSpans.length; i++) {
+                    log.info("Span: "+nameSpans[i].toString());
+                    log.info("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                    log.info("Probability is: "+spanProbs[i]);
+                    probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                }
+                model.getNameFinder().clearAdaptiveData();
 
-                  log.debug("Content: " + handlerString);
-                  final String tokens[] = model.getTokenizer().tokenize(handler.toString());
-                  final Span nameSpans[] = model.getNameFinder().find(tokens);
-                  final double[] spanProbs = model.getNameFinder().probs(nameSpans);
-                  //display names
-                  probabilityList = new ArrayList<>();
-                  for( int i = 0; i < nameSpans.length; i++) {
-                      log.info("Span: "+nameSpans[i].toString());
-                      log.info("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                      log.info("Probability is: "+spanProbs[i]);
-                      probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
-                  }
-                  model.getNameFinder().clearAdaptiveData();
-
-                  final double averageProbability = calculateAverage(probabilityList);
-                  if ((averageProbability >= probabilityThreshold)) {
-                      final FileMatchMetaData result = new FileMatchMetaData(recursivedir, file);
-                      result.setAverageProbability(averageProbability);
-                      result.setModel(model.getName());
-                      fileMatches.add(result);
-                  }
-              }
-          }
-
+                final double averageProbability = calculateAverage(probabilityList);
+                if ((averageProbability >= probabilityThreshold)) {
+                    final FileMatchMetaData result = new FileMatchMetaData(recursivedir, file);
+                    result.setAverageProbability(averageProbability);
+                    result.setModel(model.getName());
+                    fileMatches.add(result);
+                }
+            }
+        }
 
       return fileMatches;
     }
