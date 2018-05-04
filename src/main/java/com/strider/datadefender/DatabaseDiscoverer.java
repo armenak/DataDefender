@@ -231,7 +231,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 "SELECT `" + columnName + "`" +
                 " FROM " + table +
                 " WHERE `" + columnName  + "` IS NOT NULL ", limit);
-            log.debug("Executing query against database: " + query);
+            log.info("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
