@@ -228,9 +228,9 @@ public class DatabaseDiscoverer extends Discoverer {
             final String table = sqlBuilder.prefixSchema(tableName);
             final int limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
             final String query = sqlBuilder.buildSelectWithLimit(
-                "SELECT " + columnName +
+                "SELECT `" + columnName + "`" +
                 " FROM " + table +
-                " WHERE " + columnName  + " IS NOT NULL ", limit);
+                " WHERE `" + columnName  + "` IS NOT NULL ", limit);
             log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
