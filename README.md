@@ -39,11 +39,12 @@ This implementation of Data Discovery program is using [Apache OpenNLP](https://
 
 Features
 --------
-1. Identifies sensitive personal data
-2. Creates plan (XML document) to define what columns and how should be anonymized
-3. Anonymizes the data
-4. Platform-independent
+1. Identifies sensitive personal data.
+2. Creates plan (XML document) to define what columns and how should be anonymized.
+3. Anonymizes the data.
+4. Platform-independent.
 5. Supports Oracle, MS SQL Server, and MySQL. Work in progress for DB2 and PostgreSQL.
+6. This tool can help you on GDPR.
 
 Prerequisites
 ----------------
