@@ -76,7 +76,10 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
-        final String calculate_score = dataDiscoveryProperties.getProperty("score_calculation");
+        String calculate_score = dataDiscoveryProperties.getProperty("score_calculation");
+        if (CommonUtils.isEmptyString(calculate_score)) {
+            calculate_score = "false";
+        }
 
         log.info("Probability threshold [" + probabilityThreshold + "]");
 
@@ -197,9 +200,13 @@ public class DatabaseDiscoverer extends Discoverer {
         boolean specialCase = false;
 
 
-        final String[] specialCaseFunctions = dataDiscoveryProperties.getProperty("extentions").split(",");
-        if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
-            specialCase = true;
+        String extentionList = dataDiscoveryProperties.getProperty("extentions");
+        String[] specialCaseFunctions = null;
+        if (!CommonUtils.isEmptyString(extentionList)) {
+            specialCaseFunctions = extentionList.split(",");
+            if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
+                specialCase = true;
+            }
         }
 
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
