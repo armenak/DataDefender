@@ -131,11 +131,8 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("Sample data");
             log.info( CommonUtils.fixedLengthString('-', 11));
 
-            //data.getProbabilityList().sort(Probability.compare());
-
             final List<Probability> probabilityList = data.getProbabilityList();
 
-//            probabilityList = new ArrayList<>(new LinkedHashSet<>(probabilityList));
             Collections.sort(probabilityList,
                 Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
 
@@ -152,40 +149,43 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             log.info("" );
-          // Score calculation is evaluated with score_calculation parameter
-          if (calculate_score.equals("yes")) {
-            if (score.columnScore(rowCount).equals("High")) {
-                highRiskColumns++;
+            
+            // Score calculation is evaluated with score_calculation parameter
+            if (calculate_score.equals("yes")) {
+                if (score.columnScore(rowCount).equals("High")) {
+                    highRiskColumns++;
+                }
             }
-          }
             //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
             //log.info(result);
         }
+        
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
         if (calculate_score.equals("yes")) {
-        log.info("Overall score: " + score.dataStoreScore());
-        log.info("");
+            log.info("Overall score: " + score.dataStoreScore());
+            log.info("");
 
-        if (finalList != null && finalList.size() > 0) {
-            log.info("============================================");
-            final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
-            if (finalList.size() > threshold_count) {
-                log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
-            } else {
-                log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+            if (finalList != null && finalList.size() > 0) {
+                log.info("============================================");
+                final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
+                if (finalList.size() > threshold_count) {
+                    log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
+                } else {
+                    log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+                }
+            
+                final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
+                if (highRiskColumns > threshold_highrisk) {
+                    log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
+                } else {
+                    log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
+                }
             }
-            final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
-            if (highRiskColumns > threshold_highrisk) {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
-            } else {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
-            }
-          }
-      }
-      else {
-      log.info("Overall score: N/A");
-      }
+        } else {
+            log.info("Overall score: N/A");
+        }
 
+        log.info("matches: " + matches.toString());
         return matches;
     }
 

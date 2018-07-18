@@ -145,6 +145,7 @@ public class DataDefender  {
                         final Properties columnProperties = loadProperties(columnPropertyFile);
                         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                        log.info("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
                         if (line.hasOption('r')) {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
                         }                        
@@ -205,7 +206,7 @@ public class DataDefender  {
         options.addOption("c", "columns", false, "discover candidate column names for anonymization based on provided patterns");
         options.addOption("C", "column-properties", true, "define column property file");
         options.addOption("d", "data", false, "discover candidate column for anonymization based on semantic algorithms");
-        options.addOption("D", "data-properties", true, "discover candidate column for anonymization based on semantic algorithms");
+        options.addOption("D", "data-properties", true, "define data property file");
         options.addOption("r", "requirement", false, "create discover and create requirement file");
         options.addOption("R", "requirement-file", false, "define requirement file name");
         options.addOption("P", "database properties", true, "define database property file");
@@ -221,7 +222,7 @@ public class DataDefender  {
      */
     private static void help(final Options options) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("DataAnonymizer anonymize|database-discovery|file-discovery|generate [options] [table1 [table2 [...]]]", options);
+        formatter.printHelp("java -jar DataDefender.jar anonymize|database-discovery|file-discovery|generate [options] [table1 [table2 [...]]]", options);
     }
     
     /**
