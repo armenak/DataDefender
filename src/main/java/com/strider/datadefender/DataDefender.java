@@ -145,7 +145,7 @@ public class DataDefender  {
                         final Properties columnProperties = loadProperties(columnPropertyFile);
                         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
-                        log.info("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
+                        log.debug("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
                         if (line.hasOption('r')) {
                             discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
                         }                        
@@ -240,7 +240,6 @@ public class DataDefender  {
      * @return The list of table names
      */
     public static Set<String> getTableNames(List<String> tableNames, final Properties props) {
-        //List<String> tableNamesTmp = new ArrayList();
         
         if (tableNames.isEmpty()) {
             final String tableStr = props.getProperty("tables");

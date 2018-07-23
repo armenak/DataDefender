@@ -127,15 +127,15 @@ public class FileDiscoverer extends Discoverer {
             final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
             for (final File fich : files) {
-                final String file = fich.getName().toString();
-                final String recursivedir = fich.getParent().toString();
+                final String file = fich.getName();
+                final String recursivedir = fich.getParent();
 
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
-                final String ext = CommonUtils.getFileExtension(fich);
-
+                final String ext = CommonUtils.getFileExtension(fich).toLowerCase();
+                log.info("Extension: " + ext);
                 if (exclusionList != null && Arrays.asList(exclusionList).contains(ext)) {
-                   // less verbose - Ignored types on the top
+                   log.info("Ignoring type " + ext);
                    continue;
                 }
 
@@ -149,6 +149,7 @@ public class FileDiscoverer extends Discoverer {
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString =  handler.toString();
+                        log.info(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() +".Ignoring...");
