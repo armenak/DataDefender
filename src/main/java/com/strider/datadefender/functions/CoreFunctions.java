@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -381,11 +382,11 @@ public class CoreFunctions {
      */
     public String randomPostalCode() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
                 append(randInt(1,9)).
-                append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
                 append(randInt(1,9)).
-                append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
                 append(randInt(1,9)); 
         
         log.debug("Generated postal code: " + sb.toString());

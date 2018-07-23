@@ -35,6 +35,7 @@ public class PropertyCheck {
     private static final String[] dataAnonymizerProperties = {"requirement", "batch_size"};
 
     private static final String IS_NOT_DEFINED = " is not defined";
+    private static final String PROPERTY       = "Property ";    
     
     @SuppressWarnings("unchecked")
 
@@ -46,7 +47,7 @@ public class PropertyCheck {
         for (int i=0; i<databaseProperties.length; i++ ) {
             final String property = dbProperties.getProperty(databaseProperties[i]);
             if (property == null || "".equals(property)) {
-                errors.add("Property " + databaseProperties[i] + IS_NOT_DEFINED);
+                errors.add(PROPERTY + databaseProperties[i] + IS_NOT_DEFINED);
             }
         }
         return errors;
@@ -62,7 +63,7 @@ public class PropertyCheck {
             for (int i=0; i<fileDiscoveryProperties.length; i++ ) {
                 final String property = properties.getProperty(fileDiscoveryProperties[i]);
                 if (property == null || "".equals(property)) {
-                    errors.add("Property " + fileDiscoveryProperties[i] + IS_NOT_DEFINED);
+                    errors.add(PROPERTY + fileDiscoveryProperties[i] + IS_NOT_DEFINED);
                 }
             }
         } else if ("anonymize".equals(utiity)) {
@@ -71,7 +72,7 @@ public class PropertyCheck {
             for (int i=0; i<dataAnonymizerProperties.length; i++ ) {
                 final String property = properties.getProperty(dataAnonymizerProperties[i]);
                 if (property == null || "".equals(property)) {
-                    errors.add("Property " + dataAnonymizerProperties[i] + IS_NOT_DEFINED);
+                    errors.add(PROPERTY + dataAnonymizerProperties[i] + IS_NOT_DEFINED);
                 }
             }
         } else if ("database-discovery".equals(utiity)) {
@@ -86,7 +87,7 @@ public class PropertyCheck {
                 for (int i=0; i<dataDiscoveryProperties.length; i++ ) {
                     final String property = properties.getProperty(dataDiscoveryProperties[i]);
                     if (property == null || "".equals(property)) {
-                        errors.add("Property " + dataDiscoveryProperties[i] + IS_NOT_DEFINED);
+                        errors.add(PROPERTY + dataDiscoveryProperties[i] + IS_NOT_DEFINED);
                     }
                 }
             }

@@ -29,6 +29,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.database.metadata.MatchMetaData;
+import java.util.Locale;
 
 /**
  * @author Armenak Grigoryan
@@ -64,7 +65,7 @@ public class PHIDetector implements SpecialCase {
         }
         
         if (data.getColumnType().equals("VARCHAR") &&
-            phiList.contains(text.trim().toUpperCase())) {
+            phiList.contains(text.trim().toUpperCase(Locale.ENGLISH))) {
                 log.info("PHI detected: " + text);
                 data.setModel("phi");
                 data.setAverageProbability(1);

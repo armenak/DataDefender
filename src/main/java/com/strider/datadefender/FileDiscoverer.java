@@ -46,6 +46,7 @@ import opennlp.tools.util.Span;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
 import java.util.Collections;
+import java.util.Locale;
 
 /**
  *
@@ -131,7 +132,7 @@ public class FileDiscoverer extends Discoverer {
 
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
-                final String ext = CommonUtils.getFileExtension(fich).toLowerCase();
+                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
                 log.info("Extension: " + ext);
                 if (exclusionList != null && Arrays.asList(exclusionList).contains(ext)) {
                    log.info("Ignoring type " + ext);
