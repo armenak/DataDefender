@@ -113,17 +113,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(" SET ").
             append(StringUtils.join(updateColumns, " = ?, ")).
             append(" = ? WHERE ");
-            //.append(StringUtils.join(keys, " = ? AND = ?"));    
 
         log.info("keys: " + keys.toString()); 
         int iteration = 0;
-        int collectionSize = keys.size();
-        String whereStmtp = "";
+        final int collectionSize = keys.size();
+        StringBuilder whereStmtp = new StringBuilder();
         for (final String key: keys) {
             ++iteration;
-            whereStmtp += key + " = ? ";
+            whereStmtp.append(key).append(" = ? ");
             if (collectionSize > iteration) {
-                whereStmtp += " AND ";
+                whereStmtp.append(" AND ");
             }
         }
         sql.append(whereStmtp);

@@ -127,8 +127,7 @@ public class CoreFunctions {
         if (stringIters.containsKey(name)) {
             final Iterator<String> iter = stringIters.get(name);
             if (iter.hasNext()) {
-                final String next = iter.next();
-                return next;
+                return iter.next();
             }
         }
         
