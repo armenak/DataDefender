@@ -642,7 +642,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Connection updateCon = dbFactory.getUpdateConnection();
         
         try {
-
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
@@ -693,6 +692,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } catch (SQLException sqlex) {
                 log.error(sqlex.toString());
             }
+        } finally {
+            try {
+                if (selectStmt != null) {
+                    selectStmt.close();
+                }
+                if (updateStmt != null) {
+                    updateStmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException sqlex) {
+                log.error(sqlex.toString());
+            }            
         }
         
         log.info("Table " + table.getName() + ". End ...");
