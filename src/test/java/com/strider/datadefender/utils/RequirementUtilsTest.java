@@ -118,7 +118,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals(STRING_TYPE, c1.getReturnType());
 
         // default function
-        assertEquals("com.strider.dataanonymizer.functions.CoreFunctions.randomStringFromFile", c1.getFunction());
+        assertEquals("com.strider.datadefender.functions.CoreFunctions.randomStringFromFile", c1.getFunction());
         assertEquals(1, c1.getParameters().size());
         
         final Table t2 = req.getTables().get(1);

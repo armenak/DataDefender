@@ -33,8 +33,8 @@ public class UtilsTest extends TestCase {
      */
     private static final Logger log = getLogger(UtilsTest.class);    
     
-    private static final String FULL_CLASS_NAME  = "com.strider.dataanonymizer.functions.CoreFunctions";
-    private static final String EXPECTED_RESULTS_1 = "com.strider.dataanonymizer.functions";
+    private static final String FULL_CLASS_NAME    = "com.strider.datadefender.functions.CoreFunctions";
+    private static final String EXPECTED_RESULTS_1 = "com.strider.datadefender.functions";
     private static final String EXPECTED_RESULTS_2 = "CoreFunctions";
     
     public UtilsTest(final String testName) {

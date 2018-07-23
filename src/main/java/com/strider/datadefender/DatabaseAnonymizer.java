@@ -303,8 +303,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             for (final Method m : methods) {
                 if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
                     
-                    log.debug("  Found method: " + m.getName());
-                    log.debug("  Match w/: " + paramValues);
+                    log.info("  Found method: " + m.getName());
+                    log.info("  Match w/: " + paramValues);
                     
                     final java.lang.reflect.Parameter[] mParams = m.getParameters();
                     fnArguments.clear();
@@ -357,7 +357,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 throw new NoSuchMethodException(s.toString());
             }
             
-            log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
+            log.info("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
             final Object anonymizedValue = selectedMethod.invoke(instance, fnArguments.toArray());
             if (anonymizedValue == null) {
                 return null;
@@ -424,19 +424,19 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 throw new NoSuchMethodException(s.toString());
             }
             
-            log.debug("Anonymizing function name: " + methodName);
+            log.info("Anonymizing function name: " + methodName);
             final Object anonymizedValue = selectedMethod.invoke(instance);
-            log.debug("anonymizedValue " + anonymizedValue);
+            log.info("anonymizedValue " + anonymizedValue);
             if (anonymizedValue == null) {
                 return null;
             }
             
-            log.debug(returnType.toString());
+            log.debug(returnType);
             if (returnType == String.class) {
                 return anonymizedValue.toString();
             } else if (returnType == java.sql.Date.class) {
                 return anonymizedValue;
-            } else if (returnType.toString().equals("int")) {
+            } else if (returnType.equals("int")) {
                 return anonymizedValue;
             }
         } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
@@ -583,8 +583,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             anonymized.add(columnName);
             final Object colValue = callAnonymizingFunctionFor(db, row, column, vendor);
-            log.debug("colValue = " + colValue);
-            //log.debug("type= " + colValue.getClass());
+            log.info("colValue = " + colValue);
+            log.info("type= " + colValue.getClass());
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
@@ -592,6 +592,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } else if (colValue.getClass() == java.lang.Integer.class) {
                 updateStmt.setInt(columnIndexes.get(columnName), (int) colValue);
             } else {
+                log.info("Break point N1");
                 updateStmt.setString(
                     columnIndexes.get(columnName),
                     getTruncatedColumnValue(
@@ -600,14 +601,21 @@ public class DatabaseAnonymizer implements IAnonymizer {
                         columnMetaData
                     )
                 );
+                log.info("Break point N2");
             }
         }
 
-        int whereIndex = fieldIndex;
+        int whereIndex = fieldIndex - 1;
+        log.info("Break point N3");
+        log.info(keyNames.toString());
+        log.info(whereIndex);
+        log.info(updateStmt.toString());
         for (final String key : keyNames) {
             updateStmt.setString(++whereIndex, row.getString(key));
+            
         }
-
+        log.info("Break point N4");
+        log.info(updateStmt);
         updateStmt.addBatch();
     }
     
@@ -655,6 +663,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             
             while (rs.next()) {
                 anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, columnMetaData, dbFactory.getVendorName());
+                log.info(updateStmt);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();

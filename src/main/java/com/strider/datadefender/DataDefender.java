@@ -145,9 +145,9 @@ public class DataDefender  {
                         final Properties columnProperties = loadProperties(columnPropertyFile);
                         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
                         discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
-                        log.debug("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
+                        //log.debug("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
                         if (line.hasOption('r')) {
-                            discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
+                            discoverer.createRequirement("Sample-Requirement.xml");
                         }                        
                     } else if (line.hasOption('d')) {
                         errors = PropertyCheck.check(cmd, 'd');    
@@ -159,7 +159,7 @@ public class DataDefender  {
                         final DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
                         if (line.hasOption('r')) {
-                            discoverer.createRequirement(line.getOptionValue('R', "Sample-Requirement.xml"));
+                            discoverer.createRequirement("Sample-Requirement.xml");
                         }                         
                     }
                     break;
@@ -208,7 +208,7 @@ public class DataDefender  {
         options.addOption("d", "data", false, "discover candidate column for anonymization based on semantic algorithms");
         options.addOption("D", "data-properties", true, "define data property file");
         options.addOption("r", "requirement", false, "create discover and create requirement file");
-        options.addOption("R", "requirement-file", false, "define requirement file name");
+        //options.addOption("R", "requirement-file", false, "define requirement file name");
         options.addOption("P", "database properties", true, "define database property file");
         options.addOption("F", "file discovery properties", true, "define file discovery property file");
         options.addOption("debug", false, "enable debug output");
