@@ -18,7 +18,6 @@
 package com.strider.datadefender.specialcase;
 
 import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.extensions.BiographicFunctions;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
