@@ -143,7 +143,7 @@ public class RequirementUtils {
             column = new Column();
             column.setName(match.getColumnName());
             
-            String columnType = match.getColumnType();
+            final String columnType = match.getColumnType();
             if ("TEXT".equals(columnType) || "CHAR".equals(columnType)) {
                 column.setReturnType("String");
             } else {

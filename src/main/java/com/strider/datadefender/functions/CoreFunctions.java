@@ -124,15 +124,20 @@ public class CoreFunctions {
      * @return 
      */
     private String getNextShuffledItemFor(final String name) {
+        log.info("getNextShuffledItemFor: Step 1:" + name);
         if (stringIters.containsKey(name)) {
             final Iterator<String> iter = stringIters.get(name);
             if (iter.hasNext()) {
-                return iter.next();
+                String next = iter.next();
+                log.info("getNextShuffledItemFor: Step 2: " + next);
+                return next;
             }
         }
         
         final List<String> list = stringLists.get(name);
+        log.info("getNextShuffledItemFor: Step 3: reshuffle");
         Collections.shuffle(list);
+        log.info("getNextShuffledItemFor: Step 4: " + list.toString());
         
         final Iterator<String> iter = list.iterator();
         stringIters.put(name, iter);

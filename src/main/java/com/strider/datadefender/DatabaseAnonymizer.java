@@ -436,7 +436,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 return anonymizedValue.toString();
             } else if (returnType == java.sql.Date.class) {
                 return anonymizedValue;
-            } else if (returnType.equals("int")) {
+            } else if ("int".equals(returnType)) {
                 return anonymizedValue;
             }
         } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
@@ -592,7 +592,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } else if (colValue.getClass() == java.lang.Integer.class) {
                 updateStmt.setInt(columnIndexes.get(columnName), (int) colValue);
             } else {
-                log.info("Break point N1");
                 updateStmt.setString(
                     columnIndexes.get(columnName),
                     getTruncatedColumnValue(
@@ -601,12 +600,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
                         columnMetaData
                     )
                 );
-                log.info("Break point N2");
             }
         }
 
         int whereIndex = fieldIndex - 1;
-        log.info("Break point N3");
         log.info(keyNames.toString());
         log.info(whereIndex);
         log.info(updateStmt.toString());
@@ -614,7 +611,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt.setString(++whereIndex, row.getString(key));
             
         }
-        log.info("Break point N4");
         log.info(updateStmt);
         updateStmt.addBatch();
     }
