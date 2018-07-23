@@ -18,6 +18,7 @@
 package com.strider.datadefender.specialcase;
 
 
+import com.strider.datadefender.Probability;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -59,16 +60,19 @@ public class PHIDetector implements SpecialCase {
      * @param text
      * @return String
      */
-    public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {    
+    public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {   
        if (CommonUtils.isEmptyString(text)) {
             return null;
         }
         
         if (data.getColumnType().equals("VARCHAR") &&
-            phiList.contains(text.trim().toUpperCase(Locale.ENGLISH))) {
+            phiList.contains(text.trim().toLowerCase(Locale.ENGLISH))) {
                 log.info("PHI detected: " + text);
                 data.setModel("phi");
-                data.setAverageProbability(1);
+                data.setAverageProbability(100);
+                List<Probability> probabilityList = new ArrayList();
+                probabilityList.add(new Probability(text, 1.00));
+                data.setProbabilityList(probabilityList);
                 return data;
         }
         return null;

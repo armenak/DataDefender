@@ -196,6 +196,7 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
         MatchMetaData specialCaseData = null;
+        List<MatchMetaData> specialCaseDataList = new ArrayList();
         boolean specialCase = false;
 
 
@@ -258,6 +259,10 @@ public class DatabaseDiscoverer extends Discoverer {
                             for (int i=0; i<specialCaseFunctions.length; i++) {
                                 if (sentence != null && !sentence.equals("")) {
                                     specialCaseData = (MatchMetaData)callExtention(specialCaseFunctions[i], data, sentence);
+                                    if (specialCaseData != null) {
+                                        log.info("Adding new special case data: " + specialCaseData.toString());
+                                        specialCaseDataList.add(specialCaseData);
+                                    }
                                 }
                             }
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
@@ -320,14 +325,16 @@ public class DatabaseDiscoverer extends Discoverer {
                 data.setProbabilityList(probabilityList);
                 matches.add(data);
             }
-
-            // Special processing
-            if (specialCase && specialCaseData != null) {
-                matches.add(specialCaseData);
-                specialCaseData = null;
-            }
         }
 
+        // Special processing
+        if (specialCaseDataList != null && !specialCaseDataList.isEmpty()) {
+            log.info("Special case data is processed :" + specialCaseDataList.toString());
+            for (MatchMetaData specialData : specialCaseDataList) {
+                matches.add(specialData);
+            }
+        }        
+        
         return matches;
     }
 
