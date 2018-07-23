@@ -73,7 +73,7 @@ public class FileDiscoverer extends Discoverer {
         log.info("Model list [" + Arrays.toString(modelList) + "]");
 
         List<FileMatchMetaData> finalList = new ArrayList<>();
-        for (String model: modelList) {
+        for (final String model: modelList) {
             log.info("********************************");
             log.info("Processing model " + model);
             log.info("********************************");
@@ -98,18 +98,16 @@ public class FileDiscoverer extends Discoverer {
     throws AnonymizerException, IOException, SAXException, TikaException {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
-        String[] directoryList = null;
-        String[] exclusionList = null;
         final String directories = fileDiscoveryProperties.getProperty("directories");
         log.info("Directories to analyze: " + directories);
-        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
 
         if (directories == null || directories.equals("")) {
             log.error("directories property is empty in firediscovery.properties file");
             throw new AnonymizerException("directories property is empty in firediscovery.properties file");
         }
-        directoryList = directories.split(",");
-      
+        String[] directoryList = directories.split(",");
+        String[] exclusionList = null;
+        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
         if (exclusions == null || exclusions.equals("")) {      
             log.info("exclusions property is empty in firediscovery.properties file");
         } else {

@@ -66,6 +66,7 @@ import java.util.Map;
 public class DatabaseDiscoverer extends Discoverer {
 
     private static final Logger log = getLogger(DatabaseDiscoverer.class);
+    private static final String YES = "yes";
 
     private static String[] modelList;
 
@@ -106,7 +107,7 @@ public class DatabaseDiscoverer extends Discoverer {
         int rowCount=0;
         for(final MatchMetaData data: finalList) {
             // Row count
-            if ("yes".equals(calculate_score)) {
+            if (YES.equals(calculate_score)) {
               log.debug("Skipping table rowcount...");
               rowCount = ReportUtil.rowCount(factory, data.getTableName());
             }
@@ -120,7 +121,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
             log.info("Model                       : " + data.getModel());
-            if ("yes".equals(calculate_score)) {
+            if (YES.equals(calculate_score)) {
                 log.info("Number of rows in the table : " + rowCount);
                 log.info("Score                       : " + score.columnScore(rowCount));
             } else {
@@ -151,17 +152,15 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("" );
             
             // Score calculation is evaluated with score_calculation parameter
-            if ("yes".equals(calculate_score)) {
+            if (YES.equals(calculate_score)) {
                 if (score.columnScore(rowCount).equals("High")) {
                     highRiskColumns++;
                 }
             }
-            //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
-            //log.info(result);
         }
         
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
-        if ("yes".equals(calculate_score)) {
+        if (YES.equals(calculate_score)) {
             log.info("Overall score: " + score.dataStoreScore());
             log.info("");
 
@@ -200,7 +199,7 @@ public class DatabaseDiscoverer extends Discoverer {
         boolean specialCase = false;
 
 
-        String extentionList = dataDiscoveryProperties.getProperty("extentions");
+        final String extentionList = dataDiscoveryProperties.getProperty("extentions");
         String[] specialCaseFunctions = null;
         if (!CommonUtils.isEmptyString(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
@@ -296,7 +295,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            String span = nameSpans[i].toString();
+                            final String span = nameSpans[i].toString();
                             if (span.length() >2 ) {
                                 log.debug("Span: "+span);
                                 log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
@@ -345,7 +344,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, MatchMetaData data, String text)
+    private Object callExtention(final String function, final MatchMetaData data, String text)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
