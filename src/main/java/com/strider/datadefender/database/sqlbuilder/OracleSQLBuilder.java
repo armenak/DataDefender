@@ -29,10 +29,10 @@ public class OracleSQLBuilder extends SQLBuilder{
 
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
-        StringBuilder sql = new StringBuilder(sqlString);
+        final StringBuilder sql = new StringBuilder(sqlString);
         
         if (limit != 0) {
-            sql.append(" AND ").append( "rownum <= ").append(limit);
+            sql.append(" AND rownum <= ").append(limit);
         }
         return sql.toString();
     }

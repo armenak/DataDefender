@@ -106,7 +106,7 @@ public class DatabaseDiscoverer extends Discoverer {
         int rowCount=0;
         for(final MatchMetaData data: finalList) {
             // Row count
-            if (calculate_score.equals("yes")) {
+            if ("yes".equals(calculate_score)) {
               log.debug("Skipping table rowcount...");
               rowCount = ReportUtil.rowCount(factory, data.getTableName());
             }
@@ -120,12 +120,12 @@ public class DatabaseDiscoverer extends Discoverer {
 
             log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
             log.info("Model                       : " + data.getModel());
-            if (calculate_score.equals("yes")) {
-            log.info("Number of rows in the table : " + rowCount);
-            log.info("Score                       : " + score.columnScore(rowCount));
+            if ("yes".equals(calculate_score)) {
+                log.info("Number of rows in the table : " + rowCount);
+                log.info("Score                       : " + score.columnScore(rowCount));
             } else {
-            log.info("Number of rows in the table : N/A");
-            log.info("Score                       : N/A");
+                log.info("Number of rows in the table : N/A");
+                log.info("Score                       : N/A");
             }
 
             log.info("Sample data");
@@ -151,7 +151,7 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("" );
             
             // Score calculation is evaluated with score_calculation parameter
-            if (calculate_score.equals("yes")) {
+            if ("yes".equals(calculate_score)) {
                 if (score.columnScore(rowCount).equals("High")) {
                     highRiskColumns++;
                 }
@@ -161,7 +161,7 @@ public class DatabaseDiscoverer extends Discoverer {
         }
         
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
-        if (calculate_score.equals("yes")) {
+        if ("yes".equals(calculate_score)) {
             log.info("Overall score: " + score.dataStoreScore());
             log.info("");
 

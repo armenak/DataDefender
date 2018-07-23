@@ -250,7 +250,7 @@ public class CoreFunctions {
         final String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
-            if (vendor.equals("oracle")) {
+            if ("oracle".equals(vendor)) {
                 query += String.format(" WHERE %s IS NOT NULL", column, column);                
             } else {
                 query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
@@ -297,7 +297,7 @@ public class CoreFunctions {
         final String keyName = table + "." + column;
         String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
         if (excludeEmpty) {
-            if (vendor.equals("oracle")) {
+            if ("oracle".equals(vendor)) {
                 query += String.format(" WHERE %s IS NOT NULL", column, column);                
             } else {
                 query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
