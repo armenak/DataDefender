@@ -66,7 +66,7 @@ import com.strider.datadefender.utils.RequirementUtils;
 public class DatabaseAnonymizer implements IAnonymizer { 
     
     private static final Logger log = getLogger(DatabaseAnonymizer.class);
-
+    private static final String AND = " AND ";
     
     /**
      * Adds column names from the table to the passed collection of strings.
@@ -117,12 +117,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("keys: " + keys.toString()); 
         int iteration = 0;
         final int collectionSize = keys.size();
-        StringBuilder whereStmtp = new StringBuilder();
+        final StringBuilder whereStmtp = new StringBuilder();
         for (final String key: keys) {
             ++iteration;
             whereStmtp.append(key).append(" = ? ");
             if (collectionSize > iteration) {
-                whereStmtp.append(" AND ");
+                whereStmtp.append(AND);
             }
         }
         sql.append(whereStmtp);
@@ -162,16 +162,16 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     if (eq != null) {
                         query.append(separator).append('(').append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
-                        separator = " AND ";
+                        separator = AND;
                     }
                     if (lk != null && lk.length() != 0) {
                         query.append(separator).append('(').append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
-                        separator = " AND ";
+                        separator = AND;
                     }
                     if (nl) {
                         query.append(separator).append(col).append(" IS NOT NULL");
-                        separator = " AND ";
+                        separator = AND;
                     }
                 }
             }
