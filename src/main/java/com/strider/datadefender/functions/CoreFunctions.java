@@ -248,16 +248,17 @@ public class CoreFunctions {
      */
     public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
         final String keyName = table + "." + column;
-        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
         if (excludeEmpty) {
             if ("oracle".equals(vendor)) {
-                query += String.format(" WHERE %s IS NOT NULL", column, column);                
+                sb.append(String.format(" WHERE %s IS NOT NULL", column, column));                
             } else {
-                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);       
+                sb.append(String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column));       
             }
         }
-        generateStringListFromDb(keyName, query);
-        return getNextShuffledItemFor(keyName + query.hashCode());
+        generateStringListFromDb(keyName, sb.toString());
+        return getNextShuffledItemFor(keyName + sb.toString().hashCode());
     }
     
     /**
@@ -557,7 +558,7 @@ public class CoreFunctions {
     public static int randInt(final int min, final int max) {
 
         rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
+        final int randomNum = rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
     }   
