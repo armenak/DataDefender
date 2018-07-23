@@ -115,15 +115,14 @@ public class RequirementUtils {
         final Map<String, List<Column>> columns = new HashMap<>();
         Column column;
         for (final MatchMetaData match : matches) {
-            StringBuilder sb = new StringBuilder();
-            
+            final StringBuilder sb = new StringBuilder();
             if (match.getSchemaName() != null && !match.getSchemaName().equals("")) {
                 sb.append(match.getSchemaName()).append('.').append(match.getTableName());
             } else {
                 sb.append(match.getTableName());
             }
             
-            String tableName = sb.toString();
+            final String tableName = sb.toString();
             
             Table table = tables.get(tableName);
             if (table == null) { // new table
