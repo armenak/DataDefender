@@ -90,7 +90,7 @@ public class DataDefender  {
         final String cmd = unparsedArgs.get(0); // get & remove command arg
         unparsedArgs = unparsedArgs.subList(1, unparsedArgs.size());
         
-        List errors = new ArrayList();
+        List<String> errors = new ArrayList();
         if ("file-discovery".equals(cmd)) {
             errors = PropertyCheck.check(cmd, ' ');
             if (errors.size() >0) {
