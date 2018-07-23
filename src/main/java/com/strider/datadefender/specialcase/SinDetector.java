@@ -19,12 +19,16 @@ package com.strider.datadefender.specialcase;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.utils.CommonUtils;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  *
  * @author strider
  */
 public class SinDetector implements SpecialCase {
+    
+    private static final Logger log = getLogger(SinDetector.class);
     
     public static MatchMetaData detectSin(final MatchMetaData data, String text) {
         if (CommonUtils.isEmptyString(text)) {
@@ -37,6 +41,7 @@ public class SinDetector implements SpecialCase {
                 text = text.replaceAll("\\D+", "");
             }
             if ( ( text.matches("[0-9]+") && text.length() == 9) && bf.isValidSIN(text)) {
+                log.info("SIN detected: " + text + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
                 return data;

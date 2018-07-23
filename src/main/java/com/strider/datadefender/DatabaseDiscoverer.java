@@ -238,7 +238,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 "SELECT `" + columnName + "`" +
                 " FROM " + table +
                 " WHERE `" + columnName  + "` IS NOT NULL ", limit);
-            log.info("Executing query against database: " + query);
+            log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
@@ -296,10 +296,13 @@ public class DatabaseDiscoverer extends Discoverer {
 
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            log.debug("Span: "+nameSpans[i].toString());
-                            log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                            log.debug("Probability is: "+spanProbs[i]);
-                            probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                            String span = nameSpans[i].toString();
+                            if (span.length() >2 ) {
+                                log.debug("Span: "+span);
+                                log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                                log.debug("Probability is: "+spanProbs[i]);
+                                probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                            }
                         }
                         // From OpenNLP documentation:
                         //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators.
