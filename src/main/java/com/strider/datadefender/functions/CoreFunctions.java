@@ -248,7 +248,7 @@ public class CoreFunctions {
      */
     public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
         final String keyName = table + "." + column;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
         if (excludeEmpty) {
             if ("oracle".equals(vendor)) {
@@ -296,16 +296,17 @@ public class CoreFunctions {
      */
     public String mappedColumnShuffle(final String table, final String column, final String value, final boolean excludeEmpty) throws SQLException {
         final String keyName = table + "." + column;
-        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
         if (excludeEmpty) {
             if ("oracle".equals(vendor)) {
-                query += String.format(" WHERE %s IS NOT NULL", column, column);                
+                sb.append(String.format(" WHERE %s IS NOT NULL", column, column));                
             } else {
-                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
+                sb.append(String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column));                
             }
         }
-        generateStringListFromDb(keyName, query);
-        return getPredictableShuffledValueFor(keyName + query.hashCode(), value);
+        generateStringListFromDb(keyName, sb.toString());
+        return getPredictableShuffledValueFor(keyName + sb.toString().hashCode(), value);
     }
     
     /**
