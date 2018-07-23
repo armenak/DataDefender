@@ -154,10 +154,8 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("" );
             
             // Score calculation is evaluated with score_calculation parameter
-            if (YES.equals(calculate_score)) {
-                if (score.columnScore(rowCount).equals("High")) {
-                    highRiskColumns++;
-                }
+            if (YES.equals(calculate_score) && score.columnScore(rowCount).equals("High")) {
+                highRiskColumns++;
             }
         }
         
