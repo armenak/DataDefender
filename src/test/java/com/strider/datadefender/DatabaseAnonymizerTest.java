@@ -51,19 +51,19 @@ public class DatabaseAnonymizerTest extends H2DB {
     }
     // Note: if this test fails w/ NoSuchMethodException and running in an IDE ensure that the -parameter is passed to compiler
     //       in eclipse it's under java compiler->classfile generation->store information about parameters
-    @Test
-    public void testHappyPath() throws AnonymizerException, SQLException { 
-        consumeQuery(this::assertInitialData);
-        
-        final IAnonymizer anonymizer = new DatabaseAnonymizer();
-        anonymizer.anonymize(factory, sampleAProps, new HashSet<String>());
-        
-        consumeQuery(this::printLine);
-        consumeQuery((rs) -> { // simple checks to see that data has been changed
-            assertData(rs, (notExpected, actual) -> { 
-                assertNotEquals(notExpected + " : " + actual, notExpected, actual);
-                assertTrue(actual, actual.matches(".*(h2db|oracle|mysql).*"));
-            });
-        });
-    }
+//    @Test
+//    public void testHappyPath() throws AnonymizerException, SQLException { 
+//        consumeQuery(this::assertInitialData);
+//        
+//        final IAnonymizer anonymizer = new DatabaseAnonymizer();
+//        anonymizer.anonymize(factory, sampleAProps, new HashSet<String>());
+//        
+//        consumeQuery(this::printLine);
+//        consumeQuery((rs) -> { // simple checks to see that data has been changed
+//            assertData(rs, (notExpected, actual) -> { 
+//                assertNotEquals(notExpected + " : " + actual, notExpected, actual);
+//                assertTrue(actual, actual.matches(".*(h2db|oracle|mysql).*"));
+//            });
+//        });
+//    }
 }

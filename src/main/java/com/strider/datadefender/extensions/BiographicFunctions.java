@@ -116,7 +116,7 @@ public class BiographicFunctions extends CoreFunctions {
     private static String prependZero(final int num) {
         String dayStr;
         if (num <=9) {
-            dayStr = "0" + String.valueOf(num);
+            dayStr = '0' + String.valueOf(num);
         } else {
             dayStr = String.valueOf(num);
         }

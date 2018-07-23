@@ -253,7 +253,7 @@ public class CoreFunctions {
             if ("oracle".equals(vendor)) {
                 query += String.format(" WHERE %s IS NOT NULL", column, column);                
             } else {
-                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
+                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);       
             }
         }
         generateStringListFromDb(keyName, query);
@@ -378,13 +378,13 @@ public class CoreFunctions {
      * @throws IOException 
      */
     public String randomPostalCode() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9));
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9));        
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9)); 
+        final StringBuilder sb = new StringBuilder();
+        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+                append(randInt(1,9)).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+                append(randInt(1,9)).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase()).
+                append(randInt(1,9)); 
         
         log.debug("Generated postal code: " + sb.toString());
         return sb.toString();
