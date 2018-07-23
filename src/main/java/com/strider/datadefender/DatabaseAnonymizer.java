@@ -75,7 +75,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param sColumns 
      */
     private void fillColumnNames(final Table table, final Collection<String> sColumns) {
-        for (Column column : table.getColumns()) {
+        for (final Column column : table.getColumns()) {
             sColumns.add(column.getName());
         }
     }
@@ -112,10 +112,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(table.getName()).
             append(" SET ").
             append(StringUtils.join(updateColumns, " = ?, ")).
-            append(" = ?").
-            append(" WHERE " ).
-            append(StringUtils.join(keys, " = ? AND ")).
-            append(" = ?");
+            append(" = ? WHERE ").
+            append(StringUtils.join(keys, " = ? AND = ?"));
         
         log.debug(sql.toString());
         return sql.toString();
@@ -150,7 +148,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (col != null && col.length() != 0) {
                     if (eq != null) {
-                        query.append(separator).append("(").append(col).append(" != ? OR ").append(col).append(" IS NULL)");
+                        query.append(separator).append('(').append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
                         separator = " AND ";
                     }
@@ -201,7 +199,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         int paramIndex = 1;
-        for (String param : params) {
+        for (final String param : params) {
             stmt.setString(paramIndex, param);
             ++paramIndex;
         }
@@ -287,7 +285,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             final Map<String, Object> paramValues = new HashMap<>(parms.size());
             final String columnValue = row.getString(column.getName());
 
-            for (Parameter param : parms) {
+            for (final Parameter param : parms) {
                 if (param.getValue().equals("@@value@@")) {
                     paramValues.put(param.getName(), columnValue);
                 } else if (param.getValue().equals("@@row@@") && param.getType().equals("java.sql.ResultSet")) {

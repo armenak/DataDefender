@@ -105,7 +105,8 @@ public class FileDiscoverer extends Discoverer {
             log.error("directories property is empty in firediscovery.properties file");
             throw new AnonymizerException("directories property is empty in firediscovery.properties file");
         }
-        String[] directoryList = directories.split(",");
+        
+        final String[] directoryList = directories.split(",");
         String[] exclusionList = null;
         final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
         if (exclusions == null || exclusions.equals("")) {      

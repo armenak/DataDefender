@@ -344,7 +344,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, final MatchMetaData data, String text)
+    private Object callExtention(final String function, final MatchMetaData data, final String text)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
