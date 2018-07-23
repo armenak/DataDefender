@@ -88,7 +88,7 @@ public class ColumnDiscoverer extends Discoverer {
             for (final MatchMetaData entry: uniqueMatches) {
                 
                 // Row count
-                final int rowCount = ReportUtil.rowCount(factory, entry.getTableName());
+                final int rowCount = ReportUtil.rowCount(factory, entry.getTableName(),0);
                 
                 // Getting 5 sample values                
                 final List<String> sampleDataList = ReportUtil.sampleData(factory, entry.getTableName(), entry.getColumnName());

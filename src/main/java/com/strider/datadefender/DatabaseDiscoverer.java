@@ -109,7 +109,9 @@ public class DatabaseDiscoverer extends Discoverer {
             // Row count
             if (YES.equals(calculate_score)) {
               log.debug("Skipping table rowcount...");
-              rowCount = ReportUtil.rowCount(factory, data.getTableName());
+              rowCount = ReportUtil.rowCount(factory, 
+                      data.getTableName(),
+                      Integer.valueOf(dataDiscoveryProperties.getProperty("limit")));
             }
 
             // Getting 5 sample values
