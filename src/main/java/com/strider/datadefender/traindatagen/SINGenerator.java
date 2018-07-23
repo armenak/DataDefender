@@ -39,7 +39,7 @@ public class SINGenerator {
 
     //<START:medicine> Augmentin-Duo <END> is a penicillin antibiotic that contains two medicines - <START:medicine> amoxicillin trihydrate <END> 
     // <START:medicine> potassium clavulanate <END>. They work together to kill certain types of bacteria and are used to treat certain types of bacterial infections
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         
         final BiographicFunctions bf = new BiographicFunctions();
         final CoreFunctions cf = new CoreFunctions();

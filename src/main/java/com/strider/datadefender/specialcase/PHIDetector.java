@@ -33,7 +33,7 @@ import com.strider.datadefender.utils.CommonUtils;
 /**
  * @author Armenak Grigoryan
  */
-public class PHIDetector extends CoreFunctions {
+public class PHIDetector implements SpecialCase {
         
     private static final Logger log = getLogger(PHIDetector.class);
 
@@ -66,6 +66,7 @@ public class PHIDetector extends CoreFunctions {
         
         if (data.getColumnType().equals("VARCHAR") &&
             phiList.contains(text.trim().toUpperCase())) {
+                log.info("PHI detected: " + text);
                 data.setModel("phi");
                 data.setAverageProbability(1);
                 return data;

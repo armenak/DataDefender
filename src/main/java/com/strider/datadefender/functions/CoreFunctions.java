@@ -554,7 +554,7 @@ public class CoreFunctions {
      * @return Integer between min and max, inclusive.
      * @see java.util.Random#nextInt(int)
      */
-    public static int randInt(int min, int max) {
+    public static int randInt(final int min, final int max) {
 
         rand = new Random();
         int randomNum = rand.nextInt((max - min) + 1) + min;
