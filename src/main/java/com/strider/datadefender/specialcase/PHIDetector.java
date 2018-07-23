@@ -40,7 +40,7 @@ public class PHIDetector extends CoreFunctions {
     private static List phiList = new ArrayList();
     
     static {
-        String file = "phi.txt";
+        final String file = "phi.txt";
         try {
             log.info("*** reading from " + file);
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -59,17 +59,16 @@ public class PHIDetector extends CoreFunctions {
      * @param text
      * @return String
      */
-    public static MatchMetaData isPHITerm(final MatchMetaData data, String text) {    
+    public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {    
        if (CommonUtils.isEmptyString(text)) {
             return null;
         }
         
-        if (data.getColumnType().equals("VARCHAR")) {
-            if (phiList.contains(text.trim().toUpperCase())) {
+        if (data.getColumnType().equals("VARCHAR") &&
+            phiList.contains(text.trim().toUpperCase())) {
                 data.setModel("phi");
                 data.setAverageProbability(1);
                 return data;
-            }
         }
         return null;
     }
