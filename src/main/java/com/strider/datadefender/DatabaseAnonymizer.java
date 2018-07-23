@@ -239,7 +239,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (parms != null) {
             return callAnonymizingFunctionWithParameters(dbConn, row, column, vendor);
         } else {
-            return callAnonymizingFunctionWithoutParameters(dbConn, column, vendor);
+            return callAnonymizingFunctionWithoutParameters(dbConn, column);
         }
         
     }    
@@ -385,7 +385,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column, String vendor)
+    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column)
     throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
            InvocationTargetException {
         

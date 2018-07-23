@@ -88,6 +88,6 @@ public class CoreFunctionsTest extends TestCase {
     public void testRandomPostalCode() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
         final String postalCode = cf.randomPostalCode();
-        assertTrue(postalCode != null);
+        assertNotNull(postalCode);
     }
 }
