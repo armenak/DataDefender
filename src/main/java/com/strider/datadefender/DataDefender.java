@@ -66,6 +66,7 @@ public class DataDefender  {
 
         if (al.isAppActive()) {
             log.error("Another instance of this program is already active");
+            displayExecutionTime(startTime);
             System.exit(1);    
         }        
         
@@ -79,6 +80,7 @@ public class DataDefender  {
         
         if (line.hasOption("help") || args.length == 0 || unparsedArgs.size() < 1) {
             help(options);
+            displayExecutionTime(startTime);
             return;
         }
         if (line.hasOption("debug")) {
@@ -95,18 +97,21 @@ public class DataDefender  {
             errors = PropertyCheck.check(cmd, ' ');
             if (errors.size() >0) {
                 displayErrors(errors);
+                displayExecutionTime(startTime);
                 return;
             }
             final String fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
             final Properties fileDiscoveryProperties = loadProperties(fileDiscoveryPropertyFile);
             final FileDiscoverer discoverer = new FileDiscoverer();
             discoverer.discover(fileDiscoveryProperties);  
+            displayExecutionTime(startTime);
             return;
         }
         
         errors = PropertyCheck.checkDtabaseProperties();
         if (errors.size() >0) {
             displayErrors(errors);
+            displayExecutionTime(startTime);
             return;
         }
         final Properties props = loadProperties(line.getOptionValue('P', "db.properties"));            
@@ -116,6 +121,7 @@ public class DataDefender  {
                     errors = PropertyCheck.check(cmd, ' ');
                     if (errors.size() >0) {
                         displayErrors(errors);
+                        displayExecutionTime(startTime);
                         return;
                     }
                     final String anonymizerPropertyFile = line.getOptionValue('A', "anonymizer.properties");
@@ -127,6 +133,7 @@ public class DataDefender  {
                     errors = PropertyCheck.check(cmd, ' ');
                     if (errors.size() >0) {
                         displayErrors(errors);
+                        displayExecutionTime(startTime);
                         return;
                     }
                     final IGenerator generator = new DataGenerator();
@@ -139,6 +146,7 @@ public class DataDefender  {
                         errors = PropertyCheck.check(cmd, 'c');    
                         if (errors.size() >0) {
                             displayErrors(errors);
+                            displayExecutionTime(startTime);
                             return;
                         }
                         final String columnPropertyFile = line.getOptionValue('C', "columndiscovery.properties");
@@ -153,8 +161,10 @@ public class DataDefender  {
                         errors = PropertyCheck.check(cmd, 'd');    
                         if (errors.size() >0) {
                             displayErrors(errors);
+                            displayExecutionTime(startTime);
                             return;
-                        }                        final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
+                        }
+                        final String datadiscoveryPropertyFile = line.getOptionValue('D', "datadiscovery.properties");
                         final Properties dataDiscoveryProperties = loadProperties(datadiscoveryPropertyFile);
                         final DatabaseDiscoverer discoverer = new DatabaseDiscoverer();
                         discoverer.discover(dbFactory, dataDiscoveryProperties, getTableNames(unparsedArgs, dataDiscoveryProperties));
@@ -168,12 +178,15 @@ public class DataDefender  {
                     break;
             }
         }
-        
+
+        displayExecutionTime(startTime);
+    }
+    
+    private static void displayExecutionTime(long startTime) {
         final long endTime   = System.currentTimeMillis();
-        
         final NumberFormat formatter = new DecimalFormat("#0.00000");
         log.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");        
-        log.info("DataDefender completed ");
+        log.info("DataDefender completed ");        
     }
     
     /**
