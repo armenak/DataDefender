@@ -17,9 +17,6 @@
  */
 package com.strider.datadefender;
 
-import com.strider.datadefender.database.IDBFactory;
-import static com.strider.datadefender.utils.AppProperties.loadProperties;
-import com.strider.datadefender.utils.ApplicationLock;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -31,19 +28,25 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
+import com.strider.datadefender.database.IDBFactory;
+import static com.strider.datadefender.utils.AppProperties.loadProperties;
+import com.strider.datadefender.utils.ApplicationLock;
 
 /**
  * Entry point to Data Defender. 
