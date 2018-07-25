@@ -1,5 +1,5 @@
 /** 
- * Copyright 2014-2017, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,15 +16,19 @@
  */
 package com.strider.datadefender.specialcase;
 
-import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.extensions.BiographicFunctions;
-import com.strider.datadefender.utils.CommonUtils;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
+import com.strider.datadefender.Probability;
+import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.extensions.BiographicFunctions;
+import com.strider.datadefender.utils.CommonUtils;
+
 /**
- *
- * @author strider
+ * @author Armenak Grigoryan
  */
 public class SinDetector implements SpecialCase {
     
@@ -35,15 +39,18 @@ public class SinDetector implements SpecialCase {
             return null;
         }
         
-        if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")) {
+        if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR")) {
             final BiographicFunctions bf = new BiographicFunctions();
             if (data.getColumnType().equals("VARCHAR")) {
                 text = text.replaceAll("\\D+", "");
             }
-            if ( ( text.matches("[0-9]+") && text.length() == 9) && bf.isValidSIN(text)) {
+            if ( bf.isValidSIN(text)) {
                 log.info("SIN detected: " + text + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
+                List<Probability> probabilityList = new ArrayList();
+                probabilityList.add(new Probability(text, 1.00));
+                data.setProbabilityList(probabilityList);                
                 return data;
             }
         }

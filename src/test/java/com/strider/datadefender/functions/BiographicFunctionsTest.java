@@ -18,12 +18,12 @@
 
 package com.strider.datadefender.functions;
 
-
-import com.strider.datadefender.extensions.BiographicFunctions;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.datadefender.extensions.BiographicFunctions;
 
 /**
  * Biographic data anonymizer functions
@@ -48,21 +48,18 @@ public class BiographicFunctionsTest extends TestCase {
         super.tearDown();
     }
 
-    /**
-     * Test of randomSIN method
-     */
-    public void testRandomStringSIN() {
-        log.debug("Generate SIN");
-
-        final BiographicFunctions functions = new BiographicFunctions();
-        final String sin = functions.randomStringSIN();
-
-        log.debug("Random SIN = " + sin);
-
-        assertNotNull(sin);
-        assertTrue(sin.length() == 9);
-        assertTrue(functions.isValidSIN(sin));
-
+    public void testSINValidation() {
+        
+        // Fake, but valid SINs
+        String validSinList[] = {"503247512", "943209502", "514022037", "455717686", "372184101"};
+        for (int i=0; i < validSinList.length; i++) {
+            assertTrue(BiographicFunctions.isValidSIN(validSinList[i]));
+        }
+        
+        String invalidSinList[] = {"012345678", "123", "abcdefgff", "405717686", "372114101"};
+        for (int i=0; i < invalidSinList.length; i++) {
+            assertFalse(BiographicFunctions.isValidSIN(invalidSinList[i]));
+        }        
     }
     
     /**

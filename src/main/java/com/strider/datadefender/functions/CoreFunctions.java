@@ -69,9 +69,9 @@ public class CoreFunctions {
     private String vendor;
     
     static {        
-        log.info("*** Adding list of words into array");
+        log.debug("*** Adding list of words into array");
         addWordsIntoArray();
-        log.info("*** Array is populated with words from dictionary");
+        log.debug("*** Array is populated with words from dictionary");
     }    
     
     /**

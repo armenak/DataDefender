@@ -21,9 +21,11 @@ package com.strider.datadefender.extensions;
 import com.strider.datadefender.functions.CoreFunctions;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
-import java.util.Random;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -33,58 +35,6 @@ import static org.apache.log4j.Logger.getLogger;
 public class BiographicFunctions extends CoreFunctions {
 
     private static final Logger log = getLogger(BiographicFunctions.class);
-    
-    /**
-     * Generates random 9-digit social insurance number
-     * @return String
-     */
-    public String randomStringSIN() {
-        final Random random = new Random();
-        int[] sinDigits = new int[9];
-        for (int i = 0; i < sinDigits.length; i++) {
-            sinDigits[i] = random.nextInt(9);
-        }
-
-        while (!isValidSIN(sinDigits)) {
-            sinDigits = increment(sinDigits);
-        }
-
-        final StringBuilder sin = new StringBuilder(9);
-        for (final int digit : sinDigits) {
-            sin.append(String.valueOf(digit));
-        }
-        
-        log.debug("Generated SIN:[" + sin.toString() +"]");
-        
-        return sin.toString();
-
-    }
-    
-    /**
-     * Generates random 9-digit social insurance number
-     * @return String
-     */
-    public int randomNumericSIN() {
-        final Random random = new Random();
-        int[] sinDigits = new int[9];
-        for (int i = 0; i < sinDigits.length; i++) {
-            sinDigits[i] = random.nextInt(9);
-        }
-
-        while (!isValidSIN(sinDigits)) {
-            sinDigits = increment(sinDigits);
-        }
-
-        final StringBuilder sin = new StringBuilder(9);
-        for (final int digit : sinDigits) {
-            sin.append(String.valueOf(digit));
-        }
-        
-        log.debug("Generated SIN:[" + sin.toString() +"]");
-        
-        return Integer.valueOf(sin.toString());
-
-    }    
     
     /**
      * Generates random 9-digit social insurance number
@@ -128,63 +78,74 @@ public class BiographicFunctions extends CoreFunctions {
     }    
 
     /**
-     * Increment array of integers by 1, starting from end of array
-     * @param sinDigits Array of integers representing a sin
-     * @return Incremented array of integers
+     * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
+     * @param sin
+     * @return boolean true, if SIN is valid, otherwise false
      */
-    private int[] increment(int[] sinDigits) {
-        for (int i=8; i>=0; i--) {
-            if (sinDigits[i] < 9) {
-                sinDigits[i]++;
-                break;
-            } else {
-                sinDigits[i] = 0;
-            }
+    public static boolean isValidSIN(final String sin) {
+        boolean valid = false;
+        
+        if (sin.length() < 9) {
+            log.debug("SIN length is < 9");
+            return valid;
         }
-
-        return sinDigits;
-    }
-
-    /**
-     * Check if array of integers represents a valid sin
-     * @param sinDigits Array of integers representing a sin
-     * @return true if valid sin, false if not
-     */
-    private boolean isValidSIN(final int[] sinDigits) {
-        int check = 0;
-
-        for (int i=0; i<sinDigits.length; i++) {
-            if ((i % 2) == 0) {
-                // multiple by 1
-                check += sinDigits[i];
-            } else {
-                // multiple by 2
-                int tempCheck = sinDigits[i] * 2;
-                if (tempCheck > 9) {
-                    tempCheck = (tempCheck / 10) + (tempCheck % 10);
-                }
-                check += tempCheck;
-            }
+        
+        if (!StringUtils.isNumeric(sin)) {
+            log.debug("SIN " + sin + " is not number");
+            return valid;
         }
-        return (check % 10) == 0;
-    }
+        
 
+        final int[] sinArray = new int[sin.length()];
+        final int[] checkArray = {1,2,1,2,1,2,1,2,1};
+        final List<Integer> sinList = new ArrayList();
+        
+        log.info(sin);
+        
+        for (int i=0;i<9;i++) {
+            sinArray[i] = Integer.valueOf(sin.substring(i,i+1));
+            sinArray[i] = sinArray[i]*checkArray[i];
+        }        
+        
+        int sum = 0;
+        for (int i=0;i<9;i++) {
+            String tmp = String.valueOf(sinArray[i]);
+            if (tmp.length()==1) {
+                sinList.add(Integer.valueOf(tmp));
+                sum += Integer.valueOf(tmp);
+            } else {
+                sinList.add(Integer.valueOf(tmp.substring(0,1)));
+                sum += Integer.valueOf(tmp.substring(0,1));
+                sinList.add(Integer.valueOf(tmp.substring(1,2)));                
+                sum += Integer.valueOf(tmp.substring(1,2));
+            }
+        }          
+        
+        if ( (sum % 10) == 0) {
+            valid = true;
+        }        
+        
+        return valid;
+    }
+    
+    
     /**
      * Check if String represents a valid sin
      * @param sin String representing a sin
      * @return true if valid sin, false if not
      */
-    public boolean isValidSIN(final String sin) {
-        if (sin == null || sin.length() != 9 ) {
-            return false;
-        }
-        int[] sinDigits = new int[sin.length()];
-
-        for (int i=0; i<sin.length(); i++) {
-            sinDigits[i] = Integer.parseInt(sin.substring(i, i+1));
-        }
-
-        return (isValidSIN(sinDigits));
-
-    }
+//    public boolean isValidSIN(final String sin) {
+//        if (sin == null || sin.length() != 9 ) {
+//            log.info("isValidSin: Step 0");
+//            return false;
+//        }
+//        int[] sinDigits = new int[sin.length()];
+//        log.info("isValidSin: Step 1");
+//                    
+//        for (int i=0; i<sin.length(); i++) {
+//            sinDigits[i] = Integer.parseInt(sin.substring(i, i+1));
+//        }
+//
+//        return (isValidSIN(sinDigits));
+//    }
 }
