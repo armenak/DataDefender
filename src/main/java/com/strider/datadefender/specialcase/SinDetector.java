@@ -48,7 +48,7 @@ public class SinDetector implements SpecialCase {
                 log.info("SIN detected: " + text + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
-                List<Probability> probabilityList = new ArrayList();
+                final List<Probability> probabilityList = new ArrayList();
                 probabilityList.add(new Probability(text, 1.00));
                 data.setProbabilityList(probabilityList);                
                 return data;

@@ -51,12 +51,12 @@ public class BiographicFunctionsTest extends TestCase {
     public void testSINValidation() {
         
         // Fake, but valid SINs
-        String validSinList[] = {"503247512", "943209502", "514022037", "455717686", "372184101"};
+        final String validSinList[] = {"503247512", "943209502", "514022037", "455717686", "372184101"};
         for (int i=0; i < validSinList.length; i++) {
             assertTrue(BiographicFunctions.isValidSIN(validSinList[i]));
         }
         
-        String invalidSinList[] = {"012345678", "123", "abcdefgff", "405717686", "372114101"};
+        final String invalidSinList[] = {"012345678", "123", "abcdefgff", "405717686", "372114101"};
         for (int i=0; i < invalidSinList.length; i++) {
             assertFalse(BiographicFunctions.isValidSIN(invalidSinList[i]));
         }        

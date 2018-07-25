@@ -109,7 +109,7 @@ public class BiographicFunctions extends CoreFunctions {
         
         int sum = 0;
         for (int i=0;i<9;i++) {
-            String tmp = String.valueOf(sinArray[i]);
+            final String tmp = String.valueOf(sinArray[i]);
             if (tmp.length()==1) {
                 sinList.add(Integer.valueOf(tmp));
                 sum += Integer.valueOf(tmp);
