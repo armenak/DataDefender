@@ -6,6 +6,7 @@
     <artifactId>DataDefender</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
+    <description>Version 1.0 is a bug fix release.</description>
 
     <name>DataDefender</name>
     <developers>
@@ -147,6 +148,19 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>2.7.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.1</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>            
         </plugins>
     </build>
 
@@ -230,8 +244,6 @@
             <version>3.23.1</version>
         </dependency>
         
-
-        
         <!-- ORACLE database driver -->
         <!--
         <dependency>
@@ -241,5 +253,22 @@
         </dependency>
         -->
     </dependencies>
-    <description>Version 0.3 is a bug fix release.</description>
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <!-- select non-aggregate reports -->
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>    
+    
 </project>
