@@ -154,18 +154,43 @@
                 <version>0.8.1</version>
                 <executions>
                     <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
+                        <id>prepare-agent</id>
+			<goals>
                             <goal>prepare-agent</goal>
-                        </goals>
+			</goals>
                     </execution>
-                </executions>
-            </plugin>            
-        </plugins>
-    </build>
+                        <execution>
+                            <id>report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <!-- Sets the path to the file which contains the execution data. -->
+                                <dataFile>target/jacoco.exec</dataFile>
+                                <!-- Sets the output directory for the code coverage report. -->
+                                <outputDirectory>target/jacoco-ut</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+                        </systemPropertyVariables>
+                    </configuration>                
+                </plugin>            
+            </plugins>
+        </build>
 
-    <dependencies>
-        <dependency>
+        <dependencies>
+            <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>

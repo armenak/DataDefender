@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+import org.junit.Test;
 
 /**
  * Core data anonymizer functions
@@ -50,9 +51,7 @@ public class CoreFunctionsTest extends TestCase {
         super.tearDown();
     }
 
-    /**
-     * Test of generateStringFromPattern method, of class CoreFunctions.
-     */
+    @Test
     public void testGenerateStringFromPattern() {
         log.debug("Generate SIN");
         final Xeger instance = new Xeger(regExpPattern);
@@ -61,6 +60,7 @@ public class CoreFunctionsTest extends TestCase {
         assertTrue(text.matches(regExpPattern));
     }
     
+    @Test
     public void testLipsumParagraphs() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
         final String paragraphs = cf.lipsumParagraphs(3);
@@ -68,6 +68,7 @@ public class CoreFunctionsTest extends TestCase {
         assertTrue(paragraphs.matches("^[^\r]+\r\n\r\n[^\r]+\r\n\r\n[^\r]+$"));
     }
     
+    @Test
     public void testLipsumSentences() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
         final String sentences = cf.lipsumSentences(3, 3);
@@ -75,6 +76,7 @@ public class CoreFunctionsTest extends TestCase {
         assertTrue(sentences.matches("([^\\.]+\\.){3}"));
     }
     
+    @Test
     public void testLipsumSimilar() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
         final String sentences = cf.lipsumSimilar("This is a test.  It is excellent.  Should have a minimum of two sentences.");
@@ -85,6 +87,7 @@ public class CoreFunctionsTest extends TestCase {
         assertTrue(paras.matches("^[^\r]+\r\n\r\n[^\r]+\r\n\r\n[^\r]+$"));
     }
     
+    @Test
     public void testRandomPostalCode() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
         final String postalCode = cf.randomPostalCode();

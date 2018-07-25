@@ -21,6 +21,7 @@ package com.strider.datadefender.functions;
 import junit.framework.TestCase;
 
 import com.strider.datadefender.extensions.BiographicFunctions;
+import org.junit.Test;
 
 /**
  * Biographic data anonymizer functions
@@ -43,6 +44,7 @@ public class BiographicFunctionsTest extends TestCase {
         super.tearDown();
     }
 
+    @Test
     public void testSINValidation() {
         
         // Fake, but valid SINs

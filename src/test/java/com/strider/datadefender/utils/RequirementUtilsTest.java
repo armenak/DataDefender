@@ -30,6 +30,7 @@ import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
+import org.junit.Test;
 
 /**
  * Unit test to test requirement related utility methods
@@ -52,6 +53,7 @@ public class RequirementUtilsTest extends TestCase {
     }
     
     // Doesn't tests a reading a writing a simple requirement
+    @Test
     public void testSimpleWriteRead() throws Exception {
         // create
         final Requirement req = new Requirement();
@@ -98,6 +100,7 @@ public class RequirementUtilsTest extends TestCase {
     }
     
     @SuppressWarnings("serial")
+    @Test
     public void testCreate() { // just test the important stuff for now (as we aren't sure if the defaults make sense)
         final List<MatchMetaData> list = new ArrayList<MatchMetaData>() {{  
             add(new MatchMetaData(null, "t1", Arrays.asList("pk"), "col1", STRING_TYPE, 5)); // one pk, 1 column
@@ -131,6 +134,7 @@ public class RequirementUtilsTest extends TestCase {
      * Test loaded requirements from file
      * @throws Exception
      */
+    @Test
     public void testLoad() throws Exception {
         load();
         assertEquals("Test Client", requirement.getClient());
@@ -157,6 +161,7 @@ public class RequirementUtilsTest extends TestCase {
      * @author Matthew Eaton
      * @throws Exception
      */
+    @Test
     public void testGetFileParameter() throws Exception {
         load();
 
@@ -174,6 +179,7 @@ public class RequirementUtilsTest extends TestCase {
         }
     }
     
+    @Test
     public void testGetPrimitiveParameterValues() throws Exception {
         load();
 
@@ -198,6 +204,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals(Double.class, params.get(7).getTypeValue().getClass());
     }
     
+    @Test
     public void testGetStringArrayParameterValue() throws Exception {
         load();
 
@@ -215,6 +222,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("column3", arr[2]);
     }
     
+    @Test
     public void testGetPrimitiveArrayParameterValue() throws Exception {
         load();
 

@@ -22,6 +22,7 @@ import com.strider.datadefender.AnonymizerException;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+import org.junit.Test;
 
 /**
  * @author Armenak Grigoryan
@@ -55,6 +56,7 @@ public class UtilsTest extends TestCase {
      * Test of getClassName method, of class Utils.
      * @throws com.strider.datadefender.AnonymizerException
      */
+    @Test
     public void testGetClassName() throws AnonymizerException {
         log.info("Executing testGetClassName ...");
         
@@ -70,6 +72,7 @@ public class UtilsTest extends TestCase {
      * Test of getMethodName method, of class Utils.
      * @throws com.strider.datadefender.AnonymizerException
      */
+    @Test
     public void testGetMethodName() throws AnonymizerException {        
         log.debug("Parameter: " + FULL_CLASS_NAME);
         log.debug("Expected result:" + EXPECTED_RESULTS_2);
