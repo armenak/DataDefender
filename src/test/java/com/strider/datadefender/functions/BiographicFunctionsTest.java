@@ -32,8 +32,6 @@ import com.strider.datadefender.extensions.BiographicFunctions;
  */
 public class BiographicFunctionsTest extends TestCase {
 
-    private static final Logger log = getLogger(BiographicFunctionsTest.class);
-
     public BiographicFunctionsTest(final String testName) {
         super(testName);
     }
@@ -61,18 +59,4 @@ public class BiographicFunctionsTest extends TestCase {
             assertFalse(BiographicFunctions.isValidSIN(invalidSinList[i]));
         }        
     }
-    
-    /**
-     * Test of randomBirthDate method
-     */
-//    public void testRandomBirthDate() throws ParseException {
-//        log.debug("Generate BirthDate");
-//
-//        BiographicFunctions functions = new BiographicFunctions();
-//        Date birthDate = functions.randomBirthDate();
-//
-//        log.debug("Random birthdate = " + birthDate);
-//
-//        assertNotNull(birthDate);
-//    }    
 }

@@ -182,7 +182,7 @@ public class DataDefender  {
         displayExecutionTime(startTime);
     }
     
-    private static void displayExecutionTime(long startTime) {
+    private static void displayExecutionTime(final long startTime) {
         final long endTime   = System.currentTimeMillis();
         final NumberFormat formatter = new DecimalFormat("#0.00000");
         log.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");        
