@@ -196,7 +196,7 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
         MatchMetaData specialCaseData = null;
-        List<MatchMetaData> specialCaseDataList = new ArrayList();
+        final List<MatchMetaData> specialCaseDataList = new ArrayList();
         boolean specialCase = false;
 
 
@@ -330,7 +330,7 @@ public class DatabaseDiscoverer extends Discoverer {
         // Special processing
         if (specialCaseDataList != null && !specialCaseDataList.isEmpty()) {
             log.info("Special case data is processed :" + specialCaseDataList.toString());
-            for (MatchMetaData specialData : specialCaseDataList) {
+            for (final MatchMetaData specialData : specialCaseDataList) {
                 matches.add(specialData);
             }
         }        

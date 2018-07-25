@@ -70,7 +70,7 @@ public class PHIDetector implements SpecialCase {
                 log.info("PHI detected: " + text);
                 data.setModel("phi");
                 data.setAverageProbability(100);
-                List<Probability> probabilityList = new ArrayList();
+                final List<Probability> probabilityList = new ArrayList();
                 probabilityList.add(new Probability(text, 1.00));
                 data.setProbabilityList(probabilityList);
                 return data;

@@ -238,7 +238,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */   
-    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, String vendor)
+    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, final String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -270,7 +270,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, final Column column, String vendor)
+    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, 
+            final Column column, final String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,

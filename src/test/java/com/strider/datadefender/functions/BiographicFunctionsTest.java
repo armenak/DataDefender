@@ -19,9 +19,6 @@
 package com.strider.datadefender.functions;
 
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.extensions.BiographicFunctions;
 
