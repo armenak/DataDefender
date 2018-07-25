@@ -170,7 +170,7 @@ public class RequirementUtilsTest extends TestCase {
                 final Parameter parameter = RequirementUtils.getFileParameter(column.getParameters());
                 assertNull(parameter);
             }
-            assertEquals(("column" + ++columnNo), column.getName());
+            assertEquals("column" + ++columnNo, column.getName());
         }
     }
     
