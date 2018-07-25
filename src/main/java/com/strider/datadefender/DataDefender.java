@@ -252,17 +252,20 @@ public class DataDefender  {
      * @param props application property file
      * @return The list of table names
      */
-    public static Set<String> getTableNames(List<String> tableNames, final Properties props) {
+    public static Set<String> getTableNames(final List<String> tableNames, final Properties props) {
+        List<String> tableNameList = new ArrayList<String>(Arrays.asList(new String[tableNames.size()]));
+        Collections.copy(tableNameList, tableNames);
         
-        if (tableNames.isEmpty()) {
+        if (tableNameList.isEmpty()) {
             final String tableStr = props.getProperty("tables");
             if (tableStr == null) {
                 return Collections.emptySet();
+            } else {
+                tableNameList = Arrays.asList(tableStr.split(" "));
+                log.info("Adding tables from property file.");
             }
-            tableNames = Arrays.asList(tableStr.split(" "));
-            log.info("Adding tables from property file.");
         }
-        final Set<String> tables = tableNames.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
+        final Set<String> tables = tableNameList.stream().map(s -> s.toLowerCase(Locale.ENGLISH)).collect(Collectors.toSet());
         log.info("Tables: " + Arrays.toString(tables.toArray()));
         return tables;
     }
