@@ -85,7 +85,7 @@ public class Column {
      * @return boolean
      */
     public boolean isIgnoreEmpty() {
-        return (this.ignoreEmpty != null && this.ignoreEmpty.equals("true"));
+        return this.ignoreEmpty != null && this.ignoreEmpty.equals("true");
     }
     
     /**

@@ -319,7 +319,7 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             final double averageProbability = calculateAverage(probabilityList);
-            if ((averageProbability >= probabilityThreshold)) {
+            if (averageProbability >= probabilityThreshold) {
                 data.setAverageProbability(averageProbability);
                 data.setModel(model.getName());
                 data.setProbabilityList(probabilityList);

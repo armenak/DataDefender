@@ -140,7 +140,7 @@ public class RequirementUtilsTest extends TestCase {
 
         int columnNo = 0;
         for (final Column column : requirement.getTables().get(0).getColumns()) {
-            assertEquals(("column" + ++columnNo), column.getName());
+            assertEquals("column" + ++columnNo, column.getName());
         }
         
         final List<Key> pKeys = requirement.getTables().get(1).getPrimaryKeys();

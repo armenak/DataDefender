@@ -158,7 +158,7 @@ public class Exclude {
      * @return boolean
      */
     public boolean isExcludeNulls() {
-        return (this.excludeNull != null && this.excludeNull.equals("true"));
+        return this.excludeNull != null && this.excludeNull.equals("true");
     }
     
     /**

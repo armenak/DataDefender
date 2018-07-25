@@ -170,7 +170,7 @@ public class FileDiscoverer extends Discoverer {
                 model.getNameFinder().clearAdaptiveData();
 
                 final double averageProbability = calculateAverage(probabilityList);
-                if ((averageProbability >= probabilityThreshold)) {
+                if (averageProbability >= probabilityThreshold) {
                     final FileMatchMetaData result = new FileMatchMetaData(recursivedir, file);
                     result.setAverageProbability(averageProbability);
                     result.setModel(model.getName());

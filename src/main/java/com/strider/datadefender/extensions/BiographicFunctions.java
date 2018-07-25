@@ -50,7 +50,7 @@ public class BiographicFunctions extends CoreFunctions {
         gc.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
         
         final String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-" + 
-               prependZero((gc.get(GregorianCalendar.MONTH) + 1)) + "-" + 
+               prependZero(gc.get(GregorianCalendar.MONTH) + 1) + "-" + 
                gc.get(GregorianCalendar.YEAR);
         log.debug("BirthDate:[" + birthDate +"]");
         

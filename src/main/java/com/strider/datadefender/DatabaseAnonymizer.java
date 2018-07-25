@@ -517,7 +517,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
         }
 
-        return (hasInclusions && !passedInclusion);
+        return hasInclusions && !passedInclusion;
     }
     
     /**
