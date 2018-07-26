@@ -23,28 +23,13 @@ import static org.junit.Assert.*;
  * @author strider
  */
 public class PHIDetectorTest {
-    
-    private static final Logger LOG = getLogger(PHIDetectorTest.class);
-    
+        
     private static List <String> phiList;
     private static List<String> phiKeys;
     private static final String phi_with_argument = "depression";
     private static final String phi_without_argument = "";    
     private static MatchMetaData metaData;
     private static MatchMetaData expResult;
-    
-    private static final double DELTA = 1e-15;
-    
-    public PHIDetectorTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
     
     @Before
     public void setUp() {
@@ -76,16 +61,14 @@ public class PHIDetectorTest {
         probabilityList.add(new Probability(phi_with_argument, 1.00));
         expResult.setProbabilityList(probabilityList);        
         
-        MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_with_argument);
+        final MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_with_argument);
         
         assertEquals(result.getModel(),expResult.getModel());
     }
     
     @Test
     public void testIsPHITermWithoutArgument() {
-        expResult = null;
-        
-        MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
-        assertTrue(result == expResult);
+        final MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
+        assertTrue(result == null);
     }    
 }
