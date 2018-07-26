@@ -9,12 +9,7 @@ import com.strider.datadefender.Probability;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -45,10 +40,6 @@ public class PHIDetectorTest {
         expResult = new MatchMetaData("test_schema","test_table",phiKeys,"test_column","VARCHAR",10);
     }
     
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of isPHITerm method, of class PHIDetector.
      */
@@ -69,6 +60,6 @@ public class PHIDetectorTest {
     @Test
     public void testIsPHITermWithoutArgument() {
         final MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
-        assertTrue(result == null);
+        assertNull(result);
     }    
 }
