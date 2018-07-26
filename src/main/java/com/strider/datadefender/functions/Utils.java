@@ -18,7 +18,6 @@
 
 package com.strider.datadefender.functions;
 
-import com.strider.datadefender.AnonymizerException;
 import static java.lang.Integer.parseInt;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -45,17 +44,18 @@ public class Utils {
      * 
      * @param fullMethodName Fully specified method name.
      * @return Method name.
-     * @throws com.strider.datadefender.AnonymizerException
+     * @throws com.strider.datadefender.DatabaseAnonymizerException
      */
-    public static String getMethodName(final String fullMethodName) throws AnonymizerException{
+    public static String getMethodName(final String fullMethodName) {
         if (fullMethodName.length() == 0) {
-            throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
+            log.error("Please specify fully specified methid name in Requirement document");
+            return "";
         }
 
         final int index = fullMethodName.lastIndexOf(SEPARATOR);
         if (index != -1) {
             return fullMethodName.substring(index+1);
-        }
+        } 
         
         return "";    
     }
@@ -68,9 +68,10 @@ public class Utils {
      * 
      * @throws RuntimeException Parameter is an empty string.
      */
-    public static String getClassName(final String fullMethodName) throws AnonymizerException {
+    public static String getClassName(final String fullMethodName) {
         if (fullMethodName.length() == 0) {
-            throw new AnonymizerException("Please specify fully specified methid name in Requirement document");
+            log.error("Please specify fully specified methid name in Requirement document");
+            return "";
         }
 
         final int index = fullMethodName.lastIndexOf(SEPARATOR);

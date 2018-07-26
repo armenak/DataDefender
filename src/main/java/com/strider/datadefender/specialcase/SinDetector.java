@@ -32,22 +32,19 @@ import com.strider.datadefender.utils.CommonUtils;
  */
 public class SinDetector implements SpecialCase {
     
-    private static final Logger log = getLogger(SinDetector.class);
+    private static final Logger LOG = getLogger(SinDetector.class);
     
     public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
         String sinValue = text;
         
-        if (CommonUtils.isEmptyString(sinValue)) {
-            return null;
-        }
-        
-        if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR")) {
+        if (!CommonUtils.isEmptyString(sinValue) &&  
+            (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))) {
             final BiographicFunctions bf = new BiographicFunctions();
             if (data.getColumnType().equals("VARCHAR")) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
             if ( bf.isValidSIN(sinValue)) {
-                log.info("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
+                LOG.debug("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
                 final List<Probability> probabilityList = new ArrayList();

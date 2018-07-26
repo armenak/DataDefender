@@ -27,14 +27,14 @@ package com.strider.datadefender;
  * Application-level exception
  * @author Armenak Grigoryan
  */
-public class AnonymizerException extends Exception {
+public class DatabaseDiscoveryException extends Exception {
     private static final long serialVersionUID = 1L;
     
-    public AnonymizerException(final String msg) {
+    public DatabaseDiscoveryException(final String msg) {
         super(msg);
     }
 
-    public AnonymizerException(final String msg, final Throwable t) {
+    public DatabaseDiscoveryException(final String msg, final Throwable t) {
         super(msg, t);
     }
 }

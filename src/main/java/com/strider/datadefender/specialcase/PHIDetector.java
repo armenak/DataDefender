@@ -62,7 +62,7 @@ public class PHIDetector implements SpecialCase {
      */
     public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {  
         if (!CommonUtils.isEmptyString(text) && 
-            (data.getColumnType().equals("VARCHAR") && 
+            ((data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR")) && 
              phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {
                     log.info("PHI detected: " + text);
                     data.setModel("phi");

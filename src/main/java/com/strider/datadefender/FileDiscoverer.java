@@ -61,7 +61,7 @@ public class FileDiscoverer extends Discoverer {
 
     @SuppressWarnings("unchecked")
     public List<FileMatchMetaData> discover(final Properties dataDiscoveryProperties)
-    throws AnonymizerException, IOException, SAXException, TikaException {
+    throws FileDiscoveryException, DatabaseDiscoveryException, IOException, SAXException, TikaException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -96,7 +96,7 @@ public class FileDiscoverer extends Discoverer {
     }
 
     private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties, final Model model, final double probabilityThreshold)
-    throws AnonymizerException, IOException, SAXException, TikaException {
+    throws DatabaseDiscoveryException, IOException, SAXException, TikaException {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
         final String directories = fileDiscoveryProperties.getProperty("directories");
@@ -104,7 +104,7 @@ public class FileDiscoverer extends Discoverer {
 
         if (directories == null || directories.equals("")) {
             log.error("directories property is empty in firediscovery.properties file");
-            throw new AnonymizerException("directories property is empty in firediscovery.properties file");
+            throw new DatabaseDiscoveryException("directories property is empty in firediscovery.properties file");
         }
         
         final String[] directoryList = directories.split(",");

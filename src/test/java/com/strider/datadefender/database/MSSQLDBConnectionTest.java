@@ -16,6 +16,7 @@
  */
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +56,7 @@ public class MSSQLDBConnectionTest {
     private Connection mockConnection; 
     // testing class
     private class TestMSSQLDBConnection extends MSSQLDBConnection {
-        public TestMSSQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
+        public TestMSSQLDBConnection(final Properties properties) throws DatabaseAnonymizerException, DatabaseDiscoveryException {
             super(properties);
         }
         @Override
@@ -77,7 +78,7 @@ public class MSSQLDBConnectionTest {
     }
     
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, SQLException {
+    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
         final TestMSSQLDBConnection testDB = new TestMSSQLDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
         assertEquals("invalid-url;user=invalid-user;password=invalid-pass", testDB.getURL());

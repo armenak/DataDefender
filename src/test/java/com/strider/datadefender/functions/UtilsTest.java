@@ -18,7 +18,7 @@
 
 package com.strider.datadefender.functions;
 
-import com.strider.datadefender.AnonymizerException;
+import com.strider.datadefender.DatabaseAnonymizerException;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
@@ -54,10 +54,10 @@ public class UtilsTest extends TestCase {
 
     /**
      * Test of getClassName method, of class Utils.
-     * @throws com.strider.datadefender.AnonymizerException
+     * @throws com.strider.datadefender.DatabaseAnonymizerException
      */
     @Test
-    public void testGetClassName() throws AnonymizerException {
+    public void testGetClassName() throws DatabaseAnonymizerException {
         log.info("Executing testGetClassName ...");
         
         log.debug("Parameter: " + FULL_CLASS_NAME);
@@ -70,10 +70,10 @@ public class UtilsTest extends TestCase {
     
     /**
      * Test of getMethodName method, of class Utils.
-     * @throws com.strider.datadefender.AnonymizerException
+     * @throws com.strider.datadefender.DatabaseAnonymizerException
      */
     @Test
-    public void testGetMethodName() throws AnonymizerException {        
+    public void testGetMethodName() throws DatabaseAnonymizerException {        
         log.debug("Parameter: " + FULL_CLASS_NAME);
         log.debug("Expected result:" + EXPECTED_RESULTS_2);
 

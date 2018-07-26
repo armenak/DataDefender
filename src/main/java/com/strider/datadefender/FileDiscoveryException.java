@@ -1,4 +1,5 @@
 /*
+ * 
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,16 +15,21 @@
  * Lesser General Public License for more details.
  *
  */
-
-package com.strider.datadefender.database;
-
-import com.strider.datadefender.DatabaseDiscoveryException;
-import java.sql.Connection;
+package com.strider.datadefender;
 
 /**
- * Interface for all classes implementing database connection
+ * Application-level exception
  * @author Armenak Grigoryan
  */
-public interface IDBConnection {
-    Connection connect() throws DatabaseDiscoveryException;
+public class FileDiscoveryException extends Exception {
+    private static final long serialVersionUID = 1L;
+    
+    public FileDiscoveryException(final String msg) {
+        super(msg);
+    }
+
+    public FileDiscoveryException(final String msg, final Throwable t) {
+        super(msg, t);
+    }
 }
+

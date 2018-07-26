@@ -377,7 +377,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             return anonymizedValue.toString();
             
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         
@@ -452,7 +452,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } else if ("int".equals(returnType)) {
                 return anonymizedValue;
             }
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         
@@ -572,7 +572,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
              IllegalAccessException,
              IllegalArgumentException,
              InvocationTargetException,
-             AnonymizerException {
+             DatabaseAnonymizerException {
         
         int fieldIndex = 0;
         final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
@@ -633,7 +633,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table 
      */
     private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
-    throws AnonymizerException {
+    throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
@@ -727,7 +727,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     @Override
     public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties, final Set<String> tables) 
-    throws DatabaseAnonymizerException, AnonymizerException{
+    throws DatabaseAnonymizerException, DatabaseDiscoveryException{
 
         final int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

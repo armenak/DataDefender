@@ -45,7 +45,7 @@ public class ColumnDiscoverTest extends H2DB {
     @SuppressWarnings("serial")
 
     @Test
-    public void testWithColumns() throws AnonymizerException { 
+    public void testWithColumns() throws DatabaseAnonymizerException, DatabaseDiscoveryException { 
         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
         final List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, new HashSet<String>());
         assertEquals(1, suspects.size());
@@ -54,7 +54,7 @@ public class ColumnDiscoverTest extends H2DB {
     }
 
     @Test
-    public void testWithTablesColumnsAndRequirements() throws AnonymizerException { 
+    public void testWithTablesColumnsAndRequirements() throws DatabaseAnonymizerException, DatabaseDiscoveryException { 
         final ColumnDiscoverer discoverer = new ColumnDiscoverer();
         final List<MatchMetaData> suspects = discoverer.discover(factory, sampleCProps, 
             new HashSet<String>(Arrays.asList("ju_users")));

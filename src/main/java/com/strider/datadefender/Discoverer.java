@@ -48,9 +48,9 @@ public abstract class Discoverer { //implements IDiscoverer {
     
     private static final Logger log = getLogger(Discoverer.class);
 
-    public void createRequirement(final String fileName) throws AnonymizerException {
+    public void createRequirement(final String fileName) throws DatabaseDiscoveryException {
         if (matches == null || matches.isEmpty()) {
-            throw new AnonymizerException("No matches to create requirement from!");
+            throw new DatabaseDiscoveryException("No matches to create requirement from!");
         }
         RequirementUtils.write(RequirementUtils.create(matches), fileName);
     }

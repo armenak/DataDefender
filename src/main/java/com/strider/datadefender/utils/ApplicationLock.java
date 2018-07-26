@@ -14,7 +14,7 @@
 
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DatabaseDiscoveryException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,9 +53,9 @@ public class ApplicationLock {
      * Otherwise returns false.
      * 
      * @return boolean
-     * @throws com.strider.datadefender.DataDefenderException
+     * @throws com.strider.datadefender.DatabaseDiscoveryException
      */
-    public boolean isAppActive() throws DataDefenderException {
+    public boolean isAppActive() throws DatabaseDiscoveryException {
         try {
             file = new File
                  (System.getProperty("user.home"), appName + ".tmp");
@@ -85,7 +85,7 @@ public class ApplicationLock {
                             log.debug("Closing lock file");
                             closeLock();
                             deleteFile();
-                        } catch (DataDefenderException ae) {
+                        } catch (DatabaseDiscoveryException ae) {
                             log.error("Problem closing file lock");
                         }
                     }
@@ -97,17 +97,17 @@ public class ApplicationLock {
         }
     }
 
-    private void closeLock() throws DataDefenderException {
+    private void closeLock() throws DatabaseDiscoveryException {
         try { 
             lock.release();  
         } catch (IOException e) {  
-            throw new DataDefenderException("Problem releasing file lock", e);
+            throw new DatabaseDiscoveryException("Problem releasing file lock", e);
         }
         
         try { 
             channel.close(); 
         } catch (IOException e) {  
-            throw new DataDefenderException("Problem closing channel", e);
+            throw new DatabaseDiscoveryException("Problem closing channel", e);
         }
     }
 

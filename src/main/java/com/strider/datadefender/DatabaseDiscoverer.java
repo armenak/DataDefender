@@ -72,7 +72,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
     @SuppressWarnings("unchecked")
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables)
-    throws AnonymizerException, ParseException {
+    throws  ParseException, DatabaseDiscoveryException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -190,7 +190,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties,
             final Set<String> tables, final Model model, final double probabilityThreshold)
-    throws AnonymizerException, ParseException {
+    throws ParseException, DatabaseDiscoveryException {
         final IMetaData metaData = factory.fetchMetaData();
         final List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
@@ -379,7 +379,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             value = method.invoke(instance, data, text);
 
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
 

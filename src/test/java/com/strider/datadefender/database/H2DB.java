@@ -16,6 +16,7 @@
  */
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.Connection;
@@ -50,7 +51,7 @@ public abstract class H2DB {
     protected static Connection con;
 
     @BeforeClass
-    public static void setUpDB() throws DatabaseAnonymizerException, SQLException {
+    public static void setUpDB() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
         factory = IDBFactory.get(h2Props);
         con = factory.getConnection();
         try (Statement stmt = con.createStatement()) {

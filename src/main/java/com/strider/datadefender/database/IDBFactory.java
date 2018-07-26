@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.apache.log4j.Logger.getLogger;
 
 import java.sql.Connection;
@@ -46,7 +47,7 @@ public interface IDBFactory extends ICloseableNoException {
     
     Connection getConnection();
     Connection getUpdateConnection();
-    IMetaData fetchMetaData() throws DatabaseAnonymizerException;
+    IMetaData fetchMetaData() throws DatabaseDiscoveryException;
     ISQLBuilder createSQLBuilder();
     String getVendorName();
     
@@ -57,14 +58,14 @@ public interface IDBFactory extends ICloseableNoException {
         protected Connection updateConnection;
         private final String vendor;
 
-        DBFactory(String vendorName) throws DatabaseAnonymizerException {
+        DBFactory(String vendorName) throws DatabaseDiscoveryException {
             log.info("Connecting to database");
             connection = createConnection();
             updateConnection = connection;
             vendor = vendorName;
         }
         
-        public abstract Connection createConnection() throws DatabaseAnonymizerException;
+        public abstract Connection createConnection() throws DatabaseDiscoveryException;
         @Override
         public Connection getConnection() {
             return connection;
@@ -96,7 +97,7 @@ public interface IDBFactory extends ICloseableNoException {
      * @return db factory instance
      * @throws DatabaseAnonymizerException 
      */
-    static IDBFactory get(final Properties dbProps) throws DatabaseAnonymizerException {
+    static IDBFactory get(final Properties dbProps) throws DatabaseDiscoveryException {
         String vendor = dbProps.getProperty("vendor");
         if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
             return new DBFactory(vendor) {
@@ -104,11 +105,11 @@ public interface IDBFactory extends ICloseableNoException {
                     updateConnection = createConnection();
                 }
                 @Override
-                public Connection createConnection() throws DatabaseAnonymizerException {
+                public Connection createConnection() throws DatabaseDiscoveryException {
                     return new MySQLDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
+                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
                     return new MySQLMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -119,11 +120,11 @@ public interface IDBFactory extends ICloseableNoException {
         } else if ("mssql".equalsIgnoreCase(vendor)){
             return new DBFactory(vendor) {
                 @Override
-                public Connection createConnection() throws DatabaseAnonymizerException {
+                public Connection createConnection() throws DatabaseDiscoveryException {
                     return new MSSQLDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
+                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
                     return new MSSQLMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -134,11 +135,11 @@ public interface IDBFactory extends ICloseableNoException {
         } else if ("oracle".equalsIgnoreCase(vendor)) {
             return new DBFactory(vendor) {
                 @Override
-                public Connection createConnection() throws DatabaseAnonymizerException {
+                public Connection createConnection() throws DatabaseDiscoveryException {
                     return new OracleDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseAnonymizerException {
+                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
                     return new OracleMetaData(dbProps, getConnection());
                 }
                 @Override

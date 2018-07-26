@@ -18,13 +18,13 @@
 
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.AnonymizerException;
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  * Package level exception. Extends application level exception.
  * @author Armenak Grigoryan
  */
-public class DatabaseAnonymizerException extends AnonymizerException {
+public class DatabaseAnonymizerException extends DatabaseDiscoveryException {
     private static final long serialVersionUID = 1L;
     
     public DatabaseAnonymizerException(final String msg) {

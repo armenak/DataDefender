@@ -16,6 +16,7 @@
  */
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,7 +43,7 @@ public class H2DBTest extends H2DB {
     }
 
     @Test
-    public void testMetaData() throws DatabaseAnonymizerException {
+    public void testMetaData() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final List<MatchMetaData> meta = factory.fetchMetaData().getMetaData();
         final List<String> actual = meta.stream().filter(d -> d.getTableName().equals("ju_users"))
             .map(d -> d.toVerboseStr())

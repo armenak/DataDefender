@@ -60,7 +60,10 @@ public class DataDefender  {
     private static final Logger log = getLogger(DataDefender.class);
 
     @SuppressWarnings("unchecked")
-    public static void main(final String[] args) throws ParseException, DataDefenderException, AnonymizerException, IOException, SAXException, TikaException, java.text.ParseException {
+    public static void main(final String[] args) 
+            throws ParseException, DatabaseDiscoveryException, DatabaseAnonymizerException, 
+                   IOException, SAXException, TikaException, java.text.ParseException,
+                   FileDiscoveryException{
         
         final long startTime = System.currentTimeMillis();
         

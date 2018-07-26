@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static java.lang.Class.forName;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -46,7 +47,7 @@ public abstract class DBConnection implements IDBConnection {
      * @param properties
      * @throws DatabaseAnonymizerException
      */
-    public DBConnection(final Properties properties) throws DatabaseAnonymizerException {
+    public DBConnection(final Properties properties) throws DatabaseDiscoveryException {
         driver   = properties.getProperty("driver");
         vendor   = properties.getProperty("vendor");
         url      = properties.getProperty("url");
@@ -73,7 +74,7 @@ public abstract class DBConnection implements IDBConnection {
      * @return
      * @throws DatabaseAnonymizerException
      */
-    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseAnonymizerException {
+    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseDiscoveryException {
         Connection conn = null;
         try {
             log.info("Establishing database connection");

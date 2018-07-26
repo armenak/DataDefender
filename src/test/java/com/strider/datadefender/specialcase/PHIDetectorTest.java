@@ -45,7 +45,6 @@ public class PHIDetectorTest {
      */
     @Test
     public void testIsPHITermWithArgument() {
-        
         expResult.setModel("phi");
         expResult.setAverageProbability(100);
         final List<Probability> probabilityList = new ArrayList();

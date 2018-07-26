@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
-import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  *
@@ -69,13 +69,13 @@ public final class AppProperties {
         return props;
     }
  
-    public static Properties loadProperties(final String fileName) throws DataDefenderException {
+    public static Properties loadProperties(final String fileName) throws DatabaseDiscoveryException {
         final Properties properties = new Properties();
         try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
             properties.load(in);
             return properties;
         } catch (IOException e) {
-            throw new DataDefenderException("ERROR: Unable to load " + fileName, e);
+            throw new DatabaseDiscoveryException("ERROR: Unable to load " + fileName, e);
         }
     }
 }
