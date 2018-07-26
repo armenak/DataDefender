@@ -32,8 +32,6 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.DatabaseAnonymizerException;
-
 /**
  * @author Armenak Grigoryan
  */

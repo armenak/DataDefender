@@ -46,7 +46,7 @@ public class ColumnDiscoverer extends Discoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties columnProperties, final Set<String> tables) 
-        throws DatabaseAnonymizerException, DatabaseDiscoveryException{
+        throws DatabaseDiscoveryException{
      
         log.info("Column discovery in process");
         final IMetaData metaData = factory.fetchMetaData();
