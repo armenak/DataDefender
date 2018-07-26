@@ -61,9 +61,9 @@ public class PHIDetector implements SpecialCase {
      * @return String
      */
     public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {  
-        if (!CommonUtils.isEmptyString(text)) {
-            if (data.getColumnType().equals("VARCHAR") &&
-                phiList.contains(text.trim().toLowerCase(Locale.ENGLISH))) {
+        if (!CommonUtils.isEmptyString(text) && 
+            (data.getColumnType().equals("VARCHAR") && 
+             phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {
                     log.info("PHI detected: " + text);
                     data.setModel("phi");
                     data.setAverageProbability(100);
@@ -71,7 +71,6 @@ public class PHIDetector implements SpecialCase {
                     probabilityList.add(new Probability(text, 1.00));
                     data.setProbabilityList(probabilityList);
                     return data;
-            } 
         }
         return null;
     }
