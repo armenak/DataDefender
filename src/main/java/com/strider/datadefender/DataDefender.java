@@ -61,7 +61,7 @@ public class DataDefender  {
 
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) 
-            throws ParseException, DatabaseDiscoveryException, DatabaseAnonymizerException, 
+            throws ParseException, DatabaseDiscoveryException, 
                    IOException, SAXException, TikaException, java.text.ParseException,
                    FileDiscoveryException{
         

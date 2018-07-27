@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
