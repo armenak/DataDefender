@@ -176,12 +176,10 @@
                                 <dataFile>target/jacoco.exec</dataFile>
                                 <!-- Sets the output directory for the code coverage report. -->
                                 <outputDirectory>target/jacoco-ut</outputDirectory>
-                                    <excludes>
-                                        <exclude>pom.xml</exclude>
-                                        <exclude>**/com/strider/datadefender/*.*</exclude>
-                                        <exclude>**/sample_projects/*.*</exclude>
-                                    </excludes>        
-                                </configuration>
+                                <excludes>
+                                    <exclude>com/strider/datadefender/*.class</exclude>
+                                </excludes>        
+                            </configuration>
                     </execution>
                 </executions>
                     <configuration>
