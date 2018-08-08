@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 
 /**
@@ -32,13 +32,13 @@ import com.strider.datadefender.DataDefenderException;
 */
 public class AppPropertiesTest {
     
-    @Test(expected=DataDefenderException.class)
-    public void testLoadPropertiesNoFile() throws DataDefenderException {
+    @Test(expected=DatabaseDiscoveryException.class)
+    public void testLoadPropertiesNoFile() throws DatabaseDiscoveryException {
         loadProperties("/do/not/exist.properties");
     }
 
     @Test
-    public void testLoadPropertiesValid() throws DataDefenderException {
+    public void testLoadPropertiesValid() throws DatabaseDiscoveryException {
         final String path = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
         final Properties props = loadProperties(path);
         assertNotNull(props);

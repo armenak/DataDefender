@@ -16,6 +16,7 @@
  */
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +56,8 @@ public class MySQLDBConnectionTest {
     private Connection mockConnection; 
     // testing class
     private class TestMySQLDBConnection extends MySQLDBConnection {
-        public TestMySQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
+        public TestMySQLDBConnection(final Properties properties) 
+                throws DatabaseAnonymizerException, DatabaseDiscoveryException {
             super(properties);
         }
         @Override
@@ -76,7 +78,7 @@ public class MySQLDBConnectionTest {
     }
     
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, SQLException {
+    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
         final TestMySQLDBConnection testDB = new TestMySQLDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
     }

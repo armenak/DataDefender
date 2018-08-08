@@ -46,6 +46,7 @@ import opennlp.tools.util.Span;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
 import java.util.Collections;
+import java.util.Locale;
 
 /**
  *
@@ -60,7 +61,7 @@ public class FileDiscoverer extends Discoverer {
 
     @SuppressWarnings("unchecked")
     public List<FileMatchMetaData> discover(final Properties dataDiscoveryProperties)
-    throws AnonymizerException, IOException, SAXException, TikaException {
+    throws FileDiscoveryException, DatabaseDiscoveryException, IOException, SAXException, TikaException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -73,7 +74,7 @@ public class FileDiscoverer extends Discoverer {
         log.info("Model list [" + Arrays.toString(modelList) + "]");
 
         List<FileMatchMetaData> finalList = new ArrayList<>();
-        for (String model: modelList) {
+        for (final String model: modelList) {
             log.info("********************************");
             log.info("Processing model " + model);
             log.info("********************************");
@@ -95,21 +96,20 @@ public class FileDiscoverer extends Discoverer {
     }
 
     private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties, final Model model, final double probabilityThreshold)
-    throws AnonymizerException, IOException, SAXException, TikaException {
+    throws DatabaseDiscoveryException, IOException, SAXException, TikaException {
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
-        String[] directoryList = null;
-        String[] exclusionList = null;
         final String directories = fileDiscoveryProperties.getProperty("directories");
         log.info("Directories to analyze: " + directories);
-        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
 
         if (directories == null || directories.equals("")) {
             log.error("directories property is empty in firediscovery.properties file");
-            throw new AnonymizerException("directories property is empty in firediscovery.properties file");
+            throw new DatabaseDiscoveryException("directories property is empty in firediscovery.properties file");
         }
-        directoryList = directories.split(",");
-      
+        
+        final String[] directoryList = directories.split(",");
+        String[] exclusionList = null;
+        final String exclusions = fileDiscoveryProperties.getProperty("exclusions");
         if (exclusions == null || exclusions.equals("")) {      
             log.info("exclusions property is empty in firediscovery.properties file");
         } else {
@@ -127,15 +127,15 @@ public class FileDiscoverer extends Discoverer {
             final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
             for (final File fich : files) {
-                final String file = fich.getName().toString();
-                final String recursivedir = fich.getParent().toString();
+                final String file = fich.getName();
+                final String recursivedir = fich.getParent();
 
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
-                final String ext = CommonUtils.getFileExtension(fich);
-
+                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
+                log.info("Extension: " + ext);
                 if (exclusionList != null && Arrays.asList(exclusionList).contains(ext)) {
-                   // less verbose - Ignored types on the top
+                   log.info("Ignoring type " + ext);
                    continue;
                 }
 
@@ -149,6 +149,7 @@ public class FileDiscoverer extends Discoverer {
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString =  handler.toString();
+                        log.info(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() +".Ignoring...");
@@ -169,7 +170,7 @@ public class FileDiscoverer extends Discoverer {
                 model.getNameFinder().clearAdaptiveData();
 
                 final double averageProbability = calculateAverage(probabilityList);
-                if ((averageProbability >= probabilityThreshold)) {
+                if (averageProbability >= probabilityThreshold) {
                     final FileMatchMetaData result = new FileMatchMetaData(recursivedir, file);
                     result.setAverageProbability(averageProbability);
                     result.setModel(model.getName());

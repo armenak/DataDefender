@@ -35,10 +35,9 @@ public class ReportUtil {
     
     private static final Logger log = getLogger(ReportUtil.class);
 
-    public static int rowCount(final IDBFactory factory, final String tableName) {
+    public static int rowCount(final IDBFactory factory, final String tableName, final int limit) {
         
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-        final int limit = 100;
 
         final String table = sqlBuilder.prefixSchema(tableName);
 
@@ -68,7 +67,7 @@ public class ReportUtil {
             " WHERE " + columnName   + " IS NOT NULL ", 5);                
             log.debug("Executing query against database: " + querySample);
 
-        final List<String> sampleDataList = new ArrayList<String>();
+        final List<String> sampleDataList = new ArrayList<>();
         try (Statement stmt = factory.getConnection().createStatement();
              ResultSet resultSet = stmt.executeQuery(querySample);) {
             while (resultSet.next()) {

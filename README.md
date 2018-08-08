@@ -1,7 +1,9 @@
 [![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html) 
 [![Build Status](https://travis-ci.org/armenak/DataDefender.svg?branch=master)](https://travis-ci.org/armenak/DataDefender)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ed95fbecb60b4e98973c976f338ab4b5)](https://www.codacy.com/app/agstrider/DataDefender?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=armenak/DataDefender&amp;utm_campaign=Badge_Grade)
-[![](https://codescene.io/projects/1404/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1404/jobs/latest-successful/results)
+[![codecov](https://codecov.io/gh/armenak/DataDefender/branch/master/graph/badge.svg)](https://codecov.io/gh/armenak/DataDefender)
+
+
 
 Data Discovery and Anonymization toolkit
 ========================================
@@ -39,11 +41,12 @@ This implementation of Data Discovery program is using [Apache OpenNLP](https://
 
 Features
 --------
-1. Identifies sensitive personal data
-2. Creates plan (XML document) to define what columns and how should be anonymized
-3. Anonymizes the data
-4. Platform-independent
+1. Identifies sensitive personal data.
+2. Creates plan (XML document) to define what columns and how should be anonymized.
+3. Anonymizes the data.
+4. Platform-independent.
 5. Supports Oracle, MS SQL Server, and MySQL. Work in progress for DB2 and PostgreSQL.
+6. This tool can help you on GDPR.
 
 Prerequisites
 ----------------

@@ -21,6 +21,7 @@ package com.strider.datadefender.utils;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+import org.junit.Test;
 
 /**
  *
@@ -50,6 +51,7 @@ public class XegerTest extends TestCase {
     /**
      * Test of generate method, of class Xeger.
      */
+    @Test
     public void testGenerate() {
         log.debug("Generate string");
         final Xeger instance = new Xeger(REGEXP_1);
@@ -63,6 +65,7 @@ public class XegerTest extends TestCase {
     /**
      * Test of generate method, of class Xeger.
      */
+    @Test
     public void testGenerateSIN() {
         log.debug("Generate SIN");
         

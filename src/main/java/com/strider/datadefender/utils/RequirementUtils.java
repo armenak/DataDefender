@@ -115,10 +115,15 @@ public class RequirementUtils {
         final Map<String, List<Column>> columns = new HashMap<>();
         Column column;
         for (final MatchMetaData match : matches) {
-            String tableName = match.getTableName();
+            final StringBuilder sb = new StringBuilder();
             if (match.getSchemaName() != null && !match.getSchemaName().equals("")) {
-                tableName = match.getSchemaName() + "." + tableName;
+                sb.append(match.getSchemaName()).append('.').append(match.getTableName());
+            } else {
+                sb.append(match.getTableName());
             }
+            
+            final String tableName = sb.toString();
+            
             Table table = tables.get(tableName);
             if (table == null) { // new table
                 table = new Table();
@@ -137,8 +142,15 @@ public class RequirementUtils {
             } // deal with columns
             column = new Column();
             column.setName(match.getColumnName());
-            column.setReturnType(match.getColumnType());
-            addDefaultParam(column);
+            
+            final String columnType = match.getColumnType();
+            if ("TEXT".equals(columnType) || "CHAR".equals(columnType)) {
+                column.setReturnType("String");
+            } else {
+                column.setReturnType(match.getColumnType());
+            }
+
+            addDefaultParam(table.getName(), column);
             columns.get(tableName).add(column); // add column
         } // add columns to tables
         for (final Entry<String, List<Column>> entry: columns.entrySet()) {
@@ -153,13 +165,13 @@ public class RequirementUtils {
     }
     
     // Hard-coded default params for now.
-    private static void addDefaultParam(final Column column) {
-        column.setFunction("com.strider.dataanonymizer.functions.CoreFunctions.randomStringFromFile");
+    private static void addDefaultParam(final String table, final Column column) {
+        column.setFunction("com.strider.datadefender.functions.CoreFunctions.randomStringFromFile");
         final List<Parameter> params = new ArrayList<>();
         final Parameter param = new Parameter();
         param.setName("file");
-        param.setValue("default-file.txt");
-        param.setType("String");
+        param.setValue(table + "_" + column.getName() + ".txt");
+        param.setType(column.getReturnType());
         params.add(param);
         column.setParameters(params);
     }

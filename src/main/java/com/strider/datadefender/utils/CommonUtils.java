@@ -32,8 +32,6 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.AnonymizerException;
-
 /**
  * @author Armenak Grigoryan
  */
@@ -64,8 +62,7 @@ public class CommonUtils {
         return str == null || str.isEmpty();
     }
     
-    public static java.sql.Date stringToDate(final String str, final String format) 
-    throws AnonymizerException {
+    public static java.sql.Date stringToDate(final String str, final String format)  {
 	final SimpleDateFormat formatter = new SimpleDateFormat(format, Locale.ENGLISH);	
         java.sql.Date sqlDate = null;
         
@@ -74,7 +71,6 @@ public class CommonUtils {
             sqlDate = new java.sql.Date(date.getTime());
 	} catch (ParseException e) {
 	    log.error("Problem with parsing date");
-            throw new AnonymizerException("Problem with parsing date", e);
 	}   
         
         return sqlDate;
@@ -89,11 +85,12 @@ public class CommonUtils {
         return ret;
     }    
     
-    public static String fixedLengthString(final char fillChar, int count){
+    public static String fixedLengthString(final char fillChar, final int count){
+        int cnt = count;
         // creates a string of 'x' repeating characters
-        char[] chars = new char[count];
-        while (count>0) {
-            chars[--count] = fillChar;
+        char[] chars = new char[cnt];
+        while (cnt>0) {
+            chars[--cnt] = fillChar;
         }
         return new String(chars);
     }    

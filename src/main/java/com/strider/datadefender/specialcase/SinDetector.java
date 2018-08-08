@@ -1,5 +1,5 @@
 /** 
- * Copyright 2014-2017, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,29 +16,40 @@
  */
 package com.strider.datadefender.specialcase;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.datadefender.Probability;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.utils.CommonUtils;
 
 /**
- *
- * @author strider
+ * @author Armenak Grigoryan
  */
 public class SinDetector implements SpecialCase {
     
-    public static MatchMetaData detectSin(final MatchMetaData data, String text) {
-        if (CommonUtils.isEmptyString(text)) {
-            return null;
-        }
+    private static final Logger LOG = getLogger(SinDetector.class);
+    
+    public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
+        String sinValue = text;
         
-        if (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")) {
+        if (!CommonUtils.isEmptyString(sinValue) &&  
+            (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))) {
             final BiographicFunctions bf = new BiographicFunctions();
             if (data.getColumnType().equals("VARCHAR")) {
-                text = text.replaceAll("\\D+", "");
+                sinValue = sinValue.replaceAll("\\D+", "");
             }
-            if ( ( text.matches("[0-9]+") && text.length() == 9) && bf.isValidSIN(text)) {
+            if ( bf.isValidSIN(sinValue)) {
+                LOG.debug("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
+                final List<Probability> probabilityList = new ArrayList();
+                probabilityList.add(new Probability(sinValue, 1.00));
+                data.setProbabilityList(probabilityList);                
                 return data;
             }
         }

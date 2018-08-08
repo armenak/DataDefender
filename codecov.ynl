@@ -1,0 +1,6 @@
+ignore:
+    - "pom.xml"
+    - "sample_projects/.*"
+    - "DADependencyInjection/Libraries/.*"
+    - "DADependencyInjectionTests/.*"
+    - "**/*ViewController.swift"

@@ -16,6 +16,7 @@
  */
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static org.junit.Assert.*;
 
 import java.sql.Connection;
@@ -47,11 +48,11 @@ public class DBConnectionTest {
     private Connection mockConnection; 
     // testing class
     private class TestDBConnection extends DBConnection {
-        public TestDBConnection(final Properties properties) throws DatabaseAnonymizerException {
+        public TestDBConnection(final Properties properties) throws DatabaseAnonymizerException, DatabaseDiscoveryException {
             super(properties);
         }
         @Override
-        public Connection connect() throws DatabaseAnonymizerException {
+        public Connection connect() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
             return doConnect(() -> {
                 this.runAsserts();
                 return mockConnection;
@@ -67,13 +68,13 @@ public class DBConnectionTest {
     }
 
     @Test
-    public void testCtor() throws DatabaseAnonymizerException {
+    public void testCtor() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
         testDB.runAsserts();
     }
     
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, SQLException {
+    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
         assertEquals(mockConnection, testDB.connect());
         // assert

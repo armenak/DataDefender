@@ -51,7 +51,7 @@ public class DataGeneratorTest extends H2DB {
             .forEach(f -> f.delete());
     }
     @Test
-    public void testHappyPath() throws AnonymizerException, SQLException, IOException { 
+    public void testHappyPath() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException, IOException { 
         consumeQuery(this::assertInitialData);
         
         final IGenerator generator = new DataGenerator();

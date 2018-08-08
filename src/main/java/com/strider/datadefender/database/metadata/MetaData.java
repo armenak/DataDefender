@@ -114,7 +114,7 @@ public abstract class MetaData implements IMetaData {
                     }
                     log.info("Table " + tableName);
                     
-                    List<String> pkeys = new ArrayList<>();
+                    final List<String> pkeys = new ArrayList<>();
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
                             final String pkey = pkRS.getString(4);

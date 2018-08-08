@@ -66,7 +66,7 @@ import com.strider.datadefender.utils.RequirementUtils;
 public class DatabaseAnonymizer implements IAnonymizer { 
     
     private static final Logger log = getLogger(DatabaseAnonymizer.class);
-
+    private static final String AND = " AND ";
     
     /**
      * Adds column names from the table to the passed collection of strings.
@@ -75,7 +75,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param sColumns 
      */
     private void fillColumnNames(final Table table, final Collection<String> sColumns) {
-        for (Column column : table.getColumns()) {
+        for (final Column column : table.getColumns()) {
             sColumns.add(column.getName());
         }
     }
@@ -112,12 +112,22 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(table.getName()).
             append(" SET ").
             append(StringUtils.join(updateColumns, " = ?, ")).
-            append(" = ?").
-            append(" WHERE " ).
-            append(StringUtils.join(keys, " = ? AND ")).
-            append(" = ?");
-        
-        log.debug(sql.toString());
+            append(" = ? WHERE ");
+
+        log.info("keys: " + keys.toString()); 
+        int iteration = 0;
+        final int collectionSize = keys.size();
+        final StringBuilder whereStmtp = new StringBuilder();
+        for (final String key: keys) {
+            ++iteration;
+            whereStmtp.append(key).append(" = ? ");
+            if (collectionSize > iteration) {
+                whereStmtp.append(AND);
+            }
+        }
+        sql.append(whereStmtp);
+
+        log.debug("getUpdateQuery: " + sql.toString());
         return sql.toString();
     }
     
@@ -150,18 +160,18 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (col != null && col.length() != 0) {
                     if (eq != null) {
-                        query.append(separator).append("(").append(col).append(" != ? OR ").append(col).append(" IS NULL)");
+                        query.append(separator).append('(').append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
-                        separator = " AND ";
+                        separator = AND;
                     }
                     if (lk != null && lk.length() != 0) {
-                        query.append(separator).append("(").append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
+                        query.append(separator).append('(').append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
-                        separator = " AND ";
+                        separator = AND;
                     }
                     if (nl) {
                         query.append(separator).append(col).append(" IS NOT NULL");
-                        separator = " AND ";
+                        separator = AND;
                     }
                 }
             }
@@ -187,7 +197,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             if (query.indexOf(" WHERE (") != -1) {
-                query.append(")");
+                query.append(')');
             }
         }
 
@@ -201,7 +211,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         
         int paramIndex = 1;
-        for (String param : params) {
+        for (final String param : params) {
             stmt.setString(paramIndex, param);
             ++paramIndex;
         }
@@ -228,7 +238,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */   
-    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, String vendor)
+    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, final String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -241,7 +251,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (parms != null) {
             return callAnonymizingFunctionWithParameters(dbConn, row, column, vendor);
         } else {
-            return callAnonymizingFunctionWithoutParameters(dbConn, column, vendor);
+            return callAnonymizingFunctionWithoutParameters(dbConn, column);
         }
         
     }    
@@ -260,7 +270,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, final Column column, String vendor)
+    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, 
+            final Column column, final String vendor)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -287,7 +298,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             final Map<String, Object> paramValues = new HashMap<>(parms.size());
             final String columnValue = row.getString(column.getName());
 
-            for (Parameter param : parms) {
+            for (final Parameter param : parms) {
                 if (param.getValue().equals("@@value@@")) {
                     paramValues.put(param.getName(), columnValue);
                 } else if (param.getValue().equals("@@row@@") && param.getType().equals("java.sql.ResultSet")) {
@@ -366,7 +377,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             return anonymizedValue.toString();
             
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         
@@ -387,7 +398,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException 
      */
-    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column, String vendor)
+    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column)
     throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
            InvocationTargetException {
         
@@ -433,15 +444,15 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 return null;
             }
             
-            log.debug(returnType.toString());
+            log.debug(returnType);
             if (returnType == String.class) {
                 return anonymizedValue.toString();
             } else if (returnType == java.sql.Date.class) {
                 return anonymizedValue;
-            } else if (returnType.toString().equals("int")) {
+            } else if ("int".equals(returnType)) {
                 return anonymizedValue;
             }
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
         
@@ -506,7 +517,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
         }
 
-        return (hasInclusions && !passedInclusion);
+        return hasInclusions && !passedInclusion;
     }
     
     /**
@@ -561,7 +572,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
              IllegalAccessException,
              IllegalArgumentException,
              InvocationTargetException,
-             AnonymizerException {
+             DatabaseAnonymizerException {
         
         int fieldIndex = 0;
         final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
@@ -586,7 +597,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             anonymized.add(columnName);
             final Object colValue = callAnonymizingFunctionFor(db, row, column, vendor);
             log.debug("colValue = " + colValue);
-            //log.debug("type= " + colValue.getClass());
+            log.debug("type= " + colValue.getClass());
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
@@ -604,12 +615,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 );
             }
         }
-
+        
         int whereIndex = fieldIndex;
         for (final String key : keyNames) {
             updateStmt.setString(++whereIndex, row.getString(key));
         }
-
+        
         updateStmt.addBatch();
     }
     
@@ -622,7 +633,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table 
      */
     private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
-    throws AnonymizerException {
+    throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
@@ -644,7 +655,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Connection updateCon = dbFactory.getUpdateConnection();
         
         try {
-
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
@@ -695,6 +705,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } catch (SQLException sqlex) {
                 log.error(sqlex.toString());
             }
+        } finally {
+            try {
+                if (selectStmt != null) {
+                    selectStmt.close();
+                }
+                if (updateStmt != null) {
+                    updateStmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException sqlex) {
+                log.error(sqlex.toString());
+            }            
         }
         
         log.info("Table " + table.getName() + ". End ...");
@@ -703,7 +727,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     @Override
     public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties, final Set<String> tables) 
-    throws DatabaseAnonymizerException, AnonymizerException{
+    throws DatabaseAnonymizerException, DatabaseDiscoveryException{
 
         final int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

@@ -18,12 +18,10 @@
 
 package com.strider.datadefender.functions;
 
+import junit.framework.TestCase;
 
 import com.strider.datadefender.extensions.BiographicFunctions;
-import junit.framework.TestCase;
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
+import org.junit.Test;
 
 /**
  * Biographic data anonymizer functions
@@ -31,8 +29,6 @@ import static org.apache.log4j.Logger.getLogger;
  * @author Matthew Eaton
  */
 public class BiographicFunctionsTest extends TestCase {
-
-    private static final Logger log = getLogger(BiographicFunctionsTest.class);
 
     public BiographicFunctionsTest(final String testName) {
         super(testName);
@@ -48,34 +44,18 @@ public class BiographicFunctionsTest extends TestCase {
         super.tearDown();
     }
 
-    /**
-     * Test of randomSIN method
-     */
-    public void testRandomStringSIN() {
-        log.debug("Generate SIN");
-
-        final BiographicFunctions functions = new BiographicFunctions();
-        final String sin = functions.randomStringSIN();
-
-        log.debug("Random SIN = " + sin);
-
-        assertNotNull(sin);
-        assertTrue(sin.length() == 9);
-        assertTrue(functions.isValidSIN(sin));
-
+    @Test
+    public void testSINValidation() {
+        
+        // Fake, but valid SINs
+        final String validSinList[] = {"503247512", "943209502", "514022037", "455717686", "372184101"};
+        for (int i=0; i < validSinList.length; i++) {
+            assertTrue(BiographicFunctions.isValidSIN(validSinList[i]));
+        }
+        
+        final String invalidSinList[] = {"012345678", "123", "abcdefgff", "405717686", "372114101"};
+        for (int i=0; i < invalidSinList.length; i++) {
+            assertFalse(BiographicFunctions.isValidSIN(invalidSinList[i]));
+        }        
     }
-    
-    /**
-     * Test of randomBirthDate method
-     */
-//    public void testRandomBirthDate() throws ParseException {
-//        log.debug("Generate BirthDate");
-//
-//        BiographicFunctions functions = new BiographicFunctions();
-//        Date birthDate = functions.randomBirthDate();
-//
-//        log.debug("Random birthdate = " + birthDate);
-//
-//        assertNotNull(birthDate);
-//    }    
 }

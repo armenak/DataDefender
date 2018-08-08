@@ -66,17 +66,21 @@ import java.util.Map;
 public class DatabaseDiscoverer extends Discoverer {
 
     private static final Logger log = getLogger(DatabaseDiscoverer.class);
+    private static final String YES = "yes";
 
     private static String[] modelList;
 
     @SuppressWarnings("unchecked")
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties, final Set<String> tables)
-    throws AnonymizerException, ParseException {
+    throws  ParseException, DatabaseDiscoveryException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
-        final String calculate_score = dataDiscoveryProperties.getProperty("score_calculation");
+        String calculate_score = dataDiscoveryProperties.getProperty("score_calculation");
+        if (CommonUtils.isEmptyString(calculate_score)) {
+            calculate_score = "false";
+        }
 
         log.info("Probability threshold [" + probabilityThreshold + "]");
 
@@ -103,9 +107,11 @@ public class DatabaseDiscoverer extends Discoverer {
         int rowCount=0;
         for(final MatchMetaData data: finalList) {
             // Row count
-            if (calculate_score.equals("yes")) {
+            if (YES.equals(calculate_score)) {
               log.debug("Skipping table rowcount...");
-              rowCount = ReportUtil.rowCount(factory, data.getTableName());
+              rowCount = ReportUtil.rowCount(factory, 
+                      data.getTableName(),
+                      Integer.valueOf(dataDiscoveryProperties.getProperty("limit")));
             }
 
             // Getting 5 sample values
@@ -117,22 +123,19 @@ public class DatabaseDiscoverer extends Discoverer {
 
             log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
             log.info("Model                       : " + data.getModel());
-            if (calculate_score.equals("yes")) {
-            log.info("Number of rows in the table : " + rowCount);
-            log.info("Score                       : " + score.columnScore(rowCount));
+            if (YES.equals(calculate_score)) {
+                log.info("Number of rows in the table : " + rowCount);
+                log.info("Score                       : " + score.columnScore(rowCount));
             } else {
-            log.info("Number of rows in the table : N/A");
-            log.info("Score                       : N/A");
+                log.info("Number of rows in the table : N/A");
+                log.info("Score                       : N/A");
             }
 
             log.info("Sample data");
             log.info( CommonUtils.fixedLengthString('-', 11));
 
-            //data.getProbabilityList().sort(Probability.compare());
-
             final List<Probability> probabilityList = data.getProbabilityList();
 
-//            probabilityList = new ArrayList<>(new LinkedHashSet<>(probabilityList));
             Collections.sort(probabilityList,
                 Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
 
@@ -149,57 +152,61 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             log.info("" );
-          // Score calculation is evaluated with score_calculation parameter
-          if (calculate_score.equals("yes")) {
-            if (score.columnScore(rowCount).equals("High")) {
+            
+            // Score calculation is evaluated with score_calculation parameter
+            if (YES.equals(calculate_score) && score.columnScore(rowCount).equals("High")) {
                 highRiskColumns++;
             }
-          }
-            //final String result = String.format("%20s %20s %20s %20s", data.getTableName(), data.getColumnName(), probability, data.getModel());
-            //log.info(result);
         }
+        
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
-        if (calculate_score.equals("yes")) {
-        log.info("Overall score: " + score.dataStoreScore());
-        log.info("");
+        if (YES.equals(calculate_score)) {
+            log.info("Overall score: " + score.dataStoreScore());
+            log.info("");
 
-        if (finalList != null && finalList.size() > 0) {
-            log.info("============================================");
-            final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
-            if (finalList.size() > threshold_count) {
-                log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
-            } else {
-                log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+            if (finalList != null && finalList.size() > 0) {
+                log.info("============================================");
+                final int threshold_count    = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
+                if (finalList.size() > threshold_count) {
+                    log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold [" + threshold_count + "]");
+                } else {
+                    log.info("Number of PI [" + finalList.size() + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+                }
+            
+                final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
+                if (highRiskColumns > threshold_highrisk) {
+                    log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
+                } else {
+                    log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
+                }
             }
-            final int threshold_highrisk = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
-            if (highRiskColumns > threshold_highrisk) {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
-            } else {
-                log.info("Number of High risk PI [" + highRiskColumns + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
-            }
-          }
-      }
-      else {
-      log.info("Overall score: N/A");
-      }
+        } else {
+            log.info("Overall score: N/A");
+        }
 
+        log.info("matches: " + matches.toString());
         return matches;
     }
 
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory, final Properties dataDiscoveryProperties,
             final Set<String> tables, final Model model, final double probabilityThreshold)
-    throws AnonymizerException, ParseException {
+    throws ParseException, DatabaseDiscoveryException {
         final IMetaData metaData = factory.fetchMetaData();
         final List<MatchMetaData> map = metaData.getMetaData();
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
         MatchMetaData specialCaseData = null;
+        final List<MatchMetaData> specialCaseDataList = new ArrayList();
         boolean specialCase = false;
 
 
-        final String[] specialCaseFunctions = dataDiscoveryProperties.getProperty("extentions").split(",");
-        if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
-            specialCase = true;
+        final String extentionList = dataDiscoveryProperties.getProperty("extentions");
+        String[] specialCaseFunctions = null;
+        if (!CommonUtils.isEmptyString(extentionList)) {
+            specialCaseFunctions = extentionList.split(",");
+            if (specialCaseFunctions != null && specialCaseFunctions.length > 0) {
+                specialCase = true;
+            }
         }
 
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
@@ -231,7 +238,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 "SELECT `" + columnName + "`" +
                 " FROM " + table +
                 " WHERE `" + columnName  + "` IS NOT NULL ", limit);
-            log.info("Executing query against database: " + query);
+            log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
@@ -252,6 +259,10 @@ public class DatabaseDiscoverer extends Discoverer {
                             for (int i=0; i<specialCaseFunctions.length; i++) {
                                 if (sentence != null && !sentence.equals("")) {
                                     specialCaseData = (MatchMetaData)callExtention(specialCaseFunctions[i], data, sentence);
+                                    if (specialCaseData != null) {
+                                        log.info("Adding new special case data: " + specialCaseData.toString());
+                                        specialCaseDataList.add(specialCaseData);
+                                    }
                                 }
                             }
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException  e) {
@@ -289,10 +300,13 @@ public class DatabaseDiscoverer extends Discoverer {
 
                         //display names
                         for( int i = 0; i<nameSpans.length; i++) {
-                            log.debug("Span: "+nameSpans[i].toString());
-                            log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
-                            log.debug("Probability is: "+spanProbs[i]);
-                            probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                            final String span = nameSpans[i].toString();
+                            if (span.length() >2 ) {
+                                log.debug("Span: "+span);
+                                log.debug("Covered text is: "+tokens[nameSpans[i].getStart()]);
+                                log.debug("Probability is: "+spanProbs[i]);
+                                probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                            }
                         }
                         // From OpenNLP documentation:
                         //  After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators.
@@ -305,20 +319,22 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             final double averageProbability = calculateAverage(probabilityList);
-            if ((averageProbability >= probabilityThreshold)) {
+            if (averageProbability >= probabilityThreshold) {
                 data.setAverageProbability(averageProbability);
                 data.setModel(model.getName());
                 data.setProbabilityList(probabilityList);
                 matches.add(data);
             }
-
-            // Special processing
-            if (specialCase && specialCaseData != null) {
-                matches.add(specialCaseData);
-                specialCaseData = null;
-            }
         }
 
+        // Special processing
+        if (specialCaseDataList != null && !specialCaseDataList.isEmpty()) {
+            log.info("Special case data is processed :" + specialCaseDataList.toString());
+            for (final MatchMetaData specialData : specialCaseDataList) {
+                matches.add(specialData);
+            }
+        }        
+        
         return matches;
     }
 
@@ -335,7 +351,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, MatchMetaData data, String text)
+    private Object callExtention(final String function, final MatchMetaData data, final String text)
         throws SQLException,
                NoSuchMethodException,
                SecurityException,
@@ -363,7 +379,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             value = method.invoke(instance, data, text);
 
-        } catch (AnonymizerException | InstantiationException | ClassNotFoundException ex) {
+        } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
         }
 

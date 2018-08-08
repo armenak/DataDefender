@@ -17,8 +17,8 @@
 
 package com.strider.datadefender.specialcase;
 
-import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.extensions.BiographicFunctions;
+
+import com.strider.datadefender.Probability;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,23 +28,23 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.functions.CoreFunctions;
 import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.database.metadata.MatchMetaData;
+import java.util.Locale;
 
 /**
  * @author Armenak Grigoryan
  */
-public class PHIDetector extends CoreFunctions {
+public class PHIDetector implements SpecialCase {
         
     private static final Logger log = getLogger(PHIDetector.class);
-
+    private static final String PHI_FILE = "phi.txt";
     private static List phiList = new ArrayList();
     
     static {
-        String file = "phi.txt";
         try {
-            log.info("*** reading from " + file);
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            log.info("*** reading from " + PHI_FILE);
+            try (BufferedReader br = new BufferedReader(new FileReader(PHI_FILE))) {
                 for (String line; (line = br.readLine()) != null; ) {
                     phiList.add(line);
                 }
@@ -60,17 +60,17 @@ public class PHIDetector extends CoreFunctions {
      * @param text
      * @return String
      */
-    public static MatchMetaData isPHITerm(final MatchMetaData data, String text) {    
-       if (CommonUtils.isEmptyString(text)) {
-            return null;
-        }
-        
-        if (data.getColumnType().equals("VARCHAR")) {
-            if (phiList.contains(text.trim().toUpperCase())) {
-                data.setModel("phi");
-                data.setAverageProbability(1);
-                return data;
-            }
+    public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {  
+        if (!CommonUtils.isEmptyString(text) && 
+            ((data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR")) && 
+             phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {
+                    log.info("PHI detected: " + text);
+                    data.setModel("phi");
+                    data.setAverageProbability(100);
+                    final List<Probability> probabilityList = new ArrayList();
+                    probabilityList.add(new Probability(text, 1.00));
+                    data.setProbabilityList(probabilityList);
+                    return data;
         }
         return null;
     }

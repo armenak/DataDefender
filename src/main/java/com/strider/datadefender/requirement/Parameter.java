@@ -68,11 +68,13 @@ public class Parameter {
         return this.value;
     }
     
-    private Object getArrayForValues(final List<Object> list, String type) throws ClassNotFoundException {
-        if ("String".equals(type)) {
-            type = "java.lang.String";
+    private Object getArrayForValues(final List<Object> list, final String type) throws ClassNotFoundException {
+        String dataType = type;
+        
+        if ("String".equals(dataType)) {
+            dataType = "java.lang.String";
         }
-        final Class<?> c = ClassUtils.getClass(type);
+        final Class<?> c = ClassUtils.getClass(dataType);
         if (c.isPrimitive()) {
             final Class<?> w = ClassUtils.primitiveToWrapper(c);
             Object array = Array.newInstance(w, list.size());

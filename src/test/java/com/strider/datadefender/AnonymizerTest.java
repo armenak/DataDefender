@@ -36,7 +36,7 @@ public class AnonymizerTest {
     
     @SuppressWarnings("serial")
     @Test
-    public void testGetTableNames() throws AnonymizerException {
+    public void testGetTableNames() throws DatabaseAnonymizerException {
         final List<String> tableList = Arrays.asList(TABLE_ONE);
         Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
         assertEquals(1, tableNames.size());

@@ -20,6 +20,7 @@ package com.strider.datadefender.utils;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+import org.junit.Test;
 
 /**
  *
@@ -30,6 +31,7 @@ public class LikeMatcherTest extends TestCase {
     
     private static final String TEST_NAME_1 = "ZaahiD";
     
+    @Test
     public void testMatchingAtEnd() {
         log.debug("Testing match at end of string");
         final LikeMatcher matcher = new LikeMatcher("za%");
@@ -40,6 +42,7 @@ public class LikeMatcherTest extends TestCase {
         assertFalse(matcher.matches("Some Za"));
     }
     
+    @Test
     public void testMatchingAtBeginning() {
         log.debug("Testing match begginning of string");
         final LikeMatcher matcher = new LikeMatcher("%hid");
@@ -50,6 +53,7 @@ public class LikeMatcherTest extends TestCase {
         assertFalse(matcher.matches("hiding away"));
     }
     
+    @Test
     public void testMultiMatcher() {
         log.debug("Testing match with multiple %'s");
         final LikeMatcher matcher = new LikeMatcher("Z%h%d");
@@ -60,6 +64,7 @@ public class LikeMatcherTest extends TestCase {
         assertFalse(matcher.matches("Someone is hiding Zaahid"));
     }
     
+    @Test
     public void testSingleCharMatcher() {
         log.debug("Testing match with '?' and '_'");
         final LikeMatcher matcher = new LikeMatcher("Z_?h?d");
@@ -69,6 +74,7 @@ public class LikeMatcherTest extends TestCase {
         assertTrue(matcher.matches("Zaphod"));
     }
     
+    @Test
     public void testMixedMatcher() {
         log.debug("Testing match with a mix of '%', '?', and '_'");
         final LikeMatcher matcher = new LikeMatcher("%Z_?h?d%");

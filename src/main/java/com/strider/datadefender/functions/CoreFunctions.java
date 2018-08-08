@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -68,9 +69,9 @@ public class CoreFunctions {
     private String vendor;
     
     static {        
-        log.info("*** Adding list of words into array");
+        log.debug("*** Adding list of words into array");
         addWordsIntoArray();
-        log.info("*** Array is populated with words from dictionary");
+        log.debug("*** Array is populated with words from dictionary");
     }    
     
     /**
@@ -248,16 +249,17 @@ public class CoreFunctions {
      */
     public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
         final String keyName = table + "." + column;
-        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
         if (excludeEmpty) {
-            if (vendor.equals("oracle")) {
-                query += String.format(" WHERE %s IS NOT NULL", column, column);                
+            if ("oracle".equals(vendor)) {
+                sb.append(String.format(" WHERE %s IS NOT NULL", column, column));                
             } else {
-                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
+                sb.append(String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column));       
             }
         }
-        generateStringListFromDb(keyName, query);
-        return getNextShuffledItemFor(keyName + query.hashCode());
+        generateStringListFromDb(keyName, sb.toString());
+        return getNextShuffledItemFor(keyName + sb.toString().hashCode());
     }
     
     /**
@@ -295,16 +297,17 @@ public class CoreFunctions {
      */
     public String mappedColumnShuffle(final String table, final String column, final String value, final boolean excludeEmpty) throws SQLException {
         final String keyName = table + "." + column;
-        String query = String.format("SELECT DISTINCT %s FROM %s", column, table);
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
         if (excludeEmpty) {
-            if (vendor.equals("oracle")) {
-                query += String.format(" WHERE %s IS NOT NULL", column, column);                
+            if ("oracle".equals(vendor)) {
+                sb.append(String.format(" WHERE %s IS NOT NULL", column, column));                
             } else {
-                query += String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column);                
+                sb.append(String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column));                
             }
         }
-        generateStringListFromDb(keyName, query);
-        return getPredictableShuffledValueFor(keyName + query.hashCode(), value);
+        generateStringListFromDb(keyName, sb.toString());
+        return getPredictableShuffledValueFor(keyName + sb.toString().hashCode(), value);
     }
     
     /**
@@ -378,13 +381,13 @@ public class CoreFunctions {
      * @throws IOException 
      */
     public String randomPostalCode() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9));
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9));        
-        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase());
-        sb.append(randInt(1,9)); 
+        final StringBuilder sb = new StringBuilder();
+        sb.append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
+                append(randInt(1,9)).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
+                append(randInt(1,9)).
+                append(RandomStringUtils.randomAlphabetic(1).toUpperCase(Locale.ENGLISH)).
+                append(randInt(1,9)); 
         
         log.debug("Generated postal code: " + sb.toString());
         return sb.toString();
@@ -554,10 +557,10 @@ public class CoreFunctions {
      * @return Integer between min and max, inclusive.
      * @see java.util.Random#nextInt(int)
      */
-    public static int randInt(int min, int max) {
+    public static int randInt(final int min, final int max) {
 
         rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
+        final int randomNum = rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
     }   

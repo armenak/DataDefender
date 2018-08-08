@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
@@ -46,7 +45,7 @@ public class ColumnDiscoverer extends Discoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
     public List<MatchMetaData> discover(final IDBFactory factory, final Properties columnProperties, final Set<String> tables) 
-        throws DatabaseAnonymizerException {
+        throws DatabaseDiscoveryException{
      
         log.info("Column discovery in process");
         final IMetaData metaData = factory.fetchMetaData();
@@ -88,7 +87,7 @@ public class ColumnDiscoverer extends Discoverer {
             for (final MatchMetaData entry: uniqueMatches) {
                 
                 // Row count
-                final int rowCount = ReportUtil.rowCount(factory, entry.getTableName());
+                final int rowCount = ReportUtil.rowCount(factory, entry.getTableName(),0);
                 
                 // Getting 5 sample values                
                 final List<String> sampleDataList = ReportUtil.sampleData(factory, entry.getTableName(), entry.getColumnName());
@@ -109,6 +108,8 @@ public class ColumnDiscoverer extends Discoverer {
         } else {
             log.info("No suspects have been found. Please refine your criteria.");
         }
+        
+        log.info("matches: " + uniqueMatches.toString());
         return uniqueMatches;
     }
 }

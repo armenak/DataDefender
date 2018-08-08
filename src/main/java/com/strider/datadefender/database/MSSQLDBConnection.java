@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.database;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 import static java.sql.DriverManager.getConnection;
 
 import java.sql.Connection;
@@ -29,7 +30,7 @@ import java.util.Properties;
  */
 public class MSSQLDBConnection extends DBConnection {
     
-    public MSSQLDBConnection(final Properties properties) throws DatabaseAnonymizerException {
+    public MSSQLDBConnection(final Properties properties) throws DatabaseDiscoveryException {
         super(properties);
     }
     
@@ -39,7 +40,7 @@ public class MSSQLDBConnection extends DBConnection {
      * @throws DatabaseAnonymizerException 
      */
     @Override
-    public Connection connect() throws DatabaseAnonymizerException {
+    public Connection connect() throws DatabaseDiscoveryException {
         return doConnect(() -> getConnection(this.getURL()));
     }
     
