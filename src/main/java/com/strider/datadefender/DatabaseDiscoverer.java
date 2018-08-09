@@ -274,6 +274,8 @@ public class DatabaseDiscoverer extends Discoverer {
         final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
         String[]                  specialCaseFunctions = null;
 
+        log.info("Extention list: " + extentionList.toString());
+        
         if (!CommonUtils.isEmptyString(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
 
@@ -329,11 +331,14 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
 
                     final String sentence = resultSet.getString(1);
+                    log.debug(sentence);
 
                     if (specialCase) {
                         try {
                             for (int i = 0; i < specialCaseFunctions.length; i++) {
-                                if ((sentence != null) &&!sentence.equals("")) {
+                                if ((sentence != null) && !sentence.equals("")) {
+                                    log.info("sentence: " + sentence);
+                                    log.info("data: " + data);
                                     specialCaseData = (MatchMetaData) callExtention(specialCaseFunctions[i],
                                                                                     data,
                                                                                     sentence);
@@ -419,6 +424,3 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
