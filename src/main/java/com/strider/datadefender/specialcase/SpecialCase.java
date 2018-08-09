@@ -1,4 +1,4 @@
-/** 
+/**
  * Copyright 2014-2017, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,12 +14,17 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.specialcase;
 
 /**
  * Marker interface for all special case classes
- * 
+ *
  * @author Armenak Grigoryan
  */
-public interface SpecialCase {
-}
+public interface SpecialCase {}
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

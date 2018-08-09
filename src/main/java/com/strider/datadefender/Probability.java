@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,6 +15,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender;
 
 /**
@@ -24,26 +27,29 @@ package com.strider.datadefender;
 public class Probability {
     private final String sentence;
     private final Double probabilityValue;
-    
+
     public Probability(final String sentence, final Double probabilityValue) {
-        this.sentence = sentence;
+        this.sentence         = sentence;
         this.probabilityValue = probabilityValue;
     }
-    
-    public String getSentence() {
-        return this.sentence;
-    }
-    
+
     public Double getProbabilityValue() {
         return this.probabilityValue;
     }
-    
+
+    public String getSentence() {
+        return this.sentence;
+    }
+
     /**
      * @return comparator used for sorting
      */
-//    public static Comparator<Probability> compare() {
-//        return Comparator.comparing(Probability::getProbabilityValue)
-//                .thenComparing(Probability::getSentence);            
-//    }    
-    
+
+//  public static Comparator<Probability> compare() {
+//      return Comparator.comparing(Probability::getProbabilityValue)
+//              .thenComparing(Probability::getSentence);            
+//  }    
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

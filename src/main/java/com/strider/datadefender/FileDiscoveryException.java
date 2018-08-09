@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,6 +15,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender;
 
 /**
@@ -23,7 +26,7 @@ package com.strider.datadefender;
  */
 public class FileDiscoveryException extends Exception {
     private static final long serialVersionUID = 1L;
-    
+
     public FileDiscoveryException(final String msg) {
         super(msg);
     }
@@ -33,3 +36,5 @@ public class FileDiscoveryException extends Exception {
     }
 }
 
+
+//~ Formatted by Jindent --- http://www.jindent.com

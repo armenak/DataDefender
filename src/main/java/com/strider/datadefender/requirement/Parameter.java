@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,11 +16,14 @@
  *
  */
 
+
+
 package com.strider.datadefender.requirement;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,51 +37,35 @@ import org.apache.commons.lang3.ClassUtils;
 
 /**
  * JAXB class that defines parameter elements in Requirement.xml file
- * 
+ *
  * @author Armenak Grigoryan
  */
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Parameter {
-    @XmlAttribute(name="Name")
-    private String name;
-
-    @XmlAttribute(name="Value")
-    private String value;
-    
-    @XmlAttribute(name="Type")
-    private String type;
-    
-    @XmlElement(name="Element")
+    @XmlAttribute(name = "Name")
+    private String             name;
+    @XmlAttribute(name = "Value")
+    private String             value;
+    @XmlAttribute(name = "Type")
+    private String             type;
+    @XmlElement(name = "Element")
     private List<ArrayElement> elements;
-    
-    /**
-     * Getter method for name attribute
-     * @return String
-     */
-    public String getName() {
-        return this.name;
-    }
-    
-    /**
-     * Getter method for value attribute
-     * @return String
-     */
-    public String getValue() {
-        return this.value;
-    }
-    
+
     private Object getArrayForValues(final List<Object> list, final String type) throws ClassNotFoundException {
         String dataType = type;
-        
+
         if ("String".equals(dataType)) {
             dataType = "java.lang.String";
         }
+
         final Class<?> c = ClassUtils.getClass(dataType);
+
         if (c.isPrimitive()) {
-            final Class<?> w = ClassUtils.primitiveToWrapper(c);
-            Object array = Array.newInstance(w, list.size());
+            final Class<?> w     = ClassUtils.primitiveToWrapper(c);
+            Object         array = Array.newInstance(w, list.size());
+
             array = list.toArray((Object[]) array);
+
             if (c == boolean.class) {
                 return ArrayUtils.toPrimitive((Boolean[]) array);
             } else if (c == byte.class) {
@@ -96,19 +83,78 @@ public class Parameter {
             } else if (c == double.class) {
                 return ArrayUtils.toPrimitive((Double[]) array);
             }
+
             throw new IllegalArgumentException("Unhandled primitive type: " + c.getName());
         }
+
         final Object array = Array.newInstance(c, list.size());
+
         return list.toArray((Object[]) array);
     }
-    
+
+    // Setter methods
+    public void setElements(final List<ArrayElement> elements) {
+        this.elements = elements;
+    }
+
+    /**
+     * Getter method for name attribute
+     * @return String
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    /**
+     * Getter method for type attribute
+     * @return String
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public Object getTypeValue()
+            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+                   InvocationTargetException {
+        String typeName = type;
+
+        if (typeName == null) {
+            typeName = "String";
+
+            if ((elements != null) && (value == null)) {
+                typeName += "[]";
+            }
+        }
+
+        if (typeName.endsWith("[]")) {
+            if (elements == null) {
+                return null;
+            }
+
+            final String       arrayType = typeName.substring(0, typeName.length() - 2);
+            final List<Object> arr       = new ArrayList<>(elements.size());
+
+            for (final ArrayElement el : elements) {
+                arr.add(getTypeValueOf(arrayType, el.getValue()));
+            }
+
+            return getArrayForValues(arr, arrayType);
+        }
+
+        return getTypeValueOf(typeName, value);
+    }
+
     private Object getTypeValueOf(final String type, final String value)
-        throws ClassNotFoundException,
-               NoSuchMethodException,
-               InstantiationException,
-               IllegalAccessException,
-               InvocationTargetException {
-        
+            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+                   InvocationTargetException {
         if (type.equals(boolean.class.getName())) {
             return Boolean.parseBoolean(value);
         } else if (type.equals(byte.class.getName())) {
@@ -129,61 +175,23 @@ public class Parameter {
             return value;
         } else {
             final Constructor<?> constr = Class.forName(type).getConstructor(String.class);
+
             return constr.newInstance(value);
         }
     }
-    
-    public Object getTypeValue()
-        throws ClassNotFoundException,
-               NoSuchMethodException,
-               InstantiationException,
-               IllegalAccessException,
-               InvocationTargetException {
-        
-        String typeName = type;
-        if (typeName == null) {
-            typeName = "String";
-            if (elements != null && value == null) {
-                typeName += "[]";
-            }
-        }
-        
-        if (typeName.endsWith("[]")) {
-            if (elements == null) {
-                return null;
-            }
-            final String arrayType = typeName.substring(0, typeName.length() - 2);
-            final List<Object> arr = new ArrayList<>(elements.size());
-            for (final ArrayElement el : elements) {
-                arr.add(getTypeValueOf(arrayType, el.getValue()));
-            }
-            return getArrayForValues(arr, arrayType);
-        }
-        return getTypeValueOf(typeName, value);
-    }
-    
+
     /**
-     * Getter method for type attribute
+     * Getter method for value attribute
      * @return String
      */
-    public String getType() {
-        return this.type;
-    }
-
-    // Setter methods
-    public void setElements(final List<ArrayElement> elements) {
-        this.elements = elements;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
+    public String getValue() {
+        return this.value;
     }
 
     public void setValue(final String value) {
         this.value = value;
     }
-
-    public void setType(final String type) {
-        this.type = type;
-    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

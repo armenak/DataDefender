@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,8 +15,10 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender.utils;
 
+
+
+package com.strider.datadefender.utils;
 
 /**
  * @author Akira Matsuo
@@ -28,3 +30,6 @@ package com.strider.datadefender.utils;
 public interface IConsumerWithException<T, E extends Exception> {
     void accept(T obj) throws E;
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

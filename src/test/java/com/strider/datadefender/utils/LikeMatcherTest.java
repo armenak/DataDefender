@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,69 +15,59 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.utils;
 
-import junit.framework.TestCase;
 import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+
 import org.junit.Test;
+
+import static org.apache.log4j.Logger.getLogger;
+
+import junit.framework.TestCase;
 
 /**
  *
  * @author Zaahid Bateson
  */
 public class LikeMatcherTest extends TestCase {
-    private static final Logger log = getLogger(LikeMatcherTest.class);
-    
+    private static final Logger log         = getLogger(LikeMatcherTest.class);
     private static final String TEST_NAME_1 = "ZaahiD";
-    
-    @Test
-    public void testMatchingAtEnd() {
-        log.debug("Testing match at end of string");
-        final LikeMatcher matcher = new LikeMatcher("za%");
-        assertTrue(matcher.matches(TEST_NAME_1));
-        assertTrue(matcher.matches("ZAA"));
-        assertTrue(matcher.matches("za"));
-        assertFalse(matcher.matches("Not Zaahid"));
-        assertFalse(matcher.matches("Some Za"));
-    }
-    
+
     @Test
     public void testMatchingAtBeginning() {
         log.debug("Testing match begginning of string");
+
         final LikeMatcher matcher = new LikeMatcher("%hid");
+
         assertTrue(matcher.matches(TEST_NAME_1));
         assertTrue(matcher.matches("aaHID"));
         assertTrue(matcher.matches("HID"));
         assertFalse(matcher.matches("Zaahid is not here"));
         assertFalse(matcher.matches("hiding away"));
     }
-    
+
     @Test
-    public void testMultiMatcher() {
-        log.debug("Testing match with multiple %'s");
-        final LikeMatcher matcher = new LikeMatcher("Z%h%d");
+    public void testMatchingAtEnd() {
+        log.debug("Testing match at end of string");
+
+        final LikeMatcher matcher = new LikeMatcher("za%");
+
         assertTrue(matcher.matches(TEST_NAME_1));
-        assertTrue(matcher.matches("ZaHID"));
-        assertTrue(matcher.matches("Zhd"));
-        assertFalse(matcher.matches("Zaahid is not here"));
-        assertFalse(matcher.matches("Someone is hiding Zaahid"));
+        assertTrue(matcher.matches("ZAA"));
+        assertTrue(matcher.matches("za"));
+        assertFalse(matcher.matches("Not Zaahid"));
+        assertFalse(matcher.matches("Some Za"));
     }
-    
-    @Test
-    public void testSingleCharMatcher() {
-        log.debug("Testing match with '?' and '_'");
-        final LikeMatcher matcher = new LikeMatcher("Z_?h?d");
-        assertTrue(matcher.matches(TEST_NAME_1));
-        assertFalse(matcher.matches("ZaHID"));
-        assertFalse(matcher.matches("Zhd"));
-        assertTrue(matcher.matches("Zaphod"));
-    }
-    
+
     @Test
     public void testMixedMatcher() {
         log.debug("Testing match with a mix of '%', '?', and '_'");
+
         final LikeMatcher matcher = new LikeMatcher("%Z_?h?d%");
+
         assertTrue(matcher.matches(TEST_NAME_1));
         assertFalse(matcher.matches("ZaHID"));
         assertFalse(matcher.matches("Zhd"));
@@ -85,4 +75,32 @@ public class LikeMatcherTest extends TestCase {
         assertTrue(matcher.matches("Zaahid really is Zaphod"));
         assertTrue(matcher.matches("Yes, Zaahid is here"));
     }
+
+    @Test
+    public void testMultiMatcher() {
+        log.debug("Testing match with multiple %'s");
+
+        final LikeMatcher matcher = new LikeMatcher("Z%h%d");
+
+        assertTrue(matcher.matches(TEST_NAME_1));
+        assertTrue(matcher.matches("ZaHID"));
+        assertTrue(matcher.matches("Zhd"));
+        assertFalse(matcher.matches("Zaahid is not here"));
+        assertFalse(matcher.matches("Someone is hiding Zaahid"));
+    }
+
+    @Test
+    public void testSingleCharMatcher() {
+        log.debug("Testing match with '?' and '_'");
+
+        final LikeMatcher matcher = new LikeMatcher("Z_?h?d");
+
+        assertTrue(matcher.matches(TEST_NAME_1));
+        assertFalse(matcher.matches("ZaHID"));
+        assertFalse(matcher.matches("Zhd"));
+        assertTrue(matcher.matches("Zaphod"));
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

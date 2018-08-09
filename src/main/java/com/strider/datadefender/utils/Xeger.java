@@ -12,27 +12,38 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Armenak Grigoryan
  */
+
+
+
 package com.strider.datadefender.utils;
 
+import java.util.List;
+import java.util.Random;
+
 import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
-import dk.brics.automaton.RegExp;
-
-import java.util.Random;
-import java.util.List;
 
 /**
  * An object that will generate text from a regular expression. In a way, it's the opposite of a regular expression
  * matcher: an instance of this class will produce text that is guaranteed to match the regular expression passed in.
  */
 public class Xeger {
-
     private final Automaton automaton;
-    private final Random random;
+    private final Random    random;
+
+    /**
+     * As {@link nl.flotsam.xeger.Xeger#Xeger(String, java.util.Random)}, creating a {@link java.util.Random} instance
+     * implicityly.
+     * @param regex
+     */
+    public Xeger(final String regex) {
+        this(regex, new Random());
+    }
 
     /**
      * Constructs a new instance, accepting the regular expression and the randomizer.
@@ -45,16 +56,13 @@ public class Xeger {
         assert regex != null;
         assert random != null;
         this.automaton = new RegExp(regex).toAutomaton();
-        this.random = random;
+        this.random    = random;
     }
 
-    /**
-     * As {@link nl.flotsam.xeger.Xeger#Xeger(String, java.util.Random)}, creating a {@link java.util.Random} instance
-     * implicityly.
-     * @param regex
-     */
-    public Xeger(final String regex) {
-        this(regex, new Random());
+    private void appendChoice(final StringBuilder builder, final Transition transition) {
+        final char c = (char) XegerUtils.getRandomInt(transition.getMin(), transition.getMax(), random);
+
+        builder.append(c);
     }
 
     /**
@@ -63,30 +71,39 @@ public class Xeger {
      */
     public String generate() {
         final StringBuilder builder = new StringBuilder();
+
         generate(builder, automaton.getInitialState());
+
         return builder.toString();
     }
 
     private void generate(final StringBuilder builder, final State state) {
         final List<Transition> transitions = state.getSortedTransitions(true);
+
         if (transitions.isEmpty()) {
             assert state.isAccept();
+
             return;
         }
-        final int nroptions = state.isAccept() ? transitions.size() : transitions.size() - 1;
-        final int option = XegerUtils.getRandomInt(0, nroptions, random);
-        if (state.isAccept() && option == 0) {          // 0 is considered stop
+
+        final int nroptions = state.isAccept()
+                              ? transitions.size()
+                              : transitions.size() - 1;
+        final int option    = XegerUtils.getRandomInt(0, nroptions, random);
+
+        if (state.isAccept() && (option == 0)) {    // 0 is considered stop
             return;
         }
+
         // Moving on to next transition
-        final Transition transition = transitions.get(option - (state.isAccept() ? 1 : 0));
+        final Transition transition = transitions.get(option - (state.isAccept()
+                                                                ? 1
+                                                                : 0));
+
         appendChoice(builder, transition);
         generate(builder, transition.getDest());
     }
-
-    private void appendChoice(final StringBuilder builder, final Transition transition) {
-        final char c = (char) XegerUtils.getRandomInt(transition.getMin(), transition.getMax(), random);
-        builder.append(c);
-    }
-
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

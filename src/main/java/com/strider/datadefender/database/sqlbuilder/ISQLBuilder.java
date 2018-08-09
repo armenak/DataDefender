@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,6 +14,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database.sqlbuilder;
 
 /**
@@ -22,7 +25,7 @@ package com.strider.datadefender.database.sqlbuilder;
  */
 public interface ISQLBuilder {
     String buildSelectWithLimit(String sqlString, int limit);
-    
+
     /**
      * Prefix table name with schema is present.
      * @param tableName
@@ -30,3 +33,6 @@ public interface ISQLBuilder {
      */
     String prefixSchema(String tableName);
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

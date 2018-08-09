@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,111 +16,110 @@
  *
  */
 
+
+
 package com.strider.datadefender.database.metadata;
 
-import com.strider.datadefender.Probability;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import com.strider.datadefender.Probability;
+
 /**
  * Data object to hold all metadata for matching data in Discovery applications.
- * Currently this object holds column and table metadata; ie, duplicating info.  
+ * Currently this object holds column and table metadata; ie, duplicating info.
  * But since the numbers of tables/columns will always be
  * limited in size, don't really see an immediate need to refactor this.
  * @author Armenak Grigoryan
  */
 public class MatchMetaData {
-    private final String schemaName;
-    private final String tableName;
+    private String             model           = "";
+    private List<Probability>  probabilityList = new ArrayList<>();
+    private final String       schemaName;
+    private final String       tableName;
     private final List<String> pkeys;
-    private final String columnName;
-    private final String columnType;
-    private final int columnSize;
-    private double averageProbability;   
-    private String model = "";
-    private List<Probability> probabilityList = new ArrayList<>();
+    private final String       columnName;
+    private final String       columnType;
+    private final int          columnSize;
+    private double             averageProbability;
 
-    public MatchMetaData(
-        final String schemaName,
-        final String tableName,
-        final List<String> pkeys,
-        final String columnName,
-        final String columnType,
-        final int columnSize
-    ) {
+    public MatchMetaData(final String schemaName, final String tableName, final List<String> pkeys,
+                         final String columnName, final String columnType, final int columnSize) {
         this.schemaName = schemaName;
         this.tableName  = tableName;
-        this.pkeys = pkeys;
+        this.pkeys      = pkeys;
         this.columnName = columnName;
         this.columnType = columnType;
         this.columnSize = columnSize;
-    }   
+    }
 
-    public String getSchemaName() {
-        return this.schemaName;
+    /**
+     * @return comparator used for sorting
+     */
+    public static Comparator<MatchMetaData> compare() {
+        return Comparator.comparing(MatchMetaData::getSchemaName)
+                         .thenComparing(MatchMetaData::getTableName)
+                         .thenComparing(MatchMetaData::getColumnName);
     }
-    
-    public String getTableName() {
-        return this.tableName;
+
+    @Override
+    public String toString() {
+        return this.tableName + "." + this.columnName;
     }
-    
-    public List<String> getPkeys() {
-        return pkeys;
+
+    public String toVerboseStr() {
+        return this.schemaName + "." + toString() + "(" + this.columnType + ")";
+    }
+
+    public double getAverageProbability() {
+        return this.averageProbability;
+    }
+
+    public void setAverageProbability(final double averageProbability) {
+        this.averageProbability = averageProbability;
     }
 
     public String getColumnName() {
         return this.columnName;
     }
 
-    public String getColumnType() {
-        return this.columnType;
-    }
-    
     public int getColumnSize() {
         return this.columnSize;
     }
-    
-    public void setAverageProbability(final double averageProbability) {
-        this.averageProbability = averageProbability;
+
+    public String getColumnType() {
+        return this.columnType;
     }
-    
-    public double getAverageProbability() {
-        return this.averageProbability;
-    }
-    
+
     public String getModel() {
         return this.model;
     }
 
     public void setModel(final String model) {
         this.model = model;
-    }        
-    
-    @Override
-    public String toString() {
-        return this.tableName + "." + this.columnName;
     }
-    
-    public String toVerboseStr() {
-        return this.schemaName + "." + toString() + "(" + this.columnType + ")";
+
+    public List<String> getPkeys() {
+        return pkeys;
     }
-    
-    public void setProbabilityList(final List<Probability> probabilityList) {
-        this.probabilityList = probabilityList;
-    }
-    
+
     public List<Probability> getProbabilityList() {
         return this.probabilityList;
     }
-    
-    /**
-     * @return comparator used for sorting
-     */
-    public static Comparator<MatchMetaData> compare() {
-            return Comparator.comparing(MatchMetaData::getSchemaName)
-                              .thenComparing(MatchMetaData::getTableName)
-                              .thenComparing(MatchMetaData::getColumnName);            
+
+    public void setProbabilityList(final List<Probability> probabilityList) {
+        this.probabilityList = probabilityList;
+    }
+
+    public String getSchemaName() {
+        return this.schemaName;
+    }
+
+    public String getTableName() {
+        return this.tableName;
     }
 }
 
+
+//~ Formatted by Jindent --- http://www.jindent.com

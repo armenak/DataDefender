@@ -15,12 +15,16 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender;
 
-import static com.strider.datadefender.utils.AppProperties.loadProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import static com.strider.datadefender.utils.AppProperties.loadProperties;
 
 /**
  * Check for properties required for execution of data defender and data anonymizer
@@ -28,70 +32,81 @@ import java.util.Properties;
  * @author Armenak Grigoryan
  */
 public class PropertyCheck {
-
-    private static final String[] fileDiscoveryProperties = {"probability_threshold", "english_tokens", "english_sentenses", "names", "models", "directories"};
-    private static final String[] dataDiscoveryProperties = {"probability_threshold", "english_tokens", "names", "models", "limit", "extentions", "score_calculation", "threshold_count", "threshold_highrisk"};
-    private static final String[] databaseProperties = {"vendor", "driver", "username", "password", "url"};
-    private static final String[] dataAnonymizerProperties = {"requirement", "batch_size"};
-
-    private static final String IS_NOT_DEFINED = " is not defined";
-    private static final String PROPERTY       = "Property ";    
-    
-    @SuppressWarnings("unchecked")
-
-    public static List checkDtabaseProperties() throws DatabaseDiscoveryException {
-        final List<String> errors = new ArrayList<>();
-
-        final Properties dbProperties = loadProperties("db.properties");
-
-        for (int i=0; i<databaseProperties.length; i++ ) {
-            final String property = dbProperties.getProperty(databaseProperties[i]);
-            if (property == null || "".equals(property)) {
-                errors.add(PROPERTY + databaseProperties[i] + IS_NOT_DEFINED);
-            }
-        }
-        return errors;
-    }
+    private static final String[] fileDiscoveryProperties = {
+        "probability_threshold", "english_tokens", "english_sentenses", "names", "models", "directories"
+    };
+    private static final String[] dataDiscoveryProperties = {
+        "probability_threshold", "english_tokens", "names", "models", "limit", "extentions", "score_calculation",
+        "threshold_count", "threshold_highrisk"
+    };
+    private static final String[] databaseProperties       = { "vendor", "driver", "username", "password", "url" };
+    private static final String[] dataAnonymizerProperties = { "requirement", "batch_size" };
+    private static final String   IS_NOT_DEFINED           = " is not defined";
+    private static final String   PROPERTY                 = "Property ";
 
     @SuppressWarnings("unchecked")
     public static List check(final String utiity, final char option) throws DatabaseDiscoveryException {
-
         final List errors = new ArrayList<>();
+
         if ("file-discovery".equals(utiity)) {
             final Properties properties = loadProperties("filediscovery.properties");
 
-            for (int i=0; i<fileDiscoveryProperties.length; i++ ) {
+            for (int i = 0; i < fileDiscoveryProperties.length; i++) {
                 final String property = properties.getProperty(fileDiscoveryProperties[i]);
-                if (property == null || "".equals(property)) {
+
+                if ((property == null) || "".equals(property)) {
                     errors.add(PROPERTY + fileDiscoveryProperties[i] + IS_NOT_DEFINED);
                 }
             }
         } else if ("anonymize".equals(utiity)) {
             final Properties properties = loadProperties("anonymizer.properties");
 
-            for (int i=0; i<dataAnonymizerProperties.length; i++ ) {
+            for (int i = 0; i < dataAnonymizerProperties.length; i++) {
                 final String property = properties.getProperty(dataAnonymizerProperties[i]);
-                if (property == null || "".equals(property)) {
+
+                if ((property == null) || "".equals(property)) {
                     errors.add(PROPERTY + dataAnonymizerProperties[i] + IS_NOT_DEFINED);
                 }
             }
         } else if ("database-discovery".equals(utiity)) {
             if ("c".equals(option)) {
                 final Properties properties = loadProperties("datadiscovery.properties");
+
                 if (properties == null) {
                     errors.add("Column discovery properties are not defined");
                 }
             } else if ("d".equals(option)) {
                 final Properties properties = loadProperties("datadiscovery.properties");
 
-                for (int i=0; i<dataDiscoveryProperties.length; i++ ) {
+                for (int i = 0; i < dataDiscoveryProperties.length; i++) {
                     final String property = properties.getProperty(dataDiscoveryProperties[i]);
-                    if (property == null || "".equals(property)) {
+
+                    if ((property == null) || "".equals(property)) {
                         errors.add(PROPERTY + dataDiscoveryProperties[i] + IS_NOT_DEFINED);
                     }
                 }
             }
         }
+
+        return errors;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List checkDtabaseProperties() throws DatabaseDiscoveryException {
+        final List<String> errors       = new ArrayList<>();
+        final Properties   dbProperties = loadProperties("db.properties");
+
+        for (int i = 0; i < databaseProperties.length; i++) {
+            final String property = dbProperties.getProperty(databaseProperties[i]);
+
+            if ((property == null) || "".equals(property)) {
+                errors.add(PROPERTY + databaseProperties[i] + IS_NOT_DEFINED);
+            }
+        }
+
         return errors;
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

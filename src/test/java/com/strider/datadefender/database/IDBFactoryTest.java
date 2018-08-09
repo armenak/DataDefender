@@ -14,28 +14,36 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
 import java.util.Properties;
 
 import org.junit.Test;
+
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  * @author Akira Matsuo
  */
 public class IDBFactoryTest {
-
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidNoProps() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final Properties invalidProps = new Properties();
+
         IDBFactory.get(invalidProps).getConnection();
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidProps() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final Properties invalidProps = new Properties();
+
         invalidProps.setProperty("vendor", "my-invalid-db");
         IDBFactory.get(invalidProps).getConnection();
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

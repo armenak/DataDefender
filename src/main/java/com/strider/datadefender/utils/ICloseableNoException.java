@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,6 +15,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.utils;
 
 /**
@@ -22,6 +25,9 @@ package com.strider.datadefender.utils;
  * @author Akira Matsuo
  */
 public interface ICloseableNoException extends AutoCloseable {
-    @Override 
+    @Override
     void close();
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

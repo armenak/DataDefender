@@ -14,6 +14,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database.sqlbuilder;
 
 import java.util.Properties;
@@ -21,9 +24,11 @@ import java.util.Properties;
 /**
  * @author Armenak Grigoryan
  */
-public class MySQLSQLBuilder extends SQLBuilder{
-
+public class MySQLSQLBuilder extends SQLBuilder {
     public MySQLSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

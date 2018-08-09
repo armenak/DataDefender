@@ -18,18 +18,19 @@
 
 package com.strider.datadefender;
 
-import static org.apache.log4j.Logger.getLogger;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
@@ -44,63 +45,8 @@ import com.strider.datadefender.utils.RequirementUtils;
  *
  * @author Matt Eaton
  */
-public class DataGenerator  implements IGenerator {
-
+public class DataGenerator implements IGenerator {
     private static final Logger log = getLogger(DataGenerator.class);
-
-    /**
-     * Generate data to be used by anoymizer.
-     * @param dbFactory
-     * @param anonymizerProperties  Properties for anonymizer
-     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
-     */
-    @Override
-    public void generate(final IDBFactory dbFactory, final Properties anonymizerProperties) throws DatabaseAnonymizerException {
-        // Now we collect data from the requirement
-        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
-        // Iterate over the requirement and generate data sets
-        log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-
-        for(final Table table : requirement.getTables()) {
-            log.info("Table [" + table.getName() + "]. Start ...");
-
-            // Iterate over columns to generate data set for each column
-            for (final Column column : table.getColumns()) {
-                final Parameter fileParameter = RequirementUtils.getFileParameter(column.getParameters());
-                log.info("Column [" + column.getName() + "]. Start...");
-
-                if (fileParameter != null) {
-                    log.debug("Processing file " + fileParameter.getValue());
-                    
-                    // Backup existing data set file
-                    if (!backupExistingFile(fileParameter.getValue())) {
-                        throw new DatabaseAnonymizerException("Unable to rename existing data set file " + fileParameter.getValue());
-                    }
-                    
-                    final StringBuilder sql = new StringBuilder(100);
-                    sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
-                    try (Statement stmt = dbFactory.getConnection().createStatement();
-                        ResultSet rs = stmt.executeQuery(sql.toString());
-                        BufferedWriter bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));) {
-                        
-                        // Write each column value to data set file
-                        while (rs.next()) {
-                            bw.write(rs.getString(1));
-                            bw.newLine();
-                        }
-                    } catch (IOException ioException) {
-                        log.error(ioException.toString());
-                        throw new DatabaseAnonymizerException(ioException.toString(), ioException);
-                    } catch (SQLException sqle) {
-                        log.error(sqle.toString());
-                    } 
-                }
-                log.info("Column [" + column.getName() + "]. End...");
-            }
-            log.info("Table " + table.getName() + ". End ...");
-            log.info("");
-        }
-    }
 
     /**
      * Rename current data set file to .bak-N, where N is an incremented integer
@@ -109,15 +55,84 @@ public class DataGenerator  implements IGenerator {
      */
     private boolean backupExistingFile(final String file) {
         final File sourceFile = new File(file);
+
         if (!sourceFile.exists()) {
             return true;
         }
 
         int count = 1;
+
         while (new File(file + ".bak-" + count).exists()) {
             count++;
         }
 
         return sourceFile.renameTo(new File(file + ".bak-" + count));
     }
+
+    /**
+     * Generate data to be used by anoymizer.
+     * @param dbFactory
+     * @param anonymizerProperties  Properties for anonymizer
+     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
+     */
+    @Override
+    public void generate(final IDBFactory dbFactory, final Properties anonymizerProperties)
+            throws DatabaseAnonymizerException {
+
+        // Now we collect data from the requirement
+        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
+
+        // Iterate over the requirement and generate data sets
+        log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
+
+        for (final Table table : requirement.getTables()) {
+            log.info("Table [" + table.getName() + "]. Start ...");
+
+            // Iterate over columns to generate data set for each column
+            for (final Column column : table.getColumns()) {
+                final Parameter fileParameter = RequirementUtils.getFileParameter(column.getParameters());
+
+                log.info("Column [" + column.getName() + "]. Start...");
+
+                if (fileParameter != null) {
+                    log.debug("Processing file " + fileParameter.getValue());
+
+                    // Backup existing data set file
+                    if (!backupExistingFile(fileParameter.getValue())) {
+                        throw new DatabaseAnonymizerException("Unable to rename existing data set file "
+                                                              + fileParameter.getValue());
+                    }
+
+                    final StringBuilder sql = new StringBuilder(100);
+
+                    sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
+
+                    try (Statement stmt = dbFactory.getConnection().createStatement();
+                        ResultSet rs = stmt.executeQuery(sql.toString());
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(fileParameter.getValue()));) {
+
+                        // Write each column value to data set file
+                        while (rs.next()) {
+                            bw.write(rs.getString(1));
+                            bw.newLine();
+                        }
+                    } catch (IOException ioException) {
+                        log.error(ioException.toString());
+
+                        throw new DatabaseAnonymizerException(ioException.toString(), ioException);
+                    } catch (SQLException sqle) {
+                        log.error(sqle.toString());
+                    }
+                }
+
+                log.info("Column [" + column.getName() + "]. End...");
+            }
+
+            log.info("Table " + table.getName() + ". End ...");
+            log.info("");
+        }
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

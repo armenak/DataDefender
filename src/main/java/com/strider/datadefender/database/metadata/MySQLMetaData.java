@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,12 +15,16 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database.metadata;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.Properties;
 
 /**
@@ -28,30 +32,36 @@ import java.util.Properties;
  * @author armenak
  */
 public class MySQLMetaData extends MetaData {
-    
     public MySQLMetaData(final Properties databaseProperties, final Connection connection) {
         super(databaseProperties, connection);
+
         // Prevent MatchMetaData to be populated with invalid schema property
-        // since schema property not supported by MySQL database.        
+        // since schema property not supported by MySQL database.
         if (schema != null) {
             schema = null;
         }
     }
 
     @Override
-    protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
-        return md.getTables(null, null, "%", new String[] {"TABLE"});
+    protected String getColumnName(final ResultSet columnRS) throws SQLException {
+        return columnRS.getString("COLUMN_NAME");
     }
-    @Override
-    protected ResultSet getPKRS(final DatabaseMetaData md, final String tableName) throws SQLException {
-        return md.getPrimaryKeys(null, null, tableName);
-    }
+
     @Override
     protected ResultSet getColumnRS(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getColumns(null, null, tableName, null);
     }
+
     @Override
-    protected String getColumnName(final ResultSet columnRS) throws SQLException {
-        return columnRS.getString("COLUMN_NAME");
+    protected ResultSet getPKRS(final DatabaseMetaData md, final String tableName) throws SQLException {
+        return md.getPrimaryKeys(null, null, tableName);
+    }
+
+    @Override
+    protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
+        return md.getTables(null, null, "%", new String[] { "TABLE" });
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

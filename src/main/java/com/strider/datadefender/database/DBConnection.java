@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,18 +16,22 @@
  *
  */
 
-package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
-import static java.lang.Class.forName;
-import static org.apache.log4j.Logger.getLogger;
+
+package com.strider.datadefender.database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import java.util.Properties;
+
+import static java.lang.Class.forName;
 
 import org.apache.log4j.Logger;
 
+import static org.apache.log4j.Logger.getLogger;
+
+import com.strider.datadefender.DatabaseDiscoveryException;
 import com.strider.datadefender.utils.ISupplierWithException;
 
 /**
@@ -35,13 +39,12 @@ import com.strider.datadefender.utils.ISupplierWithException;
  */
 public abstract class DBConnection implements IDBConnection {
     private static final Logger log = getLogger(DBConnection.class);
+    protected final String      driver;
+    protected final String      vendor;
+    protected final String      url;
+    protected final String      userName;
+    protected final String      password;
 
-    protected final String driver;
-    protected final String vendor;
-    protected final String url;
-    protected final String userName;
-    protected final String password;
-    
     /**
      * Default constructor, initializes connection properties and loads db class.
      * @param properties
@@ -53,17 +56,17 @@ public abstract class DBConnection implements IDBConnection {
         url      = properties.getProperty("url");
         userName = properties.getProperty("username");
         password = properties.getProperty("password");
-        
         log.info("Database vendor: " + vendor);
         log.info("Using driver " + driver);
         log.info("Database URL: " + url);
-        log.info("Logging in using username " + userName); 
-        
+        log.info("Logging in using username " + userName);
+
         try {
             log.info("Loading database driver");
             forName(driver);
         } catch (ClassNotFoundException cnfe) {
             log.error(cnfe.toString());
+
             throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
         }
     }
@@ -74,14 +77,17 @@ public abstract class DBConnection implements IDBConnection {
      * @return
      * @throws DatabaseAnonymizerException
      */
-    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier) throws DatabaseDiscoveryException {
+    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier)
+            throws DatabaseDiscoveryException {
         Connection conn = null;
+
         try {
             log.info("Establishing database connection");
             conn = supplier.get();
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
+
             if (conn != null) {
                 try {
                     conn.close();
@@ -89,9 +95,13 @@ public abstract class DBConnection implements IDBConnection {
                     log.error(sql.toString());
                 }
             }
+
             throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
+
         return conn;
     }
 }
 
+
+//~ Formatted by Jindent --- http://www.jindent.com

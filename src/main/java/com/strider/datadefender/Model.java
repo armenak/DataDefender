@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,32 +15,37 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.tokenize.Tokenizer;
 
 public class Model {
-    final private Tokenizer tokenizer;
+    final private Tokenizer    tokenizer;
     final private NameFinderME nameFinder;
-    final private String name;
-    
+    final private String       name;
+
     public Model(final Tokenizer tokenizer, final NameFinderME nameFinder, final String name) {
         this.name       = name;
         this.tokenizer  = tokenizer;
         this.nameFinder = nameFinder;
     }
-    
-    public Tokenizer getTokenizer() {
-        return this.tokenizer;
+
+    public String getName() {
+        return this.name;
     }
-    
+
     public NameFinderME getNameFinder() {
         return this.nameFinder;
     }
-    
-    public String getName() {
-        return this.name;
-    }    
-  
+
+    public Tokenizer getTokenizer() {
+        return this.tokenizer;
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

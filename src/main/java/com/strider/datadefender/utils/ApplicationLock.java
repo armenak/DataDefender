@@ -1,118 +1,127 @@
-/*
- * 
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- */
 
+/*
+*
+* This is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 2.1 of
+* the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*
+ */
 package com.strider.datadefender.utils;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+
 import org.apache.log4j.Logger;
+
 import static org.apache.log4j.Logger.getLogger;
 
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
- * Most of the code is copied from this page: http://www.rgagnon.com/javadetails/java-0288.html 
- * 
+ * Most of the code is copied from this page: http://www.rgagnon.com/javadetails/java-0288.html
+ *
  * Modified by Armenak Grigoryan
  */
 public class ApplicationLock {
-    private final String appName;
-    private File file;
-    private FileChannel channel;
-    private FileLock lock;
-    
     private static final Logger log = getLogger(ApplicationLock.class);
+    private final String        appName;
+    private File                file;
+    private FileChannel         channel;
+    private FileLock            lock;
 
     /**
      * Constructor
-     * 
-     * @param appName application name 
+     *
+     * @param appName application name
      */
     public ApplicationLock(final String appName) {
         this.appName = appName;
     }
 
-    /**
-     * Returns true if there is another instance of the application is running.
-     * Otherwise returns false.
-     * 
-     * @return boolean
-     * @throws com.strider.datadefender.DatabaseDiscoveryException
-     */
-    public boolean isAppActive() throws DatabaseDiscoveryException {
-        try {
-            file = new File
-                 (System.getProperty("user.home"), appName + ".tmp");
-            channel = new RandomAccessFile(file, "rw").getChannel();
-            log.debug("Creating lock file " + file.getName());
-            
-            try {
-                lock = channel.tryLock();
-                log.debug("Locking file ...");
-            } catch (OverlappingFileLockException | IOException e) {
-                // already locked
-                log.error("File  " + file.getName() + " already locket");
-                closeLock();
-                return true;
-            }
-
-            if (lock == null) {
-                closeLock();
-                return true;
-            }
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                    // destroy the lock when the JVM is closing
-                    @Override
-                    public void run() {
-                        try {
-                            log.debug("Closing lock file");
-                            closeLock();
-                            deleteFile();
-                        } catch (DatabaseDiscoveryException ae) {
-                            log.error("Problem closing file lock");
-                        }
-                    }
-                });
-            return false;
-        } catch (FileNotFoundException fnfe) {
-            closeLock();
-            return true;
-        }
-    }
-
     private void closeLock() throws DatabaseDiscoveryException {
-        try { 
-            lock.release();  
-        } catch (IOException e) {  
+        try {
+            lock.release();
+        } catch (IOException e) {
             throw new DatabaseDiscoveryException("Problem releasing file lock", e);
         }
-        
-        try { 
-            channel.close(); 
-        } catch (IOException e) {  
+
+        try {
+            channel.close();
+        } catch (IOException e) {
             throw new DatabaseDiscoveryException("Problem closing channel", e);
         }
     }
 
     private void deleteFile() {
-        file.delete(); 
-    }    
-    
+        file.delete();
+    }
+
+    /**
+     * Returns true if there is another instance of the application is running.
+     * Otherwise returns false.
+     *
+     * @return boolean
+     * @throws com.strider.datadefender.DatabaseDiscoveryException
+     */
+    public boolean isAppActive() throws DatabaseDiscoveryException {
+        try {
+            file    = new File(System.getProperty("user.home"), appName + ".tmp");
+            channel = new RandomAccessFile(file, "rw").getChannel();
+            log.debug("Creating lock file " + file.getName());
+
+            try {
+                lock = channel.tryLock();
+                log.debug("Locking file ...");
+            } catch (OverlappingFileLockException | IOException e) {
+
+                // already locked
+                log.error("File  " + file.getName() + " already locket");
+                closeLock();
+
+                return true;
+            }
+
+            if (lock == null) {
+                closeLock();
+
+                return true;
+            }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+
+                // destroy the lock when the JVM is closing
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                log.debug("Closing lock file");
+                                                closeLock();
+                                                deleteFile();
+                                            } catch (DatabaseDiscoveryException ae) {
+                                                log.error("Problem closing file lock");
+                                            }
+                                        }
+                                    });
+
+            return false;
+        } catch (FileNotFoundException fnfe) {
+            closeLock();
+
+            return true;
+        }
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

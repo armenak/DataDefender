@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,6 +16,8 @@
  *
  */
 
+
+
 package com.strider.datadefender.utils;
 
 import java.util.HashMap;
@@ -28,21 +30,26 @@ import java.util.Map;
  */
 public class SQLToJavaMapping {
     @SuppressWarnings("serial")
-    private static final Map<String, String> JAVA_TYPES = new HashMap<String, String>() {{
-        put("VARCHAR", STRING);
-        put("NVARCHAR", STRING);
-        put("VARCHAR2", STRING);
-        put("NVARCHAR2", STRING);
-        put("LONGNVARCHAR", STRING);
-        put("LONGVARCHAR", STRING);
-        put("NCHAR", CHAR);
-        put("CHAR", CHAR);
-    }};
+    private static final Map<String, String> JAVA_TYPES = new HashMap<String, String>() {
+        {
+            put("VARCHAR", STRING);
+            put("NVARCHAR", STRING);
+            put("VARCHAR2", STRING);
+            put("NVARCHAR2", STRING);
+            put("LONGNVARCHAR", STRING);
+            put("LONGVARCHAR", STRING);
+            put("NCHAR", CHAR);
+            put("CHAR", CHAR);
+        }
+    };
     private static final String STRING = "String";
-    private static final String CHAR = "Char";
-    
+    private static final String CHAR   = "Char";
+
     public static boolean isString(final String type) {
-        return STRING.equals(JAVA_TYPES.get(type.toUpperCase(Locale.ENGLISH))) ||
-               CHAR.equals(JAVA_TYPES.get(type.toUpperCase(Locale.ENGLISH))) ;
+        return STRING.equals(JAVA_TYPES.get(type.toUpperCase(Locale.ENGLISH)))
+               || CHAR.equals(JAVA_TYPES.get(type.toUpperCase(Locale.ENGLISH)));
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

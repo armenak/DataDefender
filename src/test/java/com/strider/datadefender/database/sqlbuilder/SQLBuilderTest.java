@@ -15,13 +15,15 @@
  *
  */
 
-package com.strider.datadefender.database.sqlbuilder;
 
-import static org.junit.Assert.*;
+
+package com.strider.datadefender.database.sqlbuilder;
 
 import java.util.Properties;
 
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * One class to test all sqlbuilder.  Split out if this class becomes too large.
@@ -29,22 +31,25 @@ import org.junit.Test;
  *
  */
 public class SQLBuilderTest {
-    private final String schema = "test_schema";
-    private final String table = "test_table";
-    private final Properties noSchema = new Properties();
+    private final String     schema     = "test_schema";
+    private final String     table      = "test_table";
+    private final Properties noSchema   = new Properties();
     @SuppressWarnings("serial")
-    private final Properties withSchema = new Properties() {{ setProperty("schema", schema); }};
+    private final Properties withSchema = new Properties() {
+        {
+            setProperty("schema", schema);
+        }
+    };
 
     @Test
     public void testLimit() {
         ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
+
         assertEquals("SELECT TOP 1 ", builder.buildSelectWithLimit("SELECT ", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
-
         builder = new MySQLSQLBuilder(noSchema);
         assertEquals(" LIMIT 1", builder.buildSelectWithLimit("", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
-
         builder = new OracleSQLBuilder(noSchema);
         assertEquals(" AND rownum <= 1", builder.buildSelectWithLimit("", 1));
         assertEquals("", builder.buildSelectWithLimit("", 0));
@@ -52,11 +57,13 @@ public class SQLBuilderTest {
 
     @Test
     public void testSchemaPrefix() {
-      ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
-      assertEquals("[" + table + "]", builder.prefixSchema(table));
+        ISQLBuilder builder = new MSSQLSQLBuilder(noSchema);
 
-      builder = new MSSQLSQLBuilder(withSchema);
-      assertEquals("[" + schema + "].[" + table + "]", builder.prefixSchema(table));
+        assertEquals("[" + table + "]", builder.prefixSchema(table));
+        builder = new MSSQLSQLBuilder(withSchema);
+        assertEquals("[" + schema + "].[" + table + "]", builder.prefixSchema(table));
     }
-
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

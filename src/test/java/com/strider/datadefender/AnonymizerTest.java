@@ -14,9 +14,10 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender;
 
-import static org.junit.Assert.*;
+
+
+package com.strider.datadefender;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,30 +28,37 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * @author Akira Matsuo
  */
 public class AnonymizerTest {
-    
     private static final String TABLE_ONE = "tableOne";
-    
+
     @SuppressWarnings("serial")
     @Test
     public void testGetTableNames() throws DatabaseAnonymizerException {
-        final List<String> tableList = Arrays.asList(TABLE_ONE);
-        Set<String> tableNames = DataDefender.getTableNames(tableList, new Properties());
+        final List<String> tableList  = Arrays.asList(TABLE_ONE);
+        Set<String>        tableNames = DataDefender.getTableNames(tableList, new Properties());
+
         assertEquals(1, tableNames.size());
         assertEquals("Handle table args.", TABLE_ONE.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
-        
-        final Properties overrideProps = new Properties() {{
-            setProperty("tables", "oneT twoT");
-        }};
+
+        final Properties overrideProps = new Properties() {
+            {
+                setProperty("tables", "oneT twoT");
+            }
+        };
+
         tableNames = DataDefender.getTableNames(tableList, overrideProps);
         assertEquals(1, tableNames.size());
         assertEquals("Ignore props", TABLE_ONE.toLowerCase(Locale.ENGLISH), tableNames.iterator().next());
-        
         tableNames = DataDefender.getTableNames(Collections.emptyList(), overrideProps);
         assertEquals(2, tableNames.size());
-        assertArrayEquals("Props from file", new String[] {"onet", "twot"}, tableNames.toArray());
+        assertArrayEquals("Props from file", new String[] { "onet", "twot" }, tableNames.toArray());
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

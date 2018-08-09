@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,16 +16,20 @@
  *
  */
 
-package com.strider.datadefender.utils;
 
-import static org.apache.log4j.Logger.getLogger;
-import org.apache.log4j.Logger;
+
+package com.strider.datadefender.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
+import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.DatabaseDiscoveryException;
 
@@ -34,8 +38,19 @@ import com.strider.datadefender.DatabaseDiscoveryException;
  * @author Armenak Grigoryan
  */
 public final class AppProperties {
-    
     private static final Logger log = getLogger(AppProperties.class);
+
+    public static Properties loadProperties(final String fileName) throws DatabaseDiscoveryException {
+        final Properties properties = new Properties();
+
+        try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
+            properties.load(in);
+
+            return properties;
+        } catch (IOException e) {
+            throw new DatabaseDiscoveryException("ERROR: Unable to load " + fileName, e);
+        }
+    }
 
     /**
      * Load property file
@@ -44,20 +59,23 @@ public final class AppProperties {
      */
     public static Properties loadPropertiesFromClassPath(final String fileName) {
         final Properties props = new Properties();
-        InputStream input = null;
- 
-    	try {
+        InputStream      input = null;
+
+        try {
             input = AppProperties.class.getClassLoader().getResourceAsStream(fileName);
-            if(input==null){
-    	        log.warn("Unable to find " + fileName);
+
+            if (input == null) {
+                log.warn("Unable to find " + fileName);
+
                 return null;
             }
-            //load a properties file from class path, inside static method
+
+            // load a properties file from class path, inside static method
             props.load(input);
-    	} catch (IOException ex) {
+        } catch (IOException ex) {
             log.error(ex.toString());
-        } finally{
-            if(input!=null){
+        } finally {
+            if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
@@ -65,17 +83,10 @@ public final class AppProperties {
                 }
             }
         }
- 
+
         return props;
     }
- 
-    public static Properties loadProperties(final String fileName) throws DatabaseDiscoveryException {
-        final Properties properties = new Properties();
-        try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
-            properties.load(in);
-            return properties;
-        } catch (IOException e) {
-            throw new DatabaseDiscoveryException("ERROR: Unable to load " + fileName, e);
-        }
-    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

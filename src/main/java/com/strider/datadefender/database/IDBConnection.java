@@ -15,10 +15,13 @@
  *
  */
 
+
+
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
 import java.sql.Connection;
+
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  * Interface for all classes implementing database connection
@@ -27,3 +30,6 @@ import java.sql.Connection;
 public interface IDBConnection {
     Connection connect() throws DatabaseDiscoveryException;
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

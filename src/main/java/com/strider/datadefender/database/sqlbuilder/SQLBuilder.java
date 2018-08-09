@@ -14,6 +14,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database.sqlbuilder;
 
 import java.util.Properties;
@@ -25,6 +28,7 @@ import com.strider.datadefender.utils.CommonUtils;
  * @author Akira Matsuo
  */
 public abstract class SQLBuilder implements ISQLBuilder {
+
     /* changed to public to allow use o databaseProperties object in MSSQLSQLBuilder.java */
     public final Properties databaseProperties;
 
@@ -39,16 +43,18 @@ public abstract class SQLBuilder implements ISQLBuilder {
         if (limit != 0) {
             sql.append(" LIMIT ").append(limit);
         }
+
         return sql.toString();
     }
 
     @Override
     public String prefixSchema(final String tableName) {
         final String schema = databaseProperties.getProperty("schema");
-        String prefixAndTableName;
+        String       prefixAndTableName;
 
         if (CommonUtils.isEmptyString(schema)) {
             prefixAndTableName = tableName;
+
             return tableName;
         } else {
             prefixAndTableName = schema + "." + tableName;
@@ -56,5 +62,7 @@ public abstract class SQLBuilder implements ISQLBuilder {
 
         return prefixAndTableName;
     }
-
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

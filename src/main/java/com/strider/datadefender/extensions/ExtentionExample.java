@@ -15,6 +15,8 @@
  *
  */
 
+
+
 package com.strider.datadefender.extensions;
 
 import static java.lang.Math.random;
@@ -27,13 +29,15 @@ import com.strider.datadefender.functions.CoreFunctions;
  * @author Armenak Grigoryan
  */
 public class ExtentionExample extends CoreFunctions {
-        
+
     /**
-     * Generates random 9-digit student number 
+     * Generates random 9-digit student number
      * @return String
      */
-    public String randomStudentNumber()  {
-        return valueOf(round(random()*100000000));
-    }    
-
+    public String randomStudentNumber() {
+        return valueOf(round(random() * 100000000));
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -14,50 +14,81 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
-import static org.junit.Assert.*;
+
+
+package com.strider.datadefender.database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import java.util.Properties;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.*;
+
 import static org.mockito.Mockito.*;
+
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  * Using mock to test Connection.
  * @author Akira Matsuo
  */
-@RunWith(MockitoJUnitRunner.class)  
+@RunWith(MockitoJUnitRunner.class)
 public class DBConnectionTest {
     @SuppressWarnings("serial")
-    final private Properties testProps = new Properties() {{
-        setProperty("vendor", "mysql");
-        setProperty("driver", "java.util.List");
-        setProperty("url", "invalid-url");
-        setProperty("username", "invalid-user");
-        setProperty("password", "invalid-pass");
-    }};
-    @Mock  
-    private Connection mockConnection; 
+    final private Properties testProps = new Properties() {
+        {
+            setProperty("vendor", "mysql");
+            setProperty("driver", "java.util.List");
+            setProperty("url", "invalid-url");
+            setProperty("username", "invalid-user");
+            setProperty("password", "invalid-pass");
+        }
+    };
+    @Mock
+    private Connection mockConnection;
+
+    @Test
+    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
+        final TestDBConnection testDB = new TestDBConnection(testProps);
+
+        assertEquals(mockConnection, testDB.connect());
+
+        // assert
+        verify(mockConnection).setAutoCommit(false);
+    }
+
+    @Test
+    public void testCtor() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+        final TestDBConnection testDB = new TestDBConnection(testProps);
+
+        testDB.runAsserts();
+    }
+
     // testing class
     private class TestDBConnection extends DBConnection {
-        public TestDBConnection(final Properties properties) throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+        public TestDBConnection(final Properties properties)
+                throws DatabaseAnonymizerException, DatabaseDiscoveryException {
             super(properties);
         }
+
         @Override
         public Connection connect() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
-            return doConnect(() -> {
-                this.runAsserts();
-                return mockConnection;
-            });
+            return doConnect(
+                () -> {
+                    this.runAsserts();
+
+                    return mockConnection;
+                });
         }
+
         public void runAsserts() {
             assertEquals("mysql", this.vendor);
             assertEquals("java.util.List", this.driver);
@@ -66,18 +97,7 @@ public class DBConnectionTest {
             assertEquals("invalid-pass", this.password);
         }
     }
-
-    @Test
-    public void testCtor() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
-        final TestDBConnection testDB = new TestDBConnection(testProps);
-        testDB.runAsserts();
-    }
-    
-    @Test
-    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
-        final TestDBConnection testDB = new TestDBConnection(testProps);
-        assertEquals(mockConnection, testDB.connect());
-        // assert
-        verify(mockConnection).setAutoCommit(false);
-    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,6 +16,8 @@
  *
  */
 
+
+
 package com.strider.datadefender;
 
 /**
@@ -23,9 +25,9 @@ package com.strider.datadefender;
  * @author Armenak Grigoryan
  */
 public interface IDiscoverer {
-    
+
     /**
-     * Discovers data or data containers with data which can be be the subject 
+     * Discovers data or data containers with data which can be be the subject
      * for data anonymization.  Results found should be stored in matches member variable.
      * @param dbFactory
      * @param properties
@@ -35,15 +37,18 @@ public interface IDiscoverer {
      * @throws com.strider.datadefender.AnonymizerException
      * @returns List of results introduced for testing purposes.
      */
-    //List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws DatabaseAnonymizerException;
 
-    //List<MatchMetaData> discover(Properties dataDiscoveryProperties) throws DatabaseAnonymizerException;    
-    
+    // List<MatchMetaData> discover(IDBFactory dbFactory, Properties dataDiscoveryProperties, Set<String> tables) throws DatabaseAnonymizerException;
+    // List<MatchMetaData> discover(Properties dataDiscoveryProperties) throws DatabaseAnonymizerException;
+
     /**
-     * Creates a sample requirement file from a list of sorted matches found by the discovery method.  
+     * Creates a sample requirement file from a list of sorted matches found by the discovery method.
      * The requirement file will most likely require customization (for example; anonymzation function) before you want to run the Anonymizer against it.
      * @param fileName
      * @throws DatabaseAnonymizerException
      */
-    void createRequirement(String fileName)throws DatabaseAnonymizerException;
+    void createRequirement(String fileName) throws DatabaseAnonymizerException;
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

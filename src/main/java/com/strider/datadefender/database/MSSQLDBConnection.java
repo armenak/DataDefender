@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,41 +16,49 @@
  *
  */
 
+
+
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import java.sql.Connection;
+
+import java.util.Properties;
+
 import static java.sql.DriverManager.getConnection;
 
-import java.sql.Connection;
-import java.util.Properties;
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  *
  * @author sdi
  */
 public class MSSQLDBConnection extends DBConnection {
-    
     public MSSQLDBConnection(final Properties properties) throws DatabaseDiscoveryException {
         super(properties);
     }
-    
+
     /**
      * Establishes database connection
      * @return Connection
-     * @throws DatabaseAnonymizerException 
+     * @throws DatabaseAnonymizerException
      */
     @Override
     public Connection connect() throws DatabaseDiscoveryException {
         return doConnect(() -> getConnection(this.getURL()));
     }
-    
+
     /**
      * Get connection url.  Package-level for testing purposes.
      * @return String
      */
     protected String getURL() {
         final StringBuilder sqlServerURL = new StringBuilder(this.url);
+
         sqlServerURL.append(";user=").append(this.userName).append(";password=").append(this.password);
+
         return sqlServerURL.toString();
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

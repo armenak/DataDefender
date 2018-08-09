@@ -12,15 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * Modified by Armenak Grigoryan
  */
+
+
 
 package com.strider.datadefender.utils;
 
 import java.util.Random;
 
 public class XegerUtils {
+
     /**
      * Generates a random number within the given bounds.
      *
@@ -30,8 +33,12 @@ public class XegerUtils {
      * @return A random number in the given range.
      */
     public final static int getRandomInt(final int min, final int max, final Random random) {
-        final int dif = max - min;
-        final float number = random.nextFloat();              // 0 <= number < 1
+        final int   dif    = max - min;
+        final float number = random.nextFloat();    // 0 <= number < 1
+
         return min + Math.round(number * dif);
-    }    
+    }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

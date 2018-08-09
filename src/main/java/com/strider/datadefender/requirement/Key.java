@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,6 +16,8 @@
  *
  */
 
+
+
 package com.strider.datadefender.requirement;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,33 +26,36 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * JAXB class defining a Table's key column.
- * 
+ *
  * Represents a single key column in a table's primary key - could be part of a
  * set comprising a compound key.
- * 
+ *
  * @see Table.getKeys
  * @author Zaahid Bateson
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Key {
-    
+
     /**
      * The column name in the database
      */
-    @XmlAttribute(name="Name")
+    @XmlAttribute(name = "Name")
     private String name;
-    
+
     /**
      * Returns the column name represented by this key
-     * 
+     *
      * @return String
      */
     public String getName() {
         return this.name;
     }
-    
+
     // Setter method
     public void setName(final String name) {
         this.name = name;
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

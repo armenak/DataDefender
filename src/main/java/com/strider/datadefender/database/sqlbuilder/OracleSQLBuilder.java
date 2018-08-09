@@ -14,6 +14,9 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.database.sqlbuilder;
 
 import java.util.Properties;
@@ -21,8 +24,7 @@ import java.util.Properties;
 /**
  * @author Armenak Grigoryan
  */
-public class OracleSQLBuilder extends SQLBuilder{
-    
+public class OracleSQLBuilder extends SQLBuilder {
     public OracleSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
@@ -30,11 +32,14 @@ public class OracleSQLBuilder extends SQLBuilder{
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
         final StringBuilder sql = new StringBuilder(sqlString);
-        
+
         if (limit != 0) {
             sql.append(" AND rownum <= ").append(limit);
         }
+
         return sql.toString();
     }
-    
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

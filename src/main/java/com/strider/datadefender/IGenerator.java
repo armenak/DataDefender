@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, Matthew Eaton, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,18 +16,21 @@
  *
  */
 
+
+
 package com.strider.datadefender;
+
+import java.util.Properties;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
-
-import java.util.Properties;
 
 /**
  * Defines contract for all generators
  * @author Matthew Eaton
  */
 public interface IGenerator {
+
     /**
      * Generate data
      * @param databaseProperties Database property file name and path
@@ -35,5 +38,7 @@ public interface IGenerator {
      * @throws DatabaseAnonymizerException
      */
     void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException;
-
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

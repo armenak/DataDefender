@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,31 +16,37 @@
  *
  */
 
+
+
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import java.sql.Connection;
+
+import java.util.Properties;
+
 import static java.sql.DriverManager.getConnection;
 
-import java.sql.Connection;
-import java.util.Properties;
+import com.strider.datadefender.DatabaseDiscoveryException;
 
 /**
  * MySQL database connection
  * @author Armenak Grigoryan
  */
 public class MySQLDBConnection extends DBConnection {
-    
     public MySQLDBConnection(final Properties properties) throws DatabaseDiscoveryException {
         super(properties);
     }
-    
+
     /**
      * Establishes database connection
      * @return Connection
-     * @throws DatabaseAnonymizerException 
+     * @throws DatabaseAnonymizerException
      */
     @Override
     public Connection connect() throws DatabaseDiscoveryException {
         return doConnect(() -> getConnection(this.url, this.userName, this.password));
     }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,6 +16,8 @@
  *
  */
 
+
+
 package com.strider.datadefender;
 
 import java.util.Properties;
@@ -29,6 +31,7 @@ import com.strider.datadefender.database.IDBFactory;
  * @author strider
  */
 public interface IAnonymizer {
+
     /**
      * Anonymizes data.
      * @param dbFactory
@@ -38,6 +41,9 @@ public interface IAnonymizer {
      *        are anonymized.
      * @throws com.strider.datadefender.database.DatabaseAnonymizerException
      */
-    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables) 
-    throws DatabaseAnonymizerException, DatabaseDiscoveryException;    
+    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties, Set<String> tables)
+            throws DatabaseAnonymizerException, DatabaseDiscoveryException;
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

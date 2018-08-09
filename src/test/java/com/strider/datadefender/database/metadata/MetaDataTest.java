@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -16,54 +16,73 @@
  *
  */
 
-package com.strider.datadefender.database.metadata;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+
+package com.strider.datadefender.database.metadata;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.List;
 import java.util.Properties;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.*;
+
+import static org.mockito.Mockito.*;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 
 /**
- * 
+ *
  * @author Akira Matsuo
- * 
+ *
  * Tests the default implementation of MetaData that's used for Oracle and MSSQL.
  *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MetaDataTest {
+    final private String schema = "test-schema";
+
+    // private String table = "test-table";
+    final private String     cType          = "test-cType";
+    @SuppressWarnings("serial")
+    final private Properties testProperties = new Properties() {
+        {
+            setProperty("schema", schema);
+        }
+    };
     @Mock
     private Connection mockConnection;
     @Mock
-    private ResultSet mockTableRS;
-//    @Mock
-//    private ResultSet mockPKRS;
+    private ResultSet  mockTableRS;
+
+//  @Mock
+//  private ResultSet mockPKRS;
     @Mock
-    private ResultSet mockColumnRS;
+    private ResultSet        mockColumnRS;
     @Mock
     private DatabaseMetaData mockMetaData;
-    
-    final private String schema = "test-schema";
-    //private String table = "test-table";
-    final private String cType = "test-cType";
-    
-    @SuppressWarnings("serial")
-    final private Properties testProperties = new Properties() {{
-        setProperty("schema", schema);
-    }};
-    
+
+    @Test
+    public void testOverride() throws SQLException {
+        when(mockColumnRS.getString(6)).thenReturn(cType).thenReturn(cType).thenReturn("VARCHAR");
+
+        TestMetaData metaData = new TestMetaData(testProperties, null);
+
+        assertEquals("No override", cType, metaData.getColumnType(mockColumnRS));
+        metaData = new TestMetaData(testProperties, "Override-Strings-pls!-type");
+        assertEquals("Override, but not valid string type.", cType, metaData.getColumnType(mockColumnRS));
+        assertEquals("Override, with valid string type.", "String", metaData.getColumnType(mockColumnRS));
+    }
+
     private class TestMetaData extends MetaData {
         public TestMetaData(final Properties databaseProperties, final String columnType) {
             super(databaseProperties, mockConnection);
@@ -71,27 +90,19 @@ public class MetaDataTest {
         }
     }
 
-    @Test
-    public void testOverride() throws SQLException {
-        when(mockColumnRS.getString(6)).thenReturn(cType).thenReturn(cType).thenReturn("VARCHAR");
-        
-        TestMetaData metaData = new TestMetaData(testProperties, null);
-        assertEquals("No override", cType, metaData.getColumnType(mockColumnRS));
-        metaData = new TestMetaData(testProperties, "Override-Strings-pls!-type");
-        assertEquals("Override, but not valid string type.", cType, metaData.getColumnType(mockColumnRS));
-        assertEquals("Override, with valid string type.", "String", metaData.getColumnType(mockColumnRS));
-    }
-    
-    @Test
-    public void testNoTables() throws DatabaseAnonymizerException, SQLException {
-        when(mockConnection.getMetaData()).thenReturn(mockMetaData);
-        when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
-        
-        final TestMetaData metaData = new TestMetaData(testProperties, null);
-        final List<MatchMetaData> result = metaData.getMetaData();
-        assertEquals(0, result.size());
-        
-        verify(mockTableRS, times(1)).next(); // should return false
-        verify(mockTableRS, times(1)).close();
-    }
+//  @Test
+//  public void testNoTables() throws DatabaseAnonymizerException, SQLException {
+//      when(mockConnection.getMetaData()).thenReturn(mockMetaData);
+//      when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
+//      
+//      final TestMetaData metaData = new TestMetaData(testProperties, null);
+//      final List<MatchMetaData> result = metaData.getMetaData();
+//      assertEquals(0, result.size());
+//      
+//      verify(mockTableRS, times(1)).next(); // should return false
+//      verify(mockTableRS, times(1)).close();
+//  }
 }
+
+
+//~ Formatted by Jindent --- http://www.jindent.com

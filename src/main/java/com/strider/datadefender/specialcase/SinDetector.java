@@ -1,4 +1,4 @@
-/** 
+/**
  * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -14,12 +14,16 @@
  * Lesser General Public License for more details.
  *
  */
+
+
+
 package com.strider.datadefender.specialcase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.Probability;
@@ -31,28 +35,34 @@ import com.strider.datadefender.utils.CommonUtils;
  * @author Armenak Grigoryan
  */
 public class SinDetector implements SpecialCase {
-    
     private static final Logger LOG = getLogger(SinDetector.class);
-    
+
     public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
         String sinValue = text;
-        
-        if (!CommonUtils.isEmptyString(sinValue) &&  
-            (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))) {
+
+        if (!CommonUtils.isEmptyString(sinValue)
+                && (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")
+                    || data.getColumnType().equals("CHAR"))) {
             final BiographicFunctions bf = new BiographicFunctions();
+
             if (data.getColumnType().equals("VARCHAR")) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
-            if ( bf.isValidSIN(sinValue)) {
+
+            if (bf.isValidSIN(sinValue)) {
                 LOG.debug("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
+
                 final List<Probability> probabilityList = new ArrayList();
+
                 probabilityList.add(new Probability(sinValue, 1.00));
-                data.setProbabilityList(probabilityList);                
+                data.setProbabilityList(probabilityList);
+
                 return data;
             }
         }
+
         return null;
     }
 }
