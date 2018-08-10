@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.utils.SQLToJavaMapping;
+import java.util.Locale;
 
 /**
  * Class to hold common logic between different metadata implementations.
@@ -146,7 +147,7 @@ public abstract class MetaData implements IMetaData {
                             final String pkey = pkRS.getString(4);
 
                             log.debug("PK: " + pkey);
-                            pkeys.add(pkey);
+                            pkeys.add(pkey.toLowerCase(Locale.ENGLISH));
                         }
                     }
 

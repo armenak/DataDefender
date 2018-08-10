@@ -120,6 +120,3 @@ public class MatchMetaData {
         return this.tableName;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

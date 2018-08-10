@@ -291,12 +291,18 @@ public class DatabaseDiscoverer extends Discoverer {
             final String tableName  = data.getTableName();
             final String columnName = data.getColumnName();
 
-            log.info(data.getColumnType());
+            log.info(data.getPkeys().toString());
+            if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
+                log.info("Column [" + columnName + "] is Primary Key. Slipping this column.");
+                continue;
+            }
+            
+            log.debug("Column type: [" + data.getColumnType() + "]");
             probabilityList = new ArrayList<>();
-            log.info("Analyzing table [" + tableName + "].[" + columnName + "]");
+            log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
-            if (!tables.isEmpty() &&!tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
-                log.info("Continue ...");
+            if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
+                log.warn("List of tables is empty.");
 
                 continue;
             }
@@ -317,7 +323,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                                                  + " WHERE " + columnName + " IS NOT NULL ",
                                                                  limit);
 
-            log.info("Executing query against database: " + query);
+            log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
@@ -332,13 +338,13 @@ public class DatabaseDiscoverer extends Discoverer {
 
                     final String sentence = resultSet.getString(1);
                     log.debug(sentence);
-
+                    log.debug("special case:" + specialCase);
                     if (specialCase) {
                         try {
                             for (int i = 0; i < specialCaseFunctions.length; i++) {
-                                if ((sentence != null) && !sentence.equals("")) {
-                                    log.info("sentence: " + sentence);
-                                    log.info("data: " + data);
+                                if ((sentence != null) && !sentence.isEmpty()) {
+                                    log.debug("sentence: " + sentence);
+                                    log.debug("data: " + data);
                                     specialCaseData = (MatchMetaData) callExtention(specialCaseFunctions[i],
                                                                                     data,
                                                                                     sentence);
@@ -346,6 +352,8 @@ public class DatabaseDiscoverer extends Discoverer {
                                     if (specialCaseData != null) {
                                         log.info("Adding new special case data: " + specialCaseData.toString());
                                         specialCaseDataList.add(specialCaseData);
+                                    } else {
+                                        log.debug("No special case data found");
                                     }
                                 }
                             }
