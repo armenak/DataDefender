@@ -20,6 +20,11 @@
 
 package com.strider.datadefender.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -28,6 +33,9 @@ import static org.junit.Assert.*;
  * @author Akira Matsuo
  */
 public class CommonUtilsTest {
+    
+    private static final Logger log         = getLogger(CommonUtilsTest.class);
+    
     @Test
     public void isEmptyString() {
         assertTrue(CommonUtils.isEmptyString(""));
@@ -35,7 +43,17 @@ public class CommonUtilsTest {
         assertFalse(CommonUtils.isEmptyString(" "));
         assertFalse(CommonUtils.isEmptyString("blah"));
     }
+    
+    @Test
+    public void getMatchingStringTest() {
+        List <String> tables = new ArrayList();
+        tables.add("INTER_TEST_1");
+        tables.add("INTER_TEST_2");
+        tables.add("TEST_TABLE_1");
+        tables.add("TEST_TABLE_2");
+
+        List matchList = CommonUtils.getMatchingStrings(tables, "inter.*".toUpperCase(Locale.ENGLISH));
+        log.info(matchList.toString());
+        assertTrue(matchList.size() == 2);
+    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

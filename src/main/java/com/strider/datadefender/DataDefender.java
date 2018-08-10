@@ -314,9 +314,6 @@ public class DataDefender {
      * This guarantees table names to be in lower case, so functions comparing
      * can use contains() with a lower case name.
      *
-     * If tables names are not supplied via command line, then will search the property file
-     * for space separated list of table names.
-     *
      * @param tableNames
      * @param props application property file
      * @return The list of table names

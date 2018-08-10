@@ -20,6 +20,7 @@
 
 package com.strider.datadefender.database.metadata;
 
+import com.strider.datadefender.utils.CommonUtils;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -118,13 +119,15 @@ public abstract class MetaData implements IMetaData {
 
                     log.debug(tableName);
 
-                    if (excludeTablesList.contains(tableName)) {
-                        log.info("Excluding table " + tableName);
+                    if (excludeTablesList.size() > 0) {
+                        List matchingList = CommonUtils.getMatchingStrings(excludeTablesList, tableName.toUpperCase(Locale.ENGLISH));
+                        if (matchingList != null && !matchingList.isEmpty()) {
+                            log.info("Excluding table " + tableName);
 
-                        continue;
+                            continue;
+                        }
                     }
 
-                    // Skip table if it is empty
                     String schemaTableName = null;
 
                     if ((schemaName != null) &&!schemaName.equals("")) {

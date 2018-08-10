@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -106,7 +107,25 @@ public class CommonUtils {
 
         return ret;
     }
+    
+    /**
+     * Finds the index of all entries in the list that matches the regex
+     * @param list The list of strings to check
+     * @param regex The regular expression to use
+     * @return list containing the indexes of all matching entries
+     */
+    public static List<String> getMatchingStrings(List<String> list, String regex) {
+
+        ArrayList<String> matches = new ArrayList();
+
+        Pattern p = Pattern.compile(regex);
+
+        for (String s:list) {
+            if (p.matcher(s.toUpperCase(Locale.ENGLISH)).matches()) {
+                matches.add(s);
+            }
+        }
+
+        return matches;
+    }    
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
