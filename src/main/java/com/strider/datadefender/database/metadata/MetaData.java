@@ -156,16 +156,29 @@ public abstract class MetaData implements IMetaData {
                         continue;
                     }
 
-                    final List<String> pkeys = new ArrayList<>();
+                    // Retrieve primary keys
+                    final List<String> pKeys = new ArrayList<>();
 
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
                             final String pkey = pkRS.getString(4);
 
                             log.debug("PK: " + pkey);
-                            pkeys.add(pkey.toLowerCase(Locale.ENGLISH));
+                            pKeys.add(pkey.toLowerCase(Locale.ENGLISH));
                         }
                     }
+                    
+                    // Retrieve foreign keys
+                    final List<String> fKeys = new ArrayList<>();
+
+                    try (ResultSet pkRS = getPKRS(md, tableName)) {
+                        while (pkRS.next()) {
+                            final String fKey = pkRS.getString(4);
+
+                            log.debug("PK: " + fKey);
+                            fKeys.add(fKey.toLowerCase(Locale.ENGLISH));
+                        }
+                    }                    
 
                     try (ResultSet columnRS = getColumnRS(md, tableName)) {
                         log.debug(tableName);
@@ -174,7 +187,8 @@ public abstract class MetaData implements IMetaData {
                             log.debug(getColumnName(columnRS));
                             map.add(new MatchMetaData(schemaName,
                                                       tableName,
-                                                      pkeys,
+                                                      pKeys,
+                                                      fKeys,
                                                       getColumnName(columnRS),
                                                       getColumnType(columnRS),
                                                       getColumnSize(columnRS)));
@@ -203,6 +217,7 @@ public abstract class MetaData implements IMetaData {
 
             map.add(new MatchMetaData(rsmd.getSchemaName(i),
                                       rsmd.getTableName(i),
+                                      null,
                                       null,
                                       rsmd.getColumnName(i),
                                       colType,

@@ -61,9 +61,9 @@ public class RequirementUtilsTest extends TestCase {
     public void testCreate() {    // just test the important stuff for now (as we aren't sure if the defaults make sense)
         final List<MatchMetaData> list = new ArrayList<MatchMetaData>() {
             {
-                add(new MatchMetaData(null, "t1", Arrays.asList("pk"), "col1", STRING_TYPE, 5));    // one pk, 1 column
-                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), "col1", STRING_TYPE, 5));    // two pk, two columns
-                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), "col2", STRING_TYPE, 5));
+                add(new MatchMetaData(null, "t1", Arrays.asList("pk"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // one pk, 1 column
+                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // two pk, two columns
+                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"),"col2", STRING_TYPE, 5));
             }
         };
         final Requirement req = RequirementUtils.create(list);

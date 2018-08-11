@@ -25,7 +25,8 @@ public class PHIDetectorTest {
     private static final String  phi_with_argument    = "depression";
     private static final String  phi_without_argument = "";
     private static List<String>  phiList;
-    private static List<String>  phiKeys;
+    private static List<String>  phiPKeys;
+    private static List<String>  phiFKeys;    
     private static MatchMetaData metaData;
     private static MatchMetaData expResult;
 
@@ -59,12 +60,11 @@ public class PHIDetectorTest {
         phiList = new ArrayList();
         phiList.add("test");
         phiList.add("depression");
-        phiKeys = new ArrayList();
-        phiKeys.add("id");
-        metaData  = new MatchMetaData("test_schema", "test_table", phiKeys, "test_column", "VARCHAR", 10);
-        expResult = new MatchMetaData("test_schema", "test_table", phiKeys, "test_column", "VARCHAR", 10);
+        phiPKeys = new ArrayList();
+        phiPKeys.add("id");
+        phiFKeys = new ArrayList();
+        phiFKeys.add("id2");        
+        metaData  = new MatchMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
+        expResult = new MatchMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

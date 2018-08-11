@@ -295,6 +295,12 @@ public class DatabaseDiscoverer extends Discoverer {
                 continue;
             }
             
+            log.info(data.getFkeys().toString());
+            if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
+                log.info("Column [" + columnName + "] is Foreign Key. Slipping this column.");
+                continue;
+            }            
+            
             log.debug("Column type: [" + data.getColumnType() + "]");
             probabilityList = new ArrayList<>();
             log.info("Analyzing column [" + tableName + "].[" + columnName + "]");

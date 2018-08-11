@@ -38,17 +38,20 @@ public class MatchMetaData {
     private List<Probability>  probabilityList = new ArrayList<>();
     private final String       schemaName;
     private final String       tableName;
-    private final List<String> pkeys;
+    private final List<String> pKeys;
+    private final List<String> fKeys;    
     private final String       columnName;
     private final String       columnType;
     private final int          columnSize;
     private double             averageProbability;
 
-    public MatchMetaData(final String schemaName, final String tableName, final List<String> pkeys,
-                         final String columnName, final String columnType, final int columnSize) {
+    public MatchMetaData(final String schemaName, final String tableName, final List<String> pKeys,
+                         final List<String> fKeys, final String columnName, final String columnType, 
+                         final int columnSize) {
         this.schemaName = schemaName;
         this.tableName  = tableName;
-        this.pkeys      = pkeys;
+        this.pKeys      = pKeys;
+        this.fKeys      = fKeys;        
         this.columnName = columnName;
         this.columnType = columnType;
         this.columnSize = columnSize;
@@ -101,8 +104,12 @@ public class MatchMetaData {
     }
 
     public List<String> getPkeys() {
-        return pkeys;
+        return pKeys;
     }
+    
+    public List<String> getFkeys() {
+        return fKeys;
+    }    
 
     public List<Probability> getProbabilityList() {
         return this.probabilityList;
