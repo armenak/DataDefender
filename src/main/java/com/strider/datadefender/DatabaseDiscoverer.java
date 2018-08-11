@@ -117,8 +117,7 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties,
-                                        final Set<String> tables)
+    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties)
             throws ParseException, DatabaseDiscoveryException {
         log.info("Data discovery in process");
 
@@ -149,7 +148,6 @@ public class DatabaseDiscoverer extends Discoverer {
 
             matches = discoverAgainstSingleModel(factory,
                                                  dataDiscoveryProperties,
-                                                 tables,
                                                  modelPerson,
                                                  probabilityThreshold);
             finalList = ListUtils.union(finalList, matches);
@@ -259,11 +257,11 @@ public class DatabaseDiscoverer extends Discoverer {
 
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory,
                                                            final Properties dataDiscoveryProperties,
-                                                           final Set<String> tables, final Model model,
+                                                           final Model model,
                                                            final double probabilityThreshold)
             throws ParseException, DatabaseDiscoveryException {
         final IMetaData           metaData = factory.fetchMetaData();
-        final List<MatchMetaData> map      = metaData.getMetaData(tables);
+        final List<MatchMetaData> map      = metaData.getMetaData();
 
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
@@ -274,7 +272,7 @@ public class DatabaseDiscoverer extends Discoverer {
         final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
         String[]                  specialCaseFunctions = null;
 
-        log.info("Extention list: " + extentionList.toString());
+        log.info("Extention list: " + extentionList);
         
         if (!CommonUtils.isEmptyString(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
@@ -300,12 +298,6 @@ public class DatabaseDiscoverer extends Discoverer {
             log.debug("Column type: [" + data.getColumnType() + "]");
             probabilityList = new ArrayList<>();
             log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
-
-            if (!tables.isEmpty() && !tables.contains(tableName.toLowerCase(Locale.ENGLISH))) {
-                log.warn("List of tables is empty.");
-
-                continue;
-            }
 
             final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
 

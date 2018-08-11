@@ -86,7 +86,7 @@ public abstract class MetaData implements IMetaData {
     }
 
     @Override
-    public List<MatchMetaData> getMetaData(final Set<String> tables) {
+    public List<MatchMetaData> getMetaData() {
         final List<MatchMetaData> map = new ArrayList<>();
 
         // Get the metadata from the the database
@@ -97,13 +97,21 @@ public abstract class MetaData implements IMetaData {
             final String           schemaName      = databaseProperties.getProperty("schema");
             final String           skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
 
-            // Populate list of tables excluded from the analysis
+            // Ignore table(s) excluded from the analysis
             List<String> excludeTablesList = new ArrayList<>();
             final String excludeTables     = databaseProperties.getProperty("exclude-tables");
 
             if ((excludeTables != null) &&!"".equals(excludeTables)) {
                 excludeTablesList = Arrays.asList(excludeTables.split(","));
             }
+            
+            // Ignore table(s) excluded from the analysis
+            List<String> includeTablesList = new ArrayList<>();
+            final String includeTables     = databaseProperties.getProperty("include-tables");
+
+            if ((includeTables != null) &&!"".equals(includeTables)) {
+                includeTablesList = Arrays.asList(includeTables.split(","));
+            }            
 
             log.info("Fetching table names from schema " + schemaName);
 
@@ -111,16 +119,12 @@ public abstract class MetaData implements IMetaData {
                 while (tableRS.next()) {
                     final String tableName = tableRS.getString(3);
 
-                    if (!tables.isEmpty() &&!containsCaseInsensitive(tableName, tables)) {
-                        log.info("Tabe " + tableName + " is not defined in [tables] parameter. Skipping ...");
-
-                        continue;
-                    }
-
-                    log.debug(tableName);
+                    log.info("Processing table [" +tableName +"]");
 
                     if (excludeTablesList.size() > 0) {
+                        log.debug("Excluded table list: " + excludeTablesList.toString());
                         List matchingList = CommonUtils.getMatchingStrings(excludeTablesList, tableName.toUpperCase(Locale.ENGLISH));
+                        log.debug("matchingList: [" + matchingList + "]");
                         if (matchingList != null && !matchingList.isEmpty()) {
                             log.info("Excluding table " + tableName);
 
@@ -128,6 +132,17 @@ public abstract class MetaData implements IMetaData {
                         }
                     }
 
+                    if (excludeTablesList.isEmpty() && includeTablesList.size() > 0) {
+                        log.debug("Include table list: " + includeTablesList.toString());
+                        List matchingList = CommonUtils.getMatchingStrings(includeTablesList, tableName.toUpperCase(Locale.ENGLISH));
+                        log.debug("matchingList: [" + matchingList + "]");
+                        if (matchingList == null || matchingList.isEmpty()) {
+                            log.info("This table is not in include-table list " + tableName);
+
+                            continue;
+                        }
+                    }                    
+                    
                     String schemaTableName = null;
 
                     if ((schemaName != null) &&!schemaName.equals("")) {
@@ -140,8 +155,6 @@ public abstract class MetaData implements IMetaData {
 
                         continue;
                     }
-
-                    log.info("Table " + tableName);
 
                     final List<String> pkeys = new ArrayList<>();
 

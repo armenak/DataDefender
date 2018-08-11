@@ -52,7 +52,7 @@ public class ColumnDiscoverTest extends H2DB {
     @Test
     public void testWithColumns() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final ColumnDiscoverer    discoverer = new ColumnDiscoverer();
-        final List<MatchMetaData> suspects   = discoverer.discover(factory, sampleCProps, new HashSet<String>());
+        final List<MatchMetaData> suspects   = discoverer.discover(factory, sampleCProps);
 
         assertEquals(1, suspects.size());
         assertEquals("ju_users.fname", suspects.get(0).toString());
@@ -63,8 +63,7 @@ public class ColumnDiscoverTest extends H2DB {
     public void testWithTablesColumnsAndRequirements() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
         final ColumnDiscoverer    discoverer = new ColumnDiscoverer();
         final List<MatchMetaData> suspects   = discoverer.discover(factory,
-                                                                   sampleCProps,
-                                                                   new HashSet<String>(Arrays.asList("ju_users")));
+                                                                   sampleCProps);
 
         assertEquals(1, suspects.size());
         assertEquals("ju_users.fname", suspects.get(0).toString());

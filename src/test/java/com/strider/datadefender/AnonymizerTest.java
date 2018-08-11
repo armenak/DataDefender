@@ -47,7 +47,7 @@ public class AnonymizerTest {
 
         final Properties overrideProps = new Properties() {
             {
-                setProperty("tables", "oneT twoT");
+                setProperty("include-tables", "oneT,twoT");
             }
         };
 

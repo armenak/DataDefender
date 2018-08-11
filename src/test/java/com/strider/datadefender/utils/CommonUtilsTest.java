@@ -47,13 +47,11 @@ public class CommonUtilsTest {
     @Test
     public void getMatchingStringTest() {
         List <String> tables = new ArrayList();
-        tables.add("INTER_TEST_1");
-        tables.add("INTER_TEST_2");
-        tables.add("TEST_TABLE_1");
-        tables.add("TEST_TABLE_2");
+        tables.add("INTER.*");
+        tables.add("TEST.*");
 
-        List matchList = CommonUtils.getMatchingStrings(tables, "inter.*".toUpperCase(Locale.ENGLISH));
+        List matchList = CommonUtils.getMatchingStrings(tables, "INTER_TEST".toUpperCase(Locale.ENGLISH));
         log.info(matchList.toString());
-        assertTrue(matchList.size() == 2);
+        assertTrue(matchList.size() == 1);
     }
 }

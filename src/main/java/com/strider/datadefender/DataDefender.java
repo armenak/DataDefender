@@ -206,9 +206,7 @@ public class DataDefender {
                 final Properties  anonymizerProperties   = loadProperties(anonymizerPropertyFile);
                 final IAnonymizer anonymizer             = new DatabaseAnonymizer();
 
-                anonymizer.anonymize(dbFactory,
-                                     anonymizerProperties,
-                                     getTableNames(unparsedArgs, anonymizerProperties));
+                //anonymizer.anonymize(dbFactory,anonymizerProperties,tables);
 
                 break;
 
@@ -245,7 +243,7 @@ public class DataDefender {
                     final Properties       columnProperties   = loadProperties(columnPropertyFile);
                     final ColumnDiscoverer discoverer         = new ColumnDiscoverer();
 
-                    discoverer.discover(dbFactory, columnProperties, getTableNames(unparsedArgs, columnProperties));
+                    discoverer.discover(dbFactory, columnProperties);
 
                     // log.debug("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
                     if (line.hasOption('r')) {
@@ -266,9 +264,7 @@ public class DataDefender {
                     final Properties         dataDiscoveryProperties   = loadProperties(datadiscoveryPropertyFile);
                     final DatabaseDiscoverer discoverer                = new DatabaseDiscoverer();
 
-                    discoverer.discover(dbFactory,
-                                        dataDiscoveryProperties,
-                                        getTableNames(unparsedArgs, dataDiscoveryProperties));
+                    discoverer.discover(dbFactory,dataDiscoveryProperties);
 
                     if (line.hasOption('r')) {
                         discoverer.createRequirement("Sample-Requirement.xml");
@@ -314,26 +310,29 @@ public class DataDefender {
      * This guarantees table names to be in lower case, so functions comparing
      * can use contains() with a lower case name.
      *
+     * If tables names are not supplied via command line, then will search the property file
+     * for space separated list of table names.
+     *
      * @param tableNames
-     * @param props application property file
+     * @param appProperties application property file
+     * @param dbProperties database property file
      * @return The list of table names
      */
-    public static Set<String> getTableNames(final List<String> tableNames, final Properties props) {
+    public static Set<String> getTableNames(final List<String> tableNames, final Properties dbProperties) {
         List<String> tableNameList = new ArrayList<String>(Arrays.asList(new String[tableNames.size()]));
 
         Collections.copy(tableNameList, tableNames);
 
         if (tableNameList.isEmpty()) {
-            final String tableStr = props.getProperty("tables");
+            final String tableStr = dbProperties.getProperty("include-tables");
 
-            if (tableStr == null) {
-                return Collections.emptySet();
-            } else {
-                tableNameList = Arrays.asList(tableStr.split(" "));
-                log.info("Adding tables from property file.");
+            if (tableStr != null) {
+                tableNameList = Arrays.asList(tableStr.split(","));
+                log.debug("Adding tables from property file.");
             }
         }
 
+        
         final Set<String> tables = tableNameList.stream()
                                                 .map(s -> s.toLowerCase(Locale.ENGLISH))
                                                 .collect(Collectors.toSet());

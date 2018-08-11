@@ -725,7 +725,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("");
     }
     
-    @Override
     public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties, final Set<String> tables) 
     throws DatabaseAnonymizerException, DatabaseDiscoveryException{
 
