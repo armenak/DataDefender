@@ -46,7 +46,7 @@ public class ReportUtil {
         final String      table      = sqlBuilder.prefixSchema(tableName);
 
         // Getting number of records in the table
-        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, limit);
+        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table + " AND ", limit);
 
         log.debug("Executing query against database: " + queryCount);
 
@@ -66,7 +66,7 @@ public class ReportUtil {
     public static List<String> sampleData(final IDBFactory factory, final String tableName, final String columnName) {
         final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
         final String      querySample = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + " FROM " + tableName
-                                                                        + " WHERE " + columnName + " IS NOT NULL ",
+                                                                        + " WHERE " + columnName + " IS NOT NULL",
                                                                         5);
 
         log.debug("Executing query against database: " + querySample);

@@ -173,11 +173,13 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             // Getting 5 sample values
-            // final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());
+            final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());
             // Output
             log.info("Column                      : " + data.toString());
             log.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
-            log.info("Probability                 : " + decimalFormat.format(data.getAverageProbability()));
+            log.info("Number of rows in the table: "  + rowCount);
+            log.info("Score                      : " + score.columnScore(rowCount));
+            
             log.info("Model                       : " + data.getModel());
 
             if (YES.equals(calculate_score)) {
@@ -190,6 +192,12 @@ public class DatabaseDiscoverer extends Discoverer {
 
             log.info("Sample data");
             log.info(CommonUtils.fixedLengthString('-', 11));
+            
+            for (final String sampleData : sampleDataList) {
+                log.info(sampleData);
+            }
+
+            log.info("");            
 
             final List<Probability> probabilityList = data.getProbabilityList();
 

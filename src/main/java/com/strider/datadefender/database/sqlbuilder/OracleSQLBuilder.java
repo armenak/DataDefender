@@ -14,17 +14,20 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.database.sqlbuilder;
 
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * @author Armenak Grigoryan
  */
 public class OracleSQLBuilder extends SQLBuilder {
+    
+    private static final Logger log = getLogger(OracleSQLBuilder.class);
+    
     public OracleSQLBuilder(final Properties databaseProperties) {
         super(databaseProperties);
     }
@@ -37,6 +40,8 @@ public class OracleSQLBuilder extends SQLBuilder {
             sql.append(" AND rownum <= ").append(limit);
         }
 
+        log.info(sql.toString());
+        
         return sql.toString();
     }
 }
