@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,29 +16,24 @@
  *
  */
 
-
-
 package com.strider.datadefender;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.text.DecimalFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-
 import static java.lang.Double.parseDouble;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -46,12 +41,13 @@ import org.apache.tika.sax.BodyContentHandler;
 
 import org.xml.sax.SAXException;
 
+import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+
+import opennlp.tools.util.Span;
 
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
-
-import opennlp.tools.util.Span;
 
 /**
  *
@@ -155,12 +151,10 @@ public class FileDiscoverer extends Discoverer {
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
 
                 final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
-
-                log.info("Extension: " + ext);
+                log.debug("Extension: " + ext);
 
                 if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
-                    log.info("Ignoring type " + ext);
-
+                    log.info("Ignoring extention " + ext);
                     continue;
                 }
 
@@ -177,7 +171,7 @@ public class FileDiscoverer extends Discoverer {
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString = handler.toString();
-                        log.info(handlerString);
+                        log.debug(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
@@ -193,9 +187,9 @@ public class FileDiscoverer extends Discoverer {
                 probabilityList = new ArrayList<>();
 
                 for (int i = 0; i < nameSpans.length; i++) {
-                    log.info("Span: " + nameSpans[i].toString());
-                    log.info("Covered text is: " + tokens[nameSpans[i].getStart()]);
-                    log.info("Probability is: " + spanProbs[i]);
+                    log.debug("Span: " + nameSpans[i].toString());
+                    log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
+                    log.debug("Probability is: " + spanProbs[i]);
                     probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                 }
 
@@ -213,7 +207,7 @@ public class FileDiscoverer extends Discoverer {
             }
         }
 
-        return fileMatches;
+        return Collections.unmodifiableList(fileMatches);
     }
 }
 
