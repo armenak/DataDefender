@@ -5,3 +5,12 @@ nb-configuration.xml
 sample_projects/database_discovery/logs/anonymizer.log.2
 sample_projects/database_discovery/logs/anonymizer.log.3
 /nbproject/
+sample_projects/file_discovery/files/000b2798-b3a2-4231-aab1-6a5da3999a11.xls
+sample_projects/file_discovery/files/0a87d04c-8f4d-404f-85ab-bc9da56a7c04.docx
+sample_projects/file_discovery/files/0a965acb-e8e7-43f7-9aec-dde7b15eeca6.docx
+sample_projects/file_discovery/files/1c0ee6a2-a86b-4fd7-9942-e20cb64de58c.xls
+sample_projects/file_discovery/files/1fba4e10-f1a5-4c42-b1cc-f6bf22136f39.xls
+sample_projects/file_discovery/files/2e7a4ced-dd04-4977-9b3c-1581d091d311.xls
+sample_projects/file_discovery/files/8d6b912d-a5ee-467e-ba82-4440f3fe816f.xls
+codacy-coverage-reporter-4.0.2-assembly.jar
+sample_projects/file_discovery/DataDefender.jar
