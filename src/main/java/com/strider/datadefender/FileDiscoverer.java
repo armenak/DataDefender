@@ -94,11 +94,11 @@ public class FileDiscoverer extends Discoverer {
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
         log.info("List of suspects:");
-        log.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
+        log.info(String.format("%40s %20s %20s %20s", "Directory*", "File*", "Probability*", "Model*"));
 
         for (final FileMatchMetaData data : finalList) {
             final String probability = decimalFormat.format(data.getAverageProbability());
-            final String result      = String.format("%20s %20s %20s %20s",
+            final String result      = String.format("%40s %20s %20s %20s",
                                                      data.getDirectory(),
                                                      data.getFileName(),
                                                      probability,
@@ -177,13 +177,13 @@ public class FileDiscoverer extends Discoverer {
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString = handler.toString();
-                        log.info(handlerString);
+                        //log.info(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
                 }
 
-                log.debug("Content: " + handlerString);
+                //log.debug("Content: " + handlerString);
 
                 final String   tokens[]    = model.getTokenizer().tokenize(handler.toString());
                 final Span     nameSpans[] = model.getNameFinder().find(tokens);
@@ -193,9 +193,9 @@ public class FileDiscoverer extends Discoverer {
                 probabilityList = new ArrayList<>();
 
                 for (int i = 0; i < nameSpans.length; i++) {
-                    log.info("Span: " + nameSpans[i].toString());
-                    log.info("Covered text is: " + tokens[nameSpans[i].getStart()]);
-                    log.info("Probability is: " + spanProbs[i]);
+                    log.debug("Span: " + nameSpans[i].toString());
+                    log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
+                    log.debug("Probability is: " + spanProbs[i]);
                     probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                 }
 
