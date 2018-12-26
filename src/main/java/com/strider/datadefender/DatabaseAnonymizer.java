@@ -633,7 +633,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param table 
      */
     private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
-    throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+    throws DatabaseAnonymizerException {
         
         log.info("Table [" + table.getName() + "]. Start ...");
         
@@ -687,7 +687,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             rs.close();
             log.debug("Closing open resources");
             
-        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | 
+                 IllegalArgumentException | InvocationTargetException | DatabaseDiscoveryException ex ) {
             log.error(ex.toString());
             if (ex.getCause() != null) {
                 log.error(ex.getCause().toString());
@@ -725,16 +726,22 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("");
     }
     
-    public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties, final Set<String> tables) 
-    throws DatabaseAnonymizerException, DatabaseDiscoveryException{
+    public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties) 
+    throws DatabaseAnonymizerException{
 
-        final int batchSize = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
+        final int batchSize           = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
+        String tablesStr              = anonymizerProperties.getProperty("tables");
+        
+        Set<String> tables = null;
+        if (tablesStr != null && !tablesStr.isEmpty()) {
+            tables = new HashSet<>(Arrays.asList(tablesStr.split(",")));
+        }
         
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(final Table reqTable : requirement.getTables()) {
-            if (tables.isEmpty() || tables.contains(reqTable.getName())) {
+            if (CommonUtils.isEmptyString(tablesStr) || ( tables != null && tables.contains(reqTable.getName()))) {
                 anonymizeTable(batchSize, dbFactory, reqTable);
             }
         }

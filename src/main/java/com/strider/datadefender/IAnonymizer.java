@@ -16,18 +16,15 @@
  *
  */
 
-
-
 package com.strider.datadefender;
 
 import java.util.Properties;
-import java.util.Set;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDBFactory;
 
 /**
- * Defines contract for all anonymizers
+ * Defines contract for all Anonymizes
  * @author strider
  */
 public interface IAnonymizer {
@@ -36,14 +33,9 @@ public interface IAnonymizer {
      * Anonymizes data.
      * @param dbFactory
      * @param anonymizerProperties
-     * @param tables Optional list of tables to anonymize -
-     *        if the collection is empty, all tables specified in requirements
-     *        are anonymized.
+     * 
      * @throws com.strider.datadefender.database.DatabaseAnonymizerException
      */
-    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties,final Set<String> tables)
-            throws DatabaseAnonymizerException, DatabaseDiscoveryException;
+    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties)
+        throws DatabaseAnonymizerException;
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

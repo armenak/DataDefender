@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2016, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -59,7 +59,7 @@ import static com.strider.datadefender.utils.AppProperties.loadProperties;
  *
  */
 public class DataDefender {
-    private static final Logger log = getLogger(DataDefender.class);
+    private static final Logger LOG = getLogger(DataDefender.class);
 
     /**
      * Creates options for the command line
@@ -93,7 +93,7 @@ public class DataDefender {
 
     private static void displayErrors(final List<String> errors) {
         for (final String err : errors) {
-            log.info(err);
+            LOG.info(err);
         }
     }
 
@@ -101,8 +101,8 @@ public class DataDefender {
         final long         endTime   = System.currentTimeMillis();
         final NumberFormat formatter = new DecimalFormat("#0.00000");
 
-        log.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");
-        log.info("DataDefender completed ");
+        LOG.info("Execution time is " + formatter.format((endTime - startTime) / 1000d) + " seconds");
+        LOG.info("DataDefender completed ");
     }
 
     /**
@@ -128,12 +128,12 @@ public class DataDefender {
         final ApplicationLock al = new ApplicationLock("DataDefender");
 
         if (al.isAppActive()) {
-            log.error("Another instance of this program is already active");
+            LOG.error("Another instance of this program is already active");
             displayExecutionTime(startTime);
             System.exit(1);
         }
 
-        log.info("Command-line arguments: " + Arrays.toString(args));
+        LOG.info("Command-line arguments: " + Arrays.toString(args));
 
         final Options     options      = createOptions();
         final CommandLine line         = getCommandLine(options, args);
@@ -206,7 +206,7 @@ public class DataDefender {
                 final Properties  anonymizerProperties   = loadProperties(anonymizerPropertyFile);
                 final IAnonymizer anonymizer             = new DatabaseAnonymizer();
 
-                //anonymizer.anonymize(dbFactory,anonymizerProperties,tables);
+                anonymizer.anonymize(dbFactory,anonymizerProperties);
 
                 break;
 
@@ -245,7 +245,6 @@ public class DataDefender {
 
                     discoverer.discover(dbFactory, columnProperties);
 
-                    // log.debug("option value: " + line.getOptionValue('R', "Sample-Requirement.xml"));
                     if (line.hasOption('r')) {
                         discoverer.createRequirement("Sample-Requirement.xml");
                     }
@@ -328,7 +327,7 @@ public class DataDefender {
 
             if (tableStr != null) {
                 tableNameList = Arrays.asList(tableStr.split(","));
-                log.debug("Adding tables from property file.");
+                LOG.debug("Adding tables from property file.");
             }
         }
 
@@ -337,7 +336,7 @@ public class DataDefender {
                                                 .map(s -> s.toLowerCase(Locale.ENGLISH))
                                                 .collect(Collectors.toSet());
 
-        log.info("Tables: " + Arrays.toString(tables.toArray()));
+        LOG.info("Tables: " + Arrays.toString(tables.toArray()));
 
         return tables;
     }
