@@ -22,12 +22,16 @@ package com.strider.datadefender.database.sqlbuilder;
 import java.util.Properties;
 
 import com.strider.datadefender.utils.CommonUtils;
+import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Provides 'default' implementation which can be overridden.
  * @author Akira Matsuo
  */
 public abstract class SQLBuilder implements ISQLBuilder {
+    
+    private static final Logger log = getLogger(SQLBuilder.class);    
 
     /* changed to public to allow use o databaseProperties object in MSSQLSQLBuilder.java */
     public final Properties databaseProperties;
@@ -44,6 +48,7 @@ public abstract class SQLBuilder implements ISQLBuilder {
             sql.append(" LIMIT ").append(limit);
         }
 
+        log.debug("The final query is:[" + sql + "]");
         return sql.toString();
     }
 

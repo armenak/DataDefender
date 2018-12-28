@@ -243,7 +243,7 @@ public class DataDefender {
                     final Properties       columnProperties   = loadProperties(columnPropertyFile);
                     final ColumnDiscoverer discoverer         = new ColumnDiscoverer();
 
-                    discoverer.discover(dbFactory, columnProperties);
+                    discoverer.discover(dbFactory, columnProperties, props.getProperty("vendor"));
 
                     if (line.hasOption('r')) {
                         discoverer.createRequirement("Sample-Requirement.xml");
@@ -263,7 +263,7 @@ public class DataDefender {
                     final Properties         dataDiscoveryProperties   = loadProperties(datadiscoveryPropertyFile);
                     final DatabaseDiscoverer discoverer                = new DatabaseDiscoverer();
 
-                    discoverer.discover(dbFactory,dataDiscoveryProperties);
+                    discoverer.discover(dbFactory,dataDiscoveryProperties, props.getProperty("vendor"));
 
                     if (line.hasOption('r')) {
                         discoverer.createRequirement("Sample-Requirement.xml");

@@ -86,7 +86,7 @@ public abstract class MetaData implements IMetaData {
     }
 
     @Override
-    public List<MatchMetaData> getMetaData() {
+    public List<MatchMetaData> getMetaData(String vendor) {
         final List<MatchMetaData> map = new ArrayList<>();
 
         // Get the metadata from the the database
@@ -120,14 +120,21 @@ public abstract class MetaData implements IMetaData {
                     final String tableName = tableRS.getString(3);
 
                     log.info("Processing table [" +tableName +"]");
-
+                    
+                    // Exception for PostgreSQL
+                    
+                    if (vendor.equals("postgresql") && tableName.contains("sql_")) {
+                        log.info("Skipping " + tableName);
+                        continue;
+                    }
+                    
+                    
                     if (excludeTablesList.size() > 0) {
                         log.debug("Excluded table list: " + excludeTablesList.toString());
                         List matchingList = CommonUtils.getMatchingStrings(excludeTablesList, tableName.toUpperCase(Locale.ENGLISH));
                         log.debug("matchingList: [" + matchingList + "]");
                         if (matchingList != null && !matchingList.isEmpty()) {
                             log.info("Excluding table " + tableName);
-
                             continue;
                         }
                     }

@@ -29,6 +29,3 @@ public class MySQLSQLBuilder extends SQLBuilder {
         super(databaseProperties);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

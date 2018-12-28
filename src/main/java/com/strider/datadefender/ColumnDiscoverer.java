@@ -45,12 +45,13 @@ import com.strider.datadefender.utils.Score;
 public class ColumnDiscoverer extends Discoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
-    public List<MatchMetaData> discover(final IDBFactory factory, final Properties columnProperties)
+    public List<MatchMetaData> discover(final IDBFactory factory, 
+            final Properties columnProperties, String vendor)
             throws DatabaseDiscoveryException {
         log.info("Column discovery in process");
 
         final IMetaData           metaData      = factory.fetchMetaData();
-        final List<MatchMetaData> map           = metaData.getMetaData();
+        final List<MatchMetaData> map           = metaData.getMetaData(vendor);
         List<MatchMetaData>       uniqueMatches = null;
 
         // Converting HashMap keys into ArrayList

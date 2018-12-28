@@ -13,7 +13,7 @@ import java.util.Set;
  * @author armenak
  */
 public interface IMetaData {
-    List<MatchMetaData> getMetaData();
+    List<MatchMetaData> getMetaData(String vendor);
 
     // List<MatchMetaData> getMetaData(final String columnType);
     List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException;

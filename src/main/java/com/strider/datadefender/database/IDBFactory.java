@@ -34,11 +34,14 @@ import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MSSQLMetaData;
 import com.strider.datadefender.database.metadata.MySQLMetaData;
 import com.strider.datadefender.database.metadata.OracleMetaData;
+import com.strider.datadefender.database.metadata.PostgreSQLMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MSSQLSQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MySQLSQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.OracleSQLBuilder;
+import com.strider.datadefender.database.sqlbuilder.PostgreSQLBuilder;
 import com.strider.datadefender.utils.ICloseableNoException;
+import java.util.logging.Level;
 
 /**
  * Aggregate all the various db factories.
@@ -108,6 +111,27 @@ public interface IDBFactory extends ICloseableNoException {
                 @Override
                 public ISQLBuilder createSQLBuilder() {
                     return new OracleSQLBuilder(dbProps);
+                }
+            };
+        }  else if ("postgresql".equalsIgnoreCase(vendor)) {
+            return new DBFactory(vendor) {
+                @Override
+                public Connection createConnection() throws DatabaseDiscoveryException {
+                    Connection conn = new PostgreSQLDBConnection(dbProps).connect();
+                    try {
+                        conn.setAutoCommit(false);
+                    } catch (SQLException ex) {
+                        java.util.logging.Logger.getLogger(IDBFactory.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return conn;
+                }
+                @Override
+                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
+                    return new PostgreSQLMetaData(dbProps, getConnection());
+                }
+                @Override
+                public ISQLBuilder createSQLBuilder() {
+                    return new PostgreSQLBuilder(dbProps);
                 }
             };
         }

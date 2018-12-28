@@ -117,7 +117,8 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<MatchMetaData> discover(final IDBFactory factory, final Properties dataDiscoveryProperties)
+    public List<MatchMetaData> discover(final IDBFactory factory, 
+            final Properties dataDiscoveryProperties, String vendor)
             throws ParseException, DatabaseDiscoveryException {
         log.info("Data discovery in process");
 
@@ -149,7 +150,7 @@ public class DatabaseDiscoverer extends Discoverer {
             matches = discoverAgainstSingleModel(factory,
                                                  dataDiscoveryProperties,
                                                  modelPerson,
-                                                 probabilityThreshold);
+                                                 probabilityThreshold,vendor);
             finalList = ListUtils.union(finalList, matches);
         }
 
@@ -266,10 +267,11 @@ public class DatabaseDiscoverer extends Discoverer {
     private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory,
                                                            final Properties dataDiscoveryProperties,
                                                            final Model model,
-                                                           final double probabilityThreshold)
+                                                           final double probabilityThreshold,
+                                                           final String vendor)
             throws ParseException, DatabaseDiscoveryException {
         final IMetaData           metaData = factory.fetchMetaData();
-        final List<MatchMetaData> map      = metaData.getMetaData();
+        final List<MatchMetaData> map      = metaData.getMetaData(vendor);
 
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();

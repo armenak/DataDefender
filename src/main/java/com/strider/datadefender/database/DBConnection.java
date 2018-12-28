@@ -98,7 +98,7 @@ public abstract class DBConnection implements IDBConnection {
 
             throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
-
+        
         return conn;
     }
 }

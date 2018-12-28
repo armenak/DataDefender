@@ -46,7 +46,7 @@ public class ReportUtil {
         final String      table      = sqlBuilder.prefixSchema(tableName);
 
         // Getting number of records in the table
-        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table + " AND ", limit);
+        final String queryCount = sqlBuilder.buildSelectWithLimit("SELECT count(*) " + " FROM " + table, limit);
 
         log.debug("Executing query against database: " + queryCount);
 
