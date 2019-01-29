@@ -597,7 +597,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             anonymized.add(columnName);
             final Object colValue = callAnonymizingFunctionFor(db, row, column, vendor);
             log.debug("colValue = " + colValue);
-            log.debug("type= " + colValue.getClass());
+            log.debug("type= " + (colValue != null ? colValue.getClass() : "null"));
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
             } else if (colValue.getClass() == java.sql.Date.class) {
