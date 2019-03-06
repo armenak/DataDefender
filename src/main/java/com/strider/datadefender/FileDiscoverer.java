@@ -173,17 +173,17 @@ public class FileDiscoverer extends Discoverer {
 
                 try {
                     final InputStream stream = new FileInputStream(fich.getCanonicalPath());
-
+                    log.info("Loading data into the stream");
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString = handler.toString();
-                        //log.info(handlerString);
+                        log.info(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
                 }
 
-                //log.debug("Content: " + handlerString);
+                log.info("Content: " + handlerString);
 
                 final String   tokens[]    = model.getTokenizer().tokenize(handler.toString());
                 final Span     nameSpans[] = model.getNameFinder().find(tokens);
@@ -193,9 +193,9 @@ public class FileDiscoverer extends Discoverer {
                 probabilityList = new ArrayList<>();
 
                 for (int i = 0; i < nameSpans.length; i++) {
-                    log.debug("Span: " + nameSpans[i].toString());
-                    log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
-                    log.debug("Probability is: " + spanProbs[i]);
+                    log.info("Span: " + nameSpans[i].toString());
+                    log.info("Covered text is: " + tokens[nameSpans[i].getStart()]);
+                    log.info("Probability is: " + spanProbs[i]);
                     probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                 }
 
