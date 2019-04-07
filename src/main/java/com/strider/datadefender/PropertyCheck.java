@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
+import static com.strider.datadefender.utils.AppProperties.loadPropertiesFromClassPath;
 
 /**
  * Check for properties required for execution of data defender and data anonymizer
@@ -49,7 +50,7 @@ public class PropertyCheck {
         final List errors = new ArrayList<>();
 
         if ("file-discovery".equals(utiity)) {
-            final Properties properties = loadProperties("filediscovery.properties");
+            final Properties properties = loadPropertiesFromClassPath("filediscovery.properties");
 
             for (int i = 0; i < fileDiscoveryProperties.length; i++) {
                 final String property = properties.getProperty(fileDiscoveryProperties[i]);

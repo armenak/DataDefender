@@ -80,7 +80,6 @@ public abstract class Discoverer {    // implements IDiscoverer {
 
         try {
             log.debug("Model name: " + modelName);
-            log.debug(dataDiscoveryProperties.toString());
             modelInToken = new FileInputStream(dataDiscoveryProperties.getProperty("english_tokens"));
             log.debug(dataDiscoveryProperties.getProperty(modelName));
             modelIn    = new FileInputStream(dataDiscoveryProperties.getProperty(modelName));
@@ -119,6 +118,3 @@ public abstract class Discoverer {    // implements IDiscoverer {
         RequirementUtils.write(RequirementUtils.create(matches), fileName);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

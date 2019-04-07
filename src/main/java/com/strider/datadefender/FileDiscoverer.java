@@ -177,13 +177,13 @@ public class FileDiscoverer extends Discoverer {
                     if (stream != null) {
                         parser.parse(stream, handler, metadata);
                         handlerString = handler.toString();
-                        log.info(handlerString);
+                        log.debug(handlerString);
                     }
                 } catch (IOException e) {
                     log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
                 }
 
-                log.info("Content: " + handlerString);
+                log.debug("Content: " + handlerString);
 
                 final String   tokens[]    = model.getTokenizer().tokenize(handler.toString());
                 final Span     nameSpans[] = model.getNameFinder().find(tokens);

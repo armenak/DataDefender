@@ -50,6 +50,7 @@ import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.utils.ApplicationLock;
 
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
+import static com.strider.datadefender.utils.AppProperties.loadPropertiesFromClassPath;
 
 /**
  * Entry point to Data Defender.
@@ -170,7 +171,7 @@ public class DataDefender {
             }
 
             final String         fileDiscoveryPropertyFile = line.getOptionValue('F', "filediscovery.properties");
-            final Properties     fileDiscoveryProperties   = loadProperties(fileDiscoveryPropertyFile);
+            final Properties     fileDiscoveryProperties   = loadPropertiesFromClassPath(fileDiscoveryPropertyFile);
             final FileDiscoverer discoverer                = new FileDiscoverer();
 
             discoverer.discover(fileDiscoveryProperties);
