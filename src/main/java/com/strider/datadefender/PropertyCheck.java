@@ -93,9 +93,9 @@ public class PropertyCheck {
     }
 
     @SuppressWarnings("unchecked")
-    public static List checkDtabaseProperties() throws DatabaseDiscoveryException {
+    public static List checkDtabaseProperties(String dbPropertiesFile) throws DatabaseDiscoveryException {
         final List<String> errors       = new ArrayList<>();
-        final Properties   dbProperties = loadProperties("db.properties");
+        final Properties   dbProperties = loadProperties(dbPropertiesFile);
 
         for (int i = 0; i < databaseProperties.length; i++) {
             final String property = dbProperties.getProperty(databaseProperties[i]);
