@@ -44,7 +44,7 @@ public class MatchMetaData {
     private final String       columnType;
     private final int          columnSize;
     private double             averageProbability;
-
+    
     public MatchMetaData(final String schemaName, final String tableName, final List<String> pKeys,
                          final List<String> fKeys, final String columnName, final String columnType, 
                          final int columnSize) {

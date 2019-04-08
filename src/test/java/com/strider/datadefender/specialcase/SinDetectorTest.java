@@ -16,7 +16,7 @@ import com.strider.datadefender.database.metadata.MatchMetaData;
  * @author strider
  */
 public class SinDetectorTest {
-    private static final String  sin_with_argument    = "583336318";
+    private static final String  sin_with_argument    = "742970072";
     private static final String  sin_without_argument = "";
     private static List<String>  phiList;
     private static List<String>  phiPKeys;
