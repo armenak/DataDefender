@@ -180,7 +180,10 @@ public class DataDefender {
             return;
         }
 
-        errors = PropertyCheck.checkDtabaseProperties();
+        // Get db properties file from command line argument or use default db.properties
+        final String dbPropertiesFile = line.getOptionValue('P', "db.properties");
+
+        errors = PropertyCheck.checkDtabaseProperties(dbPropertiesFile);
 
         if (errors.size() > 0) {
             displayErrors(errors);
@@ -189,7 +192,7 @@ public class DataDefender {
             return;
         }
 
-        final Properties props = loadProperties(line.getOptionValue('P', "db.properties"));
+        final Properties props = loadProperties(dbPropertiesFile);
 
         try (final IDBFactory dbFactory = IDBFactory.get(props);) {
             switch (cmd) {
