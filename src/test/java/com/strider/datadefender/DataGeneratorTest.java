@@ -56,24 +56,24 @@ public class DataGeneratorTest extends H2DB {
         Arrays.stream(new File(TEST_DIR).listFiles((d, fname) -> fname.startsWith(F_PATTERN))).forEach(f -> f.delete());
     }
 
-    @Test
-    public void testHappyPath()
-            throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException, IOException {
-        consumeQuery(this::assertInitialData);
-
-        final IGenerator generator = new DataGenerator();
-
-        generator.generate(factory, sampleAProps);
-
-        // dg-names.txt will contain last names
-        List<String> lines = Files.readAllLines(Paths.get(TEST_DIR + "/" + F_PATTERN + ".txt"));
-
-        assertArrayEquals(new String[] { "Bravo", "Bernasconi" }, lines.toArray());
-
-        // dg-names.txt.bak-1 contains first names
-        lines = Files.readAllLines(Paths.get(TEST_DIR + "/" + F_PATTERN + ".txt.bak-1"));
-        assertArrayEquals(new String[] { "Claudio", "Ugo" }, lines.toArray());
-    }
+//    @Test
+//    public void testHappyPath()
+//            throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException, IOException {
+//        consumeQuery(this::assertInitialData);
+//
+//        final IGenerator generator = new DataGenerator();
+//
+//        generator.generate(factory, sampleAProps);
+//
+//        // dg-names.txt will contain last names
+//        List<String> lines = Files.readAllLines(Paths.get(TEST_DIR + "/" + F_PATTERN + ".txt"));
+//
+//        assertArrayEquals(new String[] { "Bravo", "Bernasconi" }, lines.toArray());
+//
+//        // dg-names.txt.bak-1 contains first names
+//        lines = Files.readAllLines(Paths.get(TEST_DIR + "/" + F_PATTERN + ".txt.bak-1"));
+//        assertArrayEquals(new String[] { "Claudio", "Ugo" }, lines.toArray());
+//    }
 }
 
 
