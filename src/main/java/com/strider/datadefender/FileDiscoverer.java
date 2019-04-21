@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2019, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -31,12 +31,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import static java.lang.Double.parseDouble;
+
+import java.sql.SQLException;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
+
 import org.apache.log4j.Logger;
+import static org.apache.log4j.Logger.getLogger;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -44,23 +55,12 @@ import org.apache.tika.sax.BodyContentHandler;
 
 import org.xml.sax.SAXException;
 
-import static org.apache.log4j.Logger.getLogger;
+import opennlp.tools.util.Span;
 
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import opennlp.tools.util.Span;
 
 /**
  *
