@@ -49,14 +49,14 @@
             <id>anonymize</id>
             <properties>
                 <execAppName>anonymize</execAppName>
-                <execAppFlag></execAppFlag>
+                <execAppFlag/>
             </properties>
         </profile>
         <profile>
             <id>generate</id>
             <properties>
                 <execAppName>generate</execAppName>
-                <execAppFlag></execAppFlag>
+                <execAppFlag/>
             </properties>
         </profile>
     </profiles>
@@ -152,7 +152,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>            
         </plugins>
@@ -205,7 +205,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.47</version>
+            <version>8.0.16</version>
         </dependency>   
         <dependency>
             <groupId>org.apache.opennlp</groupId>
