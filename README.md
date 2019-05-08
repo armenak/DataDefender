@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/armenak/DataDefender.svg?branch=master)](https://travis-ci.org/armenak/DataDefender)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ed95fbecb60b4e98973c976f338ab4b5)](https://www.codacy.com/app/agstrider/DataDefender?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=armenak/DataDefender&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/armenak/DataDefender/branch/master/graph/badge.svg)](https://codecov.io/gh/armenak/DataDefender)
+ [![Known Vulnerabilities](https://snyk.io/test/github/{armenak}/{DataDefender}/badge.svg)](https://snyk.io/test/github/{armenak}/{DataDefender}) 
 
 
 
