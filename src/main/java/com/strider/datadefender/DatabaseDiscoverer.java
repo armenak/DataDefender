@@ -301,13 +301,13 @@ public class DatabaseDiscoverer extends Discoverer {
 
             log.info(data.getPkeys().toString());
             if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
-                log.info("Column [" + columnName + "] is Primary Key. Slipping this column.");
+                log.info("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
             log.info(data.getFkeys().toString());
             if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
-                log.info("Column [" + columnName + "] is Foreign Key. Slipping this column.");
+                log.info("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
             }            
             
