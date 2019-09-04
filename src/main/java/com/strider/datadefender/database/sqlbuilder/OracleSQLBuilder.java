@@ -40,7 +40,7 @@ public class OracleSQLBuilder extends SQLBuilder {
             sql.append(" AND rownum <= ").append(limit);
         }
 
-        log.info(sql.toString());
+        log.debug(sql.toString());
         
         return sql.toString();
     }

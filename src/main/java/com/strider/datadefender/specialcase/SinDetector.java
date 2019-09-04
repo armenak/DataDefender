@@ -28,11 +28,9 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.Probability;
 import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Armenak Grigoryan
@@ -76,14 +74,14 @@ public class SinDetector implements SpecialCase {
             sinValue = text;
         }
 
-        LOG.info("Trying to findSIN in file " + metaData.getFileName() + " : " + sinValue);
+        LOG.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
         if (isValidSIN(sinValue)) {
                 LOG.info("SIN detected: " + sinValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("sin");
                 return metaData;
         } else {
-            LOG.info("SIN " + sinValue + " is not valid" );
+            LOG.debug("SIN " + sinValue + " is not valid" );
         }
 
         return null;
@@ -115,7 +113,7 @@ public class SinDetector implements SpecialCase {
         };
         final List<Integer> sinList    = new ArrayList();
 
-        LOG.info(sin);
+        LOG.debug(sin);
 
         for (int i = 0; i < 9; i++) {
             sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));

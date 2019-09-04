@@ -53,10 +53,12 @@ import com.strider.datadefender.utils.CommonUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import opennlp.tools.util.Span;
 
@@ -162,11 +164,7 @@ public class FileDiscoverer extends Discoverer {
                                     log.debug("Loading data into the stream");
                                     if (stream != null) {
                                         parser.parse(stream, handler, metadata);
-                                        handlerString = handler.toString();
-                                        
-                                        handlerString = handlerString.replaceAll("( )+", " ");
-                                        
-                                        handlerString = handlerString.replaceAll("[\\t\\n\\r]+"," ");
+                                        handlerString = handler.toString().replaceAll("( )+", " ").replaceAll("[\\t\\n\\r]+"," ");
                                         
                                         String[] tokens = handlerString.split(" ");
                                         
@@ -219,6 +217,9 @@ public class FileDiscoverer extends Discoverer {
         log.info(String.format("%40s %20s %20s %20s", "Directory*", "File*", "Probability*", "Model*"));
         
         finalList = uniqueList(finalList);
+        
+        Collections.sort(finalList, Comparator.comparing(FileMatchMetaData ::getFileName));
+        
         for (final FileMatchMetaData data : finalList) {
             String result = "";
             final String probability = decimalFormat.format(data.getAverageProbability());

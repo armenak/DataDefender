@@ -3,8 +3,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ed95fbecb60b4e98973c976f338ab4b5)](https://www.codacy.com/app/agstrider/DataDefender?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=armenak/DataDefender&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/armenak/DataDefender/branch/master/graph/badge.svg)](https://codecov.io/gh/armenak/DataDefender)
 
-
-
 Data Discovery and Anonymization toolkit
 ========================================
 

@@ -20,8 +20,6 @@
 
 package com.strider.datadefender.file.metadata;
 
-import java.util.Comparator;
-
 /**
  * Data object to hold all metadata for matching data in Discovery applications.
  * Currently this object holds column and table metadata; ie, duplicating info.
@@ -38,18 +36,6 @@ public class FileMatchMetaData {
     public FileMatchMetaData(final String directory, final String fileName) {
         this.directory = directory;
         this.fileName  = fileName;
-    }
-
-    /**
-     * @return comparator used for sorting
-     */
-    public static Comparator<FileMatchMetaData> compare() {
-        return Comparator.comparing(FileMatchMetaData::getDirectory).thenComparing(FileMatchMetaData::getFileName);
-    }
-
-    @Override
-    public String toString() {
-        return this.directory + "." + this.fileName;
     }
 
     public double getAverageProbability() {
@@ -75,6 +61,11 @@ public class FileMatchMetaData {
     public void setModel(final String model) {
         this.model = model;
     }
+    
+    @Override
+    public String toString() {
+        return this.directory + "." + this.fileName;
+    }    
 }
 
 

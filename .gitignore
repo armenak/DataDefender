@@ -21,3 +21,18 @@ sample_projects/file_discovery/files/1c0ee6a2-a86b-4fd7-9942-e20cb64de58c.xls
 sample_projects/file_discovery/files/1fba4e10-f1a5-4c42-b1cc-f6bf22136f39.xls
 sample_projects/file_discovery/files/2e7a4ced-dd04-4977-9b3c-1581d091d311.xls
 sample_projects/file_discovery/files/8d6b912d-a5ee-467e-ba82-4440f3fe816f.xls
+
+# Ignore IntelliJ files.
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Ignore Eclipse files.
+.classpath
+.project
+.factorypath
+.checkstyle
+.fbExcludeFilterFile
+.apt_generated/
+.settings/
