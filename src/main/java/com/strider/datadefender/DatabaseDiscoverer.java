@@ -16,8 +16,6 @@
  *
  */
 
-
-
 package com.strider.datadefender;
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,9 +46,11 @@ import static java.lang.Double.parseDouble;
 import static java.util.regex.Pattern.compile;
 
 import org.apache.commons.collections.ListUtils;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
+
+import opennlp.tools.util.Span;
 
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
@@ -61,8 +61,6 @@ import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
-
-import opennlp.tools.util.Span;
 
 /**
  *
@@ -203,7 +201,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             Collections.sort(probabilityList, Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
 
-            int y = 0;
+            int y;
 
             if (data.getProbabilityList().size() >= 5) {
                 y = 5;
@@ -275,7 +273,7 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
 
-        MatchMetaData             specialCaseData      = null;
+        MatchMetaData             specialCaseData;
         final List<MatchMetaData> specialCaseDataList  = new ArrayList();
         boolean                   specialCase          = false;
         final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
@@ -348,14 +346,11 @@ public class DatabaseDiscoverer extends Discoverer {
                     LOG.debug("special case:" + specialCase);
                     if (specialCaseFunctions != null && specialCase) {
                         try {
-                            for (int i = 0; i < specialCaseFunctions.length; i++) {
+                            for (String specialCaseFunction : specialCaseFunctions) {
                                 if ((sentence != null) && !sentence.isEmpty()) {
                                     LOG.debug("sentence: " + sentence);
                                     LOG.debug("data: " + data);
-                                    specialCaseData = (MatchMetaData) callExtention(specialCaseFunctions[i],
-                                                                                    data,
-                                                                                    sentence);
-
+                                    specialCaseData = (MatchMetaData) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
                                         LOG.info("Adding new special case data: " + specialCaseData.toString());
                                         specialCaseDataList.add(specialCaseData);
@@ -370,7 +365,7 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
 
                     if ((sentence != null) &&!sentence.isEmpty()) {
-                        String processingValue = "";
+                        String processingValue;
 
                         if (data.getColumnType().equals("DATE")
                                 || data.getColumnType().equals("TIMESTAMP")
@@ -431,9 +426,9 @@ public class DatabaseDiscoverer extends Discoverer {
         if (!specialCaseDataList.isEmpty()) {
             LOG.info("Special case data is processed :" + specialCaseDataList.toString());
 
-            for (final MatchMetaData specialData : specialCaseDataList) {
+            specialCaseDataList.forEach((specialData) -> {
                 matches.add(specialData);
-            }
+            });
         }
 
         return matches;
