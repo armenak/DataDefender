@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2019, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -296,13 +296,13 @@ public class DatabaseDiscoverer extends Discoverer {
             final String tableName  = data.getTableName();
             final String columnName = data.getColumnName();
 
-            LOG.info(data.getPkeys().toString());
+            LOG.info("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
             if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
-            LOG.info(data.getFkeys().toString());
+            LOG.info("Foreign key(s) for table" + tableName + ": "+ data.getFkeys().toString() + "]");
             if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;

@@ -89,20 +89,4 @@ public class MetaDataTest {
             this.columnType = columnType;
         }
     }
-
-//  @Test
-//  public void testNoTables() throws DatabaseAnonymizerException, SQLException {
-//      when(mockConnection.getMetaData()).thenReturn(mockMetaData);
-//      when(mockMetaData.getTables(null, schema, null, new String[] {"TABLE"})).thenReturn(mockTableRS);
-//      
-//      final TestMetaData metaData = new TestMetaData(testProperties, null);
-//      final List<MatchMetaData> result = metaData.getMetaData();
-//      assertEquals(0, result.size());
-//      
-//      verify(mockTableRS, times(1)).next(); // should return false
-//      verify(mockTableRS, times(1)).close();
-//  }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

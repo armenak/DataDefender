@@ -253,16 +253,8 @@ public abstract class MetaData implements IMetaData {
         return rowNum;
     }
 
-//  @Override
-//  public List<MatchMetaData> getMetaData(final String columnType) {
-//      this.columnType = columnType;
-//      return getMetaData();
-//  }
     // protected methods that allow subclasses to customize behaviour
     protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
         return md.getTables(null, schema, null, new String[] { "TABLE" });
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

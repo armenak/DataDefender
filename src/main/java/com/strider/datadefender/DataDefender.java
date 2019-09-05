@@ -25,12 +25,8 @@ import java.text.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -306,42 +302,42 @@ public class DataDefender {
         return line;
     }
 
-    /**
-     * Returns the list of unparsed arguments as a list of table names by
-     * transforming the strings to lower case.
-     *
-     * This guarantees table names to be in lower case, so functions comparing
-     * can use contains() with a lower case name.
-     *
-     * If tables names are not supplied via command line, then will search the property file
-     * for space separated list of table names.
-     *
-     * @param tableNames
-     * @param appProperties application property file
-     * @param dbProperties database property file
-     * @return The list of table names
-     */
-    public static Set<String> getTableNames(final List<String> tableNames, final Properties dbProperties) {
-        List<String> tableNameList = new ArrayList<String>(Arrays.asList(new String[tableNames.size()]));
-
-        Collections.copy(tableNameList, tableNames);
-
-        if (tableNameList.isEmpty()) {
-            final String tableStr = dbProperties.getProperty("include-tables");
-
-            if (tableStr != null) {
-                tableNameList = Arrays.asList(tableStr.split(","));
-                LOG.debug("Adding tables from property file.");
-            }
-        }
-
-        
-        final Set<String> tables = tableNameList.stream()
-                                                .map(s -> s.toLowerCase(Locale.ENGLISH))
-                                                .collect(Collectors.toSet());
-
-        LOG.info("Tables: " + Arrays.toString(tables.toArray()));
-
-        return tables;
-    }
+//    /**
+//     * Returns the list of unparsed arguments as a list of table names by
+//     * transforming the strings to lower case.
+//     *
+//     * This guarantees table names to be in lower case, so functions comparing
+//     * can use contains() with a lower case name.
+//     *
+//     * If tables names are not supplied via command line, then will search the property file
+//     * for space separated list of table names.
+//     *
+//     * @param tableNames
+//     * @param appProperties application property file
+//     * @param dbProperties database property file
+//     * @return The list of table names
+//     */
+//    public static Set<String> getTableNames(final List<String> tableNames, final Properties dbProperties) {
+//        List<String> tableNameList = new ArrayList<String>(Arrays.asList(new String[tableNames.size()]));
+//
+//        Collections.copy(tableNameList, tableNames);
+//
+//        if (tableNameList.isEmpty()) {
+//            final String tableStr = dbProperties.getProperty("include-tables");
+//
+//            if (tableStr != null) {
+//                tableNameList = Arrays.asList(tableStr.split(","));
+//                LOG.debug("Adding tables from property file.");
+//            }
+//        }
+//
+//        
+//        final Set<String> tables = tableNameList.stream()
+//                                                .map(s -> s.toLowerCase(Locale.ENGLISH))
+//                                                .collect(Collectors.toSet());
+//
+//        LOG.info("Tables: " + Arrays.toString(tables.toArray()));
+//
+//        return tables;
+//    }
 }
