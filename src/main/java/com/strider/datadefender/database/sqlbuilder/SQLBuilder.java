@@ -59,8 +59,6 @@ public abstract class SQLBuilder implements ISQLBuilder {
 
         if (CommonUtils.isEmptyString(schema)) {
             prefixAndTableName = tableName;
-
-            return tableName;
         } else {
             prefixAndTableName = schema + "." + tableName;
         }
@@ -68,6 +66,3 @@ public abstract class SQLBuilder implements ISQLBuilder {
         return prefixAndTableName;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

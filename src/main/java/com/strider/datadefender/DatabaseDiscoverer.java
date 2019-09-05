@@ -302,7 +302,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 continue;
             }
             
-            LOG.info("Foreign key(s) for table" + tableName + ": "+ data.getFkeys().toString() + "]");
+            LOG.info("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
             if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
@@ -321,9 +321,12 @@ public class DatabaseDiscoverer extends Discoverer {
                     continue;
                 }
             }
-
+            
+            LOG.info("Table name: " + tableName);
             final String table = sqlBuilder.prefixSchema(tableName);
+            
             final int    limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
+            
             final String query = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + " FROM " + table
                                                                  + " WHERE " + columnName + " IS NOT NULL ",
                                                                  limit);
