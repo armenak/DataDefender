@@ -297,6 +297,7 @@ public class DatabaseDiscoverer extends Discoverer {
             final String columnName = data.getColumnName();
 
             LOG.info("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
+            
             if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;

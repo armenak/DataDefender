@@ -51,7 +51,7 @@ public abstract class SQLBuilder implements ISQLBuilder {
         log.debug("The final query is:[" + sql + "]");
         return sql.toString();
     }
-
+    
     @Override
     public String prefixSchema(final String tableName) {
         final String schema = databaseProperties.getProperty("schema");
