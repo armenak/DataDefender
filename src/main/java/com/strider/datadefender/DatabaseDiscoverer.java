@@ -175,8 +175,8 @@ public class DatabaseDiscoverer extends Discoverer {
             // Output
             LOG.info("Column                      : " + data.toString());
             LOG.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
-            LOG.info("Number of rows in the table: "  + rowCount);
-            LOG.info("Score                      : " + score.columnScore(rowCount));
+            LOG.info("Number of rows in the table : "  + rowCount);
+            LOG.info("Score                       : " + score.columnScore(rowCount));
             
             LOG.info("Model                       : " + data.getModel());
 
