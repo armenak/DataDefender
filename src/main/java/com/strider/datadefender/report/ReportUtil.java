@@ -33,6 +33,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import java.util.HashSet;
 
 /**
  *
@@ -42,13 +43,20 @@ public class ReportUtil {
     private static final Logger log = getLogger(ReportUtil.class);
 
     public static int rowCount(final IDBFactory factory, final String tableName, final int limit) {
+        log.info("Debug 3");
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        log.info("Debug 4");
         final String      table      = sqlBuilder.prefixSchema(tableName);
-
+        log.info("Debug 5. Table name is: " + table);
+        
+        if (limit > 0) {
+            log.info("Debug 6: number of rows: " + limit);
+            return limit;
+        } 
+        
         // Getting number of records in the table
         final String queryCount = "SELECT count(*) " + " FROM " + table;
-
-        log.debug("Executing query against database: " + queryCount);
+        log.info("Executing query against database: " + queryCount);
 
         int rowCount = 0;
 
@@ -65,11 +73,11 @@ public class ReportUtil {
 
     public static List<String> sampleData(final IDBFactory factory, final String tableName, final String columnName) {
         final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
-        final String      querySample = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + " FROM " + tableName
-                                                                        + " WHERE " + columnName + " IS NOT NULL",
+        final String      querySample = sqlBuilder.buildSelectWithLimit("SELECT distinct " + columnName + 
+                                                                        " FROM " + sqlBuilder.prefixSchema(tableName) +
+                                                                        " WHERE " + columnName + " IS NOT NULL",
                                                                         5);
-
-        log.debug("Executing query against database: " + querySample);
+        log.info("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();
 
@@ -82,7 +90,11 @@ public class ReportUtil {
             log.error(sqle.toString());
         }
 
-        return sampleDataList;
+        // Removing duplicates
+        List<String> sampleDataListWithoutDuplicates = 
+                new ArrayList<>(new HashSet<>(sampleDataList));
+        
+        return sampleDataListWithoutDuplicates;
     }
 }
 
