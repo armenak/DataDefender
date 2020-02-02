@@ -15,32 +15,21 @@
  *
  */
 
-
-
 package com.strider.datadefender.specialcase;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-
 import static org.apache.log4j.Logger.getLogger;
+
+import org.apache.commons.validator.EmailValidator;
 
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.validator.EmailValidator;
-import org.apache.commons.validator.EmailValidator;
 
 /**
  * @author Armenak Grigoryan
  */
 public class EmailDetector implements SpecialCase {
     private static final Logger LOG = getLogger(EmailDetector.class);
-    private static final String EMAIL_REGEX = "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
-    private static Pattern pattern;
-    private static Matcher matcher;
     
     public static FileMatchMetaData detectEmail(final FileMatchMetaData metaData, final String text) {
         String emailValue = "";
@@ -64,7 +53,7 @@ public class EmailDetector implements SpecialCase {
     
     /**
      * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
-     * @param sin
+     * @param email Email address
      * @return boolean true, if SIN is valid, otherwise false
      */
     private static boolean isValidEmail(final String email) {
