@@ -168,13 +168,9 @@ public class DatabaseDiscoverer extends Discoverer {
             // Row count
             if (YES.equals(calculate_score)) {
                 LOG.info("Counting number of rows ...");
-                int limit = Integer.valueOf(dataDiscoveryProperties.getProperty("limit"));
-                if (limit > 0) {
-                    rowCount = ReportUtil.rowCount(factory, data.getTableName());
-                } else {
-                    rowCount = limit;
-                }
-                
+                rowCount = ReportUtil.rowCount(factory, 
+                               data.getTableName(), 
+                               Integer.valueOf(dataDiscoveryProperties.getProperty("limit")));
             } else {
                 LOG.debug("Skipping table rowcount ...");
             }
@@ -289,11 +285,12 @@ public class DatabaseDiscoverer extends Discoverer {
         
         if (!CommonUtils.isEmptyString(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
-
+            LOG.info("List of special functions:" + extentionList);
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 specialCase = true;
             }
         }
+        LOG.info("Special case: " + specialCase);
 
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
@@ -302,14 +299,14 @@ public class DatabaseDiscoverer extends Discoverer {
             final String tableName  = data.getTableName();
             final String columnName = data.getColumnName();
 
-            LOG.info("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
+            LOG.debug("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
             
             if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
-            LOG.info("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
+            LOG.debug("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
             if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 LOG.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
@@ -353,7 +350,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
                     final String sentence = resultSet.getString(1);
                     LOG.debug(sentence);
-                    LOG.debug("special case:" + specialCase);
+                    LOG.info("special case:" + specialCase);
                     if (specialCaseFunctions != null && specialCase) {
                         try {
                             for (String specialCaseFunction : specialCaseFunctions) {
