@@ -1,5 +1,5 @@
 /**
- * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2020, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -22,8 +22,8 @@ import static org.apache.log4j.Logger.getLogger;
 
 import org.apache.commons.validator.EmailValidator;
 
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.database.metadata.MatchMetaData;
 
 /**
  * @author Armenak Grigoryan
@@ -31,21 +31,20 @@ import com.strider.datadefender.utils.CommonUtils;
 public class EmailDetector implements SpecialCase {
     private static final Logger LOG = getLogger(EmailDetector.class);
     
-    public static FileMatchMetaData detectEmail(final FileMatchMetaData metaData, final String text) {
+    public static MatchMetaData detectEmail(final MatchMetaData metaData, final String text) {
         String emailValue = "";
         
         if (!CommonUtils.isEmptyString(text)) {
             emailValue = text;
         }
 
-        LOG.info("Trying to find email in file " + metaData.getFileName() + " : " + emailValue);
         if (isValidEmail(emailValue)) {
                 LOG.info("Email detected: " + emailValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("email");
                 return metaData;
         } else {
-            LOG.info("Email " + emailValue + " is not valid" );
+            LOG.debug("Email " + emailValue + " is not valid" );
         }
 
         return null;

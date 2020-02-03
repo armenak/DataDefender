@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2020, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,8 +14,6 @@
  * Lesser General Public License for more details.
  *
  */
-
-
 
 package com.strider.datadefender.specialcase;
 
@@ -39,13 +37,13 @@ import com.strider.datadefender.utils.CommonUtils;
  * @author Armenak Grigoryan
  */
 public class PHIDetector implements SpecialCase {
-    private static final Logger log      = getLogger(PHIDetector.class);
+    private static final Logger LOG      = getLogger(PHIDetector.class);
     private static final String PHI_FILE = "phi.txt";
     private static List         phiList  = new ArrayList();
 
     static {
         try {
-            log.info("*** reading from " + PHI_FILE);
+            LOG.info("*** reading from " + PHI_FILE);
 
             try (BufferedReader br = new BufferedReader(new FileReader(PHI_FILE))) {
                 for (String line; (line = br.readLine()) != null; ) {
@@ -53,7 +51,7 @@ public class PHIDetector implements SpecialCase {
                 }
             }
         } catch (IOException ioe) {
-            log.error(ioe.toString());
+            LOG.error(ioe.toString());
         }
     }
 
@@ -67,7 +65,7 @@ public class PHIDetector implements SpecialCase {
         if (!CommonUtils.isEmptyString(text)
                 && ((data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))
                     && phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {
-            log.info("PHI detected: " + text);
+            LOG.debug("PHI detected: " + text);
             data.setModel("phi");
             data.setAverageProbability(100);
 
