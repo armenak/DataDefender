@@ -99,7 +99,7 @@ public class DatabaseDiscoverer extends Discoverer {
             final String className  = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
             final Method method     = Class.forName(className)
-                                           .getMethod(methodName, new Class[] { MatchMetaData.class, String.class });
+                                           .getDeclaredMethod(methodName, new Class[] { MatchMetaData.class, String.class });
             final SpecialCase         instance    = (SpecialCase) Class.forName(className).newInstance();
             final Map<String, Object> paramValues = new HashMap<>(2);
 
@@ -285,12 +285,11 @@ public class DatabaseDiscoverer extends Discoverer {
         
         if (!CommonUtils.isEmptyString(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
-            LOG.info("List of special functions:" + extentionList);
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 specialCase = true;
             }
         }
-        LOG.info("Special case: " + specialCase);
+        LOG.debug("Special case: " + specialCase);
 
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
