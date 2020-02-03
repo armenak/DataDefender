@@ -51,7 +51,7 @@ public class SinDetector implements SpecialCase {
             }
 
             if (bf.isValidSIN(sinValue)) {
-                LOG.debug("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
+                LOG.info("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
 
