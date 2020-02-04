@@ -287,7 +287,6 @@ public class DatabaseDiscoverer extends Discoverer {
                 specialCase = true;
             }
         }
-        LOG.debug("Special case: " + specialCase);
 
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
@@ -347,7 +346,6 @@ public class DatabaseDiscoverer extends Discoverer {
 
                     final String sentence = resultSet.getString(1);
                     LOG.debug(sentence);
-                    LOG.info("special case:" + specialCase);
                     if (specialCaseFunctions != null && specialCase) {
                         try {
                             for (String specialCaseFunction : specialCaseFunctions) {

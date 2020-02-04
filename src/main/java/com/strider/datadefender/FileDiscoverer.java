@@ -128,7 +128,6 @@ public class FileDiscoverer extends Discoverer {
             specialCaseFunctions = extentionList.split(",");
 
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
-                log.debug("special case:" + specialCase);
                 File              node;
                 Metadata          metadata;
                 
