@@ -156,14 +156,11 @@ public class DatabaseDiscoverer extends Discoverer {
         LOG.info("List of suspects:");
         LOG.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
 
-        LOG.info("Debug 1");
-        
         final Score score           = new Score();
         int         highRiskColumns = 0;
         int         rowCount        = 0;
 
         for (final MatchMetaData data : finalList) {
-            LOG.info("Debug 2");
 
             // Row count
             if (YES.equals(calculate_score)) {
