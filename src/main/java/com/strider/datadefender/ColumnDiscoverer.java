@@ -119,8 +119,6 @@ public class ColumnDiscoverer extends Discoverer {
             log.info("No suspects have been found. Please refine your criteria.");
         }
 
-        log.info("matches: " + uniqueMatches);
-
         return uniqueMatches;
     }
 }

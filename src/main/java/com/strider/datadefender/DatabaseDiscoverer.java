@@ -258,8 +258,6 @@ public class DatabaseDiscoverer extends Discoverer {
             LOG.info("Overall score: N/A");
         }
 
-        LOG.info("matches: " + matches.toString());
-
         return matches;
     }
 
