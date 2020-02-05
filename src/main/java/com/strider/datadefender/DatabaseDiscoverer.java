@@ -61,6 +61,8 @@ import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -197,11 +199,10 @@ public class DatabaseDiscoverer extends Discoverer {
             LOG.info("");            
 
             final List<Probability> probabilityList = data.getProbabilityList();
-
-            Collections.sort(probabilityList, Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
-
+            List<Probability> uniqueProbabilityList = probabilityList.stream().distinct().collect(Collectors.toList());
+            Collections.sort(uniqueProbabilityList, Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
+            
             int y;
-
             if (data.getProbabilityList().size() >= 5) {
                 y = 5;
             } else {
@@ -210,7 +211,6 @@ public class DatabaseDiscoverer extends Discoverer {
 
             for (int i = 0; i < y; i++) {
                 final Probability p = data.getProbabilityList().get(i);
-
                 LOG.info(p.getSentence() + ":" + p.getProbabilityValue());
             }
 
