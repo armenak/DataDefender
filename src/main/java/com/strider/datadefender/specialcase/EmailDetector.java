@@ -39,7 +39,7 @@ public class EmailDetector implements SpecialCase {
         }
 
         if (isValidEmail(emailValue)) {
-                LOG.info("Email detected: " + emailValue);
+                LOG.debug("Email detected: " + emailValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("email");
                 return metaData;
@@ -59,7 +59,7 @@ public class EmailDetector implements SpecialCase {
         
 	EmailValidator eValidator = EmailValidator.getInstance();
 	if(eValidator.isValid(email)){
-            LOG.info("*************** Email " + email + " is valid");
+            LOG.debug("*************** Email " + email + " is valid");
             return true;
 	}else{
             return false;

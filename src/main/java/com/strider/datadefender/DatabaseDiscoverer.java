@@ -310,7 +310,7 @@ public class DatabaseDiscoverer extends Discoverer {
             
             LOG.debug("Column type: [" + data.getColumnType() + "]");
             probabilityList = new ArrayList<>();
-            LOG.debug("Analyzing column [" + tableName + "].[" + columnName + "]");
+            LOG.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
             final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
 
@@ -322,7 +322,6 @@ public class DatabaseDiscoverer extends Discoverer {
                 }
             }
             
-            LOG.info("Table name: " + tableName);
             final String table = sqlBuilder.prefixSchema(tableName);
             
             final int    limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
@@ -354,7 +353,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                     LOG.debug("data: " + data);
                                     specialCaseData = (MatchMetaData) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
-                                        LOG.info("Adding new special case data: " + specialCaseData.toString());
+                                        LOG.debug("Adding new special case data: " + specialCaseData.toString());
                                         specialCaseDataList.add(specialCaseData);
                                     } else {
                                         LOG.debug("No special case data found");
