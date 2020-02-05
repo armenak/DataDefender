@@ -43,20 +43,16 @@ public class ReportUtil {
     private static final Logger log = getLogger(ReportUtil.class);
 
     public static int rowCount(final IDBFactory factory, final String tableName, final int limit) {
-        log.info("Debug 3");
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
-        log.info("Debug 4");
         final String      table      = sqlBuilder.prefixSchema(tableName);
-        log.info("Debug 5. Table name is: " + table);
         
         if (limit > 0) {
-            log.info("Debug 6: number of rows: " + limit);
             return limit;
         } 
         
         // Getting number of records in the table
         final String queryCount = "SELECT count(*) " + " FROM " + table;
-        log.info("Executing query against database: " + queryCount);
+        log.debug("Executing query against database: " + queryCount);
 
         int rowCount = 0;
 
