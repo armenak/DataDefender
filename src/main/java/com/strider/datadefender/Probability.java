@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2015, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2020, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,13 +16,14 @@
  *
  */
 
-
-
 package com.strider.datadefender;
 
+import java.util.Comparator;
+
 /**
- *
- * @author strider
+ * This class represents the probability of sentence in database column
+ * 
+ * @author Armenak Grigoryan
  */
 public class Probability {
     private final String sentence;
@@ -45,11 +46,8 @@ public class Probability {
      * @return comparator used for sorting
      */
 
-//  public static Comparator<Probability> compare() {
-//      return Comparator.comparing(Probability::getProbabilityValue)
-//              .thenComparing(Probability::getSentence);            
-//  }    
+  public static Comparator<Probability> compare() {
+      return Comparator.comparing(Probability::getSentence)
+              .thenComparing(Probability::getProbabilityValue);            
+  }    
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

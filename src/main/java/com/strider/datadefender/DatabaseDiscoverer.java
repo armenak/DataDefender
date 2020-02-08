@@ -166,12 +166,12 @@ public class DatabaseDiscoverer extends Discoverer {
 
             // Row count
             if (YES.equals(calculate_score)) {
-                LOG.info("Counting number of rows ...");
+                LOG.debug("Counting number of rows ...");
                 rowCount = ReportUtil.rowCount(factory, 
                                data.getTableName(), 
                                Integer.valueOf(dataDiscoveryProperties.getProperty("limit")));
             } else {
-                LOG.debug("Skipping table rowcount ...");
+                LOG.debug("Skipping counting number of rows ...");
             }
 
             // Getting 5 sample values
@@ -180,12 +180,11 @@ public class DatabaseDiscoverer extends Discoverer {
             LOG.info("Column                      : " + data.toString());
             LOG.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
             LOG.info("Model                       : " + data.getModel());
+            LOG.info("Number of rows in the table : " + rowCount);
 
             if (YES.equals(calculate_score)) {
-                LOG.info("Number of rows in the table : " + rowCount);
                 LOG.info("Score                       : " + score.columnScore(rowCount));
             } else {
-                LOG.info("Number of rows in the table : N/A");
                 LOG.info("Score                       : N/A");
             }
 
@@ -195,24 +194,6 @@ public class DatabaseDiscoverer extends Discoverer {
             sampleDataList.forEach((sampleData) -> {
                 LOG.info(sampleData);
             });
-
-            LOG.info("");            
-
-            final List<Probability> probabilityList = data.getProbabilityList();
-            List<Probability> uniqueProbabilityList = probabilityList.stream().distinct().collect(Collectors.toList());
-            Collections.sort(uniqueProbabilityList, Comparator.comparingDouble(Probability::getProbabilityValue).reversed());
-            
-            int y;
-            if (data.getProbabilityList().size() >= 5) {
-                y = 5;
-            } else {
-                y = data.getProbabilityList().size();
-            }
-
-            for (int i = 0; i < y; i++) {
-                final Probability p = data.getProbabilityList().get(i);
-                LOG.info(p.getSentence() + ":" + p.getProbabilityValue());
-            }
 
             LOG.info("");
 
@@ -350,8 +331,10 @@ public class DatabaseDiscoverer extends Discoverer {
                                     LOG.debug("data: " + data);
                                     specialCaseData = (MatchMetaData) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
-                                        LOG.debug("Adding new special case data: " + specialCaseData.toString());
-                                        specialCaseDataList.add(specialCaseData);
+                                        if (!specialCaseDataList.contains(specialCaseData)) {
+                                            LOG.debug("Adding new special case data: " + specialCaseData.toString());
+                                            specialCaseDataList.add(specialCaseData);
+                                        }
                                     } else {
                                         LOG.debug("No special case data found");
                                     }
@@ -361,7 +344,7 @@ public class DatabaseDiscoverer extends Discoverer {
                             LOG.error(e.toString());
                         }
                     }
-
+                    
                     if ((sentence != null) &&!sentence.isEmpty()) {
                         String processingValue;
 
@@ -422,7 +405,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Special processing
         if (!specialCaseDataList.isEmpty()) {
-            LOG.info("Special case data is processed :" + specialCaseDataList.toString());
+            LOG.debug("Special case data is processed :" + specialCaseDataList.toString());
 
             specialCaseDataList.forEach((specialData) -> {
                 matches.add(specialData);

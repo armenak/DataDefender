@@ -73,7 +73,7 @@ public class ReportUtil {
                                                                         " FROM " + sqlBuilder.prefixSchema(tableName) +
                                                                         " WHERE " + columnName + " IS NOT NULL",
                                                                         5);
-        log.info("Executing query against database: " + querySample);
+        log.debug("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();
 
