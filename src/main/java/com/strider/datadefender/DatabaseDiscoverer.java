@@ -156,7 +156,7 @@ public class DatabaseDiscoverer extends Discoverer {
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
         LOG.info("List of suspects:");
-        LOG.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
+        //LOG.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
 
         final Score score           = new Score();
         int         highRiskColumns = 0;
@@ -168,8 +168,7 @@ public class DatabaseDiscoverer extends Discoverer {
             if (YES.equals(calculate_score)) {
                 LOG.debug("Counting number of rows ...");
                 rowCount = ReportUtil.rowCount(factory, 
-                               data.getTableName(), 
-                               Integer.valueOf(dataDiscoveryProperties.getProperty("limit")));
+                               data.getTableName());
             } else {
                 LOG.debug("Skipping counting number of rows ...");
             }
