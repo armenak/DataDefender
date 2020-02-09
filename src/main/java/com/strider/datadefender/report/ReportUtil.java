@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2014-2017, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2020, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -42,13 +42,9 @@ import java.util.HashSet;
 public class ReportUtil {
     private static final Logger log = getLogger(ReportUtil.class);
 
-    public static int rowCount(final IDBFactory factory, final String tableName, final int limit) {
+    public static int rowCount(final IDBFactory factory, final String tableName) {
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
-        
-        if (limit > 0) {
-            return limit;
-        } 
         
         // Getting number of records in the table
         final String queryCount = "SELECT count(*) " + " FROM " + table;
@@ -93,6 +89,3 @@ public class ReportUtil {
         return sampleDataListWithoutDuplicates;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

@@ -70,14 +70,19 @@ public class Score {
     public String getScoreDefinition(final int score) {
         String scoreDefinition = "";
 
-        if (score == 1) {
-            scoreDefinition = "Low";
-        } else if (score == 2) {
-            scoreDefinition = "Medium";
-        } else if (score == 3) {
-            scoreDefinition = "High";
-        } else {
-            scoreDefinition = "Undefined";
+        switch (score) {
+            case 1:
+                scoreDefinition = "Low";
+                break;
+            case 2:
+                scoreDefinition = "Medium";
+                break;
+            case 3:
+                scoreDefinition = "High";
+                break;
+            default:
+                scoreDefinition = "Undefined";
+                break;
         }
 
         return scoreDefinition;
