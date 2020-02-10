@@ -76,7 +76,10 @@ public class ReportUtil {
         try (Statement stmt = factory.getConnection().createStatement();
             ResultSet resultSet = stmt.executeQuery(querySample);) {
             while (resultSet.next()) {
-                sampleDataList.add(resultSet.getString(1));
+                String tmp = resultSet.getString(1);
+                if (!"".equals(tmp)) {
+                    sampleDataList.add(tmp);
+                }
             }
         } catch (SQLException sqle) {
             log.error(sqle.toString());
