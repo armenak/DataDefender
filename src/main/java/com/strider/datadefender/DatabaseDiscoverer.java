@@ -61,8 +61,11 @@ import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
-import java.util.HashSet;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Clob;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -118,7 +121,7 @@ public class DatabaseDiscoverer extends Discoverer {
     @SuppressWarnings("unchecked")
     public List<MatchMetaData> discover(final IDBFactory factory, 
             final Properties dataDiscoveryProperties, String vendor)
-            throws ParseException, DatabaseDiscoveryException {
+            throws ParseException, DatabaseDiscoveryException, IOException {
         LOG.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -156,7 +159,6 @@ public class DatabaseDiscoverer extends Discoverer {
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
         LOG.info("List of suspects:");
-        //LOG.info(String.format("%20s %20s %20s %20s", "Table*", "Column*", "Probability*", "Model*"));
 
         final Score score           = new Score();
         int         highRiskColumns = 0;
@@ -243,7 +245,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                                            final Model model,
                                                            final double probabilityThreshold,
                                                            final String vendor)
-            throws ParseException, DatabaseDiscoveryException {
+            throws ParseException, DatabaseDiscoveryException, IOException {
         final IMetaData           metaData = factory.fetchMetaData();
         final List<MatchMetaData> map      = metaData.getMetaData(vendor);
 
@@ -312,6 +314,12 @@ public class DatabaseDiscoverer extends Discoverer {
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
                 while (resultSet.next()) {
+                    if (data.getColumnType().equals("BLOB")) {
+                        LOG.info(data.getColumnName() + " of type BLOB: " + resultSet.getBlob(1));
+                        continue;
+                    }
+
+                    
                     if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
                         continue;
                     }
@@ -320,7 +328,14 @@ public class DatabaseDiscoverer extends Discoverer {
                         continue;
                     }
 
-                    final String sentence = resultSet.getString(1);
+                    final String sentence;
+                    if (data.getColumnType().equals("CLOB")) {
+                        Clob clob = resultSet.getClob(1);
+                        InputStream is = clob.getAsciiStream();
+                        sentence = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+                    } else {
+                        sentence = resultSet.getString(1);
+                    }
                     LOG.debug(sentence);
                     if (specialCaseFunctions != null && specialCase) {
                         try {
