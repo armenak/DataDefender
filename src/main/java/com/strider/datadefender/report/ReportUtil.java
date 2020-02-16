@@ -32,8 +32,14 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.IDBFactory;
+import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Clob;
 import java.util.HashSet;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -63,22 +69,43 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDBFactory factory, final String tableName, final String columnName) {
+    public static List<String> sampleData(final IDBFactory factory, final MatchMetaData metaData) throws IOException {
         final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
-        final String      querySample = sqlBuilder.buildSelectWithLimit("SELECT distinct " + columnName + 
-                                                                        " FROM " + sqlBuilder.prefixSchema(tableName) +
-                                                                        " WHERE " + columnName + " IS NOT NULL",
-                                                                        5);
-        log.debug("Executing query against database: " + querySample);
+        String            querySample = "";
+        String            select      = "SELECT ";
+        
+        if (!metaData.getColumnType().equals("CLOB")) {
+            select = select + "DISTINCT ";
+        }
+        
+        querySample = sqlBuilder.buildSelectWithLimit(select + metaData.getColumnName() + 
+                                                          " FROM "  + sqlBuilder.prefixSchema(metaData.getTableName()) +
+                                                          " WHERE " + metaData.getColumnName() + " IS NOT NULL",
+                                                          5);     
+        log.info("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();
 
         try (Statement stmt = factory.getConnection().createStatement();
             ResultSet resultSet = stmt.executeQuery(querySample);) {
             while (resultSet.next()) {
-                String tmp = resultSet.getString(1);
+                String tmp;
+                //log.info("Sample table.column name :" + metaData.getTableName() + " " + metaData.getColumnName());
+                if (metaData.getColumnType().equals("CLOB")) {
+                    //log.info("Sample CLOB data");
+                    
+                    Clob clob = resultSet.getClob(1);
+                    InputStream is = clob.getAsciiStream();
+                    tmp = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+                    //log.info(tmp);
+                } else {
+                    //log.info("Sample non CLOB data");
+                    tmp = resultSet.getString(1);
+                }
+                
                 if (!"".equals(tmp)) {
                     sampleDataList.add(tmp);
+                    tmp = "";
                 }
             }
         } catch (SQLException sqle) {

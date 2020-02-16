@@ -38,6 +38,7 @@ import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
+import java.io.IOException;
 
 /**
  * @author Armenak Grigoryan
@@ -47,7 +48,7 @@ public class ColumnDiscoverer extends Discoverer {
 
     public List<MatchMetaData> discover(final IDBFactory factory, 
             final Properties columnProperties, String vendor)
-            throws DatabaseDiscoveryException {
+            throws DatabaseDiscoveryException, IOException {
         log.info("Column discovery in process");
 
         final IMetaData           metaData      = factory.fetchMetaData();
@@ -95,9 +96,7 @@ public class ColumnDiscoverer extends Discoverer {
                 final int rowCount = ReportUtil.rowCount(factory, entry.getTableName());
 
                 // Getting 5 sample values
-                final List<String> sampleDataList = ReportUtil.sampleData(factory,
-                                                                          entry.getTableName(),
-                                                                          entry.getColumnName());
+                final List<String> sampleDataList = ReportUtil.sampleData(factory,entry);
 
                 // Output
                 log.info("Column                     : " + entry);

@@ -176,7 +176,7 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             // Getting 5 sample values
-            final List<String> sampleDataList = ReportUtil.sampleData(factory, data.getTableName(), data.getColumnName());
+            final List<String> sampleDataList = ReportUtil.sampleData(factory, data);
             // Output
             LOG.info("Column                      : " + data.toString());
             LOG.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
@@ -305,8 +305,9 @@ public class DatabaseDiscoverer extends Discoverer {
             
             final int    limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
             
-            final String query = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + " FROM " + table
-                                                                 + " WHERE " + columnName + " IS NOT NULL ",
+            final String query = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + 
+                                                                 " FROM "  + table      +
+                                                                 " WHERE " + columnName + " IS NOT NULL ",
                                                                  limit);
 
             LOG.debug("Executing query against database: " + query);
