@@ -315,12 +315,6 @@ public class DatabaseDiscoverer extends Discoverer {
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
                 while (resultSet.next()) {
-                    if (data.getColumnType().equals("BLOB")) {
-                        LOG.info(data.getColumnName() + " of type BLOB: " + resultSet.getBlob(1));
-                        continue;
-                    }
-
-                    
                     if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
                         continue;
                     }
@@ -329,7 +323,7 @@ public class DatabaseDiscoverer extends Discoverer {
                         continue;
                     }
 
-                    final String sentence;
+                    String sentence = "";
                     if (data.getColumnType().equals("CLOB")) {
                         Clob clob = resultSet.getClob(1);
                         InputStream is = clob.getAsciiStream();

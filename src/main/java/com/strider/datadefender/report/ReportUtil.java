@@ -34,6 +34,7 @@ import static org.apache.log4j.Logger.getLogger;
 import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
+import com.strider.datadefender.utils.CommonUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -82,7 +83,7 @@ public class ReportUtil {
                                                           " FROM "  + sqlBuilder.prefixSchema(metaData.getTableName()) +
                                                           " WHERE " + metaData.getColumnName() + " IS NOT NULL",
                                                           5);     
-        log.info("Executing query against database: " + querySample);
+        log.debug("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();
 
@@ -90,20 +91,15 @@ public class ReportUtil {
             ResultSet resultSet = stmt.executeQuery(querySample);) {
             while (resultSet.next()) {
                 String tmp;
-                //log.info("Sample table.column name :" + metaData.getTableName() + " " + metaData.getColumnName());
                 if (metaData.getColumnType().equals("CLOB")) {
-                    //log.info("Sample CLOB data");
-                    
                     Clob clob = resultSet.getClob(1);
                     InputStream is = clob.getAsciiStream();
                     tmp = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-                    //log.info(tmp);
                 } else {
-                    //log.info("Sample non CLOB data");
                     tmp = resultSet.getString(1);
                 }
                 
-                if (!"".equals(tmp)) {
+                if (!CommonUtils.isEmptyString(tmp) && !tmp.equals(" ")) {
                     sampleDataList.add(tmp);
                     tmp = "";
                 }
