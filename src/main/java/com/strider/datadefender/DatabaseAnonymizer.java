@@ -142,7 +142,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private PreparedStatement getSelectQueryStatement(final IDBFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
         
         final List<String> params = new LinkedList<>();
-        final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
+        // final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
+        final StringBuilder query = new StringBuilder("SELECT ");
         query.append(StringUtils.join(keys, ", ")).
               append(", ").
               append(StringUtils.join(columns, ", ")).
