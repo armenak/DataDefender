@@ -28,6 +28,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,9 +41,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
-import org.apache.commons.lang3.RandomStringUtils;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
@@ -336,11 +342,11 @@ public class CoreFunctions {
     
     public String randomLastName(final String file) throws IOException {        
         return randomStringFromFile(file);
-    }    
+    }
     
     public String randomMiddleName(final String file) throws IOException {        
         return randomStringFromFile(file);
-    }        
+    }
     
     public String randomEmail(final String domainName) {
         final StringBuilder email = new StringBuilder();
@@ -351,12 +357,22 @@ public class CoreFunctions {
     /**
      * Returns email address sent as a parameter 
      * @param email
+     * @deprecated use setValue
      * @return email address String 
      */
     public String staticEmail(final String email) {
         return email;
-    }        
-    
+    }
+
+    /**
+     * Returns the value passed as a parameter
+     * @param value
+     * @return value the value passed
+     */
+    public String setValue(final String value) {
+        return value;
+    }
+
     /**
      * Returns empty string 
      * @return "" 
@@ -404,7 +420,43 @@ public class CoreFunctions {
     public String randomState(final String file)  throws IOException {
         return randomStringFromFile(file);
     }        
-    
+
+    /**
+     * Generates a random date between the passed start and end dates, and using
+     * the passed format to parse the dates passed, and to format the return
+     * value.
+     *
+     * @param start
+     * @param end
+     * @param format
+     * @return 
+     */
+    public String randomDate(final String start, final String end, final String format) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+        LocalDate ds = LocalDate.parse(start, fmt);
+        LocalDate de = LocalDate.parse(end, fmt);
+        long day = RandomUtils.nextLong(ds.toEpochDay(), de.toEpochDay());
+        return LocalDate.ofEpochDay(day).format(fmt);
+    }
+
+    /**
+     * Generates a random date-time between the passed start and end dates, and
+     * using the passed format to parse the dates passed, and to format the
+     * return value.
+     *
+     * @param start
+     * @param end
+     * @param format
+     * @return
+     */
+    public String randomDateTime(final String start, final String end, final String format) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+        LocalDateTime ds = LocalDateTime.parse(start, fmt);
+        LocalDateTime de = LocalDateTime.parse(end, fmt);
+        long day = RandomUtils.nextLong(ds.toEpochSecond(ZoneOffset.UTC), de.toEpochSecond(ZoneOffset.UTC));
+        return LocalDateTime.ofEpochSecond(day, 0, ZoneOffset.UTC).format(fmt);
+    }
+
     /**
      * Generates a random string of 'num' words, with at most 'length'
      * characters (shortening the string if more characters appear in the
@@ -526,6 +578,32 @@ public class CoreFunctions {
         final int nSent = StringUtils.countMatches(text.replaceAll("\\.{2,}", "."), ".");
         return lipsumSentences(Math.max(1, nSent - 1), Math.max(1, nSent + 1));
     }
+
+    /**
+     * Replaces all occurrences of 'find' in the passed text with the passed
+     * 'replace' parameter.
+     *
+     * @param text
+     * @param find
+     * @param replacement
+     * @return the replaced string
+     */
+    public String replace(final String text, final String find, final String replacement) {
+        return text.replace(find, replacement);
+    }
+
+    /**
+     * Effectively calls String.replaceAll on the passed text, with the given
+     * regex pattern and replacement parameters.
+     *
+     * @param text
+     * @param regex
+     * @param replacement
+     * @return the replaced string
+     */
+    public String regexReplace(final String text, final String regex, final String replacement) {
+        return text.replaceAll(regex, replacement);
+    }
  
     public String randomPhoneNumber() {
         final Random rand = new Random();
@@ -563,5 +641,5 @@ public class CoreFunctions {
         final int randomNum = rand.nextInt((max - min) + 1) + min;
 
         return randomNum;
-    }   
+    }
 }

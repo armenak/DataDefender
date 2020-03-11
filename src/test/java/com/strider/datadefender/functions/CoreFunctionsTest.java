@@ -16,8 +16,6 @@
  *
  */
 
-
-
 package com.strider.datadefender.functions;
 
 import org.apache.log4j.Logger;
@@ -28,6 +26,9 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.utils.Xeger;
 import com.strider.datadefender.utils.XegerTest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import junit.framework.TestCase;
 
@@ -94,6 +95,84 @@ public class CoreFunctionsTest extends TestCase {
     }
 
     @Test
+    public void testRandomDate() throws Exception {
+        final CoreFunctions cf = new CoreFunctions();
+        final String dateStart = "1980-01-01";
+        final String dateEnd = "2020-01-01";
+        final String format = "yyyy-MM-dd";
+        log.debug("Testing random date generation between 1980-01-01 and 2020-01-01");
+
+        String rand = cf.randomDate(dateStart, dateEnd, format);
+        assertNotNull(rand);
+        assertFalse(rand.isBlank());
+        log.debug("Generated random date: " + rand);
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+        LocalDate ds = LocalDate.parse(dateStart, fmt);
+        LocalDate de = LocalDate.parse(dateEnd, fmt);
+        LocalDate rd = LocalDate.parse(rand, fmt);
+
+        assertNotNull(rd);
+        assertTrue(rd.isAfter(ds) || rd.isEqual(ds));
+        assertTrue(rd.isBefore(de) || rd.isEqual(de));
+    }
+
+    @Test
+    public void testRandomDateTime() throws Exception {
+        final CoreFunctions cf = new CoreFunctions();
+        final String dateStart = "1980-01-01 00:00:00";
+        final String dateEnd = "2020-01-01 12:22:33";
+        final String format = "yyyy-MM-dd HH:mm:ss";
+        log.debug("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
+
+        String rand = cf.randomDateTime(dateStart, dateEnd, format);
+        assertNotNull(rand);
+        assertFalse(rand.isBlank());
+        log.debug("Generated random date/time: " + rand);
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+        LocalDateTime ds = LocalDateTime.parse(dateStart, fmt);
+        LocalDateTime de = LocalDateTime.parse(dateEnd, fmt);
+        LocalDateTime rd = LocalDateTime.parse(rand, fmt);
+
+        assertNotNull(rd);
+        assertTrue(rd.isAfter(ds) || rd.isEqual(ds));
+        assertTrue(rd.isBefore(de) || rd.isEqual(de));
+    }
+
+    @Test
+    public void testReplace() throws Exception {
+        final CoreFunctions cf = new CoreFunctions();
+        final String test = "abc abc";
+        final String find = "c";
+        final String replace = "cd";
+
+        String res = cf.replace(test, find, replace);
+        assertNotNull(res);
+        assertEquals("abcd abcd", res);
+    }
+
+    @Test
+    public void testRegexReplace() throws Exception {
+        final CoreFunctions cf = new CoreFunctions();
+        final String test = "abc ac";
+        final String find = "b?(c)";
+        final String replace = "$1d";
+
+        String res = cf.regexReplace(test, find, replace);
+        assertNotNull(res);
+        assertEquals("acd acd", res);
+    }
+
+    @Test
+    public void testRandomPhoneNumber() throws Exception {
+        final CoreFunctions cf = new CoreFunctions();
+        final String phone = cf.randomPhoneNumber();
+        assertNotNull(phone);
+        assertTrue(phone.matches("\\d{3}-\\d{3}-\\d{4}"));
+    }
+
+    @Test
     public void testRandomPostalCode() throws Exception {
         final CoreFunctions cf         = new CoreFunctions();
         final String        postalCode = cf.randomPostalCode();
@@ -106,6 +185,3 @@ public class CoreFunctionsTest extends TestCase {
         super.setUp();
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
