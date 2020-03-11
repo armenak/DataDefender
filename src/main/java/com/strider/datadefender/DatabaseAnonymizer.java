@@ -57,6 +57,7 @@ import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
 import com.strider.datadefender.utils.RequirementUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -114,7 +115,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             append(StringUtils.join(updateColumns, " = ?, ")).
             append(" = ? WHERE ");
 
-        log.info("keys: " + keys.toString()); 
+        log.info("keys: " + keys.toString());
         int iteration = 0;
         final int collectionSize = keys.size();
         final StringBuilder whereStmtp = new StringBuilder();
@@ -163,6 +164,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             for (final Exclude exc : exclusions) {
                 final String eq = exc.getEqualsValue();
                 final String lk = exc.getLikeValue();
+                final List<String> in = exc.getInList();
                 final boolean nl = exc.isExcludeNulls();
                 final String col = exc.getName();
 
@@ -175,6 +177,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     if (lk != null && lk.length() != 0) {
                         query.append(separator).append('(').append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
+                        separator = AND;
+                    }
+                    if (CollectionUtils.isNotEmpty(in)) {
+                        String qs = "?" + StringUtils.repeat(", ?", in.size() - 1);
+                        query.append(separator).append('(').append(col).append(" NOT IN (")
+                            .append(qs).append(") OR ").append(col).append(" IS NULL)");
+                        params.addAll(in);
                         separator = AND;
                     }
                     if (nl) {
@@ -191,6 +200,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             for (final Exclude exc : exclusions) {
                 final String neq = exc.getNotEqualsValue();
                 final String nlk = exc.getNotLikeValue();
+                final List<String> nin = exc.getNotInList();
                 final String col = exc.getName();
                 
                 if (neq != null) {
@@ -201,7 +211,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     query.append(separator).append(col).append(" LIKE ?");
                     separator = " OR ";
                 }
-
+                if (CollectionUtils.isNotEmpty(nin)) {
+                    String qs = "?" + StringUtils.repeat(", ?", nin.size() - 1);
+                    query.append(separator).append(col).append(" IN (").append(qs).append(")");
+                    params.addAll(nin);
+                    separator = " OR ";
+                }
             }
         }
         if (query.indexOf(" WHERE (") != -1) {
@@ -737,8 +752,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("");
     }
     
-    public void anonymize(final IDBFactory dbFactory, final Properties anonymizerProperties) 
-    throws DatabaseAnonymizerException{
+    public void anonymize(
+        final IDBFactory dbFactory,
+        final Properties anonymizerProperties
+    ) throws DatabaseAnonymizerException {
 
         final int batchSize           = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));

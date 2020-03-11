@@ -20,9 +20,13 @@
 
 package com.strider.datadefender.requirement;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * JAXB class definition for &lt;Exclude&gt; tags defining exclusion rules.
@@ -108,6 +112,24 @@ public class Exclude {
      */
     @XmlAttribute(name = "Null")
     private String excludeNull;
+
+    /**
+     * Uses an "IN ()" clause to exclude a large range of values.
+     */
+    @XmlAttribute(name = "In")
+    private String excludeIn;
+
+    /**
+     * Uses an "NOT IN ()" clause to exclude a large range of values.
+     */
+    @XmlAttribute(name = "NotIn")
+    private String excludeNotIn;
+
+    /**
+     * Separator String for In attribute, defaults to ",".
+     */
+    @XmlAttribute(name = "InSeparator")
+    private String inSeparator = ",";
 
     // Setter methods
     public void setEquals(final String equals) {
@@ -195,6 +217,44 @@ public class Exclude {
      */
     public String getNotLikeValue() {
         return this.notLike;
+    }
+
+    public void setIn(final String in) {
+        excludeIn = in;
+    }
+
+    public String getInValue() {
+        return excludeIn;
+    }
+
+    public List<String> getInList() {
+        if (StringUtils.isBlank(excludeIn)) {
+            return ListUtils.EMPTY_LIST;
+        }
+        return Arrays.asList(StringUtils.splitByWholeSeparator(excludeIn, inSeparator));
+    }
+    
+    public void setNotIn(final String notIn) {
+        excludeNotIn = notIn;
+    }
+
+    public String getNotInValue() {
+        return excludeNotIn;
+    }
+
+    public List<String> getNotInList() {
+        if (StringUtils.isBlank(excludeNotIn)) {
+            return ListUtils.EMPTY_LIST;
+        }
+        return Arrays.asList(StringUtils.splitByWholeSeparator(excludeNotIn, inSeparator));
+    }
+
+    public void setInSeparator(final String separator) {
+        inSeparator = separator;
+    }
+
+    public String getInSeparatorValue() {
+        return inSeparator;
     }
 }
 
