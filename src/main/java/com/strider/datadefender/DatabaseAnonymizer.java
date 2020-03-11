@@ -525,13 +525,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * Returns the passed colValue truncated to the column's size in the table.
      * 
      * @param colValue
-     * @param index
+     * @param colName
      * @param columnMetaData
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
-    private String getTruncatedColumnValue(final String colValue, final int index, final List<MatchMetaData> columnMetaData) throws SQLException {
-        final MatchMetaData md = columnMetaData.get(index);
+    private String getTruncatedColumnValue(final String colValue, final String colName, final List<MatchMetaData> columnMetaData) throws SQLException {
+        final MatchMetaData md = columnMetaData.stream().filter((m) -> StringUtils.equalsIgnoreCase(colName, m.getColumnName())).findFirst().get();
         final int colSize = md.getColumnSize();
         final String type = md.getColumnType();
         if ("String".equals(type) && colValue.length() > colSize) {
@@ -610,7 +610,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     columnIndexes.get(columnName),
                     getTruncatedColumnValue(
                         (String) colValue,
-                        columnIndexes.get(columnName),
+                        columnName,
                         columnMetaData
                     )
                 );
