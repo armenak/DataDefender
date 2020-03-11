@@ -39,6 +39,7 @@ import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.RequirementUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Entry point for RDBMS data generator
@@ -106,6 +107,10 @@ public class DataGenerator implements IGenerator {
                     final StringBuilder sql = new StringBuilder(100);
 
                     sql.append("SELECT DISTINCT(").append(column.getName()).append(") FROM ").append(table.getName());
+                    if (!StringUtils.isBlank(table.getWhere())) {
+                        log.info("Where [" + table.getWhere() + "]");
+                        sql.append(" WHERE ").append(table.getWhere());
+                    }
 
                     try (Statement stmt = dbFactory.getConnection().createStatement();
                         ResultSet rs = stmt.executeQuery(sql.toString());

@@ -149,10 +149,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
               append(StringUtils.join(columns, ", ")).
               append(" FROM ").
               append(table.getName());
-        
+
+        if (!StringUtils.isBlank(table.getWhere())) {
+            query.append(" WHERE (").append(table.getWhere());
+        }
+
         final List<Exclude> exclusions = table.getExclusions();
         if (exclusions != null) {
             String separator = " WHERE (";
+            if (query.indexOf(" WHERE (") != -1) {
+                separator = ") AND (";
+            }
             for (final Exclude exc : exclusions) {
                 final String eq = exc.getEqualsValue();
                 final String lk = exc.getLikeValue();
@@ -196,10 +203,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 }
 
             }
-            
-            if (query.indexOf(" WHERE (") != -1) {
-                query.append(')');
-            }
+        }
+        if (query.indexOf(" WHERE (") != -1) {
+            query.append(')');
         }
 
         final PreparedStatement stmt = dbFactory.getConnection().prepareStatement(
@@ -635,8 +641,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
      */
     private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
     throws DatabaseAnonymizerException {
-        
-        log.info("Table [" + table.getName() + "]. Start ...");
+
+        if (StringUtils.isBlank(table.getWhere())) {
+            log.info("Table [" + table.getName() + "]. Start ...");
+        } else {
+            log.info("Table [" + table.getName() + ", where=" + table.getWhere() + "]. Start ...");
+        }
         
         final List<Column> tableColumns = table.getColumns();
         // colNames is looked up with contains, and iterated over.  Using LinkedHashSet means
@@ -734,11 +744,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
         String tablesStr              = anonymizerProperties.getProperty("tables");
         
-        Set<String> tables = null;
+        List<String> tables = null;
         if (tablesStr != null && !tablesStr.isEmpty()) {
-            tables = new HashSet<>(Arrays.asList(tablesStr.split(",")));
+            tables = Arrays.asList(tablesStr.split(","));
         }
-        
+
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(final Table reqTable : requirement.getTables()) {

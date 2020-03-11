@@ -39,6 +39,8 @@ import static java.util.Collections.unmodifiableList;
 public class Table {
     @XmlAttribute(name = "Name")
     private String        name;
+    @XmlAttribute(name = "Where")
+    private String        where;
     @XmlAttribute(name = "PKey")
     private String        pkey;
     @XmlElementWrapper(name = "Columns")
@@ -94,6 +96,18 @@ public class Table {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Getter method for Where attribute
+     * @return String
+     */
+    public String getWhere() {
+        return this.where;
+    }
+
+    public void setWhere(final String where) {
+        this.where = where;
     }
 
     /**
