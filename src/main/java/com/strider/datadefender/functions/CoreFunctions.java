@@ -435,7 +435,7 @@ public class CoreFunctions {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDate ds = LocalDate.parse(start, fmt);
         LocalDate de = LocalDate.parse(end, fmt);
-        long day = RandomUtils.nextLong(ds.toEpochDay(), de.toEpochDay());
+        long day = RandomUtils.nextLong(0, de.toEpochDay() - ds.toEpochDay()) + ds.toEpochDay();
         return LocalDate.ofEpochDay(day).format(fmt);
     }
 
@@ -453,7 +453,7 @@ public class CoreFunctions {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDateTime ds = LocalDateTime.parse(start, fmt);
         LocalDateTime de = LocalDateTime.parse(end, fmt);
-        long day = RandomUtils.nextLong(ds.toEpochSecond(ZoneOffset.UTC), de.toEpochSecond(ZoneOffset.UTC));
+        long day =RandomUtils.nextLong(0, de.toEpochSecond(ZoneOffset.UTC) - ds.toEpochSecond(ZoneOffset.UTC)) + ds.toEpochSecond(ZoneOffset.UTC);
         return LocalDateTime.ofEpochSecond(day, 0, ZoneOffset.UTC).format(fmt);
     }
 

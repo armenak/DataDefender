@@ -97,10 +97,10 @@ public class CoreFunctionsTest extends TestCase {
     @Test
     public void testRandomDate() throws Exception {
         final CoreFunctions cf = new CoreFunctions();
-        final String dateStart = "1980-01-01";
-        final String dateEnd = "2020-01-01";
+        final String dateStart = "1910-01-01";
+        final String dateEnd = "1930-01-01";
         final String format = "yyyy-MM-dd";
-        log.debug("Testing random date generation between 1980-01-01 and 2020-01-01");
+        log.debug("Testing random date generation between 1910-01-01 and 1930-01-01");
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
         assertNotNull(rand);
