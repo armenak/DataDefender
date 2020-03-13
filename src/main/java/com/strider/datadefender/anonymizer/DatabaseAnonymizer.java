@@ -45,7 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.functions.CoreFunctions;
 import com.strider.datadefender.functions.Utils;
@@ -59,6 +58,7 @@ import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
 import com.strider.datadefender.utils.RequirementUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -141,7 +141,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @param columns
      * @return 
      */
-    private PreparedStatement getSelectQueryStatement(final IDBFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
+    private PreparedStatement getSelectQueryStatement(final IDbFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
         
         final List<String> params = new LinkedList<>();
         // final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
@@ -655,7 +655,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(final int batchSize, final IDBFactory dbFactory, final Table table) 
+    private void anonymizeTable(final int batchSize, final IDbFactory dbFactory, final Table table) 
     throws DatabaseAnonymizerException {
 
         if (StringUtils.isBlank(table.getWhere())) {
@@ -754,7 +754,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
     }
     
     public void anonymize(
-        final IDBFactory dbFactory,
+        final IDbFactory dbFactory,
         final Properties anonymizerProperties
     ) throws DatabaseAnonymizerException {
 

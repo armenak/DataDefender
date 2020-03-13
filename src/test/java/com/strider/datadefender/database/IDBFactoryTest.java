@@ -33,7 +33,7 @@ public class IDBFactoryTest {
     public void testInvalidNoProps() throws DatabaseAnonymizerException, DataDefenderException {
         final Properties invalidProps = new Properties();
 
-        IDBFactory.get(invalidProps).getConnection();
+        IDbFactory.get(invalidProps).getConnection();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -41,7 +41,7 @@ public class IDBFactoryTest {
         final Properties invalidProps = new Properties();
 
         invalidProps.setProperty("vendor", "my-invalid-db");
-        IDBFactory.get(invalidProps).getConnection();
+        IDbFactory.get(invalidProps).getConnection();
     }
 }
 

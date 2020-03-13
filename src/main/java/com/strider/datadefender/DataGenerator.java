@@ -33,13 +33,13 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.RequirementUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  * Entry point for RDBMS data generator
@@ -77,7 +77,7 @@ public class DataGenerator implements IGenerator {
      * @throws com.strider.datadefender.database.DatabaseAnonymizerException
      */
     @Override
-    public void generate(final IDBFactory dbFactory, final Properties anonymizerProperties)
+    public void generate(final IDbFactory dbFactory, final Properties anonymizerProperties)
             throws DatabaseAnonymizerException {
 
         // Now we collect data from the requirement

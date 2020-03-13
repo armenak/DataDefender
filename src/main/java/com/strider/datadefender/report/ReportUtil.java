@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
@@ -41,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
 import java.util.HashSet;
 import org.apache.commons.io.IOUtils;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  *
@@ -49,7 +49,7 @@ import org.apache.commons.io.IOUtils;
 public class ReportUtil {
     private static final Logger log = getLogger(ReportUtil.class);
 
-    public static int rowCount(final IDBFactory factory, final String tableName) {
+    public static int rowCount(final IDbFactory factory, final String tableName) {
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
         
@@ -70,7 +70,7 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDBFactory factory, final MatchMetaData metaData) throws IOException {
+    public static List<String> sampleData(final IDbFactory factory, final MatchMetaData metaData) throws IOException {
         final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";

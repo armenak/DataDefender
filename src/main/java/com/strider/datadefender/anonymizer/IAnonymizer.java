@@ -21,7 +21,7 @@ package com.strider.datadefender.anonymizer;
 import java.util.Properties;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  * Defines contract for all Anonymizes
@@ -36,6 +36,6 @@ public interface IAnonymizer {
      * 
      * @throws com.strider.datadefender.database.DatabaseAnonymizerException
      */
-    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties)
+    void anonymize(IDbFactory dbFactory, Properties anonymizerProperties)
         throws DatabaseAnonymizerException;
 }

@@ -52,7 +52,6 @@ import static org.apache.log4j.Logger.getLogger;
 
 import opennlp.tools.util.Span;
 
-import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
@@ -66,6 +65,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
 import org.apache.commons.io.IOUtils;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  *
@@ -119,7 +119,7 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<MatchMetaData> discover(final IDBFactory factory, 
+    public List<MatchMetaData> discover(final IDbFactory factory, 
             final Properties dataDiscoveryProperties, String vendor)
             throws ParseException, DataDefenderException, IOException {
         LOG.info("Data discovery in process");
@@ -240,7 +240,7 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
 
-    private List<MatchMetaData> discoverAgainstSingleModel(final IDBFactory factory,
+    private List<MatchMetaData> discoverAgainstSingleModel(final IDbFactory factory,
                                                            final Properties dataDiscoveryProperties,
                                                            final Model model,
                                                            final double probabilityThreshold,

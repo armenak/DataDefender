@@ -31,7 +31,7 @@ import lombok.Getter;
 public class DbConfig {
 
     public enum Vendor {
-        H2, MYSQL, POSTGRESQL, SQLSERVER, ORACLE
+        H2, MYSQL, POSTGRESQL, SQLSERVER, ORACLE;
     }
 
     private static final Map<String, Vendor> VENDOR_MAP = Map.of(

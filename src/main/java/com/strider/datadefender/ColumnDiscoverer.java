@@ -32,13 +32,13 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.database.IDBFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MatchMetaData;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
 import java.io.IOException;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  * @author Armenak Grigoryan
@@ -46,7 +46,7 @@ import java.io.IOException;
 public class ColumnDiscoverer extends Discoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
-    public List<MatchMetaData> discover(final IDBFactory factory, 
+    public List<MatchMetaData> discover(final IDbFactory factory, 
             final Properties columnProperties, String vendor)
             throws DataDefenderException, IOException {
         log.info("Column discovery in process");

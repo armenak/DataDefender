@@ -23,7 +23,7 @@ package com.strider.datadefender;
 import java.util.Properties;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
  * Defines contract for all generators
@@ -37,7 +37,7 @@ public interface IGenerator {
      * @param anonymizerProperties Anonymizer property file name and path
      * @throws DatabaseAnonymizerException
      */
-    void generate(IDBFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException;
+    void generate(IDbFactory dbFactory, Properties anonymizerProperties) throws DatabaseAnonymizerException;
 }
 
 
