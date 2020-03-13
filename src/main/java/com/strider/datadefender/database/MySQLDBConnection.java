@@ -32,7 +32,7 @@ import com.strider.datadefender.DataDefenderException;
  * MySQL database connection
  * @author Armenak Grigoryan
  */
-public class MySQLDBConnection extends DBConnection {
+public class MySQLDBConnection extends DbConnection {
     public MySQLDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }

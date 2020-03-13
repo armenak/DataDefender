@@ -32,7 +32,7 @@ import com.strider.datadefender.DataDefenderException;
  *
  * @author sdi
  */
-public class MSSQLDBConnection extends DBConnection {
+public class MSSQLDBConnection extends DbConnection {
     public MSSQLDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }

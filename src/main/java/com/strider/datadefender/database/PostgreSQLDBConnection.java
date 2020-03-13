@@ -28,7 +28,7 @@ import com.strider.datadefender.DataDefenderException;
  * MySQL database connection
  * @author Armenak Grigoryan
  */
-public class PostgreSQLDBConnection extends DBConnection {
+public class PostgreSQLDBConnection extends DbConnection {
     public PostgreSQLDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }

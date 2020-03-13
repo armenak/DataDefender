@@ -73,7 +73,7 @@ public class DBConnectionTest {
     }
 
     // testing class
-    private class TestDBConnection extends DBConnection {
+    private class TestDBConnection extends DbConnection {
         public TestDBConnection(final Properties properties)
                 throws DatabaseAnonymizerException, DataDefenderException {
             super(properties);

@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,11 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database;
 
 import java.sql.Connection;
@@ -27,67 +22,47 @@ import java.util.Properties;
 
 import static java.lang.Class.forName;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig;
+import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.utils.ISupplierWithException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Abstract class handling database connections
  */
-public abstract class DBConnection implements IDBConnection {
-    private static final Logger log = getLogger(DBConnection.class);
-    protected final String      driver;
-    protected final String      vendor;
-    protected final String      url;
-    protected final String      userName;
-    protected final String      password;
+@Slf4j
+public abstract class DbConnection implements IDBConnection {
+
+    protected final DbConfig config;
 
     /**
-     * Default constructor, initializes connection properties and loads db class.
-     * @param properties
-     * @throws DatabaseAnonymizerException
+     * Default constructor, initializes config.
+     * @param config
      */
-    public DBConnection(final Properties properties) throws DataDefenderException {
-        driver   = properties.getProperty("driver");
-        vendor   = properties.getProperty("vendor");
-        url      = properties.getProperty("url");
-        userName = properties.getProperty("username");
-        password = properties.getProperty("password");
-        log.info("Database vendor: " + vendor);
-        log.info("Using driver " + driver);
-        log.info("Database URL: " + url);
-        log.info("Logging in using username " + userName);
-
-        try {
-            log.info("Loading database driver");
-            forName(driver);
-        } catch (ClassNotFoundException cnfe) {
-            log.error(cnfe.toString());
-
-            throw new DatabaseAnonymizerException(cnfe.toString(), cnfe);
-        }
+    public DbConnection(final DbConfig config) throws DataDefenderException {
+        this.config = config;
     }
 
     /**
-     * Handles the actual creating of the connection, but running the supplier function provided by subclasses.
+     * Handles the actual creating of the connection, by running the supplier
+     * method provided by subclasses.
+     *
      * @param supplier
      * @return
      * @throws DatabaseAnonymizerException
      */
-    protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier)
-            throws DataDefenderException {
+    protected Connection doConnect(
+        final ISupplierWithException<Connection, SQLException> supplier
+    ) throws DataDefenderException {
         Connection conn = null;
-
         try {
             log.info("Establishing database connection");
             conn = supplier.get();
             conn.setAutoCommit(false);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
-
             if (conn != null) {
                 try {
                     conn.close();
@@ -95,10 +70,8 @@ public abstract class DBConnection implements IDBConnection {
                     log.error(sql.toString());
                 }
             }
-
             throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
-        
         return conn;
     }
 }

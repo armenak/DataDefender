@@ -20,6 +20,7 @@ import com.strider.datadefender.anonymizer.IAnonymizer;
 
 import java.util.concurrent.Callable;
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
@@ -54,7 +55,8 @@ public class Anonymize implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         System.out.println("Starting anonymizer with requirements file: " + requirementsFile.getPath());
-        System.out.println("Datasource URL: " + dbConfig.getUrl() + ", vendor: " + dbConfig.getVendor());
+        System.out.println("Datasource URL: " + dbConfig.getUrl() + ", vendor: " + dbConfig.getVendor() + ", schema: " + dbConfig.getSchema());
+        System.out.println("Username: " + dbConfig.getUsername() + ", Password provided: " + (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
         System.out.println("Batch size: " + batchSize);
         System.out.println("");
         // final IAnonymizer anonymizer = new DatabaseAnonymizer();

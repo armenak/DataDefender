@@ -46,6 +46,12 @@ public class DbConfig {
 
     private Vendor vendor;
 
+    @Option(names = { "-u", "--user" }, description = "The username to connect with", required = false)
+    private String username;
+    
+    @Option(names = { "-p", "--password" }, description = "The password to connect with", required = false, arity = "0..1", interactive = true)
+    private String password;
+
     @Option(names = { "--schema" }, description = "The schema to connect to", required = false)
     private String schema;
 
