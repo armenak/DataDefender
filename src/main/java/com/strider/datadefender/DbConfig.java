@@ -15,9 +15,9 @@
  */
 package com.strider.datadefender;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine.Option;
 
 import lombok.Getter;
@@ -30,7 +30,21 @@ import lombok.Getter;
 @Getter
 public class DbConfig {
 
-    private String vendor;
+    public enum Vendor {
+        H2, MYSQL, POSTGRESQL, SQLSERVER, ORACLE
+    }
+
+    private static final Map<String, Vendor> VENDOR_MAP = Map.of(
+        "h2", Vendor.H2,
+        "mysql", Vendor.MYSQL,
+        "mariadb", Vendor.MYSQL,
+        "postgresql", Vendor.POSTGRESQL,
+        "sqlserver", Vendor.SQLSERVER,
+        "mssql", Vendor.SQLSERVER,
+        "oracle", Vendor.ORACLE
+    );
+
+    private Vendor vendor;
 
     @Option(names = { "--schema" }, description = "The schema to connect to", required = false)
     private String schema;
@@ -44,20 +58,14 @@ public class DbConfig {
         required = false
     )
     public void setVendor(String vendor) {
-        if (!StringUtils.equalsAny(vendor, "h2", "mysql", "mariadb", "postgresql", "mssql", "sqlserver", "oracle")) {
+        String c = vendor.trim().toLowerCase();
+        if (!VENDOR_MAP.containsKey(c)) {
             throw new IllegalArgumentException(
                 "Invalid value for option '--vendor': Valid options are: "
-                + "h2, mysql, postgresql, mssql and oracle."
+                + "h2, mysql, mariadb, postgresql, sqlserver and oracle."
             );
         }
-        if (vendor.equals("mariadb")) {
-            this.vendor = "mysql";
-        } else if (vendor.equals("mssql")) {
-            // old versions of DataDefender used the name 'mssql'
-            this.vendor = "sqlserver";
-        } else {
-            this.vendor = vendor;
-        }
+        this.vendor = VENDOR_MAP.get(c);
     }
 
     @Option(names = { "--url" }, description = "The datasource URL", required = true)
