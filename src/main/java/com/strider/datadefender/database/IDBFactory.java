@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,23 +12,14 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import java.util.Properties;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MSSQLMetaData;
 import com.strider.datadefender.database.metadata.MySQLMetaData;
@@ -46,13 +36,14 @@ import java.util.logging.Level;
 /**
  * Aggregate all the various db factories.
  * Will handle the 'pooling' of connections (currently only one).
- * All clients should close the connection by calling the close() method of the AutoCloseable interface.
+ * All clients should close the connection by calling the close() method of the
+ * AutoCloseable interface.
  * @author Akira Matsuo
  */
 public interface IDBFactory extends ICloseableNoException {
     ISQLBuilder createSQLBuilder();
 
-    IMetaData fetchMetaData() throws DatabaseDiscoveryException;
+    IMetaData fetchMetaData() throws DataDefenderException;
 
     Connection getConnection();
 
@@ -62,7 +53,7 @@ public interface IDBFactory extends ICloseableNoException {
      * @return db factory instance
      * @throws DatabaseAnonymizerException
      */
-    static IDBFactory get(final Properties dbProps) throws DatabaseDiscoveryException {
+    static IDBFactory get(final DbConfig config) throws DataDefenderException {
         String vendor = dbProps.getProperty("vendor");
 
         if ("mysql".equalsIgnoreCase(vendor) || "h2".equalsIgnoreCase(vendor)) {
@@ -71,11 +62,11 @@ public interface IDBFactory extends ICloseableNoException {
                     updateConnection = createConnection();
                 }
                 @Override
-                public Connection createConnection() throws DatabaseDiscoveryException {
+                public Connection createConnection() throws DataDefenderException {
                     return new MySQLDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
+                public IMetaData fetchMetaData() throws DataDefenderException {
                     return new MySQLMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -86,11 +77,11 @@ public interface IDBFactory extends ICloseableNoException {
         } else if ("mssql".equalsIgnoreCase(vendor)) {
             return new DBFactory(vendor) {
                 @Override
-                public Connection createConnection() throws DatabaseDiscoveryException {
+                public Connection createConnection() throws DataDefenderException {
                     return new MSSQLDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
+                public IMetaData fetchMetaData() throws DataDefenderException {
                     return new MSSQLMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -101,11 +92,11 @@ public interface IDBFactory extends ICloseableNoException {
         } else if ("oracle".equalsIgnoreCase(vendor)) {
             return new DBFactory(vendor) {
                 @Override
-                public Connection createConnection() throws DatabaseDiscoveryException {
+                public Connection createConnection() throws DataDefenderException {
                     return new OracleDBConnection(dbProps).connect();
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
+                public IMetaData fetchMetaData() throws DataDefenderException {
                     return new OracleMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -116,7 +107,7 @@ public interface IDBFactory extends ICloseableNoException {
         }  else if ("postgresql".equalsIgnoreCase(vendor)) {
             return new DBFactory(vendor) {
                 @Override
-                public Connection createConnection() throws DatabaseDiscoveryException {
+                public Connection createConnection() throws DataDefenderException {
                     Connection conn = new PostgreSQLDBConnection(dbProps).connect();
                     try {
                         conn.setAutoCommit(false);
@@ -126,7 +117,7 @@ public interface IDBFactory extends ICloseableNoException {
                     return conn;
                 }
                 @Override
-                public IMetaData fetchMetaData() throws DatabaseDiscoveryException {
+                public IMetaData fetchMetaData() throws DataDefenderException {
                     return new PostgreSQLMetaData(dbProps, getConnection());
                 }
                 @Override
@@ -150,7 +141,7 @@ public interface IDBFactory extends ICloseableNoException {
         protected Connection        updateConnection;
         private final String        vendor;
 
-        DBFactory(String vendorName) throws DatabaseDiscoveryException {
+        DBFactory(String vendorName) throws DataDefenderException {
             log.info("Connecting to database");
             connection       = createConnection();
             updateConnection = connection;
@@ -170,7 +161,7 @@ public interface IDBFactory extends ICloseableNoException {
             }
         }
 
-        public abstract Connection createConnection() throws DatabaseDiscoveryException;
+        public abstract Connection createConnection() throws DataDefenderException;
 
         @Override
         public Connection getConnection() {

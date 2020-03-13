@@ -46,7 +46,7 @@ public class PropertyCheck {
     private static final String   PROPERTY                 = "Property ";
 
     @SuppressWarnings("unchecked")
-    public static List check(final String utiity, final char option) throws DatabaseDiscoveryException {
+    public static List check(final String utiity, final char option) throws DataDefenderException {
         final List errors = new ArrayList<>();
 
         if ("file-discovery".equals(utiity)) {
@@ -93,7 +93,7 @@ public class PropertyCheck {
     }
 
     @SuppressWarnings("unchecked")
-    public static List checkDtabaseProperties(String dbPropertiesFile) throws DatabaseDiscoveryException {
+    public static List checkDtabaseProperties(String dbPropertiesFile) throws DataDefenderException {
         final List<String> errors       = new ArrayList<>();
         final Properties   dbProperties = loadProperties(dbPropertiesFile);
 

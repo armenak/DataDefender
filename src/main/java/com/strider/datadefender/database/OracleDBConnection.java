@@ -22,7 +22,7 @@ package com.strider.datadefender.database;
 
 import java.util.Properties;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * Oracle database connection.
@@ -31,7 +31,7 @@ import com.strider.datadefender.DatabaseDiscoveryException;
  * @author Armenak Grigoryan
  */
 public class OracleDBConnection extends MySQLDBConnection {
-    public OracleDBConnection(final Properties properties) throws DatabaseDiscoveryException {
+    public OracleDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }
 }

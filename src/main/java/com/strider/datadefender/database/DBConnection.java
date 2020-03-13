@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.utils.ISupplierWithException;
 
 /**
@@ -50,7 +50,7 @@ public abstract class DBConnection implements IDBConnection {
      * @param properties
      * @throws DatabaseAnonymizerException
      */
-    public DBConnection(final Properties properties) throws DatabaseDiscoveryException {
+    public DBConnection(final Properties properties) throws DataDefenderException {
         driver   = properties.getProperty("driver");
         vendor   = properties.getProperty("vendor");
         url      = properties.getProperty("url");
@@ -78,7 +78,7 @@ public abstract class DBConnection implements IDBConnection {
      * @throws DatabaseAnonymizerException
      */
     protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier)
-            throws DatabaseDiscoveryException {
+            throws DataDefenderException {
         Connection conn = null;
 
         try {

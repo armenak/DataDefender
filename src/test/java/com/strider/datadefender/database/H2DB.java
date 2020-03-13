@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 
 import static org.junit.Assert.assertEquals;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.utils.IConsumerWithException;
 
 /**
@@ -92,7 +92,7 @@ public abstract class H2DB {
     }
 
     @BeforeClass
-    public static void setUpDB() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
+    public static void setUpDB() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
         factory = IDBFactory.get(h2Props);
         con     = factory.getConnection();
 

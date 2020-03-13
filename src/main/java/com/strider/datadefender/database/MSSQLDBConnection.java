@@ -26,14 +26,14 @@ import java.util.Properties;
 
 import static java.sql.DriverManager.getConnection;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  *
  * @author sdi
  */
 public class MSSQLDBConnection extends DBConnection {
-    public MSSQLDBConnection(final Properties properties) throws DatabaseDiscoveryException {
+    public MSSQLDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }
 
@@ -43,7 +43,7 @@ public class MSSQLDBConnection extends DBConnection {
      * @throws DatabaseAnonymizerException
      */
     @Override
-    public Connection connect() throws DatabaseDiscoveryException {
+    public Connection connect() throws DataDefenderException {
         return doConnect(() -> getConnection(this.getURL()));
     }
 

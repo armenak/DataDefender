@@ -121,7 +121,7 @@ public class DatabaseDiscoverer extends Discoverer {
     @SuppressWarnings("unchecked")
     public List<MatchMetaData> discover(final IDBFactory factory, 
             final Properties dataDiscoveryProperties, String vendor)
-            throws ParseException, DatabaseDiscoveryException, IOException {
+            throws ParseException, DataDefenderException, IOException {
         LOG.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -245,7 +245,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                                            final Model model,
                                                            final double probabilityThreshold,
                                                            final String vendor)
-            throws ParseException, DatabaseDiscoveryException, IOException {
+            throws ParseException, DataDefenderException, IOException {
         final IMetaData           metaData = factory.fetchMetaData();
         final List<MatchMetaData> map      = metaData.getMetaData(vendor);
 

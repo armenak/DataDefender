@@ -110,9 +110,9 @@ public abstract class Discoverer {    // implements IDiscoverer {
         return new Model(tokenizer, nameFinder, modelName);
     }
 
-    public void createRequirement(final String fileName) throws DatabaseDiscoveryException {
+    public void createRequirement(final String fileName) throws DataDefenderException {
         if ((matches == null) || matches.isEmpty()) {
-            throw new DatabaseDiscoveryException("No matches to create requirement from!");
+            throw new DataDefenderException("No matches to create requirement from!");
         }
 
         RequirementUtils.write(RequirementUtils.create(matches), fileName);

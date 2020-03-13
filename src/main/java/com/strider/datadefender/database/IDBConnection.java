@@ -21,14 +21,14 @@ package com.strider.datadefender.database;
 
 import java.sql.Connection;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * Interface for all classes implementing database connection
  * @author Armenak Grigoryan
  */
 public interface IDBConnection {
-    Connection connect() throws DatabaseDiscoveryException;
+    Connection connect() throws DataDefenderException;
 }
 
 

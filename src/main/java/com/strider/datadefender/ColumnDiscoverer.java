@@ -48,7 +48,7 @@ public class ColumnDiscoverer extends Discoverer {
 
     public List<MatchMetaData> discover(final IDBFactory factory, 
             final Properties columnProperties, String vendor)
-            throws DatabaseDiscoveryException, IOException {
+            throws DataDefenderException, IOException {
         log.info("Column discovery in process");
 
         final IMetaData           metaData      = factory.fetchMetaData();

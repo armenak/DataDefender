@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 
 import static org.mockito.Mockito.*;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * Using mock to test Connection.
@@ -56,7 +56,7 @@ public class DBConnectionTest {
     private Connection mockConnection;
 
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
+    public void testConnect() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
 
         assertEquals(mockConnection, testDB.connect());
@@ -66,7 +66,7 @@ public class DBConnectionTest {
     }
 
     @Test
-    public void testCtor() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+    public void testCtor() throws DatabaseAnonymizerException, DataDefenderException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
 
         testDB.runAsserts();
@@ -75,12 +75,12 @@ public class DBConnectionTest {
     // testing class
     private class TestDBConnection extends DBConnection {
         public TestDBConnection(final Properties properties)
-                throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+                throws DatabaseAnonymizerException, DataDefenderException {
             super(properties);
         }
 
         @Override
-        public Connection connect() throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+        public Connection connect() throws DatabaseAnonymizerException, DataDefenderException {
             return doConnect(
                 () -> {
                     this.runAsserts();

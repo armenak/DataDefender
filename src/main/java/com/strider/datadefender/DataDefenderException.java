@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,24 +12,23 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender;
 
 /**
- * 
- * Application-level exception
- * 
+ * Application-level exception.
+ *
+ * @author Armenak Grigoryan
  */
-public class DatabaseAnonymizerException extends Exception {
+public class DataDefenderException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
-    public DatabaseAnonymizerException(final String msg) {
+    public DataDefenderException(final String msg) {
         super(msg);
     }
 
-    public DatabaseAnonymizerException(final String msg, final Throwable t) {
+    public DataDefenderException(final String msg, final Throwable t) {
         super(msg, t);
     }
 }

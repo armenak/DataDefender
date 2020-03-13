@@ -20,6 +20,8 @@
 
 package com.strider.datadefender;
 
+import com.strider.datadefender.anonymizer.DatabaseAnonymizerException;
+
 /**
  * Defines contract for all discoverers
  * @author Armenak Grigoryan

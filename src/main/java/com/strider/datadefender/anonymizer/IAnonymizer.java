@@ -16,31 +16,26 @@
  *
  */
 
+package com.strider.datadefender.anonymizer;
 
+import java.util.Properties;
 
-package com.strider.datadefender;
-
-/**
- * Application-level exception
- *
- * @author Armenak Grigoryan
- */
+import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.IDBFactory;
 
 /**
- * Application-level exception
- * @author Armenak Grigoryan
+ * Defines contract for all Anonymizes
+ * @author strider
  */
-public class DatabaseDiscoveryException extends Exception {
-    private static final long serialVersionUID = 1L;
+public interface IAnonymizer {
 
-    public DatabaseDiscoveryException(final String msg) {
-        super(msg);
-    }
-
-    public DatabaseDiscoveryException(final String msg, final Throwable t) {
-        super(msg, t);
-    }
+    /**
+     * Anonymizes data.
+     * @param dbFactory
+     * @param anonymizerProperties
+     * 
+     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
+     */
+    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties)
+        throws DatabaseAnonymizerException;
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

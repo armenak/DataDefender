@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.DatabaseAnonymizerException;
+import com.strider.datadefender.anonymizer.DatabaseAnonymizerException;
 
 import junit.framework.TestCase;
 
@@ -54,7 +54,7 @@ public class UtilsTest extends TestCase {
 
     /**
      * Test of getClassName method, of class Utils.
-     * @throws com.strider.datadefender.DatabaseAnonymizerException
+     * @throws com.strider.datadefender.anonymizer.DatabaseAnonymizerException
      */
     @Test
     public void testGetClassName() throws DatabaseAnonymizerException {
@@ -69,7 +69,7 @@ public class UtilsTest extends TestCase {
 
     /**
      * Test of getMethodName method, of class Utils.
-     * @throws com.strider.datadefender.DatabaseAnonymizerException
+     * @throws com.strider.datadefender.anonymizer.DatabaseAnonymizerException
      */
     @Test
     public void testGetMethodName() throws DatabaseAnonymizerException {

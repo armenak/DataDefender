@@ -40,7 +40,7 @@ import static org.apache.log4j.Logger.getLogger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.utils.ISupplierWithException;
 
 /**
@@ -64,7 +64,7 @@ public class MSSQLDBConnectionTest {
     private Connection mockConnection;
 
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, DatabaseDiscoveryException, SQLException {
+    public void testConnect() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
         final TestMSSQLDBConnection testDB = new TestMSSQLDBConnection(testProps);
 
         assertEquals(mockConnection, testDB.connect());
@@ -74,7 +74,7 @@ public class MSSQLDBConnectionTest {
     // testing class
     private class TestMSSQLDBConnection extends MSSQLDBConnection {
         public TestMSSQLDBConnection(final Properties properties)
-                throws DatabaseAnonymizerException, DatabaseDiscoveryException {
+                throws DatabaseAnonymizerException, DataDefenderException {
             super(properties);
         }
 

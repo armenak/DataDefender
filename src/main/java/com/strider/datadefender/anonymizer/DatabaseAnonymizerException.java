@@ -16,26 +16,21 @@
  *
  */
 
-package com.strider.datadefender;
-
-import java.util.Properties;
-
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDBFactory;
+package com.strider.datadefender.anonymizer;
 
 /**
- * Defines contract for all Anonymizes
- * @author strider
+ * 
+ * Application-level exception
+ * 
  */
-public interface IAnonymizer {
+public class DatabaseAnonymizerException extends Exception {
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * Anonymizes data.
-     * @param dbFactory
-     * @param anonymizerProperties
-     * 
-     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
-     */
-    void anonymize(IDBFactory dbFactory, Properties anonymizerProperties)
-        throws DatabaseAnonymizerException;
+    public DatabaseAnonymizerException(final String msg) {
+        super(msg);
+    }
+
+    public DatabaseAnonymizerException(final String msg, final Throwable t) {
+        super(msg, t);
+    }
 }

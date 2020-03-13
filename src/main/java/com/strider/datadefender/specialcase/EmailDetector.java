@@ -51,18 +51,17 @@ public class EmailDetector implements SpecialCase {
     }    
     
     /**
-     * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
      * @param email Email address
-     * @return boolean true, if SIN is valid, otherwise false
+     * @return true if email is valid, otherwise false
      */
     private static boolean isValidEmail(final String email) {
-        
-	EmailValidator eValidator = EmailValidator.getInstance();
-	if(eValidator.isValid(email)){
+
+        EmailValidator eValidator = EmailValidator.getInstance();
+        if (eValidator.isValid(email)) {
             LOG.debug("*************** Email " + email + " is valid");
             return true;
-	}else{
+        } else {
             return false;
-	}        
-    }    
+        }
+    }
 }

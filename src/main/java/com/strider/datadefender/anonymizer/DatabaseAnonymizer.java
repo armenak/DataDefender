@@ -16,9 +16,10 @@
  *
  */
 
-package com.strider.datadefender;
+package com.strider.datadefender.anonymizer;
 
-import static org.apache.log4j.Logger.getLogger;
+import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DataDefenderException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -714,7 +715,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.debug("Closing open resources");
             
         } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | 
-                 IllegalArgumentException | InvocationTargetException | DatabaseDiscoveryException ex ) {
+                 IllegalArgumentException | InvocationTargetException | DataDefenderException ex ) {
             log.error(ex.toString());
             if (ex.getCause() != null) {
                 log.error(ex.getCause().toString());

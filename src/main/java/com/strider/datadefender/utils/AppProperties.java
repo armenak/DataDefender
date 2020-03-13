@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  *
@@ -40,7 +40,7 @@ import com.strider.datadefender.DatabaseDiscoveryException;
 public final class AppProperties {
     private static final Logger log = getLogger(AppProperties.class);
 
-    public static Properties loadProperties(final String fileName) throws DatabaseDiscoveryException {
+    public static Properties loadProperties(final String fileName) throws DataDefenderException {
         final Properties properties = new Properties();
 
         try (InputStreamReader in = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
@@ -48,7 +48,7 @@ public final class AppProperties {
 
             return properties;
         } catch (IOException e) {
-            throw new DatabaseDiscoveryException("ERROR: Unable to load " + fileName, e);
+            throw new DataDefenderException("ERROR: Unable to load " + fileName, e);
         }
     }
 

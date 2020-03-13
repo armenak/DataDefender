@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 import static com.strider.datadefender.utils.AppProperties.loadProperties;
 
@@ -34,13 +34,13 @@ import static com.strider.datadefender.utils.AppProperties.loadProperties;
  * @author Akira Matsuo
  */
 public class AppPropertiesTest {
-    @Test(expected = DatabaseDiscoveryException.class)
-    public void testLoadPropertiesNoFile() throws DatabaseDiscoveryException {
+    @Test(expected = DataDefenderException.class)
+    public void testLoadPropertiesNoFile() throws DataDefenderException {
         loadProperties("/do/not/exist.properties");
     }
 
     @Test
-    public void testLoadPropertiesValid() throws DatabaseDiscoveryException {
+    public void testLoadPropertiesValid() throws DataDefenderException {
         final String     path  = this.getClass().getClassLoader().getResource("AppPropertiesTest.properties").getPath();
         final Properties props = loadProperties(path);
 

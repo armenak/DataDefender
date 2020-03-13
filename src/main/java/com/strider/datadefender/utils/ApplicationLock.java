@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * Most of the code is copied from this page: http://www.rgagnon.com/javadetails/java-0288.html
@@ -50,17 +50,17 @@ public class ApplicationLock {
         this.appName = appName;
     }
 
-    private void closeLock() throws DatabaseDiscoveryException {
+    private void closeLock() throws DataDefenderException {
         try {
             lock.release();
         } catch (IOException e) {
-            throw new DatabaseDiscoveryException("Problem releasing file lock", e);
+            throw new DataDefenderException("Problem releasing file lock", e);
         }
 
         try {
             channel.close();
         } catch (IOException e) {
-            throw new DatabaseDiscoveryException("Problem closing channel", e);
+            throw new DataDefenderException("Problem closing channel", e);
         }
     }
 
@@ -73,9 +73,9 @@ public class ApplicationLock {
      * Otherwise returns false.
      *
      * @return boolean
-     * @throws com.strider.datadefender.DatabaseDiscoveryException
+     * @throws com.strider.datadefender.DataDefenderException
      */
-    public boolean isAppActive() throws DatabaseDiscoveryException {
+    public boolean isAppActive() throws DataDefenderException {
         try {
             file    = new File(System.getProperty("user.home"), appName + ".tmp");
             channel = new RandomAccessFile(file, "rw").getChannel();
@@ -108,7 +108,7 @@ public class ApplicationLock {
                                                 log.debug("Closing lock file");
                                                 closeLock();
                                                 deleteFile();
-                                            } catch (DatabaseDiscoveryException ae) {
+                                            } catch (DataDefenderException ae) {
                                                 log.error("Problem closing file lock");
                                             }
                                         }

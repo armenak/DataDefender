@@ -22,14 +22,14 @@ import java.util.Properties;
 import java.sql.Connection;
 import static java.sql.DriverManager.getConnection;
 
-import com.strider.datadefender.DatabaseDiscoveryException;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * MySQL database connection
  * @author Armenak Grigoryan
  */
 public class PostgreSQLDBConnection extends DBConnection {
-    public PostgreSQLDBConnection(final Properties properties) throws DatabaseDiscoveryException {
+    public PostgreSQLDBConnection(final Properties properties) throws DataDefenderException {
         super(properties);
     }
 
@@ -39,7 +39,7 @@ public class PostgreSQLDBConnection extends DBConnection {
      * @throws DatabaseAnonymizerException
      */
     @Override
-    public Connection connect() throws DatabaseDiscoveryException {
+    public Connection connect() throws DataDefenderException {
         return doConnect(() -> getConnection(this.url, this.userName, this.password));
     }
 }
