@@ -158,16 +158,16 @@ public interface IDbFactory extends ICloseableNoException {
     static IDbFactory get(final DbConfig config) throws DataDefenderException {
 
         if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.H2) {
-            DbFactory factory = getFactoryWith(config, MySqlDbConnection.class, MySQLMetaData.class, MySQLSQLBuilder.class);
+            DbFactory factory = getFactoryWith(config, DbConnection.class, MySQLMetaData.class, MySQLSQLBuilder.class);
             // create separate connection for updates
             factory.updateConnection = factory.createConnection();
             return factory;
         } else if (config.getVendor() == Vendor.SQLSERVER) {
             return getFactoryWith(config, MsSqlDbConnection.class, MSSQLMetaData.class, MSSQLSQLBuilder.class);
         } else if (config.getVendor() == Vendor.ORACLE) {
-            return getFactoryWith(config, OracleDBConnection.class, OracleMetaData.class, OracleSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, OracleMetaData.class, OracleSQLBuilder.class);
         } else if (config.getVendor() == Vendor.POSTGRESQL) {
-            return getFactoryWith(config, PostgreSQLDBConnection.class, PostgreSQLMetaData.class, PostgreSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, PostgreSQLMetaData.class, PostgreSQLBuilder.class);
         }
 
         throw new IllegalArgumentException("Database " + config.getVendor() + " is not supported");

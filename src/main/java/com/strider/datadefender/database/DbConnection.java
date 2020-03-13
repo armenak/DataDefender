@@ -15,20 +15,22 @@
  */
 package com.strider.datadefender.database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.utils.ISupplierWithException;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import static java.sql.DriverManager.getConnection;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Abstract class handling database connections
+ * Handles standard database connections with username/password provided.
  */
 @Slf4j
-public abstract class DbConnection implements IDbConnection {
+public class DbConnection implements IDbConnection {
 
     protected final DbConfig config;
 
@@ -68,5 +70,24 @@ public abstract class DbConnection implements IDbConnection {
             throw new DatabaseAnonymizerException(sqle.toString(), sqle);
         }
         return conn;
+    }
+
+    /**
+     * Default implementation calls DriverManager.getConnection with the
+     * provided jdbc url, username and password.
+     *
+     * @return Connection
+     * @throws DatabaseAnonymizerException
+     */
+    @Override
+    public Connection connect() throws DataDefenderException {
+        if (!StringUtils.isNoneBlank(config.getUsername(), config.getPassword())) {
+            return doConnect(() -> getConnection(
+                config.getUrl(),
+                config.getUsername(),
+                config.getPassword()
+            ));
+        }
+        return doConnect(() -> getConnection(config.getUrl()));
     }
 }
