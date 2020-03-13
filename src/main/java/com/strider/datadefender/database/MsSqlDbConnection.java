@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,32 +12,29 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database;
 
 import java.sql.Connection;
-
-import java.util.Properties;
-
 import static java.sql.DriverManager.getConnection;
 
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author sdi
  */
-public class MSSQLDBConnection extends DbConnection {
-    public MSSQLDBConnection(final Properties properties) throws DataDefenderException {
-        super(properties);
-    }
+public class MsSqlDbConnection extends DbConnection {
 
+    public MsSqlDbConnection(DbConfig config) throws DataDefenderException {
+        super(config);
+    }
+    
     /**
      * Establishes database connection
+     *
      * @return Connection
      * @throws DatabaseAnonymizerException
      */
@@ -48,17 +44,17 @@ public class MSSQLDBConnection extends DbConnection {
     }
 
     /**
-     * Get connection url.  Package-level for testing purposes.
+     * Get connection url.
      * @return String
      */
     protected String getURL() {
-        final StringBuilder sqlServerURL = new StringBuilder(this.url);
-
-        sqlServerURL.append(";user=").append(this.userName).append(";password=").append(this.password);
-
-        return sqlServerURL.toString();
+        StringBuilder sqlServerUrl = new StringBuilder(config.getUrl());
+        if (!StringUtils.isBlank(config.getUsername())) {
+            sqlServerUrl.append(";user=").append(config.getUsername());
+        }
+        if (!StringUtils.isBlank(config.getPassword())) {
+            sqlServerUrl.append(";password=").append(config.getPassword());
+        }
+        return sqlServerUrl.toString();
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

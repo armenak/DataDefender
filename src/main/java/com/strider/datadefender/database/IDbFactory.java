@@ -163,7 +163,7 @@ public interface IDbFactory extends ICloseableNoException {
             factory.updateConnection = factory.createConnection();
             return factory;
         } else if (config.getVendor() == Vendor.SQLSERVER) {
-            return getFactoryWith(config, MSSQLDBConnection.class, MSSQLMetaData.class, MSSQLSQLBuilder.class);
+            return getFactoryWith(config, MsSqlDbConnection.class, MSSQLMetaData.class, MSSQLSQLBuilder.class);
         } else if (config.getVendor() == Vendor.ORACLE) {
             return getFactoryWith(config, OracleDBConnection.class, OracleMetaData.class, OracleSQLBuilder.class);
         } else if (config.getVendor() == Vendor.POSTGRESQL) {

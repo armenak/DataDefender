@@ -72,7 +72,7 @@ public class MSSQLDBConnectionTest {
     }
 
     // testing class
-    private class TestMSSQLDBConnection extends MSSQLDBConnection {
+    private class TestMSSQLDBConnection extends MsSqlDbConnection {
         public TestMSSQLDBConnection(final Properties properties)
                 throws DatabaseAnonymizerException, DataDefenderException {
             super(properties);
