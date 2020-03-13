@@ -48,13 +48,9 @@ import lombok.extern.slf4j.Slf4j;
 public interface IDbFactory extends ICloseableNoException {
 
     ISQLBuilder createSQLBuilder() throws DataDefenderException;
-
     IMetaData fetchMetaData() throws DataDefenderException;
-
     Connection getConnection();
-
     Connection getUpdateConnection();
-
     String getVendorName();
 
     /**
