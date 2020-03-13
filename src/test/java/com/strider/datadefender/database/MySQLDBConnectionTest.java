@@ -71,7 +71,7 @@ public class MySQLDBConnectionTest {
     }
 
     // testing class
-    private class TestMySQLDBConnection extends MySQLDBConnection {
+    private class TestMySQLDBConnection extends MySqlDbConnection {
         public TestMySQLDBConnection(final Properties properties)
                 throws DatabaseAnonymizerException, DataDefenderException {
             super(properties);

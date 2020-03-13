@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,40 +12,37 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database;
 
-import java.sql.Connection;
-
-import java.util.Properties;
-
-import static java.sql.DriverManager.getConnection;
-
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig;
+
+import java.sql.Connection;
+import static java.sql.DriverManager.getConnection;
 
 /**
  * MySQL database connection
  * @author Armenak Grigoryan
  */
-public class MySQLDBConnection extends DbConnection {
-    public MySQLDBConnection(final Properties properties) throws DataDefenderException {
-        super(properties);
+public class MySqlDbConnection extends DbConnection {
+
+    public MySqlDbConnection(DbConfig config) throws DataDefenderException {
+        super(config);
     }
 
     /**
      * Establishes database connection
+     *
      * @return Connection
      * @throws DatabaseAnonymizerException
      */
     @Override
     public Connection connect() throws DataDefenderException {
-        return doConnect(() -> getConnection(this.url, this.userName, this.password));
+        return doConnect(() -> getConnection(
+            config.getUrl(),
+            config.getUsername(),
+            config.getPassword()
+        ));
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
