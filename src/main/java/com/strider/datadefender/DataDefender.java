@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,9 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender;
 
 import java.util.concurrent.Callable;
@@ -47,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
     subcommands = {
         HelpCommand.class,
         //FileDiscoverer.class,
-        //DatabaseAnonymizer.class,
+        Anonymize.class,
         //DataGenerator.class,
         //ColumnDiscoverer.class
     }
