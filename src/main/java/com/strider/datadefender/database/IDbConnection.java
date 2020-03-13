@@ -12,11 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database;
 
 import java.sql.Connection;
@@ -25,11 +21,9 @@ import com.strider.datadefender.DataDefenderException;
 
 /**
  * Interface for all classes implementing database connection
+ *
  * @author Armenak Grigoryan
  */
-public interface IDBConnection {
+public interface IDbConnection {
     Connection connect() throws DataDefenderException;
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

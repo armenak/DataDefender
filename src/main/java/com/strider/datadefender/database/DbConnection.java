@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  * Abstract class handling database connections
  */
 @Slf4j
-public abstract class DbConnection implements IDBConnection {
+public abstract class DbConnection implements IDbConnection {
 
     protected final DbConfig config;
 

@@ -114,7 +114,7 @@ public interface IDbFactory extends ICloseableNoException {
      * @return
      * @throws DataDefenderException
      */
-    private static <D extends IDBConnection, M extends IMetaData, S extends ISQLBuilder> DbFactory getFactoryWith(
+    private static <D extends IDbConnection, M extends IMetaData, S extends ISQLBuilder> DbFactory getFactoryWith(
         final DbConfig config,
         Class<D> connection,
         Class<M> metaData,
