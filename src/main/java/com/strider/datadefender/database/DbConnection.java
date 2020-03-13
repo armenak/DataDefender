@@ -18,13 +18,8 @@ package com.strider.datadefender.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import java.util.Properties;
-
-import static java.lang.Class.forName;
-
 import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
-import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.utils.ISupplierWithException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +70,3 @@ public abstract class DbConnection implements IDBConnection {
         return conn;
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
