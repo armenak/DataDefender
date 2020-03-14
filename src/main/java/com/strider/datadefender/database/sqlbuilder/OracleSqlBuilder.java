@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2018, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,28 +14,35 @@
  * Lesser General Public License for more details.
  *
  */
-
 package com.strider.datadefender.database.sqlbuilder;
 
-import java.util.Properties;
+import com.strider.datadefender.DbConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
+ * Oracle implementation of the ISqlBuilder
+ *
  * @author Armenak Grigoryan
  */
-public class PostgreSQLBuilder extends SQLBuilder {
-    
-    public PostgreSQLBuilder(final Properties databaseProperties) {
-        super(databaseProperties);
+@Slf4j
+public class OracleSqlBuilder extends SqlBuilder {
+
+    public OracleSqlBuilder(DbConfig config) {
+        super(config);
     }
-    
+
+    /**
+     * Uses ROWNUM to limit the passed query.
+     *
+     * @param sqlString
+     * @param limit
+     * @return 
+     */
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
-        final StringBuilder sql = new StringBuilder(sqlString);
-
-        if (limit != 0) {
-            sql.append(" LIMIT ").append(limit);
-        }
-        
-        return sql.toString();
-    }    
+        String sql = "SELECT q.* FROM (" + StringUtils.stripEnd(sqlString.trim(), ";") + ") q WHERE ROWNUM <= " + limit;
+        log.debug("Query after adding limit: [{}]", sql);
+        return sql;
+    }
 }

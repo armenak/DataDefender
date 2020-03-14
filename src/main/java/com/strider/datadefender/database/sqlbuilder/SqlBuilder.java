@@ -12,57 +12,55 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database.sqlbuilder;
 
-import java.util.Properties;
+import com.strider.datadefender.DbConfig;
 
-import com.strider.datadefender.utils.CommonUtils;
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides 'default' implementation which can be overridden.
  * @author Akira Matsuo
  */
-public abstract class SQLBuilder implements ISQLBuilder {
-    
-    private static final Logger log = getLogger(SQLBuilder.class);    
+@Slf4j
+@RequiredArgsConstructor
+public abstract class SqlBuilder implements ISqlBuilder {
 
-    /* changed to public to allow use o databaseProperties object in MSSQLSQLBuilder.java */
-    public final Properties databaseProperties;
+    protected final DbConfig config;
 
-    protected SQLBuilder(final Properties databaseProperties) {
-        this.databaseProperties = databaseProperties;
-    }
-
+    /**
+     * Appends "LIMIT {n}" to the end of the query.
+     *
+     * @param sqlString
+     * @param limit
+     * @return
+     */
     @Override
     public String buildSelectWithLimit(final String sqlString, final int limit) {
         final StringBuilder sql = new StringBuilder(sqlString);
-
         if (limit != 0) {
             sql.append(" LIMIT ").append(limit);
         }
-
-        log.debug("The final query is:[" + sql + "]");
+        log.debug("Query after adding limit: [{}]", sql);
         return sql.toString();
     }
-    
+
+    /**
+     * Prepends the schema name followed by a single "." to the passed tableName
+     * if a schema name is configured.
+     *
+     * @param tableName
+     * @return
+     */
     @Override
     public String prefixSchema(final String tableName) {
-        final String schema = databaseProperties.getProperty("schema");
-        String       prefixAndTableName;
-
-        if (CommonUtils.isEmptyString(schema)) {
-            prefixAndTableName = tableName;
-        } else {
-            prefixAndTableName = schema + "." + tableName;
+        final String schema = config.getSchema();
+        if (StringUtils.isNotBlank(schema)) {
+            return schema + "." + tableName;
         }
-
-        return prefixAndTableName;
+        return tableName;
     }
 }

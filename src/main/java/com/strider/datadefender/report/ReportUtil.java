@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +40,7 @@ import java.sql.Clob;
 import java.util.HashSet;
 import org.apache.commons.io.IOUtils;
 import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
 
 /**
  *
@@ -50,7 +50,7 @@ public class ReportUtil {
     private static final Logger log = getLogger(ReportUtil.class);
 
     public static int rowCount(final IDbFactory factory, final String tableName) {
-        final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
         
         // Getting number of records in the table
@@ -71,7 +71,7 @@ public class ReportUtil {
     }
 
     public static List<String> sampleData(final IDbFactory factory, final TableMetaData metaData) throws IOException {
-        final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
+        final ISqlBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";
         

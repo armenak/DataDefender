@@ -12,22 +12,28 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database.sqlbuilder;
 
 /**
- * Interface for all classes implementing sql builder.
+ * Interface for all classes implementing SQL builder.
+ *
  * @author Armenak Grigoryan
  */
-public interface ISQLBuilder {
+public interface ISqlBuilder {
+
+    /**
+     * Add a limit to returned rows for the passed sqlString.
+     *
+     * @param sqlString
+     * @param limit
+     * @return
+     */
     String buildSelectWithLimit(String sqlString, int limit);
 
     /**
-     * Prefix table name with schema is present.
+     * Prefix table name with schema if present.
+     *
      * @param tableName
      * @return
      */

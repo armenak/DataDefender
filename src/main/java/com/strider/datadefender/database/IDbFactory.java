@@ -15,6 +15,7 @@
  */
 package com.strider.datadefender.database;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -24,13 +25,12 @@ import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MetaData;
 import com.strider.datadefender.database.metadata.MySqlMetaData;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.MSSQLSQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.MySQLSQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.OracleSQLBuilder;
-import com.strider.datadefender.database.sqlbuilder.PostgreSQLBuilder;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
+import com.strider.datadefender.database.sqlbuilder.SqlBuilder;
+import com.strider.datadefender.database.sqlbuilder.MsSqlBuilder;
+import com.strider.datadefender.database.sqlbuilder.OracleSqlBuilder;
 import com.strider.datadefender.utils.ICloseableNoException;
-import java.lang.reflect.InvocationTargetException;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 public interface IDbFactory extends ICloseableNoException {
 
-    ISQLBuilder createSQLBuilder() throws DataDefenderException;
+    ISqlBuilder createSQLBuilder() throws DataDefenderException;
     IMetaData fetchMetaData() throws DataDefenderException;
     Connection getConnection();
     Connection getUpdateConnection();
@@ -112,7 +112,7 @@ public interface IDbFactory extends ICloseableNoException {
      * @return
      * @throws DataDefenderException
      */
-    private static <D extends IDbConnection, M extends IMetaData, S extends ISQLBuilder> DbFactory getFactoryWith(
+    private static <D extends IDbConnection, M extends IMetaData, S extends ISqlBuilder> DbFactory getFactoryWith(
         final DbConfig config,
         Class<D> connection,
         Class<M> metaData,
@@ -136,7 +136,7 @@ public interface IDbFactory extends ICloseableNoException {
                 }
             }
             @Override
-            public ISQLBuilder createSQLBuilder() throws DataDefenderException {
+            public ISqlBuilder createSQLBuilder() throws DataDefenderException {
                 try {
                     return builder.getConstructor(DbConfig.class).newInstance(config);
                 } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
@@ -156,16 +156,16 @@ public interface IDbFactory extends ICloseableNoException {
     static IDbFactory get(final DbConfig config) throws DataDefenderException {
 
         if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.H2) {
-            DbFactory factory = getFactoryWith(config, DbConnection.class, MySqlMetaData.class, MySQLSQLBuilder.class);
+            DbFactory factory = getFactoryWith(config, DbConnection.class, MySqlMetaData.class, SqlBuilder.class);
             // create separate connection for updates
             factory.updateConnection = factory.createConnection();
             return factory;
         } else if (config.getVendor() == Vendor.SQLSERVER) {
-            return getFactoryWith(config, MsSqlDbConnection.class, MetaData.class, MSSQLSQLBuilder.class);
+            return getFactoryWith(config, MsSqlDbConnection.class, MetaData.class, MsSqlBuilder.class);
         } else if (config.getVendor() == Vendor.ORACLE) {
-            return getFactoryWith(config, DbConnection.class, MetaData.class, OracleSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, MetaData.class, OracleSqlBuilder.class);
         } else if (config.getVendor() == Vendor.POSTGRESQL) {
-            return getFactoryWith(config, DbConnection.class, MetaData.class, PostgreSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, MetaData.class, SqlBuilder.class);
         }
 
         throw new IllegalArgumentException("Database " + config.getVendor() + " is not supported");

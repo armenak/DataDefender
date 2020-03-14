@@ -54,7 +54,6 @@ import opennlp.tools.util.Span;
 
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
@@ -66,6 +65,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
 import org.apache.commons.io.IOUtils;
 import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
 
 /**
  *
@@ -267,7 +267,7 @@ public class DatabaseDiscoverer extends Discoverer {
             }
         }
 
-        final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+        final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
 
         for (final TableMetaData data : map) {
