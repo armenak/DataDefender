@@ -37,7 +37,7 @@ import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
-import com.strider.datadefender.utils.RequirementUtils;
+import com.strider.datadefender.requirement.file.Loader;
 import org.apache.commons.lang3.StringUtils;
 import com.strider.datadefender.database.IDbFactory;
 
@@ -81,7 +81,7 @@ public class DataGenerator implements IGenerator {
             throws DatabaseAnonymizerException {
 
         // Now we collect data from the requirement
-        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
+        final Requirement requirement = Loader.load(anonymizerProperties.getProperty("requirement"));
 
         // Iterate over the requirement and generate data sets
         log.info("Generating data for client " + requirement.getClient() + " Version " + requirement.getVersion());
@@ -91,7 +91,7 @@ public class DataGenerator implements IGenerator {
 
             // Iterate over columns to generate data set for each column
             for (final Column column : table.getColumns()) {
-                final Parameter fileParameter = RequirementUtils.getFileParameter(column.getParameters());
+                final Parameter fileParameter = Loader.getFileParameter(column.getParameters());
 
                 log.info("Column [" + column.getName() + "]. Start...");
 

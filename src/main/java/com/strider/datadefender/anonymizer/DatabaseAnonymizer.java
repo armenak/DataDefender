@@ -30,7 +30,7 @@ import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
-import com.strider.datadefender.utils.RequirementUtils;
+import com.strider.datadefender.requirement.file.Loader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

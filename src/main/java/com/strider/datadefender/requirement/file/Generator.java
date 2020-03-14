@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, Matthew Eaton, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,12 +12,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
-package com.strider.datadefender.utils;
+package com.strider.datadefender.requirement.file;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,12 +48,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Matthew Eaton
  */
 @Log4j2
-public class RequirementUtils {
-
-    /**
-     * Requirement file parameter name
-     */
-    public static final String PARAM_NAME_FILE = "file";
+public class Generator {
 
     // Hard-coded default params for now.
     private static void addDefaultParam(final String table, final Column column) {

@@ -50,7 +50,7 @@ public class Anonymize implements Callable<Integer> {
     @ParentCommand
     private DataDefender dataDefender;
 
-    @Option(names = { "-r", "--requirement-file" }, description = "Requirement XML file", required = true)
+    @Option(names = { "-r", "--requirement-file" }, paramLabel = "<requirementFile>", description = "Requirement XML file", required = true)
     private Requirement requirement;
 
     @Option(names = { "-b", "--batch-size" }, description = "Number of update queries to batch together", defaultValue = "1000")

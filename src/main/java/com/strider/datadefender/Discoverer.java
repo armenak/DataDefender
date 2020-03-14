@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.utils.RequirementUtils;
+import com.strider.datadefender.requirement.file.Loader;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -115,6 +115,6 @@ public abstract class Discoverer {    // implements IDiscoverer {
             throw new DataDefenderException("No matches to create requirement from!");
         }
 
-        RequirementUtils.write(RequirementUtils.create(matches), fileName);
+        Loader.write(Loader.create(matches), fileName);
     }
 }

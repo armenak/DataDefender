@@ -16,8 +16,11 @@
 package com.strider.datadefender;
 
 import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.utils.RequirementUtils;
+import com.strider.datadefender.requirement.file.Loader;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.concurrent.Callable;
+import javax.xml.bind.JAXBException;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -28,6 +31,11 @@ import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Option;
 
 import lombok.extern.log4j.Log4j2;
+import picocli.CommandLine.IParameterExceptionHandler;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.TypeConversionException;
+import picocli.CommandLine.UnmatchedArgumentException;
 
 /**
  * Entry point to Data Defender.
@@ -53,9 +61,34 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DataDefender implements Callable<Integer> {
 
+    public static class ShortErrorMessageHandler implements IParameterExceptionHandler {
+
+        public int handleParseException(ParameterException ex, String[] args) {
+            CommandLine cmd = ex.getCommandLine();
+            PrintWriter writer = cmd.getErr();
+
+            writer.println(ex.getMessage());
+            UnmatchedArgumentException.printSuggestions(ex, writer);
+            writer.print(cmd.getHelp().fullSynopsis()); // since 4.1
+
+            CommandSpec spec = cmd.getCommandSpec();
+            writer.printf("Try '%s --help' for more information.%n", spec.qualifiedName());
+
+            return cmd.getExitCodeExceptionMapper() != null
+                        ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
+                        : spec.exitCodeOnInvalidInput();
+        }
+    }
+
     public static class RequirementConverter implements CommandLine.ITypeConverter<Requirement> {
         public Requirement convert(String value) throws Exception {
-            return RequirementUtils.load(value);
+            try {
+                return Loader.load(value);
+            } catch (FileNotFoundException e) {
+                throw new TypeConversionException("Unable to load requirements file: File not found");
+            } catch (JAXBException e) {
+                throw new TypeConversionException("Unable to load requirements file: Error in XML");
+            }
         }
     }
 
@@ -76,8 +109,9 @@ public class DataDefender implements Callable<Integer> {
     }
 
     public static void main(String... args) throws Exception {
-        CommandLine cmd = new CommandLine(new DataDefender());
-        cmd.registerConverter(Requirement.class, new RequirementConverter());
+        CommandLine cmd = new CommandLine(new DataDefender())
+            .registerConverter(Requirement.class, new RequirementConverter())
+            .setParameterExceptionHandler(new ShortErrorMessageHandler());
         int exitCode = cmd.execute(args);
         System.exit(exitCode);
     }
