@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Parameter;
@@ -81,12 +81,12 @@ public class RequirementUtils {
      * @param matches
      * @return
      */
-    public static Requirement create(final List<MatchMetaData> matches) {
+    public static Requirement create(final List<TableMetaData> matches) {
         final Map<String, Table>        tables  = new HashMap<>();
         final Map<String, List<Column>> columns = new HashMap<>();
         Column                          column;
 
-        for (final MatchMetaData match : matches) {
+        for (final TableMetaData match : matches) {
             final StringBuilder sb = new StringBuilder();
 
             if ((match.getSchemaName() != null) &&!match.getSchemaName().equals("")) {

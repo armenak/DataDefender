@@ -23,7 +23,7 @@ import static org.apache.log4j.Logger.getLogger;
 import org.apache.commons.validator.EmailValidator;
 
 import com.strider.datadefender.utils.CommonUtils;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 
 /**
  * @author Armenak Grigoryan
@@ -31,7 +31,7 @@ import com.strider.datadefender.database.metadata.MatchMetaData;
 public class EmailDetector implements SpecialCase {
     private static final Logger LOG = getLogger(EmailDetector.class);
     
-    public static MatchMetaData detectEmail(final MatchMetaData metaData, final String text) {
+    public static TableMetaData detectEmail(final TableMetaData metaData, final String text) {
         String emailValue = "";
         
         if (!CommonUtils.isEmptyString(text)) {

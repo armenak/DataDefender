@@ -25,8 +25,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -130,9 +132,9 @@ public abstract class MetaData implements IMetaData {
      * @return
      */
     @Override
-    public List<MatchMetaData> getMetaData() throws SQLException {
+    public List<TableMetaData> getMetaData() throws SQLException {
 
-        final List<MatchMetaData> list = new ArrayList<>();
+        final List<TableMetaData> tables = new ArrayList<>();
 
         // Getting all tables name
         final DatabaseMetaData md = connection.getMetaData();
@@ -140,37 +142,18 @@ public abstract class MetaData implements IMetaData {
 
         try (ResultSet trs = getTableResultSet(md)) {
             while (trs.next()) {
-
                 final String tableName = trs.getString("TABLE_NAME");
                 log.info("Processing table [" + tableName + "]");
-
                 if (skipTable(tableName)) {
                     continue;
                 }
-
-                // Retrieve primary keys and foreign keys
-                final List<String> pKeys = getPrimaryKeysList(md, tableName);
-                final List<String> fKeys = getForeignKeysList(md, tableName);
-
-                try (ResultSet crs = getColumnResultSet(md, tableName)) {
-                    while (crs.next()) {
-                        String columnName = getColumnName(crs);
-                        log.debug("Adding column " + columnName + " of table " + tableName + " to the metadata object");
-                        list.add(new MatchMetaData(
-                            config.getSchema(),
-                            tableName,
-                            pKeys,
-                            fKeys,
-                            columnName,
-                            getColumnType(crs),
-                            getColumnSize(crs)
-                        ));
-                    }
-                }
+                TableMetaData table = new TableMetaData(config.getSchema(), tableName);
+                addColumnMetaData(md, table);
+                tables.add(table);
             }
         }
 
-        return list;
+        return tables;
     }
 
     /**
@@ -182,23 +165,22 @@ public abstract class MetaData implements IMetaData {
      * @throws SQLException
      */
     @Override
-    public List<MatchMetaData> getMetaDataFor(final ResultSet rs) throws SQLException {
-        final List<MatchMetaData> map  = new ArrayList<>();
-        final ResultSetMetaData   rsmd = rs.getMetaData();
-
+    public TableMetaData getMetaDataFor(final ResultSet rs) throws SQLException {
+        TableMetaData table = null;
+        final ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
-            map.add(new MatchMetaData(
-                rsmd.getSchemaName(i),
-                rsmd.getTableName(i),
-                null,
-                null,
+            if (table == null) {
+                table = new TableMetaData(rsmd.getSchemaName(i), rsmd.getTableName(i));
+            }
+            table.addColumn(
                 rsmd.getColumnName(i),
                 sqlTypeMap.getTypeFrom(rsmd.getColumnType(i)),
-                rsmd.getColumnDisplaySize(i))
+                rsmd.getColumnDisplaySize(i),
+                false,
+                null
             );
         }
-
-        return map;
+        return table;
     }
 
     /**
@@ -285,21 +267,22 @@ public abstract class MetaData implements IMetaData {
     }
 
     /**
-     * Returns a List of column names representing foreign keys for the passed
-     * DatabaseMetaData and tableName.
+     * Returns a Map of column names as keys, and values representing the
+     * foreign key relationship for the passed DatabaseMetaData and tableName.
      *
      * @param md
      * @param tableName
      * @return
      * @throws SQLException
      */
-    private List<String> getForeignKeysList(final DatabaseMetaData md, final String tableName) throws SQLException {
-        List<String> ret = new ArrayList<>();
+    private Map<String, String> getForeignKeysMap(final DatabaseMetaData md, final String tableName) throws SQLException {
+        Map<String, String> ret = new HashMap<>();
         try (ResultSet rs = getForeignKeysResultSet(md, tableName)) {
             while (rs.next()) {
-                String fkey = rs.getString("PKCOLUMN_NAME");
-                log.debug("Found foreign key: {}", fkey);
-                ret.add(fkey.toLowerCase(Locale.ENGLISH));
+                String col = rs.getString("FKCOLUMN_NAME").toLowerCase(Locale.ENGLISH);
+                String fkey = (rs.getString("PKTABLE_NAME") + "." + rs.getString("PKCOLUMN_NAME")).toLowerCase(Locale.ENGLISH);
+                log.debug("Found foreign key for column: {} referencing: {}", col, fkey);
+                ret.put(col, fkey);
             }
         }
         return ret;
@@ -350,5 +333,27 @@ public abstract class MetaData implements IMetaData {
      */
     protected ResultSet getPrimaryKeysResultSet(final DatabaseMetaData md, final String tableName) throws SQLException {
         return md.getPrimaryKeys(null, config.getSchema(), tableName);
+    }
+
+    /**
+     * Finds and adds columns to the passed TableMetaData.
+     * @param md
+     * @param table
+     * @throws SQLException
+     */
+    private void addColumnMetaData(DatabaseMetaData md, TableMetaData table) throws SQLException {
+
+        final List<String> pKeys = getPrimaryKeysList(md, table.getTableName());
+        final Map<String, String> fKeys = getForeignKeysMap(md, table.getTableName());
+
+        try (ResultSet crs = getColumnResultSet(md, table.getTableName())) {
+            while (crs.next()) {
+                String columnName = getColumnName(crs);
+                boolean isPrimaryKey = pKeys.contains(columnName.toLowerCase(Locale.ENGLISH));
+                String foreignKey = fKeys.get(columnName.toLowerCase(Locale.ENGLISH));
+                log.debug("Found metadata for column {} in table {}", columnName, table);
+                table.addColumn(columnName, getColumnType(crs), getColumnSize(crs), isPrimaryKey, foreignKey);
+            }
+        }
     }
 }

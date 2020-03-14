@@ -15,7 +15,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 
 /**
  *
@@ -27,8 +27,8 @@ public class PHIDetectorTest {
     private static List<String>  phiList;
     private static List<String>  phiPKeys;
     private static List<String>  phiFKeys;    
-    private static MatchMetaData metaData;
-    private static MatchMetaData expResult;
+    private static TableMetaData metaData;
+    private static TableMetaData expResult;
 
     /**
      * Test of isPHITerm method, of class PHIDetector.
@@ -43,14 +43,14 @@ public class PHIDetectorTest {
         probabilityList.add(new Probability(phi_with_argument, 1.00));
         expResult.setProbabilityList(probabilityList);
 
-        final MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_with_argument);
+        final TableMetaData result = PHIDetector.isPHITerm(metaData, phi_with_argument);
 
         assertEquals(result.getModel(), expResult.getModel());
     }
 
     @Test
     public void testIsPHITermWithoutArgument() {
-        final MatchMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
+        final TableMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
 
         assertNull(result);
     }
@@ -64,7 +64,7 @@ public class PHIDetectorTest {
         phiPKeys.add("id");
         phiFKeys = new ArrayList();
         phiFKeys.add("id2");        
-        metaData  = new MatchMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
-        expResult = new MatchMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
+        metaData  = new TableMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
+        expResult = new TableMetaData("test_schema", "test_table", phiPKeys, phiFKeys, "test_column", "VARCHAR", 10);
     }
 }

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.utils.CommonUtils;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDbFactory factory, final MatchMetaData metaData) throws IOException {
+    public static List<String> sampleData(final IDbFactory factory, final TableMetaData metaData) throws IOException {
         final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";

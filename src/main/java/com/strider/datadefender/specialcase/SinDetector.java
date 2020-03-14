@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
@@ -38,7 +38,7 @@ import com.strider.datadefender.utils.CommonUtils;
 public class SinDetector implements SpecialCase {
     private static final Logger LOG = getLogger(SinDetector.class);
 
-    public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
+    public static TableMetaData detectSin(final TableMetaData data, final String text) {
         String sinValue = text;
 
         if (!CommonUtils.isEmptyString(sinValue)

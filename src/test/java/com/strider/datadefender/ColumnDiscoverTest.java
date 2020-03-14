@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.strider.datadefender.database.H2DB;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.utils.RequirementUtils;
 

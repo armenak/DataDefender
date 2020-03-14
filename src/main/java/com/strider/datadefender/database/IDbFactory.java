@@ -22,10 +22,8 @@ import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.database.metadata.IMetaData;
-import com.strider.datadefender.database.metadata.MSSQLMetaData;
+import com.strider.datadefender.database.metadata.MetaData;
 import com.strider.datadefender.database.metadata.MySQLMetaData;
-import com.strider.datadefender.database.metadata.OracleMetaData;
-import com.strider.datadefender.database.metadata.PostgreSQLMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MSSQLSQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MySQLSQLBuilder;
@@ -163,11 +161,11 @@ public interface IDbFactory extends ICloseableNoException {
             factory.updateConnection = factory.createConnection();
             return factory;
         } else if (config.getVendor() == Vendor.SQLSERVER) {
-            return getFactoryWith(config, MsSqlDbConnection.class, MSSQLMetaData.class, MSSQLSQLBuilder.class);
+            return getFactoryWith(config, MsSqlDbConnection.class, MetaData.class, MSSQLSQLBuilder.class);
         } else if (config.getVendor() == Vendor.ORACLE) {
-            return getFactoryWith(config, DbConnection.class, OracleMetaData.class, OracleSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, MetaData.class, OracleSQLBuilder.class);
         } else if (config.getVendor() == Vendor.POSTGRESQL) {
-            return getFactoryWith(config, DbConnection.class, PostgreSQLMetaData.class, PostgreSQLBuilder.class);
+            return getFactoryWith(config, DbConnection.class, MetaData.class, PostgreSQLBuilder.class);
         }
 
         throw new IllegalArgumentException("Database " + config.getVendor() + " is not supported");

@@ -27,7 +27,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Parameter;
@@ -59,11 +59,11 @@ public class RequirementUtilsTest extends TestCase {
     @SuppressWarnings("serial")
     @Test
     public void testCreate() {    // just test the important stuff for now (as we aren't sure if the defaults make sense)
-        final List<MatchMetaData> list = new ArrayList<MatchMetaData>() {
+        final List<TableMetaData> list = new ArrayList<TableMetaData>() {
             {
-                add(new MatchMetaData(null, "t1", Arrays.asList("pk"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // one pk, 1 column
-                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // two pk, two columns
-                add(new MatchMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"),"col2", STRING_TYPE, 5));
+                add(new TableMetaData(null, "t1", Arrays.asList("pk"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // one pk, 1 column
+                add(new TableMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"), "col1", STRING_TYPE, 5));    // two pk, two columns
+                add(new TableMetaData(null, "t2", Arrays.asList("pk1", "pk2"), Arrays.asList("fk"),"col2", STRING_TYPE, 5));
             }
         };
         final Requirement req = RequirementUtils.create(list);

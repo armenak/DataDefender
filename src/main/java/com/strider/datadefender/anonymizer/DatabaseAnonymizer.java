@@ -45,7 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.functions.CoreFunctions;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.requirement.Column;
@@ -552,8 +552,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return
      * @throws SQLException
      */
-    private String getTruncatedColumnValue(final String colValue, final String colName, final List<MatchMetaData> columnMetaData) throws SQLException {
-        final MatchMetaData md = columnMetaData.stream().filter((m) -> StringUtils.equalsIgnoreCase(colName, m.getColumnName())).findFirst().get();
+    private String getTruncatedColumnValue(final String colValue, final String colName, final List<TableMetaData> columnMetaData) throws SQLException {
+        final TableMetaData md = columnMetaData.stream().filter((m) -> StringUtils.equalsIgnoreCase(colName, m.getColumnName())).findFirst().get();
         final int colSize = md.getColumnSize();
         final String type = md.getColumnType();
         if ("String".equals(type) && colValue.length() > colSize) {
@@ -587,7 +587,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Collection<String> keyNames,
         final Connection db,
         final ResultSet row,
-        final List<MatchMetaData> columnMetaData,
+        final List<TableMetaData> columnMetaData,
         final String vendor
     ) throws SQLException,
              NoSuchMethodException,
@@ -685,7 +685,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
-            final List<MatchMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
+            final List<TableMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
             
             final String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);

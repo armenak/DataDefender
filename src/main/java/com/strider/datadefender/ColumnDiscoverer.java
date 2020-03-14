@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.metadata.IMetaData;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
@@ -46,14 +46,14 @@ import com.strider.datadefender.database.IDbFactory;
 public class ColumnDiscoverer extends Discoverer {
     private static final Logger log = getLogger(ColumnDiscoverer.class);
 
-    public List<MatchMetaData> discover(final IDbFactory factory, 
+    public List<TableMetaData> discover(final IDbFactory factory, 
             final Properties columnProperties, String vendor)
             throws DataDefenderException, IOException {
         log.info("Column discovery in process");
 
         final IMetaData           metaData      = factory.fetchMetaData();
-        final List<MatchMetaData> map           = metaData.getMetaData(vendor);
-        List<MatchMetaData>       uniqueMatches = null;
+        final List<TableMetaData> map           = metaData.getMetaData(vendor);
+        List<TableMetaData>       uniqueMatches = null;
 
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -66,7 +66,7 @@ public class ColumnDiscoverer extends Discoverer {
             final Pattern p = compile(suspStr);
 
             // Find out if database columns contain any of of the "suspicious" fields
-            for (final MatchMetaData data : map) {
+            for (final TableMetaData data : map) {
                 final String tableName  = data.getTableName();
                 final String columnName = data.getColumnName();
 
@@ -86,11 +86,11 @@ public class ColumnDiscoverer extends Discoverer {
             log.info("-----------------");
             log.info("List of suspects:");
             log.info("-----------------");
-            uniqueMatches.sort(MatchMetaData.compare());
+            uniqueMatches.sort(TableMetaData.compare());
 
             final Score score = new Score();
 
-            for (final MatchMetaData entry : uniqueMatches) {
+            for (final TableMetaData entry : uniqueMatches) {
 
                 // Row count
                 final int rowCount = ReportUtil.rowCount(factory, entry.getTableName());

@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.utils.CommonUtils;
 
 /**
@@ -61,7 +61,7 @@ public class PHIDetector implements SpecialCase {
      * @param text
      * @return String
      */
-    public static MatchMetaData isPHITerm(final MatchMetaData data, final String text) {
+    public static TableMetaData isPHITerm(final TableMetaData data, final String text) {
         if (!CommonUtils.isEmptyString(text)
                 && ((data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))
                     && phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {

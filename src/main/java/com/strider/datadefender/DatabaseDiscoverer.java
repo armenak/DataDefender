@@ -53,7 +53,7 @@ import static org.apache.log4j.Logger.getLogger;
 import opennlp.tools.util.Span;
 
 import com.strider.datadefender.database.metadata.IMetaData;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.report.ReportUtil;
@@ -89,7 +89,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, final MatchMetaData data, final String text)
+    private Object callExtention(final String function, final TableMetaData data, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException {
         if ((function == null) || function.equals("")) {
@@ -104,7 +104,7 @@ public class DatabaseDiscoverer extends Discoverer {
             final String className  = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
             final Method method     = Class.forName(className)
-                                           .getDeclaredMethod(methodName, new Class[] { MatchMetaData.class, String.class });
+                                           .getDeclaredMethod(methodName, new Class[] { TableMetaData.class, String.class });
             final SpecialCase         instance    = (SpecialCase) Class.forName(className).newInstance();
             final Map<String, Object> paramValues = new HashMap<>(2);
 
@@ -119,7 +119,7 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<MatchMetaData> discover(final IDbFactory factory, 
+    public List<TableMetaData> discover(final IDbFactory factory, 
             final Properties dataDiscoveryProperties, String vendor)
             throws ParseException, DataDefenderException, IOException {
         LOG.info("Data discovery in process");
@@ -140,7 +140,7 @@ public class DatabaseDiscoverer extends Discoverer {
         modelList = models.split(",");
         LOG.info("Model list [" + Arrays.toString(modelList) + "]");
 
-        List<MatchMetaData> finalList = new ArrayList<>();
+        List<TableMetaData> finalList = new ArrayList<>();
 
         for (final String model : modelList) {
             LOG.info("********************************");
@@ -164,7 +164,7 @@ public class DatabaseDiscoverer extends Discoverer {
         int         highRiskColumns = 0;
         int         rowCount        = 0;
 
-        for (final MatchMetaData data : finalList) {
+        for (final TableMetaData data : finalList) {
 
             // Row count
             if (YES.equals(calculate_score)) {
@@ -240,20 +240,20 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
 
-    private List<MatchMetaData> discoverAgainstSingleModel(final IDbFactory factory,
+    private List<TableMetaData> discoverAgainstSingleModel(final IDbFactory factory,
                                                            final Properties dataDiscoveryProperties,
                                                            final Model model,
                                                            final double probabilityThreshold,
                                                            final String vendor)
             throws ParseException, DataDefenderException, IOException {
         final IMetaData           metaData = factory.fetchMetaData();
-        final List<MatchMetaData> map      = metaData.getMetaData(vendor);
+        final List<TableMetaData> map      = metaData.getMetaData(vendor);
 
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
 
-        MatchMetaData             specialCaseData;
-        final List<MatchMetaData> specialCaseDataList  = new ArrayList();
+        TableMetaData             specialCaseData;
+        final List<TableMetaData> specialCaseDataList  = new ArrayList();
         boolean                   specialCase          = false;
         final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
         String[]                  specialCaseFunctions = null;
@@ -270,7 +270,7 @@ public class DatabaseDiscoverer extends Discoverer {
         final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
 
-        for (final MatchMetaData data : map) {
+        for (final TableMetaData data : map) {
             final String tableName  = data.getTableName();
             final String columnName = data.getColumnName();
 
@@ -338,7 +338,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                 if ((sentence != null) && !sentence.isEmpty()) {
                                     LOG.debug("sentence: " + sentence);
                                     LOG.debug("data: " + data);
-                                    specialCaseData = (MatchMetaData) callExtention(specialCaseFunction, data, sentence);
+                                    specialCaseData = (TableMetaData) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
                                         if (!specialCaseDataList.contains(specialCaseData)) {
                                             LOG.debug("Adding new special case data: " + specialCaseData.toString());
