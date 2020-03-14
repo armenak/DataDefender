@@ -25,9 +25,9 @@ import java.sql.SQLException;
  * Overridden to omit using schema in some cases, as it's not supported.
  * @author armenak
  */
-public class MySQLMetaData extends MetaData {
+public class MySqlMetaData extends MetaData {
 
-    public MySQLMetaData(DbConfig config, Connection connection) {
+    public MySqlMetaData(DbConfig config, Connection connection) {
         super(config, connection);
     }
 

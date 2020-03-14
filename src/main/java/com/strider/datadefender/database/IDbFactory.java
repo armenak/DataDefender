@@ -23,7 +23,7 @@ import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.MetaData;
-import com.strider.datadefender.database.metadata.MySQLMetaData;
+import com.strider.datadefender.database.metadata.MySqlMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MSSQLSQLBuilder;
 import com.strider.datadefender.database.sqlbuilder.MySQLSQLBuilder;
@@ -156,7 +156,7 @@ public interface IDbFactory extends ICloseableNoException {
     static IDbFactory get(final DbConfig config) throws DataDefenderException {
 
         if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.H2) {
-            DbFactory factory = getFactoryWith(config, DbConnection.class, MySQLMetaData.class, MySQLSQLBuilder.class);
+            DbFactory factory = getFactoryWith(config, DbConnection.class, MySqlMetaData.class, MySQLSQLBuilder.class);
             // create separate connection for updates
             factory.updateConnection = factory.createConnection();
             return factory;
