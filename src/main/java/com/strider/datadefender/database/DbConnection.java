@@ -24,12 +24,12 @@ import java.sql.SQLException;
 import static java.sql.DriverManager.getConnection;
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Handles standard database connections with username/password provided.
  */
-@Slf4j
+@Log4j2
 public class DbConnection implements IDbConnection {
 
     protected final DbConfig config;

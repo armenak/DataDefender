@@ -18,7 +18,7 @@ package com.strider.datadefender.database.sqlbuilder;
 import com.strider.datadefender.DbConfig;
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * MS SQL Server implementation of the ISqlBuilder
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Armenak Grigoryan
  * @author Luis Marques
  */
-@Slf4j
+@Log4j2
 public class MsSqlBuilder extends SqlBuilder {
 
     public MsSqlBuilder(DbConfig config) {

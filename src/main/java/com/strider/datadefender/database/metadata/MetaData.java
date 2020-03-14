@@ -32,16 +32,16 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.common.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Class to hold common logic between different metadata implementations.
  *
  * @author Akira Matsuo
  */
-@Slf4j
+@Log4j2
 public abstract class MetaData implements IMetaData {
 
     private final Connection connection;
@@ -71,14 +71,14 @@ public abstract class MetaData implements IMetaData {
         );
         String debugLogFound = (isIncludePatterns) ? "Table {} included by pattern: {}" : "Table {} excluded by pattern: {}";
         String debugLogNotFound = (isIncludePatterns) ? "Table {} did not match any inclusion patterns" : "Table {} did not match any exclusion patterns";
-        log.atDebug()
-            .addArgument(tableName)
-            .addArgument(() -> patterns.stream().filter(
+
+        log.debug(
+            (ret) ? debugLogFound : debugLogNotFound,
+            () -> tableName,
+            () -> patterns.stream().filter(
                 (p) -> p.matcher(upperName).matches()
-            ).findFirst().map((p) -> p.pattern()).orElse(""))
-            .log(
-                (ret) ? debugLogFound : debugLogNotFound
-            );
+            ).findFirst().map((p) -> p.pattern()).orElse("")
+        );
         return ret;
     }
 
@@ -107,11 +107,11 @@ public abstract class MetaData implements IMetaData {
      */
     protected boolean skipTable(String tableName) {
         if (config.getVendor() == Vendor.POSTGRESQL && tableName.startsWith("sql_")) {
-            log.info("Skipping postgresql 'sql_' table: " + tableName);
+            log.info("Skipping postgresql 'sql_' table: {}", tableName);
             return true;
         }
         if (!includeTable(tableName)) {
-            log.info("Excluding table by inclusion/exclusion rules: " + tableName);
+            log.info("Excluding table by inclusion/exclusion rules: {}", tableName);
             return true;
         }
         String schemaTableName = tableName;
@@ -119,7 +119,7 @@ public abstract class MetaData implements IMetaData {
             schemaTableName = config.getSchema() + "." + tableName;
         }
         if (config.isSkipEmptyTables() && getNumberOfRows(schemaTableName) == 0) {
-            log.info("Skipping empty table " + tableName);
+            log.info("Skipping empty table: {}", tableName);
             return true;
         }
         return false;

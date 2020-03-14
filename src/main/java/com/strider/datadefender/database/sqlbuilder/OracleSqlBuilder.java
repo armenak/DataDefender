@@ -17,15 +17,16 @@
 package com.strider.datadefender.database.sqlbuilder;
 
 import com.strider.datadefender.DbConfig;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Oracle implementation of the ISqlBuilder
  *
  * @author Armenak Grigoryan
  */
-@Slf4j
+@Log4j2
 public class OracleSqlBuilder extends SqlBuilder {
 
     public OracleSqlBuilder(DbConfig config) {

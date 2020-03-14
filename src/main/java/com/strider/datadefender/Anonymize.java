@@ -17,15 +17,21 @@ package com.strider.datadefender;
 
 import com.strider.datadefender.anonymizer.DatabaseAnonymizer;
 import com.strider.datadefender.anonymizer.IAnonymizer;
+import com.strider.datadefender.requirement.Requirement;
 
 import java.util.concurrent.Callable;
-import java.io.File;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Anonymize picocli subcommand, configures and executes the database
@@ -38,13 +44,14 @@ import picocli.CommandLine.ParentCommand;
     version = "2.0",
     description = "Run anonymization utility"
 )
+@Log4j2
 public class Anonymize implements Callable<Integer> {
 
     @ParentCommand
     private DataDefender dataDefender;
 
-    @Option(names = { "-r", "--requirements-file" }, description = "Requirements XML file", required = true)
-    private File requirementsFile;
+    @Option(names = { "-r", "--requirement-file" }, description = "Requirement XML file", required = true)
+    private Requirement requirement;
 
     @Option(names = { "-b", "--batch-size" }, description = "Number of update queries to batch together", defaultValue = "1000")
     private Integer batchSize;
@@ -52,12 +59,16 @@ public class Anonymize implements Callable<Integer> {
     @ArgGroup(exclusive = false, multiplicity = "1")
     private DbConfig dbConfig;
 
+    @Parameters(paramLabel = "tables", description = "Limit anonymization to specified tables")
+    private List<String> tables;
+
     @Override
     public Integer call() throws Exception {
-        System.out.println("Starting anonymizer with requirements file: " + requirementsFile.getPath());
-        System.out.println("Datasource URL: " + dbConfig.getUrl() + ", vendor: " + dbConfig.getVendor() + ", schema: " + dbConfig.getSchema());
-        System.out.println("Username: " + dbConfig.getUsername() + ", Password provided: " + (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
-        System.out.println("Batch size: " + batchSize);
+        System.out.println("Starting anonymizer");
+        log.info("Datasource URL: {}, vendor: {}, schema: {}", dbConfig.getUrl(), dbConfig.getVendor(), dbConfig.getSchema());
+        log.info("Username: {}, Password provided: {}", dbConfig.getUsername(), (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
+        log.info("Batch size: {}", batchSize);
+        log.info("Limiting to tables: {}", CollectionUtils.isEmpty(tables) ? "<all tables selected>" : StringUtils.join(tables, ", "));
         System.out.println("");
         // final IAnonymizer anonymizer = new DatabaseAnonymizer();
         return 0;

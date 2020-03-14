@@ -17,15 +17,16 @@ package com.strider.datadefender.database.sqlbuilder;
 
 import com.strider.datadefender.DbConfig;
 
-import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.log4j.Log4j2;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Provides 'default' implementation which can be overridden.
  * @author Akira Matsuo
  */
-@Slf4j
+@Log4j2
 @RequiredArgsConstructor
 public abstract class SqlBuilder implements ISqlBuilder {
 

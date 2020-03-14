@@ -31,7 +31,7 @@ import com.strider.datadefender.database.sqlbuilder.MsSqlBuilder;
 import com.strider.datadefender.database.sqlbuilder.OracleSqlBuilder;
 import com.strider.datadefender.utils.ICloseableNoException;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Aggregate all the various db factories.
@@ -54,7 +54,7 @@ public interface IDbFactory extends ICloseableNoException {
     /**
      * Implements the common logic of getting/closing database connections
      */
-    @Slf4j
+    @Log4j2
     static abstract class DbFactory implements IDbFactory {
 
         private final Connection connection;

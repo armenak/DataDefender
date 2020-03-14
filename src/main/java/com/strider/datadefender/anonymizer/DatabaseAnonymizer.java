@@ -1,5 +1,4 @@
 /*
- * 
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,13 +12,25 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender.anonymizer;
 
 import com.strider.datadefender.DataDefenderException;
-import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig;
+import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.functions.CoreFunctions;
+import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.requirement.Column;
+import com.strider.datadefender.requirement.Exclude;
+import com.strider.datadefender.requirement.Key;
+import com.strider.datadefender.requirement.Parameter;
+import com.strider.datadefender.requirement.Requirement;
+import com.strider.datadefender.requirement.Table;
+import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.utils.LikeMatcher;
+import com.strider.datadefender.utils.RequirementUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,37 +48,22 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.functions.CoreFunctions;
-import com.strider.datadefender.functions.Utils;
-import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Exclude;
-import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Parameter;
-import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.Table;
-import com.strider.datadefender.utils.CommonUtils;
-import com.strider.datadefender.utils.LikeMatcher;
-import com.strider.datadefender.utils.RequirementUtils;
 import org.apache.commons.collections4.CollectionUtils;
-import com.strider.datadefender.database.IDbFactory;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Entry point for RDBMS data anonymizer
  * 
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class DatabaseAnonymizer implements IAnonymizer { 
     
-    private static final Logger log = getLogger(DatabaseAnonymizer.class);
     private static final String AND = " AND ";
     
     /**
@@ -655,7 +651,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * 
      * @param table 
      */
-    private void anonymizeTable(final int batchSize, final IDbFactory dbFactory, final Table table) 
+    private void anonymizeTable(final int batchSize, final IDbFactory dbFactory, final Table table)
     throws DatabaseAnonymizerException {
 
         if (StringUtils.isBlank(table.getWhere())) {
@@ -755,18 +751,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
     
     public void anonymize(
         final IDbFactory dbFactory,
-        final Properties anonymizerProperties
+        final DbConfig config,
+        final int batchSize,
+        final Requirement requirement,
+        List<String> tables
     ) throws DatabaseAnonymizerException {
-
-        final int batchSize           = Integer.parseInt(anonymizerProperties.getProperty("batch_size"));
-        final Requirement requirement = RequirementUtils.load(anonymizerProperties.getProperty("requirement"));
-        String tablesStr              = anonymizerProperties.getProperty("tables");
-        
-        List<String> tables = null;
-        if (tablesStr != null && !tablesStr.isEmpty()) {
-            tables = Arrays.asList(tablesStr.split(","));
-        }
-
         // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for(final Table reqTable : requirement.getTables()) {

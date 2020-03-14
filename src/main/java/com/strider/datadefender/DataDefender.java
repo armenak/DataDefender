@@ -15,6 +15,8 @@
  */
 package com.strider.datadefender;
 
+import com.strider.datadefender.requirement.Requirement;
+import com.strider.datadefender.utils.RequirementUtils;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.Level;
@@ -25,7 +27,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Option;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Entry point to Data Defender.
@@ -34,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
  * service.
  *
  */
-@Slf4j
 @Command(
     name = "datadefender",
     mixinStandardHelpOptions = true,
@@ -49,11 +50,23 @@ import lombok.extern.slf4j.Slf4j;
         //ColumnDiscoverer.class
     }
 )
+@Log4j2
 public class DataDefender implements Callable<Integer> {
+
+    public static class RequirementConverter implements CommandLine.ITypeConverter<Requirement> {
+        public Requirement convert(String value) throws Exception {
+            return RequirementUtils.load(value);
+        }
+    }
 
     @Option(names = "--debug", description = "enable debug logging")
     public void setDebug(boolean debug) {
         Configurator.setRootLevel(Level.DEBUG);
+    }
+
+    @Option(names = { "-v", "--verbose" }, description = "enable more verbose output")
+    public void setVerbose(boolean verbose) {
+        Configurator.setLevel("com.strider.datadefender", Level.INFO);
     }
 
     @Override
@@ -64,6 +77,7 @@ public class DataDefender implements Callable<Integer> {
 
     public static void main(String... args) throws Exception {
         CommandLine cmd = new CommandLine(new DataDefender());
+        cmd.registerConverter(Requirement.class, new RequirementConverter());
         int exitCode = cmd.execute(args);
         System.exit(exitCode);
     }

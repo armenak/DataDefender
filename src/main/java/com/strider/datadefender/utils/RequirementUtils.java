@@ -38,10 +38,6 @@ import javax.xml.bind.Unmarshaller;
 
 import static javax.xml.bind.JAXBContext.newInstance;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
@@ -50,12 +46,14 @@ import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Utility class to help handling requirement objects
  * @author Matthew Eaton
  */
+@Log4j2
 public class RequirementUtils {
-    private static final Logger log = getLogger(RequirementUtils.class);
 
     /**
      * Requirement file parameter name
