@@ -15,12 +15,19 @@
  */
 package com.strider.datadefender;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import picocli.CommandLine.Option;
 
 import lombok.Getter;
+import picocli.CommandLine.IParameterConsumer;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
 
 /**
  * Database configuration options for picocli.
@@ -54,6 +61,14 @@ public class DbConfig {
 
     @Option(names = { "--schema" }, description = "The schema to connect to", required = false)
     private String schema;
+
+    @Option(names = { "--skip-empty-tables-metadata" }, description = "Skips generating metadata for empty tables", required = false, defaultValue = "true")
+    private boolean skipEmptyTables;
+
+    @Option(names = { "--include-table-patterns-metadata" }, description = "List of regex patterns matching table names to include for metadata analysis", required = false)
+    private List<Pattern> includeTablePatterns;
+    @Option(names = { "--exclude-table-patterns-metadata" }, description = "List of regex patterns matching table names to exclude for metadata analysis", required = false)
+    private List<Pattern> excludeTablePatterns;
 
     private String url;
 

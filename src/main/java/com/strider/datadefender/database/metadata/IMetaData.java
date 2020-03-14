@@ -15,8 +15,6 @@
  */
 package com.strider.datadefender.database.metadata;
 
-import com.strider.datadefender.DbConfig.Vendor;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -28,6 +26,6 @@ import java.util.List;
  * @author armenak
  */
 public interface IMetaData {
-    List<MatchMetaData> getMetaData(Vendor vendor);
-    List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException;
+    List<MatchMetaData> getMetaData() throws SQLException;
+    List<MatchMetaData> getMetaDataFor(final ResultSet rs) throws SQLException;
 }

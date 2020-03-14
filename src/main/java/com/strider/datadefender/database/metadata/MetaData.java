@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,229 +12,215 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.database.metadata;
 
-import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.DbConfig;
+import com.strider.datadefender.DbConfig.Vendor;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.utils.SQLToJavaMapping;
 import java.util.Locale;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.common.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to hold common logic between different metadata implementations.
  *
  * @author Akira Matsuo
  */
+@Slf4j
 public abstract class MetaData implements IMetaData {
-    private static final Logger log = getLogger(MetaData.class);
-    private final Properties    databaseProperties;
-    private final Connection    connection;
-    protected String            schema;
-    protected String            columnType;
 
-    public MetaData(final Properties databaseProperties, final Connection connection) {
-        this.databaseProperties = databaseProperties;
-        this.schema             = databaseProperties.getProperty("schema");
-        this.connection         = connection;
+    private final Connection connection;
+    protected final DbConfig config;
+    protected String columnType;
+    protected SqlTypeToClass sqlTypeMap = new SqlTypeToClass();
+
+    public MetaData(final DbConfig config, final Connection connection) {
+        this.config = config;
+        this.connection = connection;
     }
 
-    private boolean containsCaseInsensitive(String s, Set<String> set) {
-        return set.stream().anyMatch(x -> x.equalsIgnoreCase(s));
+    /**
+     * Loops over passed patterns, and returns true if one of them matches the
+     * tableName.
+     *
+     * @param patterns
+     * @param tableName
+     * @param isIncludePatterns Used for debug output (either "included" or
+     *  "excluded" in output)
+     * @return
+     */
+    private boolean checkPatternsWithTableName(List<Pattern> patterns, String tableName, boolean isIncludePatterns) {
+        String upperName = tableName.toUpperCase(Locale.ENGLISH);
+        boolean ret = patterns.stream().anyMatch(
+            (p) -> p.matcher(upperName).matches()
+        );
+        String debugLogFound = (isIncludePatterns) ? "Table {} included by pattern: {}" : "Table {} excluded by pattern: {}";
+        String debugLogNotFound = (isIncludePatterns) ? "Table {} did not match any inclusion patterns" : "Table {} did not match any exclusion patterns";
+        log.atDebug()
+            .addArgument(tableName)
+            .addArgument(() -> patterns.stream().filter(
+                (p) -> p.matcher(upperName).matches()
+            ).findFirst().map((p) -> p.pattern()).orElse(""))
+            .log(
+                (ret) ? debugLogFound : debugLogNotFound
+            );
+        return ret;
     }
 
-    protected String getColumnName(final ResultSet columnRS) throws SQLException {
-        return columnRS.getString(4);
-    }
-
-    protected ResultSet getColumnRS(final DatabaseMetaData md, final String tableName) throws SQLException {
-        return md.getColumns(null, schema, tableName, null);
-    }
-
-    protected int getColumnSize(final ResultSet columnRs) throws SQLException {
-        return columnRs.getInt(7);
-    }
-
-    protected String getColumnType(final ResultSet columnRS) throws SQLException {
-        String colType = columnRS.getString(6);
-
-        if ((this.columnType != null) && SQLToJavaMapping.isString(colType)) {
-            colType = "String";
+    /**
+     * Returns true if the table should be included based on configured/passed
+     * 'include' and 'exclude' patterns.
+     *
+     * @param tableName
+     * @return
+     */
+    private boolean includeTable(String tableName) {
+        List<Pattern> exclude = config.getExcludeTablePatterns();
+        List<Pattern> include = config.getIncludeTablePatterns();
+        if (!CollectionUtils.isEmpty(include) && !checkPatternsWithTableName(include, tableName, true)) {
+            return false;
         }
-
-        return colType;
+        return CollectionUtils.isEmpty(exclude)
+            || !checkPatternsWithTableName(exclude, tableName, false);
     }
 
+    /**
+     * Returns true if the table should be skipped for metadata extraction.
+     *
+     * @param tableName
+     * @return 
+     */
+    protected boolean skipTable(String tableName) {
+        if (config.getVendor() == Vendor.POSTGRESQL && tableName.startsWith("sql_")) {
+            log.info("Skipping postgresql 'sql_' table: " + tableName);
+            return true;
+        }
+        if (!includeTable(tableName)) {
+            log.info("Excluding table by inclusion/exclusion rules: " + tableName);
+            return true;
+        }
+        String schemaTableName = tableName;
+        if (!StringUtils.isBlank(config.getSchema())) {
+            schemaTableName = config.getSchema() + "." + tableName;
+        }
+        if (config.isSkipEmptyTables() && getNumberOfRows(schemaTableName) == 0) {
+            log.info("Skipping empty table " + tableName);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns a list of metadata information for tables in the current
+     * database/schema.
+     *
+     * @return
+     */
     @Override
-    public List<MatchMetaData> getMetaData(String vendor) {
-        final List<MatchMetaData> map = new ArrayList<>();
+    public List<MatchMetaData> getMetaData() throws SQLException {
 
-        // Get the metadata from the the database
-        try {
+        final List<MatchMetaData> list = new ArrayList<>();
 
-            // Getting all tables name
-            final DatabaseMetaData md              = connection.getMetaData();
-            final String           schemaName      = databaseProperties.getProperty("schema");
-            final String           skipEmptyTables = databaseProperties.getProperty("skip-empty-tables");
+        // Getting all tables name
+        final DatabaseMetaData md = connection.getMetaData();
+        log.info("Fetching table names");
 
-            // Ignore table(s) excluded from the analysis
-            List<String> excludeTablesList = new ArrayList<>();
-            String excludeTables     = databaseProperties.getProperty("exclude-tables");
-            if ((excludeTables != null) && !"".equals(excludeTables)) {
-                excludeTables = excludeTables.toUpperCase();
-                excludeTablesList = Arrays.asList(excludeTables.split(","));
-            }
-            
-            // Ignore table(s) excluded from the analysis
-            List<String> includeTablesList = new ArrayList<>();
-            String includeTables     = databaseProperties.getProperty("include-tables");
-            if ((includeTables != null) && !"".equals(includeTables)) {
-                includeTables = includeTables.toUpperCase();
-                includeTablesList = Arrays.asList(includeTables.split(","));
-            }            
+        try (ResultSet trs = getTableResultSet(md)) {
+            while (trs.next()) {
 
-            log.info("Fetching table names from schema " + schemaName);
+                final String tableName = trs.getString("TABLE_NAME");
+                log.info("Processing table [" + tableName + "]");
 
-            try (ResultSet tableRS = getTableRS(md)) {
-                while (tableRS.next()) {
-                    final String tableName = tableRS.getString(3);
+                if (skipTable(tableName)) {
+                    continue;
+                }
 
-                    log.info("Processing table [" +tableName +"]");
-                    
-                    // Exception for PostgreSQL
-                    if (vendor.equals("postgresql") && tableName.contains("sql_")) {
-                        log.info("Skipping " + tableName);
-                        continue;
-                    }
-                    
-                    if (includeTablesList.isEmpty() && excludeTablesList.size() > 0) {
-                        log.info("Excluded table list: " + excludeTablesList.toString());
-                        List matchingList = CommonUtils.getMatchingStrings(excludeTablesList, tableName.toUpperCase(Locale.ENGLISH));
-                        log.info("matchingList: [" + matchingList + "]");
-                        if (matchingList != null && !matchingList.isEmpty()) {
-                            log.info("Excluding table " + tableName);
-                            continue;
-                        }
-                    }
+                // Retrieve primary keys and foreign keys
+                final List<String> pKeys = getPrimaryKeysList(md, tableName);
+                final List<String> fKeys = getForeignKeysList(md, tableName);
 
-                    if (excludeTablesList.isEmpty() && includeTablesList.size() > 0) {
-                        log.info("Include table list: " + includeTablesList.toString());
-                        List matchingList = CommonUtils.getMatchingStrings(includeTablesList, tableName.toUpperCase(Locale.ENGLISH));
-                        log.info("matchingList: [" + matchingList + "]");
-                        if (matchingList == null || matchingList.isEmpty()) {
-                            log.info("This table is not in include-table list " + tableName);
-                            continue;
-                        }
-                    }                    
-                    
-                    String schemaTableName = null;
-
-                    if ((schemaName != null) &&!schemaName.equals("")) {
-                        schemaTableName = schemaName + "." + tableName;
-                    }
-
-                    if (((skipEmptyTables != null) && skipEmptyTables.equals("true"))
-                            && (getRowNumber(schemaTableName) == 0)) {
-                        log.info("Skipping empty table " + tableName);
-
-                        continue;
-                    }
-
-                    // Retrieve primary keys
-                    final List<String> pKeys = new ArrayList<>();
-
-                    try (ResultSet pkRS = getPKRS(md, tableName)) {
-                        while (pkRS.next()) {
-                            final String pkey = pkRS.getString(4);
-
-                            log.debug("PK: " + pkey);
-                            pKeys.add(pkey.toLowerCase(Locale.ENGLISH));
-                        }
-                    }
-                    
-                    // Retrieve foreign keys
-                    final List<String> fKeys = new ArrayList<>();
-
-                    try (ResultSet pkRS = getPKRS(md, tableName)) {
-                        while (pkRS.next()) {
-                            final String fKey = pkRS.getString(4);
-
-                            log.debug("PK: " + fKey);
-                            fKeys.add(fKey.toLowerCase(Locale.ENGLISH));
-                        }
-                    }                    
-
-                    try (ResultSet columnRS = getColumnRS(md, tableName)) {
-                        while (columnRS.next()) {
-                            log.debug("Adding column " + getColumnName(columnRS) + " of table " + tableName + " to the metadata object");
-                            map.add(new MatchMetaData(schemaName,
-                                                      tableName,
-                                                      pKeys,
-                                                      fKeys,
-                                                      getColumnName(columnRS),
-                                                      getColumnType(columnRS),
-                                                      getColumnSize(columnRS)));
-                        }
+                try (ResultSet crs = getColumnResultSet(md, tableName)) {
+                    while (crs.next()) {
+                        String columnName = getColumnName(crs);
+                        log.debug("Adding column " + columnName + " of table " + tableName + " to the metadata object");
+                        list.add(new MatchMetaData(
+                            config.getSchema(),
+                            tableName,
+                            pKeys,
+                            fKeys,
+                            columnName,
+                            getColumnType(crs),
+                            getColumnSize(crs)
+                        ));
                     }
                 }
             }
-        } catch (SQLException e) {
-            log.error(e.toString());
         }
 
-        return map;
+        return list;
     }
 
+    /**
+     * Returns a list of metadata information for columns in the passed
+     * ResultSet.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     @Override
-    public List<MatchMetaData> getMetaDataForRs(final ResultSet rs) throws SQLException {
+    public List<MatchMetaData> getMetaDataFor(final ResultSet rs) throws SQLException {
         final List<MatchMetaData> map  = new ArrayList<>();
         final ResultSetMetaData   rsmd = rs.getMetaData();
 
         for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
-            String colType = rsmd.getColumnTypeName(i);
-
-            if (SQLToJavaMapping.isString(colType)) {
-                colType = "String";
-            }
-
-            map.add(new MatchMetaData(rsmd.getSchemaName(i),
-                                      rsmd.getTableName(i),
-                                      null,
-                                      null,
-                                      rsmd.getColumnName(i),
-                                      colType,
-                                      rsmd.getColumnDisplaySize(i)));
+            map.add(new MatchMetaData(
+                rsmd.getSchemaName(i),
+                rsmd.getTableName(i),
+                null,
+                null,
+                rsmd.getColumnName(i),
+                sqlTypeMap.getTypeFrom(rsmd.getColumnType(i)),
+                rsmd.getColumnDisplaySize(i))
+            );
         }
 
         return map;
     }
 
-    protected ResultSet getPKRS(final DatabaseMetaData md, final String tableName) throws SQLException {
-        return md.getPrimaryKeys(null, schema, tableName);
+    /**
+     * Returns ResultSet for tables.
+     * 
+     * @param md
+     * @return
+     * @throws SQLException
+     */
+    protected ResultSet getTableResultSet(final DatabaseMetaData md) throws SQLException {
+        return md.getTables(null, config.getSchema(), null, new String[] { "TABLE" });
     }
 
-    private int getRowNumber(final String table) {
+    /**
+     * Performs a COUNT(*) query on the passed table to determine number of rows
+     * in a table.
+     *
+     * @param table
+     * @return
+     */
+    private int getNumberOfRows(final String table) {
         int rowNum = 0;
-
         try (Statement stmt = connection.createStatement();) {
             try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + table);) {
                 rs.next();
@@ -244,12 +229,126 @@ public abstract class MetaData implements IMetaData {
         } catch (SQLException sqle) {
             log.error(sqle.toString());
         }
-
         return rowNum;
     }
 
-    // protected methods that allow subclasses to customize behaviour
-    protected ResultSet getTableRS(final DatabaseMetaData md) throws SQLException {
-        return md.getTables(null, schema, null, new String[] { "TABLE" });
+    /**
+     * Returns a ResultSet representing columns in the passed DatabaseMetaData
+     * object.  Overridable to account for differences between databases, but
+     * essentially a call to DatabaseMetaData.getColumns().
+     *
+     * @param md
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    protected ResultSet getColumnResultSet(final DatabaseMetaData md, final String tableName) throws SQLException {
+        return md.getColumns(null, config.getSchema(), tableName, null);
+    }
+
+    /**
+     * For a DatabaseMetaData.getColumns ResultSet, calls
+     * rs.getString("COLUMN_NAME") to return the name of the column.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private String getColumnName(final ResultSet rs) throws SQLException {
+        return rs.getString("COLUMN_NAME");
+    }
+
+    /**
+     * For a DatabaseMetaData.getColumns ResultSet, calls 
+     * rs.getInt("COLUMN_SIZE") to return the size of the column.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException 
+     */
+    private int getColumnSize(final ResultSet rs) throws SQLException {
+        return rs.getInt("COLUMN_SIZE");
+    }
+
+    /**
+     * For a DatabaseMetaData.getColumns ResultSet, calls
+     * rs.getString("DATA_TYPE") and uses SqlTypeToClass.getTypeFrom() to get a
+     * Class to represent the type of column.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private Class getColumnType(final ResultSet rs) throws SQLException {
+        int type = rs.getInt("DATA_TYPE");
+        return sqlTypeMap.getTypeFrom(type);
+    }
+
+    /**
+     * Returns a List of column names representing foreign keys for the passed
+     * DatabaseMetaData and tableName.
+     *
+     * @param md
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    private List<String> getForeignKeysList(final DatabaseMetaData md, final String tableName) throws SQLException {
+        List<String> ret = new ArrayList<>();
+        try (ResultSet rs = getForeignKeysResultSet(md, tableName)) {
+            while (rs.next()) {
+                String fkey = rs.getString("PKCOLUMN_NAME");
+                log.debug("Found foreign key: {}", fkey);
+                ret.add(fkey.toLowerCase(Locale.ENGLISH));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns a ResultSet for foreign keys of the passed DatabaseMetaData and
+     * tableName.
+     *
+     * @param md
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    protected ResultSet getForeignKeysResultSet(final DatabaseMetaData md, final String tableName) throws SQLException {
+        return md.getImportedKeys(null, config.getSchema(), tableName);
+    }
+
+    /**
+     * Returns a List of column names representing primary keys for the passed
+     * DatabaseMetaData and tableName.
+     *
+     * @param md
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    private List<String> getPrimaryKeysList(final DatabaseMetaData md, final String tableName) throws SQLException {
+        List<String> ret = new ArrayList<>();
+        try (ResultSet rs = getPrimaryKeysResultSet(md, tableName)) {
+            while (rs.next()) {
+                String pkey = rs.getString("COLUMN_NAME");
+                log.debug("Found primary key: {}", pkey);
+                ret.add(pkey.toLowerCase(Locale.ENGLISH));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Returns a ResultSet for primary keys of the passed DatabaseMetaData and
+     * tableName.
+     *
+     * @param md
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    protected ResultSet getPrimaryKeysResultSet(final DatabaseMetaData md, final String tableName) throws SQLException {
+        return md.getPrimaryKeys(null, config.getSchema(), tableName);
     }
 }

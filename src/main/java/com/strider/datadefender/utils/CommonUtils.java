@@ -107,26 +107,4 @@ public class CommonUtils {
 
         return ret;
     }
-    
-    /**
-     * Finds the index of all entries in the list that matches the regex
-     * @param list The list of strings to check
-     * @param str String table name
-     * @return list containing the indexes of all matching entries
-     */
-    public static List<String> getMatchingStrings(List<String> list, String str) {
-
-        ArrayList<String> matches = new ArrayList();
-
-
-
-        for (String s:list) {
-            Pattern p = Pattern.compile(s);
-            if (p.matcher(str.toUpperCase(Locale.ENGLISH)).matches()) {
-                matches.add(str);
-            }
-        }
-
-        return matches;
-    }    
 }
