@@ -42,7 +42,7 @@ public class VersionUtil {
         if (StringUtils.equals(appVersion, fileVersion)) {
             return true;
         }
-        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)");
+        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)(\\.\\d+)*");
         Matcher app = p.matcher(appVersion);
         Matcher file = p.matcher(fileVersion);
         if (!app.matches()) {

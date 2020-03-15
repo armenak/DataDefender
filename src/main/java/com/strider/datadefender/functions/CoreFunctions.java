@@ -1,5 +1,4 @@
 /*
- * 
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,9 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender.functions;
 
 import com.strider.datadefender.utils.Xeger;
@@ -46,24 +43,22 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class CoreFunctions {
-    
-    private static final Logger log = getLogger(CoreFunctions.class);
 
-    private static Random rand = new Random();    
-    
-    private static Map<String, List<String>> stringLists = new HashMap<>();
-    private static Map<String, Iterator<String>> stringIters = new HashMap<>();
-    private static List<String> words = new ArrayList<>();
-    private static Map<String, Map<String, String>> predictableShuffle = new HashMap<>();
-    private static List<String> lipsumParagraphs = new ArrayList<>();
-    
+    private static final Random rand = new Random();
+
+    private static final Map<String, List<String>> stringLists = new HashMap<>();
+    private static final Map<String, Iterator<String>> stringIters = new HashMap<>();
+    private static final List<String> words = new ArrayList<>();
+    private static final Map<String, Map<String, String>> predictableShuffle = new HashMap<>();
+    private static final List<String> lipsumParagraphs = new ArrayList<>();
+
     /**
      * Set after construction with a call to setDatabaseConnection.
      */
@@ -215,7 +210,6 @@ public class CoreFunctions {
      * 
      * @param keyName
      * @param query
-     * @return 
      * @throws java.sql.SQLException 
      */
     protected void generateStringListFromDb(final String keyName, final String query) throws SQLException {
@@ -267,26 +261,7 @@ public class CoreFunctions {
         generateStringListFromDb(keyName, sb.toString());
         return getNextShuffledItemFor(keyName + sb.toString().hashCode());
     }
-    
-    /**
-     * Generates a randomized collection of column values and selects and
-     * returns one.
-     * 
-     * Same as calling randomColumnValue with excludeEmpty set to true (empty
-     * values are excluded).  For backwards compatibility this differs from
-     * the default 'randomColumnValue' exclusion policy and is therefore
-     * deprecated.
-     * 
-     * @param table the table name
-     * @param column the column name
-     * @return the next item
-     * @deprecated
-     * @throws SQLException 
-     */
-    public String randomColumnValue(final String table, final String column) throws SQLException {
-        return this.randomColumnValue(table, column, true);
-    }
-    
+
     /**
      * Returns a 'predictable' shuffled value based on the passed value which is
      * guaranteed to return the same random value for the same column value.
@@ -315,54 +290,24 @@ public class CoreFunctions {
         generateStringListFromDb(keyName, sb.toString());
         return getPredictableShuffledValueFor(keyName + sb.toString().hashCode(), value);
     }
-    
-    /**
-     * Returns a 'predictable' shuffled value based on the passed value which is
-     * guaranteed to return the same random value for the same column value.
-     * 
-     * Same as calling mappedColumnShuffle with excludeEmpty set to false (empty
-     * values are NOT excluded).  For backwards compatibility this differs from
-     * the default 'randomColumnValue' exclusion policy and is therefore
-     * deprecated.
-     * 
-     * @param table
-     * @param column
-     * @param value
-     * @return
-     * @deprecated 
-     * @throws SQLException 
-     */
-    public String mappedColumnShuffle(final String table, final String column, final String value) throws SQLException {
-        return this.mappedColumnShuffle(table, column, value, false);
-    }
-    
+
     public String randomFirstName(final String file) throws IOException {
 		return randomStringFromFile(file);
     }
-    
+
     public String randomLastName(final String file) throws IOException {        
         return randomStringFromFile(file);
     }
-    
+
     public String randomMiddleName(final String file) throws IOException {        
         return randomStringFromFile(file);
     }
-    
+
     public String randomEmail(final String domainName) {
         final StringBuilder email = new StringBuilder();
         email.append(generateRandomString(1,43).trim()).append('@').append(domainName);
         return email.toString();
     }    
-    
-    /**
-     * Returns email address sent as a parameter 
-     * @param email
-     * @deprecated use setValue
-     * @return email address String 
-     */
-    public String staticEmail(final String email) {
-        return email;
-    }
 
     /**
      * Returns the value passed as a parameter
@@ -393,8 +338,7 @@ public class CoreFunctions {
     
     /**
      * Generates random postal code
-     * @return String Random postal code
-     * @throws IOException 
+     * @return String Random postal code 
      */
     public String randomPostalCode() {
         final StringBuilder sb = new StringBuilder();
@@ -467,11 +411,10 @@ public class CoreFunctions {
      * @return 
      */
     public String generateRandomString(final int num, final int length) {
-        final Random random = new Random();
         final StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
-            final int rand = random.nextInt(479617);
-            randomString.append(words.get(rand)).append(' ');
+            final int r = rand.nextInt(479617);
+            randomString.append(words.get(r)).append(' ');
         }
 
         if (randomString.length() > length) {
@@ -498,7 +441,6 @@ public class CoreFunctions {
      */
     public String lipsumSentences(final int min, final int max) throws IOException {
         final List<String> lp = getLipsumParagraphs();
-        final Random rand = new Random();
         final StringBuilder sb = new StringBuilder();
         
         final int nSentences = max - rand.nextInt((max + 1) - min);
@@ -541,7 +483,6 @@ public class CoreFunctions {
      */
     public String lipsumParagraphs(final int paragraphs) throws IOException {
         final List<String> lp = getLipsumParagraphs();
-        final Random rand = new Random();
         final StringBuilder sb = new StringBuilder();
         for (int i = 0, start = rand.nextInt(lp.size()); i < paragraphs; ++i, ++start) {
             sb.append(lp.get(start % lp.size())).append("\r\n\r\n");
@@ -606,7 +547,6 @@ public class CoreFunctions {
     }
  
     public String randomPhoneNumber() {
-        final Random rand = new Random();
         final int num1 = (rand.nextInt(7) + 1) * 100 + (rand.nextInt(8) * 10) + rand.nextInt(8);
         final int num2 = rand.nextInt(743);
         final int num3 = rand.nextInt(10000);
@@ -636,10 +576,7 @@ public class CoreFunctions {
      * @see java.util.Random#nextInt(int)
      */
     public static int randInt(final int min, final int max) {
-
-        rand = new Random();
         final int randomNum = rand.nextInt((max - min) + 1) + min;
-
         return randomNum;
     }
 }

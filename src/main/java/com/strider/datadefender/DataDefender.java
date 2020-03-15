@@ -19,6 +19,8 @@ import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.file.Loader;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.xml.bind.JAXBException;
 
@@ -38,6 +40,11 @@ import picocli.CommandLine.UnmatchedArgumentException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.AppenderRef;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 /**
  * Entry point to Data Defender.
@@ -111,7 +118,16 @@ public class DataDefender implements Callable<Integer> {
 
     @Option(names = { "-v", "--verbose" }, description = "enable more verbose output")
     public void setVerbose(boolean verbose) {
-        Configurator.setLevel("com.strider.datadefender", Level.INFO);
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        LoggerConfig conf = ctx.getLogger("com.strider.datadefender").get();
+        Map<String, Appender> appenders = conf.getAppenders();
+        List<AppenderRef> refs = conf.getAppenderRefs();
+        for (AppenderRef ref : refs) {
+            if (ref.getLevel().isMoreSpecificThan(Level.INFO)) {
+                conf.removeAppender(ref.getRef());
+                conf.addAppender(appenders.get(ref.getRef()), Level.INFO, null);
+            }
+        }
     }
 
     @Override

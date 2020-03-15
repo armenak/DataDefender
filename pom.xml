@@ -231,6 +231,11 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>2.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>dk.brics</groupId>
+            <artifactId>automaton</artifactId>
+            <version>1.12-1</version>
+        </dependency>
 
         <!--dependency>
             <groupId>org.apache.opennlp</groupId>
@@ -238,11 +243,6 @@
             <version>1.9.0</version>
             <type>jar</type>
         </dependency>    
-        <dependency>
-            <groupId>dk.brics.automaton</groupId>
-            <artifactId>automaton</artifactId>
-            <version>1.11-8</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>

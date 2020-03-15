@@ -20,6 +20,7 @@ import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.database.DatabaseAnonymizerException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.functions.CoreFunctions;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.requirement.Column;
@@ -498,11 +499,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (exclusions != null) {
             for (final Exclude exc : exclusions) {
                 String name = exc.getName();
-                final String eq = exc.getEqualsValue();
-                final String lk = exc.getLikeValue();
-                final String neq = exc.getNotEqualsValue();
-                final String nlk = exc.getNotLikeValue();
-                final boolean nl = exc.isExcludeNulls();
+                final String eq = exc.getEquals();
+                final String lk = exc.getLike();
+                final String neq = exc.getNotEquals();
+                final String nlk = exc.getNotLike();
+                final boolean nl = exc.isExcludeNull();
                 if (name == null || name.length() == 0) {
                     name = columnName;
                 }
@@ -547,11 +548,11 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return
      * @throws SQLException
      */
-    private String getTruncatedColumnValue(final String colValue, final String colName, final List<TableMetaData> columnMetaData) throws SQLException {
-        final TableMetaData md = columnMetaData.stream().filter((m) -> StringUtils.equalsIgnoreCase(colName, m.getColumnName())).findFirst().get();
-        final int colSize = md.getColumnSize();
-        final String type = md.getColumnType();
-        if ("String".equals(type) && colValue.length() > colSize) {
+    private String getTruncatedColumnValue(final String colValue, final String colName, final TableMetaData tableMetaData) throws SQLException {
+        final ColumnMetaData col = tableMetaData.getColumn(colName);
+        final int colSize = col.getColumnSize();
+        final Class clazz = col.getColumnType();
+        if (clazz.equals(String.class) && colValue.length() > colSize) {
             return colValue.substring(0, colSize);
         }
         return colValue;
@@ -582,7 +583,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Collection<String> keyNames,
         final Connection db,
         final ResultSet row,
-        final List<TableMetaData> columnMetaData,
+        final TableMetaData tableMetaData,
         final String vendor
     ) throws SQLException,
              NoSuchMethodException,
@@ -628,7 +629,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     getTruncatedColumnValue(
                         (String) colValue,
                         columnName,
-                        columnMetaData
+                        tableMetaData
                     )
                 );
             }
@@ -680,7 +681,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
             
-            final List<TableMetaData> columnMetaData = dbFactory.fetchMetaData().getMetaDataForRs(rs);
+            final TableMetaData tableMetaData = dbFactory.fetchMetaData().getMetaDataFor(rs);
             
             final String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
@@ -689,7 +690,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             int rowCount = 0;
             
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, columnMetaData, dbFactory.getVendorName());
+                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, tableMetaData, dbFactory.getVendorName());
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();

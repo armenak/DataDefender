@@ -105,6 +105,30 @@ public class TableMetaData implements Comparable<TableMetaData> {
         ));
     }
 
+    /**
+     * Returns the column at the specified '1'-based index.
+     *
+     * @param index
+     * @return
+     */
+    public ColumnMetaData getColumn(int index) {
+        return columns.get(index - 1);
+    }
+
+    /**
+     * Returns the column with the specified name.
+     *
+     * @param name
+     * @return
+     */
+    public ColumnMetaData getColumn(String name) {
+        return columns
+            .stream()
+            .filter((c) -> StringUtils.equalsIgnoreCase(name, c.columnName))
+            .findAny()
+            .orElse(null);
+    }
+
     @Override
     public int compareTo(TableMetaData t) {
         return Comparator
