@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,11 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.requirement;
 
 import java.util.Arrays;
@@ -25,8 +20,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import org.apache.commons.collections.ListUtils;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * JAXB class definition for &lt;Exclude&gt; tags defining exclusion rules.
@@ -63,7 +61,20 @@ import org.apache.commons.lang3.StringUtils;
  * @author Zaahid Bateson
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@NoArgsConstructor
+@Data
 public class Exclude {
+
+    /**
+     * Sets both the equals value to an empty string, and excludeNulls to "true"
+     * for the "IgnoreEmpty" shortcut.
+     */
+    Exclude(boolean ignoreEmpty) {
+        if (ignoreEmpty) {
+            equals = "";
+            excludeNull = true;
+        }
+    }
 
     /**
      * The column name in the database
@@ -111,7 +122,7 @@ public class Exclude {
      * The excluded value includes nulls.
      */
     @XmlAttribute(name = "Null")
-    private String excludeNull;
+    private boolean excludeNull;
 
     /**
      * Uses an "IN ()" clause to exclude a large range of values.
@@ -131,132 +142,31 @@ public class Exclude {
     @XmlAttribute(name = "InSeparator")
     private String inSeparator = ",";
 
-    // Setter methods
-    public void setEquals(final String equals) {
-        this.equals = equals;
-    }
-
     /**
-     * Returns the excluded (identical) value for the column
-     *
-     * @return String
+     * Generates a List for "IN" exclusions using the set separator.
+     * 
+     * @return
      */
-    public String getEqualsValue() {
-        return this.equals;
-    }
-
-    public void setExcludeNull(final String excludeNull) {
-        this.excludeNull = excludeNull;
-    }
-
-    /**
-     * Returns true if the Null attribute is set
-     *
-     * @return boolean
-     */
-    public boolean isExcludeNulls() {
-        return (this.excludeNull != null) && this.excludeNull.equals("true");
-    }
-
-    /**
-     * Sets both the equals value to an empty string, and excludeNulls to "true"
-     * for the "IgnoreEmpty" shortcut.
-     */
-    public void setIgnoreEmpty() {
-        equals      = "";
-        excludeNull = "true";
-    }
-
-    public void setLike(final String like) {
-        this.like = like;
-    }
-
-    /**
-     * Returns the excluded (LIKE) value for the column
-     *
-     * @return String
-     */
-    public String getLikeValue() {
-        return this.like;
-    }
-
-    /**
-     * Returns the column name represented by this exclusion
-     *
-     * @return String
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setNotEquals(final String notEquals) {
-        this.notEquals = notEquals;
-    }
-
-    /**
-     * Returns the identical value that is not excluded for the column (!=)
-     *
-     * @return String
-     */
-    public String getNotEqualsValue() {
-        return this.notEquals;
-    }
-
-    public void setNotLike(final String notLike) {
-        this.notLike = notLike;
-    }
-
-    /**
-     * Returns the (LIKE) value that is not excluded for the column (NOT LIKE)
-     *
-     * @return String
-     */
-    public String getNotLikeValue() {
-        return this.notLike;
-    }
-
-    public void setIn(final String in) {
-        excludeIn = in;
-    }
-
-    public String getInValue() {
-        return excludeIn;
-    }
-
-    public List<String> getInList() {
+    public List<String> getExcludeInList() {
         if (StringUtils.isBlank(excludeIn)) {
-            return ListUtils.EMPTY_LIST;
+            return List.of();
         }
-        return Arrays.asList(StringUtils.splitByWholeSeparator(excludeIn, inSeparator));
-    }
-    
-    public void setNotIn(final String notIn) {
-        excludeNotIn = notIn;
+        return Arrays.asList(
+            StringUtils.splitByWholeSeparator(excludeIn, inSeparator)
+        );
     }
 
-    public String getNotInValue() {
-        return excludeNotIn;
-    }
-
-    public List<String> getNotInList() {
+    /**
+     * Generates a List for "NOT IN" exclusions using the set separator.
+     *
+     * @return
+     */
+    public List<String> getExcludeNotInList() {
         if (StringUtils.isBlank(excludeNotIn)) {
-            return ListUtils.EMPTY_LIST;
+            return List.of();
         }
-        return Arrays.asList(StringUtils.splitByWholeSeparator(excludeNotIn, inSeparator));
-    }
-
-    public void setInSeparator(final String separator) {
-        inSeparator = separator;
-    }
-
-    public String getInSeparatorValue() {
-        return inSeparator;
+        return Arrays.asList(
+            StringUtils.splitByWholeSeparator(excludeNotIn, inSeparator)
+        );
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

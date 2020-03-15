@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,16 +12,14 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.requirement;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+
+import lombok.Data;
 
 /**
  * JAXB class defining a Table's key column.
@@ -34,28 +31,11 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Zaahid Bateson
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Data
 public class Key {
-
     /**
      * The column name in the database
      */
     @XmlAttribute(name = "Name")
     private String name;
-
-    /**
-     * Returns the column name represented by this key
-     *
-     * @return String
-     */
-    public String getName() {
-        return this.name;
-    }
-
-    // Setter method
-    public void setName(final String name) {
-        this.name = name;
-    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

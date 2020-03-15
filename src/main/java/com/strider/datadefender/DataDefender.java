@@ -36,6 +36,8 @@ import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * Entry point to Data Defender.

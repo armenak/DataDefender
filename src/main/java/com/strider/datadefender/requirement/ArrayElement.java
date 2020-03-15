@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,16 +12,14 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.requirement;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+
+import lombok.Data;
 
 /**
  * JAXB class defining values for array parameters.
@@ -33,28 +30,11 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Zaahid Bateson
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Data
 public class ArrayElement {
-
     /**
      * The array element's value
      */
     @XmlAttribute(name = "Value")
     private String value;
-
-    /**
-     * Returns the String value of the array element
-     *
-     * @return String
-     */
-    public String getValue() {
-        return this.value;
-    }
-
-    // Setter method
-    public void setValue(final String value) {
-        this.value = value;
-    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

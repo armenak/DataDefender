@@ -64,6 +64,8 @@ public class Anonymize implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        System.out.println(double.class);
+        
         System.out.println("Starting anonymizer");
         log.info("Datasource URL: {}, vendor: {}, schema: {}", dbConfig.getUrl(), dbConfig.getVendor(), dbConfig.getSchema());
         log.info("Username: {}, Password provided: {}", dbConfig.getUsername(), (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));

@@ -30,7 +30,6 @@ import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
-import com.strider.datadefender.requirement.file.Loader;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -91,7 +90,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 sKeys.add(key.getName());
             }
         } else {
-            sKeys.add(table.getPKey());
+            sKeys.add(table.getPkey());
         }
     }
     
@@ -159,10 +158,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 separator = ") AND (";
             }
             for (final Exclude exc : exclusions) {
-                final String eq = exc.getEqualsValue();
-                final String lk = exc.getLikeValue();
-                final List<String> in = exc.getInList();
-                final boolean nl = exc.isExcludeNulls();
+                final String eq = exc.getEquals();
+                final String lk = exc.getLike();
+                final List<String> in = exc.getExcludeInList();
+                final boolean nl = exc.isExcludeNull();
                 final String col = exc.getName();
 
                 if (col != null && col.length() != 0) {
@@ -195,9 +194,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
             
             for (final Exclude exc : exclusions) {
-                final String neq = exc.getNotEqualsValue();
-                final String nlk = exc.getNotLikeValue();
-                final List<String> nin = exc.getNotInList();
+                final String neq = exc.getNotEquals();
+                final String nlk = exc.getNotLike();
+                final List<String> nin = exc.getExcludeNotInList();
                 final String col = exc.getName();
                 
                 if (neq != null) {
@@ -756,12 +755,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Requirement requirement,
         List<String> tables
     ) throws DatabaseAnonymizerException {
-        // Iterate over the requirement
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
-        for(final Table reqTable : requirement.getTables()) {
-            if (CommonUtils.isEmptyString(tablesStr) || ( tables != null && tables.contains(reqTable.getName()))) {
-                anonymizeTable(batchSize, dbFactory, reqTable);
-            }
+        for (final Table reqTable : requirement.getFilteredTables(tables)) {
+            anonymizeTable(batchSize, dbFactory, reqTable);
         }
     }
 }

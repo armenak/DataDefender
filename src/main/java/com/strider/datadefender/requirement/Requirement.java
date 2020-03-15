@@ -16,14 +16,17 @@
  */
 package com.strider.datadefender.requirement;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 
@@ -43,4 +46,32 @@ public class Requirement {
     @XmlElementWrapper(name = "Tables")
     @XmlElement(name = "Table")
     private List<Table> tables;
+
+    /**
+     * Returns a list of Table elements that match entries in the passed filter.
+     *
+     * Attempts to filter out differences with schema, so 'schema.tablename'
+     * matches 'tablename'.
+     *
+     * @param tables
+     * @return
+     */
+    public List<Table> getFilteredTables(List<String> filter) {
+        if (CollectionUtils.isEmpty(filter)) {
+            return tables;
+        }
+        return tables.stream().filter((req) ->
+            filter.stream().anyMatch((s) -> {
+                String r = req.getName();
+                if (s.equalsIgnoreCase(r)) {
+                    return true;
+                } else if (s.contains(".") && !r.contains(".")) {
+                    return StringUtils.endsWithIgnoreCase(s, "." + r);
+                } else if (r.contains(".") && !s.contains(".")) {
+                    return StringUtils.endsWithIgnoreCase(r, "." + s);
+                }
+                return false;
+            })
+        ).collect(Collectors.toList());
+    }
 }
