@@ -29,13 +29,13 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.Option;
-
-import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine.IParameterExceptionHandler;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Entry point to Data Defender.
@@ -43,11 +43,12 @@ import picocli.CommandLine.UnmatchedArgumentException;
  * This class will parse and analyze the parameters and execute appropriate
  * service.
  *
+ * @author Zaahid Bateson
  */
 @Command(
     name = "datadefender",
     mixinStandardHelpOptions = true,
-    version = "2.0",
+    version = DataDefender.VERSION,
     description = "Data detection and anonymization tool",
     synopsisSubcommandLabel = "COMMAND",
     subcommands = {
@@ -61,6 +62,14 @@ import picocli.CommandLine.UnmatchedArgumentException;
 @Log4j2
 public class DataDefender implements Callable<Integer> {
 
+    public static final String VERSION = "2.0.0";
+
+    /**
+     * Copied from picocli documentation, presents a shorter "Usage" help when
+     * there's an error in the options/arguments.
+     *
+     * https://picocli.info
+     */
     public static class ShortErrorMessageHandler implements IParameterExceptionHandler {
 
         public int handleParseException(ParameterException ex, String[] args) {
@@ -82,8 +91,9 @@ public class DataDefender implements Callable<Integer> {
 
     public static class RequirementConverter implements CommandLine.ITypeConverter<Requirement> {
         public Requirement convert(String value) throws Exception {
+            Loader loader = new Loader();
             try {
-                return Loader.load(value);
+                return loader.load(value, DataDefender.VERSION);
             } catch (FileNotFoundException e) {
                 throw new TypeConversionException("Unable to load requirements file: File not found");
             } catch (JAXBException e) {

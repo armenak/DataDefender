@@ -15,43 +15,20 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.requirement.file;
 
-import com.strider.datadefender.DataDefenderException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
 import static javax.xml.bind.JAXBContext.newInstance;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Parameter;
-import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.Table;
-import com.strider.datadefender.requirement.Table;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -59,24 +36,32 @@ import lombok.extern.log4j.Log4j2;
  * @author Matthew Eaton
  */
 @Log4j2
+@RequiredArgsConstructor
 public class Loader {
+
+    private final JAXBContext jaxbContext;
+    private final Unmarshaller unmarshaller;
+
+    public Loader() throws JAXBException {
+        jaxbContext = newInstance(Requirement.class);
+        unmarshaller = jaxbContext.createUnmarshaller();
+    }
 
     /**
      * Load requirement XML file and return a Requirement object representing
      * it.
      *
      * @param requirementFile Requirement filename and path
+     * @param version required version
      * @return Requirement object loaded based on file
      * @throws LoaderException
      */
-    public static Requirement load(final String requirementFile) throws JAXBException, FileNotFoundException {
+    public Requirement load(final String requirementFile, final String version) throws JAXBException, FileNotFoundException {
 
         Requirement requirement = null;
         log.info("Loading requirement file: {}", requirementFile);
 
         try {
-            final JAXBContext  jc = newInstance(Requirement.class);
-            final Unmarshaller unmarshaller = jc.createUnmarshaller();
             requirement = (Requirement) unmarshaller.unmarshal(
                 new FileInputStream(new File(requirementFile))
             );
@@ -87,7 +72,14 @@ public class Loader {
             log.error("Requirement file not found, {}", ex.getMessage());
             throw ex;
         }
-
+        if (!VersionUtil.isCompatible(version, requirement.getVersion())) {
+            throw new IllegalArgumentException(String.format(
+                "The Requirement XML file's version: %s, is incompatible with "
+                + " the application's version: %s",
+                requirement.getVersion(),
+                version
+            ));
+        }
         return requirement;
     }
 }
