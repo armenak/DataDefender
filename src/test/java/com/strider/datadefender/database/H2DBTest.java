@@ -42,7 +42,7 @@ import com.strider.datadefender.database.metadata.TableMetaData;
  */
 public class H2DBTest extends H2DB {
     @Test
-    public void testData() throws DatabaseAnonymizerException, SQLException {
+    public void testData() throws DatabaseException, SQLException {
         consumeQuery(this::assertInitialData);
     }
 

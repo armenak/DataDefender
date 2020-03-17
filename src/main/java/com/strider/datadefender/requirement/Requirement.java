@@ -39,6 +39,7 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 public class Requirement {
+
     @XmlElement(name = "Client")
     private String client;
     @XmlElement(name = "Version")

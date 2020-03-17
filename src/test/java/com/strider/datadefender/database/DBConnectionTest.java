@@ -56,7 +56,7 @@ public class DBConnectionTest {
     private Connection mockConnection;
 
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
+    public void testConnect() throws DatabaseException, DataDefenderException, SQLException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
 
         assertEquals(mockConnection, testDB.connect());
@@ -66,7 +66,7 @@ public class DBConnectionTest {
     }
 
     @Test
-    public void testCtor() throws DatabaseAnonymizerException, DataDefenderException {
+    public void testCtor() throws DatabaseException, DataDefenderException {
         final TestDBConnection testDB = new TestDBConnection(testProps);
 
         testDB.runAsserts();
@@ -75,12 +75,12 @@ public class DBConnectionTest {
     // testing class
     private class TestDBConnection extends DbConnection {
         public TestDBConnection(final Properties properties)
-                throws DatabaseAnonymizerException, DataDefenderException {
+                throws DatabaseException, DataDefenderException {
             super(properties);
         }
 
         @Override
-        public Connection connect() throws DatabaseAnonymizerException, DataDefenderException {
+        public Connection connect() throws DatabaseException, DataDefenderException {
             return doConnect(
                 () -> {
                     this.runAsserts();

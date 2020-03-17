@@ -15,7 +15,6 @@
  */
 package com.strider.datadefender.database;
 
-import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.utils.ISupplierWithException;
 
@@ -38,7 +37,7 @@ public class DbConnection implements IDbConnection {
      * Default constructor, initializes config.
      * @param config
      */
-    public DbConnection(final DbConfig config) throws DataDefenderException {
+    public DbConnection(final DbConfig config) {
         this.config = config;
     }
 
@@ -48,26 +47,25 @@ public class DbConnection implements IDbConnection {
      *
      * @param supplier
      * @return
-     * @throws DatabaseAnonymizerException
+     * @throws DatabaseException
      */
     protected Connection doConnect(
         final ISupplierWithException<Connection, SQLException> supplier
-    ) throws DataDefenderException {
+    ) throws DatabaseException {
         Connection conn = null;
         try {
             log.info("Establishing database connection");
             conn = supplier.get();
             conn.setAutoCommit(false);
-        } catch (SQLException sqle) {
-            log.error(sqle.toString());
+        } catch (SQLException e) {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException sql) {
-                    log.error(sql.toString());
+                } catch (SQLException e2) {
+                    // ignore
                 }
             }
-            throw new DatabaseAnonymizerException(sqle.toString(), sqle);
+            throw new DatabaseException(e.getMessage(), e);
         }
         return conn;
     }
@@ -80,14 +78,11 @@ public class DbConnection implements IDbConnection {
      * @throws DatabaseAnonymizerException
      */
     @Override
-    public Connection connect() throws DataDefenderException {
-        if (!StringUtils.isNoneBlank(config.getUsername(), config.getPassword())) {
-            return doConnect(() -> getConnection(
-                config.getUrl(),
-                config.getUsername(),
-                config.getPassword()
-            ));
-        }
-        return doConnect(() -> getConnection(config.getUrl()));
+    public Connection connect() throws DatabaseException {
+        return doConnect(() -> getConnection(
+            config.getUrl(),
+            StringUtils.trimToNull(config.getUsername()),
+            StringUtils.trimToNull(config.getPassword())
+        ));
     }
 }

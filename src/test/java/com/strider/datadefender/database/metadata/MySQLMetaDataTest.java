@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 
 /**
  *
@@ -57,7 +57,7 @@ public class MySQLMetaDataTest {
 //      }
 //  }
     @Test
-    public void testHappyPath() throws DatabaseAnonymizerException, SQLException {
+    public void testHappyPath() throws DatabaseException, SQLException {
 
 //      when(mockConnection.getMetaData()).thenReturn(mockMetaData);
 //      when(mockMetaData.getTables(null, null, "%", null)).thenReturn(mockTableRS);

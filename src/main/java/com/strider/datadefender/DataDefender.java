@@ -17,6 +17,7 @@ package com.strider.datadefender;
 
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.file.Loader;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -24,8 +25,15 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -38,13 +46,6 @@ import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.AppenderRef;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 
 /**
  * Entry point to Data Defender.
@@ -105,14 +106,20 @@ public class DataDefender implements Callable<Integer> {
                 return loader.load(value, DataDefender.VERSION);
             } catch (FileNotFoundException e) {
                 throw new TypeConversionException("Unable to load requirements file: File not found");
-            } catch (JAXBException e) {
-                throw new TypeConversionException("Unable to load requirements file: Error in XML");
+            } catch (Exception e) {
+                Throwable exc = e;
+                if (StringUtils.isBlank(e.getMessage()) && e.getCause() != null) {
+                    exc = e.getCause();
+                }
+                log.debug("Error loading requirements.", exc);
+                throw new TypeConversionException("Unable to load requirements file: " + exc.getMessage());
             }
         }
     }
 
     @Option(names = "--debug", description = "enable debug logging")
     public void setDebug(boolean debug) {
+        System.out.println("DEBUG logging turned on. DEBUG level messages only appear in the log file.");
         Configurator.setRootLevel(Level.DEBUG);
     }
 

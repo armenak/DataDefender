@@ -92,7 +92,7 @@ public abstract class H2DB {
     }
 
     @BeforeClass
-    public static void setUpDB() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
+    public static void setUpDB() throws DatabaseException, DataDefenderException, SQLException {
         factory = IDbFactory.get(h2Props);
         con     = factory.getConnection();
 

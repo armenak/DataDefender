@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 
 import static org.mockito.Mockito.*;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 
 /**
  *

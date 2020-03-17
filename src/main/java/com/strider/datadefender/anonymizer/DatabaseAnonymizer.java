@@ -15,9 +15,12 @@
  */
 package com.strider.datadefender.anonymizer;
 
+import com.strider.datadefender.requirement.functions.DatabaseAwareRequirementFunctionClass;
+import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
+import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
 import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
@@ -34,13 +37,12 @@ import com.strider.datadefender.utils.LikeMatcher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,39 +52,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Entry point for RDBMS data anonymizer
- * 
+ *
  * @author Armenak Grigoryan
  */
+@RequiredArgsConstructor
 @Log4j2
-public class DatabaseAnonymizer implements IAnonymizer { 
-    
-    private static final String AND = " AND ";
-    
+public class DatabaseAnonymizer implements IAnonymizer {
+
+    final IDbFactory dbFactory;
+    final DbConfig config;
+    final int batchSize;
+    final Requirement requirement;
+    final List<String> tables;
+
     /**
      * Adds column names from the table to the passed collection of strings.
-     * 
+     *
      * @param table
-     * @param sColumns 
+     * @param sColumns
      */
     private void fillColumnNames(final Table table, final Collection<String> sColumns) {
         for (final Column column : table.getColumns()) {
             sColumns.add(column.getName());
         }
     }
-    
+
     /**
      * Adds column names that make up the table's primary key.
-     * 
+     *
      * @param table
-     * @return 
+     * @return
      */
     private void fillPrimaryKeyNamesList(final Table table, final Collection<String> sKeys) {
         final List<Key> pKeys = table.getPrimaryKeys();
@@ -94,10 +101,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
             sKeys.add(table.getPkey());
         }
     }
-    
+
     /**
      * Creates the UPDATE query for a single row of results.
-     * 
+     *
      * @param table
      * @param columns
      * @param keys
@@ -120,7 +127,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             ++iteration;
             whereStmtp.append(key).append(" = ? ");
             if (collectionSize > iteration) {
-                whereStmtp.append(AND);
+                whereStmtp.append(" AND ");
             }
         }
         sql.append(whereStmtp);
@@ -128,17 +135,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.debug("getUpdateQuery: " + sql.toString());
         return sql.toString();
     }
-    
+
     /**
      * Creates the SELECT query for key and update columns.
-     * 
+     *
      * @param tableName
      * @param keys
      * @param columns
-     * @return 
+     * @return
      */
     private PreparedStatement getSelectQueryStatement(final IDbFactory dbFactory, final Table table, final Collection<String> keys, final Collection<String> columns) throws SQLException {
-        
+
         final List<String> params = new LinkedList<>();
         // final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
         final StringBuilder query = new StringBuilder("SELECT ");
@@ -169,37 +176,37 @@ public class DatabaseAnonymizer implements IAnonymizer {
                     if (eq != null) {
                         query.append(separator).append('(').append(col).append(" != ? OR ").append(col).append(" IS NULL)");
                         params.add(eq);
-                        separator = AND;
+                        separator = " AND ";
                     }
                     if (lk != null && lk.length() != 0) {
                         query.append(separator).append('(').append(col).append(" NOT LIKE ? OR ").append(col).append(" IS NULL)");
                         params.add(lk);
-                        separator = AND;
+                        separator = " AND ";
                     }
                     if (CollectionUtils.isNotEmpty(in)) {
                         String qs = "?" + StringUtils.repeat(", ?", in.size() - 1);
                         query.append(separator).append('(').append(col).append(" NOT IN (")
                             .append(qs).append(") OR ").append(col).append(" IS NULL)");
                         params.addAll(in);
-                        separator = AND;
+                        separator = " AND ";
                     }
                     if (nl) {
                         query.append(separator).append(col).append(" IS NOT NULL");
-                        separator = AND;
+                        separator = " AND ";
                     }
                 }
             }
-            
+
             if (query.indexOf(" WHERE (") != -1) {
                 separator = ") AND (";
             }
-            
+
             for (final Exclude exc : exclusions) {
                 final String neq = exc.getNotEquals();
                 final String nlk = exc.getNotLike();
                 final List<String> nin = exc.getExcludeNotInList();
                 final String col = exc.getName();
-                
+
                 if (neq != null) {
                     query.append(separator).append(col).append(" = ?");
                     separator = " OR ";
@@ -228,260 +235,25 @@ public class DatabaseAnonymizer implements IAnonymizer {
         if (dbFactory.getVendorName().equalsIgnoreCase("mysql")) {
             stmt.setFetchSize(Integer.MIN_VALUE);
         }
-        
+
         int paramIndex = 1;
         for (final String param : params) {
             stmt.setString(paramIndex, param);
             ++paramIndex;
         }
-        
+
         log.debug("Querying for: " + query.toString());
         if (params.size() > 0) {
             log.debug("\t - with parameters: " + StringUtils.join(params, ','));
         }
-        
+
         return stmt;
     }
-    
-    /**
-     * Calls the anonymization function for the given Column, and returns its
-     * anonymized value.
-     * 
-     * @param dbConn
-     * @param row
-     * @param column
-     * @return anonymized value
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
-     */   
-    private Object callAnonymizingFunctionFor(final Connection dbConn, final ResultSet row, final Column column, final String vendor)
-        throws SQLException,
-               NoSuchMethodException,
-               SecurityException,
-               IllegalAccessException,
-               IllegalArgumentException,
-               InvocationTargetException {
-        
-        // Check if function has parameters
-        final List<Parameter> parms = column.getParameters();
-        if (parms != null) {
-            return callAnonymizingFunctionWithParameters(dbConn, row, column, vendor);
-        } else {
-            return callAnonymizingFunctionWithoutParameters(dbConn, column);
-        }
-        
-    }    
-    
-    /**
-     * Calls the anonymization function for the given Column, and returns its
-     * anonymized value.
-     * 
-     * @param dbConn
-     * @param row
-     * @param column
-     * @return
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
-     */
-    private Object callAnonymizingFunctionWithParameters(final Connection dbConn, final ResultSet row, 
-            final Column column, final String vendor)
-        throws SQLException,
-               NoSuchMethodException,
-               SecurityException,
-               IllegalAccessException,
-               IllegalArgumentException,
-               InvocationTargetException {
-        
-        final String function = column.getFunction();
-        if (function == null || function.equals("")) {
-            log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
-            return "";
-        } 
-        
-        try {
-            final String className = Utils.getClassName(function);
-            final String methodName = Utils.getMethodName(function);
-            final Class<?> clazz = Class.forName(className);
-            
-            final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
-            instance.setDatabaseConnection(dbConn);
-            instance.setVendor(vendor);
-            
-            final List<Parameter> parms = column.getParameters();
-            final Map<String, Object> paramValues = new HashMap<>(parms.size());
-            final String columnValue = row.getString(column.getName());
 
-            for (final Parameter param : parms) {
-                if (param.getValue().equals("@@value@@")) {
-                    paramValues.put(param.getName(), columnValue);
-                } else if (param.getValue().equals("@@row@@") && param.getType().equals("java.sql.ResultSet")) {
-                    paramValues.put(param.getName(), row);
-                } else {
-                    paramValues.put(param.getName(), param.getTypeValue());
-                }
-            }
-            
-            final List<Object> fnArguments = new ArrayList<>(parms.size());
-            final Method[] methods = clazz.getMethods();
-            Method selectedMethod = null;
-            
-            methodLoop:
-            for (final Method m : methods) {
-                if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
-                    
-                    log.debug("  Found method: " + m.getName());
-                    log.debug("  Match w/: " + paramValues);
-                    
-                    final java.lang.reflect.Parameter[] mParams = m.getParameters();
-                    fnArguments.clear();
-                    for (final java.lang.reflect.Parameter par : mParams) {
-                        //log.debug("    Name present? " + par.isNamePresent());
-                        // Note: requires -parameter compiler flag
-                        log.debug("    Real param: " + par.getName());
-                        if (!paramValues.containsKey(par.getName())) {
-                            continue methodLoop;
-                        }
-                        
-                        final Object value = paramValues.get(par.getName());
-                        Class<?> fnParamType = par.getType();
-                        final Class<?> confParamType = (value == null) ? fnParamType : value.getClass();
-                        
-                        if (fnParamType.isPrimitive() && value == null) {
-                            continue methodLoop;
-                        }
-                        if (ClassUtils.isPrimitiveWrapper(confParamType)) {
-                            if (!ClassUtils.isPrimitiveOrWrapper(fnParamType)) {
-                                continue methodLoop;
-                            }
-                            fnParamType = ClassUtils.primitiveToWrapper(fnParamType);
-                        }
-                        if (!fnParamType.equals(confParamType)) {
-                            continue methodLoop;
-                        }
-                        fnArguments.add(value);
-                    }
-                    
-                    // actual parameters check less than xml defined parameters size, because values could be auto-assigned (like 'values' and 'row' params)
-                    if (fnArguments.size() != mParams.length || fnArguments.size() < paramValues.size()) {
-                        continue;
-                    }
-                    
-                    selectedMethod = m;
-                    break;
-                }
-            }
-            
-            if (selectedMethod == null) {
-                final StringBuilder s = new StringBuilder("Anonymization method: ");
-                s.append(methodName).append(" with parameters matching (");
-                String comma = "";
-                for (final Parameter p : parms) {
-                    s.append(comma).append(p.getType()).append(' ').append(p.getName());
-                    comma = ", ";
-                }
-                s.append(") was not found in class ").append(className);
-                throw new NoSuchMethodException(s.toString());
-            }
-            
-            log.debug("Anonymizing function: " + methodName + " with parameters: " + Arrays.toString(fnArguments.toArray()));
-            final Object anonymizedValue = selectedMethod.invoke(instance, fnArguments.toArray());
-            if (anonymizedValue == null) {
-                return null;
-            }
-            return anonymizedValue.toString();
-            
-        } catch (InstantiationException | ClassNotFoundException ex) {
-            log.error(ex.toString());
-        }
-        
-        return "";
-    }
-    
-    /**
-     * Calls the anonymization function for the given Column, and returns its
-     * anonymized value.
-     * 
-     * @param dbConn
-     * @param row
-     * @param column
-     * @return
-     * @throws NoSuchMethodException
-     * @throws SecurityException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
-     */
-    private Object callAnonymizingFunctionWithoutParameters(final Connection dbConn, final Column column)
-    throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
-           InvocationTargetException {
-        
-        final String function = column.getFunction();
-        if (function == null || function.equals("")) {
-            log.warn("Function is not defined for column [" + column + "]. Moving to the next column.");
-            return "";
-        } 
-        
-        try {
-            final String className = Utils.getClassName(function);
-            final String methodName = Utils.getMethodName(function);
-            final Class<?> clazz = Class.forName(className);
-            
-            final CoreFunctions instance = (CoreFunctions) Class.forName(className).newInstance();
-            instance.setDatabaseConnection(dbConn);
-
-            final Method[] methods = clazz.getMethods();
-            Method selectedMethod = null;
-            Object returnType = null;
-            
-            methodLoop:
-            for (final Method m : methods) {
-                //if (m.getName().equals(methodName) && m.getReturnType() == String.class) {
-                if (m.getName().equals(methodName)) {
-                    log.debug("  Found method: " + m.getName());
-                    selectedMethod = m;
-                    returnType = m.getReturnType();
-                    break;
-                }
-            }
-            
-            if (selectedMethod == null) {
-                final StringBuilder s = new StringBuilder("Anonymization method: ");
-                s.append(methodName).append(") was not found in class ").append(className);
-                throw new NoSuchMethodException(s.toString());
-            }
-            
-            log.debug("Anonymizing function name: " + methodName);
-            final Object anonymizedValue = selectedMethod.invoke(instance);
-            log.debug("anonymizedValue " + anonymizedValue);
-            if (anonymizedValue == null) {
-                return null;
-            }
-            
-            log.debug(returnType);
-            if (returnType == String.class) {
-                return anonymizedValue.toString();
-            } else if (returnType == java.sql.Date.class) {
-                return anonymizedValue;
-            } else if ("int".equals(returnType)) {
-                return anonymizedValue;
-            }
-        } catch (InstantiationException | ClassNotFoundException ex) {
-            log.error(ex.toString());
-        }
-        
-        return "";
-    }    
-    
     /**
      * Returns true if the current column's value is excluded by the rulesets
      * defined by the Requirements.
-     * 
+     *
      * @param db
      * @param row
      * @param column
@@ -489,13 +261,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws SQLException
      */
     private boolean isExcludedColumn(final ResultSet row, final Column column) throws SQLException {
-        
+
         final String columnName = column.getName();
-        
+
         final List<Exclude> exclusions = column.getExclusions();
         boolean hasInclusions = false;
         boolean passedInclusion = false;
-        
+
         if (exclusions != null) {
             for (final Exclude exc : exclusions) {
                 String name = exc.getName();
@@ -519,7 +291,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                         return true;
                     }
                 }
-                
+
                 if (neq != null) {
                     hasInclusions = true;
                     if (neq.equals(testValue)) {
@@ -538,10 +310,10 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
         return hasInclusions && !passedInclusion;
     }
-    
+
     /**
      * Returns the passed colValue truncated to the column's size in the table.
-     * 
+     *
      * @param colValue
      * @param colName
      * @param columnMetaData
@@ -557,13 +329,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
         return colValue;
     }
-    
+
     /**
      * Anonymizes a row of columns.
-     * 
+     *
      * Sets query parameters on the passed updateStmt - this includes the key
      * values - and calls anonymization functions for the columns.
-     * 
+     *
      * @param updateStmt
      * @param tableColumns
      * @param keyNames
@@ -575,24 +347,22 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @throws SecurityException
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
-     * @throws InvocationTargetException 
+     * @throws InvocationTargetException
      */
     private void anonymizeRow(
         final PreparedStatement updateStmt,
         final Collection<Column> tableColumns,
         final Collection<String> keyNames,
-        final Connection db,
         final ResultSet row,
-        final TableMetaData tableMetaData,
-        final String vendor
+        final TableMetaData tableMetaData
     ) throws SQLException,
              NoSuchMethodException,
              SecurityException,
              IllegalAccessException,
              IllegalArgumentException,
              InvocationTargetException,
-             DatabaseAnonymizerException {
-        
+             DatabaseException {
+
         int fieldIndex = 0;
         final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
         final Set<String> anonymized = new HashSet<>(tableColumns.size());
@@ -612,9 +382,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 log.debug("Excluding column: " + columnName + " with value: " + columnValue);
                 continue;
             }
-            
+
             anonymized.add(columnName);
-            final Object colValue = callAnonymizingFunctionFor(db, row, column, vendor);
+            final Object colValue = column.invokeFunction(row);
             log.debug("colValue = " + colValue);
             log.debug("type= " + (colValue != null ? colValue.getClass() : "null"));
             if (colValue == null) {
@@ -634,32 +404,31 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 );
             }
         }
-        
+
         int whereIndex = fieldIndex;
         for (final String key : keyNames) {
             updateStmt.setString(++whereIndex, row.getString(key));
         }
-        
+
         updateStmt.addBatch();
     }
-    
+
     /**
      * Anonymization function for a single table.
-     * 
+     *
      * Sets up queries, loops over columns and anonymizes columns for the passed
      * Table.
-     * 
-     * @param table 
+     *
+     * @param table
      */
-    private void anonymizeTable(final int batchSize, final IDbFactory dbFactory, final Table table)
-    throws DatabaseAnonymizerException {
+    private void anonymizeTable(final Table table) throws DatabaseException {
 
         if (StringUtils.isBlank(table.getWhere())) {
             log.info("Table [" + table.getName() + "]. Start ...");
         } else {
             log.info("Table [" + table.getName() + ", where=" + table.getWhere() + "]. Start ...");
         }
-        
+
         final List<Column> tableColumns = table.getColumns();
         // colNames is looked up with contains, and iterated over.  Using LinkedHashSet means
         // duplicate column names won't be added to the query, so a check in the column loop
@@ -667,30 +436,30 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
         // keyNames is only iterated over, so no need for a hash set
         final List<String> keyNames = new LinkedList<>();
-        
+
         fillColumnNames(table, colNames);
         fillPrimaryKeyNamesList(table, keyNames);
-        
+
         // required in this scope for 'catch' block
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
         ResultSet rs = null;
         final Connection updateCon = dbFactory.getUpdateConnection();
-        
+
         try {
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
-            
+
             final TableMetaData tableMetaData = dbFactory.fetchMetaData().getMetaDataFor(rs);
-            
+
             final String updateString = getUpdateQuery(table, colNames, keyNames);
             updateStmt = updateCon.prepareStatement(updateString);
-            
-            int batchCounter = 0; 
+
+            int batchCounter = 0;
             int rowCount = 0;
-            
+
             while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, updateCon, rs, tableMetaData, dbFactory.getVendorName());
+                anonymizeRow(updateStmt, tableColumns, keyNames, rs, tableMetaData);
                 batchCounter++;
                 if (batchCounter == batchSize) {
                     updateStmt.executeBatch();
@@ -700,7 +469,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 rowCount++;
             }
             log.debug("Rows processed: " + rowCount);
-            
+
             updateStmt.executeBatch();
             log.debug("Batch executed");
             updateCon.commit();
@@ -709,8 +478,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
             updateStmt.close();
             rs.close();
             log.debug("Closing open resources");
-            
-        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException | 
+
+        } catch (SQLException | NoSuchMethodException | SecurityException | IllegalAccessException |
                  IllegalArgumentException | InvocationTargetException | DataDefenderException ex ) {
             log.error(ex.toString());
             if (ex.getCause() != null) {
@@ -742,23 +511,17 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 }
             } catch (SQLException sqlex) {
                 log.error(sqlex.toString());
-            }            
+            }
         }
-        
+
         log.info("Table " + table.getName() + ". End ...");
         log.info("");
     }
-    
-    public void anonymize(
-        final IDbFactory dbFactory,
-        final DbConfig config,
-        final int batchSize,
-        final Requirement requirement,
-        List<String> tables
-    ) throws DatabaseAnonymizerException {
+
+    public void anonymize() throws DataDefenderException {
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for (final Table reqTable : requirement.getFilteredTables(tables)) {
-            anonymizeTable(batchSize, dbFactory, reqTable);
+            anonymizeTable(reqTable);
         }
     }
 }

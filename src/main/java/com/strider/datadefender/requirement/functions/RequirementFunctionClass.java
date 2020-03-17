@@ -13,20 +13,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.anonymizer;
+package com.strider.datadefender.requirement.functions;
 
 /**
- * Package-level exception
- * @author Armenak Grigoryan
+ * Specifies that the class contains functions for use by anonymizer functions.
+ *
+ * This identifies classes that the anonymizer should try to construct, versus
+ * classes that identify the return type of a column (and methods that operate
+ * on them, for example a function java.lang.String#substring) that should not
+ * be constructed.
+ *
+ * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
-public class DatabaseAnonymizerException extends Exception {
-    private static final long serialVersionUID = 1L;
-
-    public DatabaseAnonymizerException(final String msg) {
-        super(msg);
-    }
-
-    public DatabaseAnonymizerException(final String msg, final Throwable t) {
-        super(msg, t);
-    }
+public abstract class RequirementFunctionClass {
+    
 }

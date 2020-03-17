@@ -15,12 +15,7 @@
  */
 package com.strider.datadefender.anonymizer;
 
-import com.strider.datadefender.DbConfig;
-import com.strider.datadefender.database.DatabaseAnonymizerException;
-import com.strider.datadefender.database.IDbFactory;
-import com.strider.datadefender.requirement.Requirement;
-
-import java.util.List;
+import com.strider.datadefender.DataDefenderException;
 
 /**
  * Defines contract for all Anonymizes
@@ -31,16 +26,7 @@ public interface IAnonymizer {
     /**
      * Anonymizes data.
      *
-     * @param dbFactory
-     * @param anonymizerProperties
-     * 
-     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
+     * @throws DataDefenderException
      */
-    void anonymize(
-        final IDbFactory dbFactory,
-        final DbConfig config,
-        final int batchSize,
-        final Requirement requirement,
-        List<String> tables
-    ) throws DatabaseAnonymizerException;
+    void anonymize() throws DataDefenderException;
 }

@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
@@ -48,11 +48,11 @@ public class RequirementUtilsTest extends TestCase {
     private Requirement         requirement;
 
     // Setup load-related tests
-    private void load() throws DatabaseAnonymizerException {
+    private void load() throws DatabaseException {
         load(getClass().getResource("/Requirement.xml").getFile());
     }
 
-    private void load(final String fname) throws DatabaseAnonymizerException {
+    private void load(final String fname) throws DatabaseException {
         requirement = Loader.load(fname);
         assertNotNull(requirement);
     }

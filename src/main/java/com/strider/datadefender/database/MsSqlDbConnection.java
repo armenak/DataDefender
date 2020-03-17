@@ -36,10 +36,10 @@ public class MsSqlDbConnection extends DbConnection {
      * Establishes database connection
      *
      * @return Connection
-     * @throws DatabaseAnonymizerException
+     * @throws DatabaseException
      */
     @Override
-    public Connection connect() throws DataDefenderException {
+    public Connection connect() throws DatabaseException {
         return doConnect(() -> getConnection(this.getURL()));
     }
 

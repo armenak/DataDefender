@@ -64,7 +64,7 @@ public class MSSQLDBConnectionTest {
     private Connection mockConnection;
 
     @Test
-    public void testConnect() throws DatabaseAnonymizerException, DataDefenderException, SQLException {
+    public void testConnect() throws DatabaseException, DataDefenderException, SQLException {
         final TestMSSQLDBConnection testDB = new TestMSSQLDBConnection(testProps);
 
         assertEquals(mockConnection, testDB.connect());
@@ -74,13 +74,13 @@ public class MSSQLDBConnectionTest {
     // testing class
     private class TestMSSQLDBConnection extends MsSqlDbConnection {
         public TestMSSQLDBConnection(final Properties properties)
-                throws DatabaseAnonymizerException, DataDefenderException {
+                throws DatabaseException, DataDefenderException {
             super(properties);
         }
 
         @Override
         protected Connection doConnect(final ISupplierWithException<Connection, SQLException> supplier)
-                throws DatabaseAnonymizerException {
+                throws DatabaseException {
             final Field[] allFields = supplier.getClass().getDeclaredFields();
 
             assertEquals(1, allFields.length);

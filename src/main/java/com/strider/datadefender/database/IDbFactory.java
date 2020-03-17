@@ -153,7 +153,7 @@ public interface IDbFactory extends ICloseableNoException {
      * @return db factory instance
      * @throws DatabaseAnonymizerException
      */
-    static IDbFactory get(final DbConfig config) throws DataDefenderException {
+    public static IDbFactory get(final DbConfig config) throws DataDefenderException {
 
         if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.H2) {
             DbFactory factory = getFactoryWith(config, DbConnection.class, MySqlMetaData.class, SqlBuilder.class);

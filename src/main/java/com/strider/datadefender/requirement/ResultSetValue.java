@@ -13,20 +13,33 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.anonymizer;
+package com.strider.datadefender.requirement;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 
 /**
- * Package-level exception
- * @author Armenak Grigoryan
+ * @author Zaahid Bateson
  */
-public class DatabaseAnonymizerException extends Exception {
-    private static final long serialVersionUID = 1L;
+@Data
+@Log4j2
+public class ResultSetValue {
 
-    public DatabaseAnonymizerException(final String msg) {
-        super(msg);
+    private Class type;
+    private String columnName;
+
+    public ResultSetValue(Class type, String columnName) {
+        this.type = type;
+        this.columnName = columnName;
     }
 
-    public DatabaseAnonymizerException(final String msg, final Throwable t) {
-        super(msg, t);
+    public Object getValue(ResultSet rs) throws SQLException {
+        if (type == ResultSet.class) {
+            return rs;
+        }
+        return rs.getObject(columnName, type);
     }
 }

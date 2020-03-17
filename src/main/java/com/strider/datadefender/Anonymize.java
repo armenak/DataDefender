@@ -17,7 +17,9 @@ package com.strider.datadefender;
 
 import com.strider.datadefender.anonymizer.DatabaseAnonymizer;
 import com.strider.datadefender.anonymizer.IAnonymizer;
+import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.requirement.Requirement;
+import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
 
 import java.util.concurrent.Callable;
 import java.util.List;
@@ -64,15 +66,33 @@ public class Anonymize implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        System.out.println(double.class);
-        
+        System.out.println("");
         System.out.println("Starting anonymizer");
         log.info("Datasource URL: {}, vendor: {}, schema: {}", dbConfig.getUrl(), dbConfig.getVendor(), dbConfig.getSchema());
         log.info("Username: {}, Password provided: {}", dbConfig.getUsername(), (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
         log.info("Batch size: {}", batchSize);
         log.info("Limiting to tables: {}", CollectionUtils.isEmpty(tables) ? "<all tables selected>" : StringUtils.join(tables, ", "));
-        System.out.println("");
-        // final IAnonymizer anonymizer = new DatabaseAnonymizer();
+
+        IDbFactory factory = IDbFactory.get(dbConfig);
+        RequirementFunctionClassRegistry.singleton().initialize(factory);
+
+        final IAnonymizer anonymizer = new DatabaseAnonymizer(
+            factory,
+            dbConfig,
+            batchSize,
+            requirement,
+            tables
+        );
+        try {
+            anonymizer.anonymize();
+        } catch (DataDefenderException e) {
+            log.error(e.getMessage());
+            log.debug("Exception occurred during anonymization", e);
+            return 1;
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+            return 1;
+        }
         return 0;
     }
 }

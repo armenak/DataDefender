@@ -33,7 +33,7 @@ import javax.xml.bind.Unmarshaller;
 
 import static javax.xml.bind.JAXBContext.newInstance;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
@@ -146,9 +146,9 @@ public class Generator {
      * Load requirement file into java objects
      * @param requirementFile Requirement filename and path
      * @return Requirement object loaded based on file
-     * @throws DatabaseAnonymizerException
+     * @throws DatabaseException
      */
-    public static Requirement load(final String requirementFile) throws DatabaseAnonymizerException {
+    public static Requirement load(final String requirementFile) throws DatabaseException {
 
         // Now we collect data from the requirement
         Requirement requirement = null;
@@ -163,7 +163,7 @@ public class Generator {
         } catch (JAXBException je) {
             log.error(je.toString());
 
-            throw new DatabaseAnonymizerException(je.toString(), je);
+            throw new DatabaseException(je.toString(), je);
         } catch (FileNotFoundException ex) {
             log.error("Requirement file not found", ex);
         }
@@ -175,9 +175,9 @@ public class Generator {
      * Write requirement to file.
      * @param requirement
      * @param fileName
-     * @throws DatabaseAnonymizerException
+     * @throws DatabaseException
      */
-    public static void write(final Requirement requirement, final String fileName) throws DatabaseAnonymizerException {
+    public static void write(final Requirement requirement, final String fileName) throws DatabaseException {
         log.info("Requirement.write() to file: " + fileName);
 
         final File outFile = new File(fileName);
@@ -191,7 +191,7 @@ public class Generator {
         } catch (JAXBException je) {
             log.error(je.toString());
 
-            throw new DatabaseAnonymizerException(je.toString(), je);
+            throw new DatabaseException(je.toString(), je);
         }
     }
 

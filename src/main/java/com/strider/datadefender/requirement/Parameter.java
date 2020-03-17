@@ -15,19 +15,26 @@
  */
 package com.strider.datadefender.requirement;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.ClassUtils;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * JAXB class that defines parameter elements in Requirement.xml file
@@ -36,40 +43,75 @@ import lombok.Data;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@Log4j2
 public class Parameter {
+
     @XmlAttribute(name = "Name")
     private String name;
-    @XmlAttribute(name = "Value")
-    private String value;
+
     @XmlAttribute(name = "Type")
-    private String type;
+    @XmlJavaTypeAdapter(ClassAdapter.class)
+    private Class<?> type;
+
+    @XmlAttribute(name = "Value")
+    @Getter(AccessLevel.NONE)
+    private String value;
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    private Object objectValue;
+
+    @XmlAttribute(name = "UseRSColumnValue")
+    private boolean useRsColumnValue = false;
+
+    @XmlAttribute(name = "UseRSRow")
+    private boolean useRsRow = false;
+
     @XmlElement(name = "Element")
     private List<ArrayElement> elements;
 
     /**
-     * Converts a Parameter element to an Object based on Type and Value, or
-     * Type and Elements for an array.
-     * 
-     * @return
-     * @throws ClassNotFoundException
+     * Sets up the value based on the type.
+     *
+     * @param unmarshaller
+     * @param parent
      */
-    public Object getTypeValue() throws ClassNotFoundException {
-        
-        String t = StringUtils.trimToEmpty(type);
-        if (StringUtils.isBlank(t)) {
-            t = "java.lang.String";
-        } else if (!t.contains(".") && Character.isUpperCase(t.charAt(0))) {
-            t = "java.lang." + t;
-        }
-        if (elements != null && value == null) {
-            if (t.endsWith("[]")) {
-                t = t.substring(0, t.length() - 2);
-            }
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        Column c = (Column) parent;
+        if (useRsRow || StringUtils.equals("@@row@@", value)) {
+            objectValue = new ResultSetValue(ResultSet.class, c.getName());
+        } else if (useRsColumnValue || StringUtils.equals("@@column@@", value)) {
+            objectValue = new ResultSetValue(type, c.getName());
+        } else if (elements != null) {
             List a = new ArrayList(elements.size());
             for (ArrayElement el : elements) {
-                a.add(ConvertUtils.convert(el.getValue(), ClassUtils.getClass(t)));
+                a.add(ConvertUtils.convert(el.getValue(), type));
             }
+            objectValue = a;
+        } else {
+            objectValue = ConvertUtils.convert(value, type);
         }
-        return ConvertUtils.convert(value, ClassUtils.getClass(t));
+    }
+
+    /**
+     * Returns the value of the parameter.  Requires a ResultSet for dynamic
+     * parameter values set with UseRSColumnValue or UseRSRow.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    public Object getValue(ResultSet rs) throws SQLException {
+        if (objectValue instanceof ResultSetValue) {
+            ResultSetValue rsValue = (ResultSetValue) objectValue;
+            return rsValue.getValue(rs);
+        }
+        return objectValue;
+    }
+
+    /**
+     * Returns the String value of the attribute named "Value".
+     */
+    public String getValueAttribute() {
+        return value;
     }
 }

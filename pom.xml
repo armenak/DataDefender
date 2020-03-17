@@ -108,6 +108,7 @@
                     <source>11</source>
                     <target>11</target>
                     <showDeprecation>true</showDeprecation>
+                    <!-- for Method Parameter inspection -->
                     <compilerArgument>-parameters</compilerArgument>
                 </configuration>
             </plugin>
@@ -235,6 +236,12 @@
             <groupId>dk.brics</groupId>
             <artifactId>automaton</artifactId>
             <version>1.12-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.5.1</version>
         </dependency>
 
         <!--dependency>

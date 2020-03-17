@@ -27,6 +27,8 @@ import javax.xml.bind.Unmarshaller;
 import static javax.xml.bind.JAXBContext.newInstance;
 
 import com.strider.datadefender.requirement.Requirement;
+import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
+import java.lang.reflect.InvocationTargetException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -54,24 +56,29 @@ public class Loader {
      * @param requirementFile Requirement filename and path
      * @param version required version
      * @return Requirement object loaded based on file
-     * @throws LoaderException
+     * @throws javax.xml.bind.JAXBException
+     * @throws java.io.FileNotFoundException
+     * @throws java.lang.NoSuchMethodException
+     * @throws java.lang.InstantiationException
+     * @throws java.lang.IllegalAccessException
+     * @throws java.lang.reflect.InvocationTargetException
      */
-    public Requirement load(final String requirementFile, final String version) throws JAXBException, FileNotFoundException {
+    public Requirement load(final String requirementFile, final String version) throws
+        FileNotFoundException,
+        JAXBException,
+        NoSuchMethodException,
+        InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
 
         Requirement requirement = null;
         log.info("Loading requirement file: {}", requirementFile);
 
-        try {
-            requirement = (Requirement) unmarshaller.unmarshal(
-                new FileInputStream(new File(requirementFile))
-            );
-        } catch (JAXBException je) {
-            log.error("Unable to load XML from requirements file {}", je.getMessage());
-            throw je;
-        } catch (FileNotFoundException ex) {
-            log.error("Requirement file not found, {}", ex.getMessage());
-            throw ex;
-        }
+        requirement = (Requirement) unmarshaller.unmarshal(
+            new FileInputStream(new File(requirementFile))
+        );
+        RequirementFunctionClassRegistry.singleton().register(requirement);
         if (!VersionUtil.isCompatible(version, requirement.getVersion())) {
             throw new IllegalArgumentException(String.format(
                 "The Requirement XML file's version: %s, is incompatible with "

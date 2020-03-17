@@ -30,14 +30,14 @@ import com.strider.datadefender.DataDefenderException;
  */
 public class IDBFactoryTest {
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidNoProps() throws DatabaseAnonymizerException, DataDefenderException {
+    public void testInvalidNoProps() throws DatabaseException, DataDefenderException {
         final Properties invalidProps = new Properties();
 
         IDbFactory.get(invalidProps).getConnection();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidProps() throws DatabaseAnonymizerException, DataDefenderException {
+    public void testInvalidProps() throws DatabaseException, DataDefenderException {
         final Properties invalidProps = new Properties();
 
         invalidProps.setProperty("vendor", "my-invalid-db");

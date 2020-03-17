@@ -12,21 +12,24 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
+ *
  */
-package com.strider.datadefender.anonymizer;
+package com.strider.datadefender.database;
+
+import com.strider.datadefender.DataDefenderException;
 
 /**
- * Package-level exception
+ * Package level exception. Extends application level exception.
  * @author Armenak Grigoryan
  */
-public class DatabaseAnonymizerException extends Exception {
+public class DatabaseException extends DataDefenderException {
     private static final long serialVersionUID = 1L;
 
-    public DatabaseAnonymizerException(final String msg) {
+    public DatabaseException(final String msg) {
         super(msg);
     }
 
-    public DatabaseAnonymizerException(final String msg, final Throwable t) {
+    public DatabaseException(final String msg, final Throwable t) {
         super(msg, t);
     }
 }

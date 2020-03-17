@@ -13,20 +13,20 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.anonymizer;
+package com.strider.datadefender.requirement.functions;
+
+import com.strider.datadefender.database.IDbFactory;
 
 /**
- * Package-level exception
- * @author Armenak Grigoryan
+ * Configures a member variable IDbFactory in a concrete 'initialize' method.
+ *
+ * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
-public class DatabaseAnonymizerException extends Exception {
-    private static final long serialVersionUID = 1L;
+public abstract class DatabaseAwareRequirementFunctionClass {
 
-    public DatabaseAnonymizerException(final String msg) {
-        super(msg);
-    }
+    protected IDbFactory dbFactory;
 
-    public DatabaseAnonymizerException(final String msg, final Throwable t) {
-        super(msg, t);
+    public final void initialize(IDbFactory dbFactory) {
+        this.dbFactory = dbFactory;
     }
 }

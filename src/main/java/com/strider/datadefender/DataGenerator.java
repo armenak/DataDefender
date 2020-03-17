@@ -32,7 +32,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.database.DatabaseAnonymizerException;
+import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Parameter;
 import com.strider.datadefender.requirement.Requirement;
@@ -74,11 +74,11 @@ public class DataGenerator implements IGenerator {
      * Generate data to be used by anoymizer.
      * @param dbFactory
      * @param anonymizerProperties  Properties for anonymizer
-     * @throws com.strider.datadefender.database.DatabaseAnonymizerException
+     * @throws com.strider.datadefender.database.DatabaseException
      */
     @Override
     public void generate(final IDbFactory dbFactory, final Properties anonymizerProperties)
-            throws DatabaseAnonymizerException {
+            throws DatabaseException {
 
         // Now we collect data from the requirement
         final Requirement requirement = Loader.load(anonymizerProperties.getProperty("requirement"));
@@ -100,7 +100,7 @@ public class DataGenerator implements IGenerator {
 
                     // Backup existing data set file
                     if (!backupExistingFile(fileParameter.getValue())) {
-                        throw new DatabaseAnonymizerException("Unable to rename existing data set file "
+                        throw new DatabaseException("Unable to rename existing data set file "
                                                               + fileParameter.getValue());
                     }
 
@@ -124,7 +124,7 @@ public class DataGenerator implements IGenerator {
                     } catch (IOException ioException) {
                         log.error(ioException.toString());
 
-                        throw new DatabaseAnonymizerException(ioException.toString(), ioException);
+                        throw new DatabaseException(ioException.toString(), ioException);
                     } catch (SQLException sqle) {
                         log.error(sqle.toString());
                     }

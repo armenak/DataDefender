@@ -17,13 +17,11 @@ package com.strider.datadefender.database;
 
 import java.sql.Connection;
 
-import com.strider.datadefender.DataDefenderException;
-
 /**
  * Interface for all classes implementing database connection
  *
  * @author Armenak Grigoryan
  */
 public interface IDbConnection {
-    Connection connect() throws DataDefenderException;
+    Connection connect() throws DatabaseException;
 }
