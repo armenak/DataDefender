@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.functions;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.junit.Test;
@@ -104,7 +105,7 @@ public class CoreFunctionsTest extends TestCase {
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
         assertNotNull(rand);
-        assertFalse(rand.isBlank());
+        assertFalse(StringUtils.isBlank(rand));
         log.debug("Generated random date: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -127,7 +128,7 @@ public class CoreFunctionsTest extends TestCase {
 
         String rand = cf.randomDateTime(dateStart, dateEnd, format);
         assertNotNull(rand);
-        assertFalse(rand.isBlank());
+        assertFalse(StringUtils.isBlank(rand));
         log.debug("Generated random date/time: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
