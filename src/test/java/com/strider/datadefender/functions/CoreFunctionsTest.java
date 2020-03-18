@@ -18,20 +18,18 @@
 
 package com.strider.datadefender.functions;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
-import org.junit.Test;
-
-import static org.apache.log4j.Logger.getLogger;
-
+import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Xeger;
 import com.strider.datadefender.utils.XegerTest;
+import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import junit.framework.TestCase;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Core data anonymizer functions
@@ -104,7 +102,7 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date generation between 1910-01-01 and 1930-01-01");
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
-        assertFalse(StringUtils.isBlank(rand));
+        assertFalse(CommonUtils.isEmptyString(rand));
         log.debug("Generated random date: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -126,7 +124,7 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
 
         String rand = cf.randomDateTime(dateStart, dateEnd, format);
-        assertFalse(StringUtils.isBlank(rand));
+        assertFalse(CommonUtils.isEmptyString(rand));
         log.debug("Generated random date/time: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
