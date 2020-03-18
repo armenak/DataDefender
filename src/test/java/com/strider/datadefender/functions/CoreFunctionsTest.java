@@ -104,7 +104,6 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date generation between 1910-01-01 and 1930-01-01");
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
-        assertNotNull(rand);
         assertFalse(StringUtils.isBlank(rand));
         log.debug("Generated random date: " + rand);
 
@@ -127,7 +126,6 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
 
         String rand = cf.randomDateTime(dateStart, dateEnd, format);
-        assertNotNull(rand);
         assertFalse(StringUtils.isBlank(rand));
         log.debug("Generated random date/time: " + rand);
 
