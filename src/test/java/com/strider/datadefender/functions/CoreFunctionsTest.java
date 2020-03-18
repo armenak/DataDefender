@@ -18,19 +18,17 @@
 
 package com.strider.datadefender.functions;
 
-import org.apache.log4j.Logger;
-
-import org.junit.Test;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.utils.Xeger;
 import com.strider.datadefender.utils.XegerTest;
+import junit.framework.TestCase;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import junit.framework.TestCase;
+import static org.apache.log4j.Logger.getLogger;
 
 /**
  * Core data anonymizer functions
@@ -104,7 +102,7 @@ public class CoreFunctionsTest extends TestCase {
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
         assertNotNull(rand);
-        assertFalse(rand.isBlank());
+        assertFalse(rand.isEmpty());
         log.debug("Generated random date: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -127,7 +125,7 @@ public class CoreFunctionsTest extends TestCase {
 
         String rand = cf.randomDateTime(dateStart, dateEnd, format);
         assertNotNull(rand);
-        assertFalse(rand.isBlank());
+        assertFalse(rand.isEmpty());
         log.debug("Generated random date/time: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
