@@ -18,7 +18,6 @@
 
 package com.strider.datadefender.functions;
 
-import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Xeger;
 import com.strider.datadefender.utils.XegerTest;
 import junit.framework.TestCase;
@@ -102,7 +101,8 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date generation between 1910-01-01 and 1930-01-01");
 
         String rand = cf.randomDate(dateStart, dateEnd, format);
-        assertFalse(CommonUtils.isEmptyString(rand));
+        assertNotNull(rand);
+        assertFalse(rand.isEmpty());
         log.debug("Generated random date: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
@@ -124,7 +124,8 @@ public class CoreFunctionsTest extends TestCase {
         log.debug("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
 
         String rand = cf.randomDateTime(dateStart, dateEnd, format);
-        assertFalse(CommonUtils.isEmptyString(rand));
+        assertNotNull(rand);
+        assertFalse(rand.isEmpty());
         log.debug("Generated random date/time: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
