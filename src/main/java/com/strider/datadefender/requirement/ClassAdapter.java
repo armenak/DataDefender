@@ -16,10 +16,12 @@
 package com.strider.datadefender.requirement;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ * XmlAdapter to get a Class<?> type from a String, and vice-versa.
  *
  * @author Zaahid Bateson
  */
@@ -32,9 +34,6 @@ public class ClassAdapter extends XmlAdapter<String, Class<?>> {
             t = "java.lang.String";
         } else if (!t.contains(".") && Character.isUpperCase(t.charAt(0))) {
             t = "java.lang." + t;
-        }
-        if (t.endsWith("[]")) {
-            t = t.substring(0, t.length() - 2);
         }
         return ClassUtils.getClass(t);
     }

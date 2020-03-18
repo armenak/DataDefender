@@ -31,7 +31,7 @@ import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Parameter;
+import com.strider.datadefender.requirement.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 
@@ -108,12 +108,12 @@ public class RequirementUtilsTest extends TestCase {
 
         for (final Column column : requirement.getTables().get(0).getColumns()) {
             if ("column1".equals(column.getName()) || "column2".equals(column.getName())) {
-                final Parameter parameter = Loader.getFileParameter(column.getParameters());
+                final Argument parameter = Loader.getFileParameter(column.getParameters());
 
                 assertNotNull(parameter);
                 assertEquals(Loader.PARAM_NAME_FILE, parameter.getName());
             } else {
-                final Parameter parameter = Loader.getFileParameter(column.getParameters());
+                final Argument parameter = Loader.getFileParameter(column.getParameters());
 
                 assertNull(parameter);
             }
@@ -126,7 +126,7 @@ public class RequirementUtilsTest extends TestCase {
     public void testGetPrimitiveArrayParameterValue() throws Exception {
         load();
 
-        List<Parameter> params = requirement.getTables().get(2).getColumns().get(2).getParameters();
+        List<Argument> params = requirement.getTables().get(2).getColumns().get(2).getParameters();
 
         assertNotNull(params);
 
@@ -157,7 +157,7 @@ public class RequirementUtilsTest extends TestCase {
     public void testGetPrimitiveParameterValues() throws Exception {
         load();
 
-        final List<Parameter> params = requirement.getTables().get(2).getColumns().get(0).getParameters();
+        final List<Argument> params = requirement.getTables().get(2).getColumns().get(0).getParameters();
 
         assertNotNull(params);
         assertEquals(true, (boolean) params.get(0).getTypeValue());
@@ -182,7 +182,7 @@ public class RequirementUtilsTest extends TestCase {
     public void testGetStringArrayParameterValue() throws Exception {
         load();
 
-        final List<Parameter> params = requirement.getTables().get(2).getColumns().get(1).getParameters();
+        final List<Argument> params = requirement.getTables().get(2).getColumns().get(1).getParameters();
 
         assertNotNull(params);
 
@@ -245,7 +245,7 @@ public class RequirementUtilsTest extends TestCase {
         col.setName("cName");
         col.setFunction("some.function()");
 
-        final Parameter param = new Parameter();
+        final Argument param = new Argument();
 
         param.setName("pName");
         param.setValue("pvalue/file.txt");
@@ -275,7 +275,7 @@ public class RequirementUtilsTest extends TestCase {
         assertEquals("some.function()", c1.getFunction());
         assertEquals(1, c1.getParameters().size());
 
-        final Parameter p1 = c1.getParameters().get(0);
+        final Argument p1 = c1.getParameters().get(0);
 
         assertEquals("pName", p1.getName());
         assertEquals("pvalue/file.txt", p1.getValue());

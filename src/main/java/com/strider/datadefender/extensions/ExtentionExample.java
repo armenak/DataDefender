@@ -23,7 +23,7 @@ import static java.lang.Math.random;
 import static java.lang.Math.round;
 import static java.lang.String.valueOf;
 
-import com.strider.datadefender.functions.CoreFunctions;
+import com.strider.datadefender.anonymizer.functions.CoreFunctions;
 
 /**
  * @author Armenak Grigoryan

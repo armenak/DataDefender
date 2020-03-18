@@ -24,12 +24,12 @@ import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
-import com.strider.datadefender.functions.CoreFunctions;
+import com.strider.datadefender.anonymizer.functions.CoreFunctions;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Exclude;
 import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Parameter;
+import com.strider.datadefender.requirement.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.CommonUtils;
@@ -361,7 +361,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
              IllegalAccessException,
              IllegalArgumentException,
              InvocationTargetException,
-             DatabaseException {
+             DatabaseException,
+             InstantiationException {
 
         int fieldIndex = 0;
         final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
@@ -384,7 +385,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             }
 
             anonymized.add(columnName);
-            final Object colValue = column.invokeFunction(row);
+            final Object colValue = column.invokeFunctionChain(row);
             log.debug("colValue = " + colValue);
             log.debug("type= " + (colValue != null ? colValue.getClass() : "null"));
             if (colValue == null) {
@@ -421,7 +422,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
      *
      * @param table
      */
-    private void anonymizeTable(final Table table) throws DatabaseException {
+    private void anonymizeTable(final Table table) throws DatabaseException, InstantiationException {
 
         if (StringUtils.isBlank(table.getWhere())) {
             log.info("Table [" + table.getName() + "]. Start ...");
@@ -518,7 +519,8 @@ public class DatabaseAnonymizer implements IAnonymizer {
         log.info("");
     }
 
-    public void anonymize() throws DataDefenderException {
+    @Override
+    public void anonymize() throws DataDefenderException, InstantiationException {
         log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
         for (final Table reqTable : requirement.getFilteredTables(tables)) {
             anonymizeTable(reqTable);

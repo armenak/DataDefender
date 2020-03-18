@@ -37,7 +37,7 @@ import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Parameter;
+import com.strider.datadefender.requirement.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 
@@ -54,8 +54,8 @@ public class Generator {
     private static void addDefaultParam(final String table, final Column column) {
         column.setFunction("com.strider.datadefender.functions.CoreFunctions.randomStringFromFile");
 
-        final List<Parameter> params = new ArrayList<>();
-        final Parameter       param  = new Parameter();
+        final List<Argument> params = new ArrayList<>();
+        final Argument       param  = new Argument();
 
         param.setName("file");
         param.setValue(table + "_" + column.getName() + ".txt");
@@ -200,9 +200,9 @@ public class Generator {
      * @param parameters List of column parameters
      * @return File parameter object
      */
-    public static Parameter getFileParameter(final List<Parameter> parameters) {
+    public static Argument getFileParameter(final List<Argument> parameters) {
         if ((parameters != null) &&!parameters.isEmpty()) {
-            for (final Parameter parameter : parameters) {
+            for (final Argument parameter : parameters) {
                 if (PARAM_NAME_FILE.equalsIgnoreCase(parameter.getName())) {
                     return parameter;
                 }

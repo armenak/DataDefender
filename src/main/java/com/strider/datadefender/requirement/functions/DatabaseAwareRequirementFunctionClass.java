@@ -22,7 +22,7 @@ import com.strider.datadefender.database.IDbFactory;
  *
  * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
-public abstract class DatabaseAwareRequirementFunctionClass {
+public abstract class DatabaseAwareRequirementFunctionClass extends RequirementFunctionClass {
 
     protected IDbFactory dbFactory;
 

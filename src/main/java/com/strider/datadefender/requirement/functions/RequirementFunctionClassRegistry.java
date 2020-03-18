@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Very basic registry for classes that need to be instantiated for use by
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
  * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
 @RequiredArgsConstructor
+@Log4j2
 public class RequirementFunctionClassRegistry {
 
     private static RequirementFunctionClassRegistry instance = new RequirementFunctionClassRegistry();
@@ -52,11 +54,19 @@ public class RequirementFunctionClassRegistry {
         InvocationTargetException {
         List<Method> fns = requirements.getTables().stream()
             .flatMap((t) -> t.getColumns().stream())
-            .map((c) -> c.getFunction())
+            .flatMap((c) -> c.getFunctions().stream())
+            .map((fn) -> fn.getFunction())
             .collect(Collectors.toList());
+        log.debug("Found {} classes to register with functions for anonymization", fns.size());
         for (Method m : fns) {
             Class<?> cls = m.getDeclaringClass();
+            log.debug(
+                "Class: {}, is a RequirementFunctionClass: {}",
+                () -> cls.getName(),
+                () -> RequirementFunctionClass.class.isAssignableFrom(cls)
+            );
             if (RequirementFunctionClass.class.isAssignableFrom(cls)) {
+                log.debug("Registering RequirementFunctionClass: {}", cls);
                 singletons.put(cls, (RequirementFunctionClass) cls.getDeclaredConstructor().newInstance());
             }
         }
@@ -65,6 +75,7 @@ public class RequirementFunctionClassRegistry {
     public void initialize(IDbFactory factory) {
         for (Object o : singletons.values()) {
             if (o instanceof DatabaseAwareRequirementFunctionClass) {
+                log.debug("Initializing DatabaseAwareRequirementFunctionClass for: {}", o.getClass());
                 ((DatabaseAwareRequirementFunctionClass) o).initialize(factory);
             }
         }

@@ -34,7 +34,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Parameter;
+import com.strider.datadefender.requirement.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.requirement.file.Loader;
@@ -91,7 +91,7 @@ public class DataGenerator implements IGenerator {
 
             // Iterate over columns to generate data set for each column
             for (final Column column : table.getColumns()) {
-                final Parameter fileParameter = Loader.getFileParameter(column.getParameters());
+                final Argument fileParameter = Loader.getFileParameter(column.getParameters());
 
                 log.info("Column [" + column.getName() + "]. Start...");
 

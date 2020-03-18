@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.functions.CoreFunctions;
+import com.strider.datadefender.anonymizer.functions.CoreFunctions;
 
 /**
  * @author Matthew Eaton

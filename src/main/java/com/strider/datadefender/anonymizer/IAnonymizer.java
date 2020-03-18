@@ -28,5 +28,5 @@ public interface IAnonymizer {
      *
      * @throws DataDefenderException
      */
-    void anonymize() throws DataDefenderException;
+    void anonymize() throws DataDefenderException, InstantiationException;
 }

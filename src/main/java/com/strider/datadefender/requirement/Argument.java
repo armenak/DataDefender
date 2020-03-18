@@ -15,7 +15,7 @@
  */
 package com.strider.datadefender.requirement;
 
-import java.sql.ResultSet;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -37,14 +34,14 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * JAXB class that defines parameter elements in Requirement.xml file
+ * JAXB class that defines argument elements in Requirement.xml file
  *
  * @author Armenak Grigoryan
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @Log4j2
-public class Parameter {
+public class Argument {
 
     @XmlAttribute(name = "Name")
     private String name;
@@ -56,18 +53,22 @@ public class Parameter {
     @XmlAttribute(name = "Value")
     @Getter(AccessLevel.NONE)
     private String value;
+
+    @XmlElement(name = "Element")
+    private List<ArrayElement> elements;
+    
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Object objectValue;
 
-    @XmlAttribute(name = "UseRSColumnValue")
-    private boolean useRsColumnValue = false;
-
-    @XmlAttribute(name = "UseRSRow")
-    private boolean useRsRow = false;
-
-    @XmlElement(name = "Element")
-    private List<ArrayElement> elements;
+    /**
+     * If set to true, "Value" is null, and elements are empty, uses the passed
+     * value -- either the running value in a function chain (the return value
+     * from the last call) or the value of the column, or the ResultSet at the
+     * current row if "Type" is java.sql.ResultSet.
+     */
+    @XmlAttribute(name = "IsDynamicValue")
+    private boolean isDynamicValue = false;
 
     /**
      * Sets up the value based on the type.
@@ -75,35 +76,46 @@ public class Parameter {
      * @param unmarshaller
      * @param parent
      */
-    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-        Column c = (Column) parent;
-        if (useRsRow || StringUtils.equals("@@row@@", value)) {
-            objectValue = new ResultSetValue(ResultSet.class, c.getName());
-        } else if (useRsColumnValue || StringUtils.equals("@@column@@", value)) {
-            objectValue = new ResultSetValue(type, c.getName());
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent)
+        throws InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
+        
+        if (value != null) {
+            log.debug("Converting value: {} to type: {}", value, type);
+            objectValue = TypeConverter.convert(value, type);
         } else if (elements != null) {
             List a = new ArrayList(elements.size());
             for (ArrayElement el : elements) {
-                a.add(ConvertUtils.convert(el.getValue(), type));
+                a.add(TypeConverter.convert(el.getValue(), type));
             }
             objectValue = a;
-        } else {
-            objectValue = ConvertUtils.convert(value, type);
         }
     }
 
     /**
-     * Returns the value of the parameter.  Requires a ResultSet for dynamic
-     * parameter values set with UseRSColumnValue or UseRSRow.
+     * Returns the value of the argument.
+     *
+     * The method is called with a dynamic value set from a previous invocation
+     * in a chain of method calls, which is used if IsDynamicValue is set to
+     * true.
      *
      * @param rs
      * @return
      * @throws SQLException
      */
-    public Object getValue(ResultSet rs) throws SQLException {
-        if (objectValue instanceof ResultSetValue) {
-            ResultSetValue rsValue = (ResultSetValue) objectValue;
-            return rsValue.getValue(rs);
+    public Object getValue(Object lastValue)
+        throws InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
+        
+        if (isDynamicValue && value == null && elements == null) {
+            if (!type.isInstance(lastValue)) {
+                return TypeConverter.convert(lastValue, type);
+            }
+            return lastValue;
         }
         return objectValue;
     }

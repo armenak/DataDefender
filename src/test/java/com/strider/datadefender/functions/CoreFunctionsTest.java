@@ -18,6 +18,7 @@
 
 package com.strider.datadefender.functions;
 
+import com.strider.datadefender.anonymizer.functions.CoreFunctions;
 import org.apache.log4j.Logger;
 
 import org.junit.Test;
