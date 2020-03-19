@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 
 import static org.apache.log4j.Logger.getLogger;
 
-import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.requirement.file.Loader;
 
 import opennlp.tools.namefind.NameFinderME;
@@ -47,7 +47,7 @@ import opennlp.tools.tokenize.TokenizerModel;
  */
 public abstract class Discoverer {    // implements IDiscoverer {
     private static final Logger   log = getLogger(Discoverer.class);
-    protected List<TableMetaData> matches;
+    protected List<ColumnMetaData> matches;
 
     public double calculateAverage(final List<Probability> values) {
         Double sum = 0.0;

@@ -54,6 +54,10 @@ public class TableMetaData implements Comparable<TableMetaData> {
         public String toString() {
             return TableMetaData.this.toString() + "." + columnName;
         }
+
+        public TableMetaData getTable() {
+            return TableMetaData.this;
+        }
     }
 
     private final String schemaName;

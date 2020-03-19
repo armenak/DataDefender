@@ -15,40 +15,35 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.report;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
 import com.strider.datadefender.utils.CommonUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import com.strider.datadefender.database.IDbFactory;
-import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  *
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class ReportUtil {
-    private static final Logger log = getLogger(ReportUtil.class);
-
+    
     public static int rowCount(final IDbFactory factory, final String tableName) {
         final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
@@ -70,7 +65,7 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDbFactory factory, final TableMetaData metaData) throws IOException {
+    public static List<String> sampleData(final IDbFactory factory, final ColumnMetaData metaData) throws IOException {
         final ISqlBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";
@@ -79,10 +74,12 @@ public class ReportUtil {
             select = select + "DISTINCT ";
         }
         
-        querySample = sqlBuilder.buildSelectWithLimit(select + metaData.getColumnName() + 
-                                                          " FROM "  + sqlBuilder.prefixSchema(metaData.getTableName()) +
-                                                          " WHERE " + metaData.getColumnName() + " IS NOT NULL",
-                                                          5);     
+        querySample = sqlBuilder.buildSelectWithLimit(
+            select + metaData.getColumnName() + " FROM "
+                + sqlBuilder.prefixSchema(metaData.getTable().getTableName())
+                + " WHERE " + metaData.getColumnName() + " IS NOT NULL",
+            5
+        );
         log.debug("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();

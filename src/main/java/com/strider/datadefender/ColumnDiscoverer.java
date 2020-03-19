@@ -23,80 +23,67 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Pattern;
-
-import static java.util.regex.Pattern.compile;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
+import java.io.IOException;
 
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
-import java.io.IOException;
 import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import java.sql.SQLException;
+
+import lombok.extern.log4j.Log4j2;
+
+import static java.util.regex.Pattern.compile;
+import java.util.stream.Collectors;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class ColumnDiscoverer extends Discoverer {
-    private static final Logger log = getLogger(ColumnDiscoverer.class);
 
-    public List<TableMetaData> discover(final IDbFactory factory, 
+    public List<ColumnMetaData> discover(final IDbFactory factory,
             final Properties columnProperties, String vendor)
-            throws DataDefenderException, IOException {
+            throws DataDefenderException, IOException, SQLException {
         log.info("Column discovery in process");
 
-        final IMetaData           metaData      = factory.fetchMetaData();
-        final List<TableMetaData> map           = metaData.getMetaData(vendor);
-        List<TableMetaData>       uniqueMatches = null;
+        final IMetaData metaData = factory.fetchMetaData();
+        final List<TableMetaData> list = metaData.getMetaData();
 
         // Converting HashMap keys into ArrayList
         @SuppressWarnings({ "rawtypes", "unchecked" })
         final List<String> suspList = new ArrayList(columnProperties.keySet());
-
         suspList.remove("tables");    // removing 'special' tables property that's not a pattern
-        matches = new ArrayList<>();
 
-        for (final String suspStr : suspList) {
-            final Pattern p = compile(suspStr);
-
-            // Find out if database columns contain any of of the "suspicious" fields
-            for (final TableMetaData data : map) {
-                final String tableName  = data.getTableName();
-                final String columnName = data.getColumnName();
-
-                if (p.matcher(columnName.toLowerCase(Locale.ENGLISH)).matches()) {
-                    log.debug(data.toVerboseStr());
-                    matches.add(data);
-                }
-            }
-        }
+        final List<Pattern> patterns = suspList.stream().map((s) -> compile(s)).collect(Collectors.toList());
+        matches = list.stream().flatMap((t) -> t.getColumns().stream())
+            .filter((c) -> patterns.stream().anyMatch((p) -> p.matcher(c.getColumnName().toLowerCase()).matches()))
+            .collect(Collectors.toList());
 
         log.info("Preparing report ...");
 
         // Report column names
-
+        List<ColumnMetaData> uniqueMatches = null;
         if ((matches != null) &&!matches.isEmpty()) {
             uniqueMatches = new ArrayList<>(new LinkedHashSet<>(matches));
             log.info("-----------------");
             log.info("List of suspects:");
             log.info("-----------------");
-            uniqueMatches.sort(TableMetaData.compare());
+            uniqueMatches.sort((a, b) -> a.compareTo(b));
 
             final Score score = new Score();
 
-            for (final TableMetaData entry : uniqueMatches) {
+            for (final ColumnMetaData entry : uniqueMatches) {
 
                 // Row count
-                final int rowCount = ReportUtil.rowCount(factory, entry.getTableName());
+                final int rowCount = ReportUtil.rowCount(factory, entry.getTable().getTableName());
 
                 // Getting 5 sample values
-                final List<String> sampleDataList = ReportUtil.sampleData(factory,entry);
+                final List<String> sampleDataList = ReportUtil.sampleData(factory, entry);
 
                 // Output
                 log.info("Column                     : " + entry);
