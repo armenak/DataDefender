@@ -21,11 +21,11 @@
         <developer>
             <id>akira.matsuo</id>
             <name>Akira Matsuo</name>
-        </developer>          
+        </developer>
         <developer>
             <id>zaahid.bateson</id>
             <name>Zaahid Bateson</name>
-        </developer>              
+        </developer>
     </developers>
 
     <url>https://github.com/armenak/DataDefender</url>
@@ -87,7 +87,7 @@
         <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
         <sonar.profile>SIS</sonar.profile>
     </properties>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -180,7 +180,11 @@
                     </formats>
                     <check/>
                 </configuration>
-            </plugin>            
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -210,6 +214,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>commons-validator</groupId>
@@ -253,7 +262,7 @@
             <artifactId>opennlp-tools</artifactId>
             <version>1.9.0</version>
             <type>jar</type>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
@@ -263,7 +272,7 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
             <version>1.21</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jbig2-imageio</artifactId>
@@ -289,26 +298,8 @@
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.1-901-1.jdbc4</version>
-        </dependency>   
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.199</version>
-            <scope>test</scope>
-        </dependency-->
+        -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -327,8 +318,26 @@
             <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>3.3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-    
+
     <reporting>
         <plugins>
             <plugin>

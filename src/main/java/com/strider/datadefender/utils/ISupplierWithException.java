@@ -15,9 +15,6 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.utils;
 
 /**
@@ -31,6 +28,3 @@ package com.strider.datadefender.utils;
 public interface ISupplierWithException<T, E extends Exception> {
     T get() throws E;
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

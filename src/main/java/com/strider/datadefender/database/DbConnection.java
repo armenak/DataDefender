@@ -20,7 +20,8 @@ import com.strider.datadefender.utils.ISupplierWithException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import static java.sql.DriverManager.getConnection;
+import java.sql.DriverManager;
+
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
@@ -52,6 +53,7 @@ public class DbConnection implements IDbConnection {
     protected Connection doConnect(
         final ISupplierWithException<Connection, SQLException> supplier
     ) throws DatabaseException {
+        
         Connection conn = null;
         try {
             log.info("Establishing database connection");
@@ -79,7 +81,7 @@ public class DbConnection implements IDbConnection {
      */
     @Override
     public Connection connect() throws DatabaseException {
-        return doConnect(() -> getConnection(
+        return doConnect(() -> DriverManager.getConnection(
             config.getUrl(),
             StringUtils.trimToNull(config.getUsername()),
             StringUtils.trimToNull(config.getPassword())

@@ -16,18 +16,12 @@
 package com.strider.datadefender;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import picocli.CommandLine.Option;
 
 import lombok.Getter;
-import picocli.CommandLine.IParameterConsumer;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.CommandSpec;
 
 /**
  * Database configuration options for picocli.
