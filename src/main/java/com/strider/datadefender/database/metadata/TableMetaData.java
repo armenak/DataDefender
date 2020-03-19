@@ -157,6 +157,6 @@ public class TableMetaData implements Comparable<TableMetaData> {
 
     @Override
     public String toString() {
-        
+        return getCanonicalTableName();
     }
 }
