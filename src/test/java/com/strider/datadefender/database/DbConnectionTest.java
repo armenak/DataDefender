@@ -48,8 +48,8 @@ public class DbConnectionTest {
         assertFalse(con.isClosed());
         assertFalse(con.getAutoCommit());
 
-        verify(config.getUrl(), atLeast(1));
-        verify(config.getUsername(), atLeast(1));
-        verify(config.getPassword(), atLeast(1));
+        verify(config, atLeast(1)).getUrl();
+        verify(config, atLeast(1)).getUsername();
+        verify(config, atLeast(1)).getPassword();
     }
 }
