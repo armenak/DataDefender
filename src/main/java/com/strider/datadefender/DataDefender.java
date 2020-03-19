@@ -119,8 +119,11 @@ public class DataDefender implements Callable<Integer> {
 
     @Option(names = "--debug", description = "enable debug logging")
     public void setDebug(boolean debug) {
-        System.out.println("DEBUG logging turned on. DEBUG level messages only appear in the log file.");
+        System.out.println("DEBUG logging turned on. DEBUG level messages only "
+            + "appear in the log file by default.");
         Configurator.setRootLevel(Level.DEBUG);
+        log.warn("Private/sensitive data that should be anonymized will be "
+            + "logged to configured debug output streams.");
     }
 
     @Option(names = { "-v", "--verbose" }, description = "enable more verbose output")
