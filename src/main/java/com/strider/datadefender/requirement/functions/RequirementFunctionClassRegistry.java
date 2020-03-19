@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -52,11 +53,18 @@ public class RequirementFunctionClassRegistry {
         IllegalAccessException,
         IllegalArgumentException,
         InvocationTargetException {
-        List<Method> fns = requirements.getTables().stream()
-            .flatMap((t) -> t.getColumns().stream())
-            .flatMap((c) -> c.getFunctions().stream())
+        List<Method> fns = Stream.concat(
+            requirements.getTables().stream()
+                .flatMap((t) -> t.getColumns().stream())
+                .flatMap((c) -> c.getFunctionList().getFunctions().stream()),
+            requirements.getTables().stream()
+                .flatMap((t) -> t.getColumns().stream())
+                .map((c) -> c.getFunctionList().getCombiner())
+        )
+            .filter((fn) -> fn != null)     // combiner could be null
             .map((fn) -> fn.getFunction())
             .collect(Collectors.toList());
+
         log.debug("Found {} classes to register with functions for anonymization", fns.size());
         for (Method m : fns) {
             Class<?> cls = m.getDeclaringClass();

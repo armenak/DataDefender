@@ -26,20 +26,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  *
@@ -48,16 +48,31 @@ import org.apache.commons.collections4.CollectionUtils;
 @Log4j2
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Function {
+public class Function implements IFunction {
 
     @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
     @XmlAttribute(name = "Name")
     private String functionName;
+
     private Method function;
+
+    @XmlAttribute(name = "CombinerGlue")
+    private String combinerGlue;
+
+    private Object combinerGlueObject;
 
     @XmlElement(name = "Argument")
     private List<Argument> arguments;
+
+    private boolean isCombinerFunction = false;
+
+    public Function() {
+    }
+
+    public Function(String functionName) {
+        this.functionName = functionName;
+        isCombinerFunction = true;
+    }
 
     /**
      * Setter for 'Function' element.
@@ -67,6 +82,13 @@ public class Function {
     public void setFunction(Method fn) {
         function = fn;
         functionName = fn.getName();
+    }
+
+    /**
+     * Returns true if the underlying method is static
+     */
+    public boolean isStatic() {
+        return Modifier.isStatic(function.getModifiers());
     }
 
     /**
@@ -81,7 +103,7 @@ public class Function {
     private List<Method> getFunctionCandidates(Class<?> returnType) 
         throws ClassNotFoundException {
 
-        int index = StringUtils.lastIndexOfAny(functionName, "#", ".");
+        int index = StringUtils.lastIndexOfAny(functionName, "#", ".", "::");
         if (index == -1) {
             throw new IllegalArgumentException(
                 "Function element is empty or incomplete: " + functionName
@@ -95,34 +117,65 @@ public class Function {
             );
         }
         String cn = functionName.substring(0, index);
-        String fn = functionName.substring(index + 1);
+        String fn = StringUtils.stripStart(functionName.substring(index), "#.:");
         if (!cn.contains(".") && Character.isUpperCase(cn.charAt(0))) {
             cn = "java.lang." + cn;
         }
+        int argCount = CollectionUtils.size(arguments);
+
+        log.debug("Looking for function in class {} with name {} and {} parameters", cn, fn, argCount);
         Class clazz = ClassUtils.getClass(cn);
         List<Method> methods = Arrays.asList(clazz.getMethods());
+
         return methods
             .stream()
-            .filter(
-                (m) -> Modifier.isPublic(m.getModifiers())
-                && StringUtils.equals(fn, m.getName())
-                && TypeConverter.isConvertible(m.getReturnType(), returnType)
-                && m.getParameterCount() == CollectionUtils.size(arguments)
-            )
+            .filter((m) -> {
+                if (!StringUtils.equals(fn, m.getName()) || !Modifier.isPublic(m.getModifiers())) {
+                    return false;
+                }
+                final int ac = (!isCombinerFunction || Modifier.isStatic(m.getModifiers())) ? argCount : 1;
+                log.debug(
+                    "Candidate function {} needs {} parameters and gives {} return type, "
+                    + "looking for {} arguments and {} return type",
+                    () -> m.getName(),
+                    () -> m.getParameterCount(),
+                    () -> m.getReturnType(),
+                    () -> ac,
+                    () -> returnType
+                );
+                return (m.getParameterCount() == ac
+                    && TypeConverter.isConvertible(m.getReturnType(), returnType));
+            })
             .collect(Collectors.toList());
     }
 
     /**
-     * Uses functionName and arguments to find the method to associate with
-     * 'Function'.
-     *
-     * @param returnType
+     * 
+     * @param type 
      */
-    Method findFunction(Class<?> returnType) throws ClassNotFoundException {
-        List<Method> candidates = getFunctionCandidates(returnType);
+    private void initializeCombinerGlue(Class<?> type)
+        throws InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
+        if (!isCombinerFunction && combinerGlue != null) {
+            log.debug("Converting combinerGlue {} to object of type {}", combinerGlue, type);
+            combinerGlueObject = TypeConverter.convert(combinerGlue, type);
+        }
+    }
+
+    /**
+     * Finds a method in the passed candidates with parameters matching the
+     * arguments assigned to the current object, and returns it, or null if not
+     * found.
+     *
+     * @param candidates
+     * @return
+     */
+    private Method findCandidateFunction(List<Method> candidates) {
         final Map<String, Argument> mappedArgs = CollectionUtils.emptyIfNull(arguments).stream()
             .collect(Collectors.toMap(Argument::getName, (o) -> o, (x, y) -> y));
-        function = candidates.stream().filter((m) -> {
+        return candidates.stream().filter((m) -> {
             int index = -1;
             for (java.lang.reflect.Parameter p : m.getParameters()) {
                 ++index;
@@ -136,6 +189,69 @@ public class Function {
             }
             return true;
         }).findFirst().orElse(null);
+    }
+
+    /**
+     * Specialized function finder for a combiner that looks for either a single
+     * parameter for a non-static function that would be run on the first
+     * argument, or a two-parameter static function with compatible types.
+     *
+     * @param candidates
+     * @return
+     */
+    private Method findCombinerCandidateFunction(List<Method> candidates) {
+        return candidates.stream().filter((m) -> {
+            boolean isStatic = Modifier.isStatic(m.getModifiers());
+            int count = m.getParameterCount();
+            if (count == 0 || (isStatic && count != 2) || (!isStatic && count != 1)) {
+                return false;
+            }
+            int index = -1;
+            if (!isStatic) {
+                ++index;
+                if (!TypeConverter.isConvertible(arguments.get(index).getType(), m.getDeclaringClass())) {
+                    return false;
+                }
+            }
+            for (java.lang.reflect.Parameter p : m.getParameters()) {
+                ++index;
+                Argument arg = arguments.get(index);
+                if (!TypeConverter.isConvertible(p.getType(), arg.getType())) {
+                    return false;
+                }
+            }
+            return true;
+        }).findFirst().orElse(null);
+    }
+
+    /**
+     * Uses functionName and arguments to find the method to associate with
+     * 'Function'.
+     *
+     * @param returnType
+     */
+    Method initialize(Class<?> returnType)
+        throws ClassNotFoundException,
+        InstantiationException,
+        IllegalAccessException,
+        IllegalArgumentException,
+        InvocationTargetException {
+
+        log.debug("Initializing function {}", functionName);
+        initializeCombinerGlue(returnType);
+        List<Method> candidates = getFunctionCandidates(returnType);
+        log.debug(
+            "Found method candidates: {}",
+            () -> CollectionUtils.emptyIfNull(candidates).stream()
+                .map((m) -> m.getName()).collect(Collectors.toList())
+        );
+        if (!isCombinerFunction) {
+            function = findCandidateFunction(candidates);
+        } else {
+            function = findCombinerCandidateFunction(candidates);
+        }
+
+        log.debug("Function references method: {}", () -> (function == null) ? "null" : function.getName());
         // could try and sort returned functions if more than one based on
         // "best selection" for argument/parameter types
         if (function == null) {
@@ -154,7 +270,8 @@ public class Function {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    public Object invokeFunction(Object lastValue)
+    @Override
+    public Object invoke(Object lastValue)
         throws SQLException,
         IllegalAccessException,
         InvocationTargetException,
@@ -163,9 +280,15 @@ public class Function {
         log.debug("Function declaring class: {}", function.getDeclaringClass());
         RequirementFunctionClassRegistry registry = RequirementFunctionClassRegistry.singleton();
         Object ob = registry.getFunctionsSingleton(function.getDeclaringClass());
-        if (ob == null && lastValue != null && !Modifier.isStatic(function.getModifiers()) && lastValue.getClass().equals(function.getDeclaringClass())) {
-            ob = lastValue;
+        if (
+            ob == null
+            && lastValue != null
+            && !Modifier.isStatic(function.getModifiers())
+            && TypeConverter.isConvertible(lastValue.getClass(), function.getDeclaringClass())
+        ) {
+            ob = TypeConverter.convert(lastValue, function.getDeclaringClass());
         }
+
         java.lang.reflect.Parameter[] parameters = function.getParameters();
         List<Object> fnArguments = new ArrayList<>();
         final Map<String, Argument> mappedArgs = CollectionUtils.emptyIfNull(arguments).stream()

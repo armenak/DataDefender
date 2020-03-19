@@ -31,7 +31,7 @@ public class Address extends Core {
 
     public String randomCountry() throws IOException {
         return randomStringFromStream(
-            "resource:cities.txt",
+            "resource:countries.txt",
             () -> Lipsum.class.getClassLoader().getResourceAsStream("countries.txt")
         );
     }
@@ -45,7 +45,7 @@ public class Address extends Core {
 
     public String randomStreet() throws IOException {
         return randomStringFromStream(
-            "resource:cities.txt",
+            "resource:streets.txt",
             () -> Lipsum.class.getClassLoader().getResourceAsStream("streets.txt")
         );
     }
@@ -65,17 +65,17 @@ public class Address extends Core {
     }
 
     public String randomCanadianPostalCode() {
-        final Xeger instance = new Xeger("[A-Z]\\d[A-Z] \\d[A-Z]\\d");
+        final Xeger instance = new Xeger("[A-Z][0-9][A-Z] [0-9][A-Z][0-9]");
         return instance.generate();
     }
 
     public String randomUsZipCode() {
-        final Xeger instance = new Xeger("\\d{5}");
+        final Xeger instance = new Xeger("[0-9]{5}");
         return instance.generate();
     }
 
     public String randomUsZipCodeNineDigit() {
-        final Xeger instance = new Xeger("\\d{5}-\\d{4}");
+        final Xeger instance = new Xeger("[0-9]{5}-[0-9]{4}");
         return instance.generate();
     }
 

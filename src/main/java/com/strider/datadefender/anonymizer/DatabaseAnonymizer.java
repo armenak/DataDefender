@@ -15,29 +15,21 @@
  */
 package com.strider.datadefender.anonymizer;
 
-import com.strider.datadefender.requirement.functions.DatabaseAwareRequirementFunctionClass;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
 import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
-import com.strider.datadefender.anonymizer.functions.CoreFunctions;
-import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Exclude;
 import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -320,12 +312,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
      * @return
      * @throws SQLException
      */
-    private String getTruncatedColumnValue(final String colValue, final String colName, final TableMetaData tableMetaData) throws SQLException {
+    private Object getTruncatedColumnValue(final Object colValue, final String colName, final TableMetaData tableMetaData) throws SQLException {
         final ColumnMetaData col = tableMetaData.getColumn(colName);
         final int colSize = col.getColumnSize();
         final Class clazz = col.getColumnType();
-        if (clazz.equals(String.class) && colValue.length() > colSize) {
-            return colValue.substring(0, colSize);
+        if (clazz.equals(String.class) && colValue.toString().length() > colSize) {
+            return colValue.toString().substring(0, colSize);
         }
         return colValue;
     }
@@ -395,7 +387,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             } else if (colValue.getClass() == java.lang.Integer.class) {
                 updateStmt.setInt(columnIndexes.get(columnName), (int) colValue);
             } else {
-                updateStmt.setString(
+                updateStmt.setObject(
                     columnIndexes.get(columnName),
                     getTruncatedColumnValue(
                         (String) colValue,
@@ -486,19 +478,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
             if (ex.getCause() != null) {
                 log.error(ex.getCause().toString());
             }
-            try {
-                if (selectStmt != null) {
-                    selectStmt.close();
-                }
-                if (updateStmt != null) {
-                    updateStmt.close();
-                }
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException sqlex) {
-                log.error(sqlex.toString());
-            }
+            throw new DatabaseException("Exception anonymizing table", ex);
         } finally {
             try {
                 if (selectStmt != null) {

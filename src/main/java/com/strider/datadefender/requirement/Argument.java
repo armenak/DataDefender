@@ -57,7 +57,6 @@ public class Argument {
     @XmlElement(name = "Element")
     private List<ArrayElement> elements;
     
-    @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Object objectValue;
 
@@ -69,6 +68,13 @@ public class Argument {
      */
     @XmlAttribute(name = "IsDynamicValue")
     private boolean isDynamicValue = false;
+
+    public Argument() {
+    }
+
+    public Argument(Class<?> type) {
+        this.type = type;
+    }
 
     /**
      * Sets up the value based on the type.
@@ -112,7 +118,9 @@ public class Argument {
         InvocationTargetException {
         
         if (isDynamicValue && value == null && elements == null) {
+            log.debug("Using dynamic value for attribute");
             if (!type.isInstance(lastValue)) {
+                log.debug("Converting dynamic attribute value: {} to type: {}", lastValue, type);
                 return TypeConverter.convert(lastValue, type);
             }
             return lastValue;

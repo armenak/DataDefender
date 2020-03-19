@@ -54,6 +54,8 @@ public class TypeConverter {
     public static boolean isConvertible(Class<?> from, Class<?> to) {
         if (ClassUtils.isAssignable(from, to) || String.class.equals(to)) {
             return true;
+        } else if (ClassUtils.isPrimitiveOrWrapper(from) && String.class.isAssignableFrom(from)) {
+            return true;
         }
         return (getConvertibleConstructor(from, to) != null);
     }

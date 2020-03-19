@@ -16,12 +16,10 @@
 package com.strider.datadefender.requirement;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,6 +35,7 @@ import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
 import static java.util.Collections.unmodifiableList;
+import org.apache.commons.beanutils.ConvertUtils;
 
 /**
  * JAXB class that defines column elements in Requirement.xml file
@@ -58,9 +57,8 @@ public class Column {
     @XmlAttribute(name = "Type")
     private Class<?> type;
 
-    @XmlElementWrapper(name = "Functions", required = true)
-    @XmlElement(name = "Function", required = true)
-    private List<Function> functions;
+    @XmlElement(name = "Functions")
+    private FunctionList functionList;
 
     @XmlElementWrapper(name = "Exclusions")
     @XmlElement(name = "Exclude")
@@ -96,39 +94,14 @@ public class Column {
         IllegalAccessException,
         InvocationTargetException,
         InstantiationException {
-        
-        Object returnedValue = null;
-        Argument args = functions.get(0).getArguments().stream()
-            .filter((a) -> a.isDynamicValue())
-            .findFirst()
-            .orElse(null);
-        if (args != null) {
-            if (ClassUtils.isAssignable(ResultSet.class, args.getType())) {
-                returnedValue = rs;
-            } else {
-                returnedValue = rs.getObject(name, args.getType());
-            }
-        }
-        for (Function fn : functions) {
-            returnedValue = fn.invokeFunction(returnedValue);
-        }
-        return returnedValue;
-    }
 
-    /**
-     * Uses functionName and parameters to find the method to associate with
-     * 'Function'.
-     *
-     * @param unmarshaller
-     * @param parent
-     */
-    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent)
-        throws ClassNotFoundException {
-
-        Class<?> chain = type;
-        for (Function fn : functions) {
-            Method m = fn.findFunction(chain);
-            chain = m.getReturnType();
+        Object startingValue = null;
+        Class<?> argType = functionList.getDynamicArgumentType();
+        if (argType != null && ClassUtils.isAssignable(ResultSet.class, argType)) {
+            startingValue = rs;
+        } else {
+            startingValue = rs.getObject(name, type);
         }
+        return ConvertUtils.convert(functionList.invoke(startingValue), type);
     }
 }
