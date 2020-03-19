@@ -17,17 +17,12 @@ package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
 import com.strider.datadefender.utils.Xeger;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -37,13 +32,9 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
 import java.util.Scanner;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -52,8 +43,6 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 public class Core extends RequirementFunctionClass {
-
-    private static final Random rand = new Random();
 
     private static final Map<String, List<String>> stringLists = new HashMap<>();
     private static final Map<String, Iterator<String>> stringIters = new HashMap<>();
@@ -69,7 +58,6 @@ public class Core extends RequirementFunctionClass {
                 words.add(scanner.next());
             }
         }
-
     }
 
     /**
@@ -175,7 +163,7 @@ public class Core extends RequirementFunctionClass {
     public String randomString(final int num, final int length) {
         final StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; i++) {
-            final int r = rand.nextInt(479617);
+            final int r = RandomUtils.nextInt(0, words.size());
             randomString.append(words.get(r)).append(' ');
         }
 

@@ -20,10 +20,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Holds metadata for a table.
@@ -141,11 +142,21 @@ public class TableMetaData implements Comparable<TableMetaData> {
             .compare(this, t);
     }
 
-    @Override
-    public String toString() {
-        if (schemaName != null) {
+    /**
+     * If schemaName is set, returns {schemaName}.{tableName}, otherwise returns
+     * {tableName} alone.
+     * 
+     * @return 
+     */
+    public String getCanonicalTableName() {
+        if (StringUtils.isNotBlank(schemaName)) {
             return schemaName + "." + tableName;
         }
         return tableName;
+    }
+
+    @Override
+    public String toString() {
+        
     }
 }

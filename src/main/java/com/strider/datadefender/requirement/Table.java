@@ -48,4 +48,11 @@ public class Table {
     @XmlElementWrapper(name = "Exclusions")
     @XmlElement(name = "Exclude")
     private List<Exclude> exclusions;
+
+    public Table() {
+    }
+
+    public Table(String name) {
+        this.name = name;
+    }
 }

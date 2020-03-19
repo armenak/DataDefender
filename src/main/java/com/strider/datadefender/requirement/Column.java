@@ -64,6 +64,13 @@ public class Column {
     @XmlElement(name = "Exclude")
     private List<Exclude> exclusions;
 
+    public Column() {
+    }
+
+    public Column(String name) {
+        this.name = name;
+    }
+
     /**
      * Returns a list of exclusions
      *

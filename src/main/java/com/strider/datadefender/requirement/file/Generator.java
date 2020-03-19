@@ -35,13 +35,18 @@ import static javax.xml.bind.JAXBContext.newInstance;
 
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Argument;
+import com.strider.datadefender.requirement.Function;
+import com.strider.datadefender.requirement.FunctionList;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class to help handling requirement objects
@@ -52,16 +57,17 @@ public class Generator {
 
     // Hard-coded default params for now.
     private static void addDefaultParam(final String table, final Column column) {
-        column.setFunction("com.strider.datadefender.functions.CoreFunctions.randomStringFromFile");
+        final FunctionList fl = new FunctionList();
+        final Function fn = new Function("com.strider.datadefender.anonymizer.functions.Core#randomStringFromFile", false);
+        final Argument arg  = new Argument();
 
-        final List<Argument> params = new ArrayList<>();
-        final Argument       param  = new Argument();
+        arg.setName("file");
+        arg.setValue(table + "_" + column.getName() + ".txt");
+        arg.setType(String.class);
 
-        param.setName("file");
-        param.setValue(table + "_" + column.getName() + ".txt");
-        param.setType(column.getReturnType());
-        params.add(param);
-        column.setParameters(params);
+        fn.setArguments(List.of(arg));
+        fl.setFunctions(List.of(fn));
+        column.setFunctionList(fl);
     }
 
     /**
@@ -70,105 +76,39 @@ public class Generator {
      * @return
      */
     public static Requirement create(final List<TableMetaData> matches) {
-        final Map<String, Table>        tables  = new HashMap<>();
-        final Map<String, List<Column>> columns = new HashMap<>();
-        Column                          column;
+
+        List<Table> tables = new ArrayList<>();
 
         for (final TableMetaData match : matches) {
-            final StringBuilder sb = new StringBuilder();
-
-            if ((match.getSchemaName() != null) &&!match.getSchemaName().equals("")) {
-                sb.append(match.getSchemaName()).append('.').append(match.getTableName());
-            } else {
-                sb.append(match.getTableName());
+            Table table = new Table(match.getCanonicalTableName());
+            final List<ColumnMetaData> pks = match.getPrimaryKeys();
+            if (pks.size() == 1) {    // only one pk
+                table.setPkey(pks.get(0).getColumnName());
+            } else {                  // multiple key pk
+                final List<Key> keys = pks.stream().map(col -> new Key(col.getColumnName())).collect(Collectors.toList());
+                table.setPrimaryKeys(keys);
             }
 
-            final String tableName = sb.toString();
-            Table        table     = tables.get(tableName);
+            final List<Column> columns = new ArrayList<>();
+            for (final ColumnMetaData cmatch : match.getColumns()) {
+                final Column column = new Column();
+                column.setName(cmatch.getColumnName());
+                column.setType(cmatch.getColumnType());
 
-            if (table == null) {          // new table
-                table = new Table();
-                table.setName(tableName);
-
-                final List<String> pks = match.getPkeys();
-
-                if (pks.size() == 1) {    // only one pk
-                    table.setPkey(pks.get(0));
-                } else {                  // multiple key pk
-                    final List<Key> keys = pks.stream()
-                                              .map(
-                                                  pkName -> {
-                                                      Key key = new Key();
-
-                                                      key.setName(pkName);
-
-                                                      return key;
-                                                  })
-                                              .collect(Collectors.toList());
-
-                    table.setPrimaryKeys(keys);
-                }
-
-                // store table
-                tables.put(tableName, table);
-                columns.put(tableName, new ArrayList<>());
-            }                                      // deal with columns
-
-            column = new Column();
-            column.setName(match.getColumnName());
-
-            final String columnType = match.getColumnType();
-
-            if ("TEXT".equals(columnType) || "CHAR".equals(columnType)) {
-                column.setReturnType("String");
-            } else {
-                column.setReturnType(match.getColumnType());
+                addDefaultParam(table.getName(), column);
+                columns.add(column);
             }
-
-            addDefaultParam(table.getName(), column);
-            columns.get(tableName).add(column);    // add column
-        }                                          // add columns to tables
-
-        for (final Entry<String, List<Column>> entry : columns.entrySet()) {
-            tables.get(entry.getKey()).setColumns(entry.getValue());
+            table.setColumns(columns);
+            tables.add(table);
         }
 
         final Requirement req = new Requirement();
 
         req.setClient("Autogenerated Template Client");
-        req.setVersion("1.0");    // hopefully order of tables doesn't matter
-        req.setTables(new ArrayList<>(tables.values()));
+        req.setVersion("2.0");    // hopefully order of tables doesn't matter
+        req.setTables(tables);
 
         return req;
-    }
-
-    /**
-     * Load requirement file into java objects
-     * @param requirementFile Requirement filename and path
-     * @return Requirement object loaded based on file
-     * @throws DatabaseException
-     */
-    public static Requirement load(final String requirementFile) throws DatabaseException {
-
-        // Now we collect data from the requirement
-        Requirement requirement = null;
-
-        log.info("Requirement.load() file: " + requirementFile);
-
-        try {
-            final JAXBContext  jc           = newInstance(Requirement.class);
-            final Unmarshaller unmarshaller = jc.createUnmarshaller();
-
-            requirement = (Requirement) unmarshaller.unmarshal(new FileInputStream(new File(requirementFile)));
-        } catch (JAXBException je) {
-            log.error(je.toString());
-
-            throw new DatabaseException(je.toString(), je);
-        } catch (FileNotFoundException ex) {
-            log.error("Requirement file not found", ex);
-        }
-
-        return requirement;
     }
 
     /**
@@ -177,41 +117,28 @@ public class Generator {
      * @param fileName
      * @throws DatabaseException
      */
-    public static void write(final Requirement requirement, final String fileName) throws DatabaseException {
+    public static void write(final Requirement requirement, final String fileName) throws DatabaseException, JAXBException {
         log.info("Requirement.write() to file: " + fileName);
 
         final File outFile = new File(fileName);
+        final JAXBContext jc = newInstance(Requirement.class);
+        final Marshaller  marshaller = jc.createMarshaller();
 
-        try {
-            final JAXBContext jc         = newInstance(Requirement.class);
-            final Marshaller  marshaller = jc.createMarshaller();
-
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(requirement, outFile);
-        } catch (JAXBException je) {
-            log.error(je.toString());
-
-            throw new DatabaseException(je.toString(), je);
-        }
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(requirement, outFile);
     }
 
     /**
-     * Returns Parameter of name "file" if exists else returns null
-     * @param parameters List of column parameters
+     * Returns argument of name "file" if exists else returns null
+     * @param arguments List of function arguments
      * @return File parameter object
      */
-    public static Argument getFileParameter(final List<Argument> parameters) {
-        if ((parameters != null) &&!parameters.isEmpty()) {
-            for (final Argument parameter : parameters) {
-                if (PARAM_NAME_FILE.equalsIgnoreCase(parameter.getName())) {
-                    return parameter;
-                }
-            }
-        }
-
-        return null;
+    public static Argument getFileParameter(final List<Argument> arguments) {
+        return CollectionUtils
+            .emptyIfNull(arguments)
+            .stream()
+            .filter((a) -> StringUtils.equals(a.getName(), "file"))
+            .findAny()
+            .orElse(null);
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

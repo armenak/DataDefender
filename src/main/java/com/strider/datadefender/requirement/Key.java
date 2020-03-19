@@ -38,4 +38,11 @@ public class Key {
      */
     @XmlAttribute(name = "Name")
     private String name;
+
+    public Key() {
+    }
+
+    public Key(String name) {
+        this.name = name;
+    }
 }

@@ -17,9 +17,6 @@ package com.strider.datadefender.requirement;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * XmlAdapter to get a Function type from a String attribute.
  *
@@ -29,7 +26,7 @@ public class FunctionAttributeAdapter extends XmlAdapter<String, Function> {
 
     @Override
     public Function unmarshal(String value) throws Exception {
-        return new Function(value);
+        return new Function(value, true);
     }
 
     @Override

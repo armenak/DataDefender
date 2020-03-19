@@ -69,9 +69,9 @@ public class Function implements IFunction {
     public Function() {
     }
 
-    public Function(String functionName) {
+    public Function(String functionName, boolean isCombinerFunction) {
         this.functionName = functionName;
-        isCombinerFunction = true;
+        this.isCombinerFunction = isCombinerFunction;
     }
 
     /**
