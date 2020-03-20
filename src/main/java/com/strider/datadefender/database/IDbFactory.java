@@ -70,13 +70,19 @@ public interface IDbFactory extends ICloseableNoException {
 
         @Override
         public void close() {
-            if (connection == null) {
-                return;
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                log.error(e.getMessage(), e);
+            if (updateConnection != null && updateConnection != connection) {
+                try {
+                    updateConnection.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
 
@@ -167,7 +173,6 @@ public interface IDbFactory extends ICloseableNoException {
         } else if (config.getVendor() == Vendor.POSTGRESQL) {
             return getFactoryWith(config, DbConnection.class, MetaData.class, SqlBuilder.class);
         }
-
         throw new IllegalArgumentException("Database " + config.getVendor() + " is not supported");
     }
 }

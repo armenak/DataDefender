@@ -40,14 +40,14 @@ public class MsSqlDbConnection extends DbConnection {
      */
     @Override
     public Connection connect() throws DatabaseException {
-        return doConnect(() -> getConnection(this.getURL()));
+        return doConnect(() -> getConnection(this.getUrl()));
     }
 
     /**
-     * Get connection url.
+     * Get connection URL.
      * @return String
      */
-    protected String getURL() {
+    protected String getUrl() {
         StringBuilder sqlServerUrl = new StringBuilder(config.getUrl());
         if (!StringUtils.isBlank(config.getUsername())) {
             sqlServerUrl.append(";user=").append(config.getUsername());

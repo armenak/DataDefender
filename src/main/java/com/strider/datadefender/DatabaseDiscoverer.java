@@ -15,25 +15,34 @@
  * Lesser General Public License for more details.
  *
  */
-
 package com.strider.datadefender;
 
+import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.IMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
+import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.report.ReportUtil;
+import com.strider.datadefender.specialcase.SpecialCase;
+import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.utils.Score;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import java.nio.charset.StandardCharsets;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,38 +50,22 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static java.lang.Double.parseDouble;
-
-import static java.util.regex.Pattern.compile;
-
 import org.apache.commons.collections.ListUtils;
-
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.commons.io.IOUtils;
 
 import opennlp.tools.util.Span;
 
-import com.strider.datadefender.database.metadata.IMetaData;
-import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.functions.Utils;
-import com.strider.datadefender.report.ReportUtil;
-import com.strider.datadefender.specialcase.SpecialCase;
-import com.strider.datadefender.utils.CommonUtils;
-import com.strider.datadefender.utils.Score;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.sql.Clob;
-import org.apache.commons.io.IOUtils;
-import com.strider.datadefender.database.IDbFactory;
-import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
+import static java.lang.Double.parseDouble;
+import static java.util.regex.Pattern.compile;
+import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author Armenak Grigoryan
  */
+@Log4j
 public class DatabaseDiscoverer extends Discoverer {
-    private static final Logger LOG = getLogger(DatabaseDiscoverer.class);
     private static final String YES = "yes";
     private static String[]     modelList;
 
@@ -92,9 +85,9 @@ public class DatabaseDiscoverer extends Discoverer {
     private Object callExtention(final String function, final TableMetaData data, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException {
-        if ((function == null) || function.equals("")) {
-            LOG.warn("Function " + function + " is not defined");
 
+        if (!StringUtils.isBlank(function)) {
+            log.warn("Function {} is not defined", function);
             return null;
         }
 
@@ -112,7 +105,8 @@ public class DatabaseDiscoverer extends Discoverer {
             paramValues.put("text", text);
             value = method.invoke(instance, data, text);
         } catch (InstantiationException | ClassNotFoundException ex) {
-            LOG.error(ex.toString());
+            log.error(ex.toString());
+            log.debug(ex.toString(), ex);
         }
 
         return value;
@@ -122,7 +116,7 @@ public class DatabaseDiscoverer extends Discoverer {
     public List<TableMetaData> discover(final IDbFactory factory, 
             final Properties dataDiscoveryProperties, String vendor)
             throws ParseException, DataDefenderException, IOException {
-        LOG.info("Data discovery in process");
+        log.info("Data discovery in process");
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
@@ -132,20 +126,20 @@ public class DatabaseDiscoverer extends Discoverer {
             calculate_score = "false";
         }
 
-        LOG.info("Probability threshold [" + probabilityThreshold + "]");
+        log.info("Probability threshold [{}]", probabilityThreshold);
 
         // Get list of models used in data discovery
         final String models = dataDiscoveryProperties.getProperty("models");
 
         modelList = models.split(",");
-        LOG.info("Model list [" + Arrays.toString(modelList) + "]");
+        log.info("Model list [" + Arrays.toString(modelList) + "]");
 
         List<TableMetaData> finalList = new ArrayList<>();
 
         for (final String model : modelList) {
-            LOG.info("********************************");
-            LOG.info("Processing model " + model);
-            LOG.info("********************************");
+            log.info("********************************");
+            log.info("Processing model " + model);
+            log.info("********************************");
 
             final Model modelPerson = createModel(dataDiscoveryProperties, model);
 
@@ -158,7 +152,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-        LOG.info("List of suspects:");
+        log.info("List of suspects:");
 
         final Score score           = new Score();
         int         highRiskColumns = 0;
@@ -168,35 +162,35 @@ public class DatabaseDiscoverer extends Discoverer {
 
             // Row count
             if (YES.equals(calculate_score)) {
-                LOG.debug("Counting number of rows ...");
+                log.debug("Counting number of rows ...");
                 rowCount = ReportUtil.rowCount(factory, 
                                data.getTableName());
             } else {
-                LOG.debug("Skipping counting number of rows ...");
+                log.debug("Skipping counting number of rows ...");
             }
 
             // Getting 5 sample values
             final List<String> sampleDataList = ReportUtil.sampleData(factory, data);
             // Output
-            LOG.info("Column                      : " + data.toString());
-            LOG.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
-            LOG.info("Model                       : " + data.getModel());
-            LOG.info("Number of rows in the table : " + rowCount);
+            log.info("Column                      : " + data.toString());
+            log.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
+            log.info("Model                       : " + data.getModel());
+            log.info("Number of rows in the table : " + rowCount);
 
             if (YES.equals(calculate_score)) {
-                LOG.info("Score                       : " + score.columnScore(rowCount));
+                log.info("Score                       : " + score.columnScore(rowCount));
             } else {
-                LOG.info("Score                       : N/A");
+                log.info("Score                       : N/A");
             }
 
-            LOG.info("Sample data");
-            LOG.info(CommonUtils.fixedLengthString('-', 11));
+            log.info("Sample data");
+            log.info(CommonUtils.fixedLengthString('-', 11));
             
             sampleDataList.forEach((sampleData) -> {
-                LOG.info(sampleData);
+                log.info(sampleData);
             });
 
-            LOG.info("");
+            log.info("");
 
             // Score calculation is evaluated with score_calculation parameter
             if (YES.equals(calculate_score) && score.columnScore(rowCount).equals("High")) {
@@ -206,19 +200,19 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
         if (YES.equals(calculate_score)) {
-            LOG.info("Overall score: " + score.dataStoreScore());
-            LOG.info("");
+            log.info("Overall score: " + score.dataStoreScore());
+            log.info("");
 
             if ((finalList != null) && (finalList.size() > 0)) {
-                LOG.info("============================================");
+                log.info("============================================");
 
                 final int threshold_count = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
 
                 if (finalList.size() > threshold_count) {
-                    LOG.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold ["
+                    log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold ["
                              + threshold_count + "]");
                 } else {
-                    LOG.info("Number of PI [" + finalList.size()
+                    log.info("Number of PI [" + finalList.size()
                              + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
                 }
 
@@ -226,28 +220,30 @@ public class DatabaseDiscoverer extends Discoverer {
                     Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
 
                 if (highRiskColumns > threshold_highrisk) {
-                    LOG.info("Number of High risk PI [" + highRiskColumns
+                    log.info("Number of High risk PI [" + highRiskColumns
                              + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
                 } else {
-                    LOG.info("Number of High risk PI [" + highRiskColumns
+                    log.info("Number of High risk PI [" + highRiskColumns
                              + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
                 }
             }
         } else {
-            LOG.info("Overall score: N/A");
+            log.info("Overall score: N/A");
         }
 
         return matches;
     }
 
-    private List<TableMetaData> discoverAgainstSingleModel(final IDbFactory factory,
-                                                           final Properties dataDiscoveryProperties,
-                                                           final Model model,
-                                                           final double probabilityThreshold,
-                                                           final String vendor)
-            throws ParseException, DataDefenderException, IOException {
+    private List<ColumnMetaData> discoverAgainstSingleModel(
+        final IDbFactory factory,
+        final Properties dataDiscoveryProperties,
+        final Model model,
+        final double probabilityThreshold,
+        final String vendor
+    ) throws ParseException, DataDefenderException, IOException {
+
         final IMetaData           metaData = factory.fetchMetaData();
-        final List<TableMetaData> map      = metaData.getMetaData(vendor);
+        final List<TableMetaData> map      = metaData.getMetaData();
 
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
@@ -258,9 +254,9 @@ public class DatabaseDiscoverer extends Discoverer {
         final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
         String[]                  specialCaseFunctions = null;
 
-        LOG.info("Extention list: " + extentionList);
+        log.info("Extention list: " + extentionList);
         
-        if (!CommonUtils.isEmptyString(extentionList)) {
+        if (StringUtils.isNotBlank(extentionList)) {
             specialCaseFunctions = extentionList.split(",");
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 specialCase = true;
@@ -274,22 +270,22 @@ public class DatabaseDiscoverer extends Discoverer {
             final String tableName  = data.getTableName();
             final String columnName = data.getColumnName();
 
-            LOG.debug("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
+            log.debug("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
             
             if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
-                LOG.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
+                log.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
-            LOG.debug("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
+            log.debug("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
             if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
-                LOG.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
+                log.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
             }            
             
-            LOG.debug("Column type: [" + data.getColumnType() + "]");
+            log.debug("Column type: [" + data.getColumnType() + "]");
             probabilityList = new ArrayList<>();
-            LOG.info("Analyzing column [" + tableName + "].[" + columnName + "]");
+            log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
             final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
 
@@ -310,7 +306,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                                                  " WHERE " + columnName + " IS NOT NULL ",
                                                                  limit);
 
-            LOG.debug("Executing query against database: " + query);
+            log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
@@ -331,26 +327,26 @@ public class DatabaseDiscoverer extends Discoverer {
                     } else {
                         sentence = resultSet.getString(1);
                     }
-                    LOG.debug(sentence);
+                    log.debug(sentence);
                     if (specialCaseFunctions != null && specialCase) {
                         try {
                             for (String specialCaseFunction : specialCaseFunctions) {
                                 if ((sentence != null) && !sentence.isEmpty()) {
-                                    LOG.debug("sentence: " + sentence);
-                                    LOG.debug("data: " + data);
+                                    log.debug("sentence: " + sentence);
+                                    log.debug("data: " + data);
                                     specialCaseData = (TableMetaData) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
                                         if (!specialCaseDataList.contains(specialCaseData)) {
-                                            LOG.debug("Adding new special case data: " + specialCaseData.toString());
+                                            log.debug("Adding new special case data: " + specialCaseData.toString());
                                             specialCaseDataList.add(specialCaseData);
                                         }
                                     } else {
-                                        LOG.debug("No special case data found");
+                                        log.debug("No special case data found");
                                     }
                                 }
                             }
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                            LOG.error(e.toString());
+                            log.error(e.toString());
                         }
                     }
                     
@@ -385,9 +381,9 @@ public class DatabaseDiscoverer extends Discoverer {
                             final String span = nameSpans[i].toString();
 
                             if (span.length() > 2) {
-                                LOG.debug("Span: " + span);
-                                LOG.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
-                                LOG.debug("Probability is: " + spanProbs[i]);
+                                log.debug("Span: " + span);
+                                log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
+                                log.debug("Probability is: " + spanProbs[i]);
                                 probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
                             }
                         }
@@ -399,7 +395,7 @@ public class DatabaseDiscoverer extends Discoverer {
                     }
                 }
             } catch (SQLException sqle) {
-                LOG.error(sqle.toString());
+                log.error(sqle.toString());
             }
 
             final double averageProbability = calculateAverage(probabilityList);
@@ -414,7 +410,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Special processing
         if (!specialCaseDataList.isEmpty()) {
-            LOG.debug("Special case data is processed :" + specialCaseDataList.toString());
+            log.debug("Special case data is processed :" + specialCaseDataList.toString());
 
             specialCaseDataList.forEach((specialData) -> {
                 matches.add(specialData);
