@@ -28,7 +28,7 @@ import com.strider.datadefender.anonymizer.functions.CoreFunctions;
 /**
  * @author Armenak Grigoryan
  */
-public class ExtentionExample extends CoreFunctions {
+public class ExtensionExample extends CoreFunctions {
 
     /**
      * Generates random 9-digit student number

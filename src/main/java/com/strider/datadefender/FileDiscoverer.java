@@ -98,7 +98,7 @@ public class FileDiscoverer extends Discoverer {
         // Special case
         String[] specialCaseFunctions = null;
         boolean specialCase = false;
-        final String extentionList = fileDiscoveryProperties.getProperty("extentions");
+        final String extensionList = fileDiscoveryProperties.getProperty("extensions");
         
         final String directories   = fileDiscoveryProperties.getProperty("directories");
         final String   exclusions    = fileDiscoveryProperties.getProperty("exclusions");
@@ -118,9 +118,9 @@ public class FileDiscoverer extends Discoverer {
         }
 
         final String[] directoryList = directories.split(",");        
-        if (!CommonUtils.isEmptyString(extentionList)) {
-            log.info("***** Extension list:" + extentionList);
-            specialCaseFunctions = extentionList.split(",");
+        if (!CommonUtils.isEmptyString(extensionList)) {
+            log.info("***** Extension list:" + extensionList);
+            specialCaseFunctions = extensionList.split(",");
 
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 File              node;
@@ -172,7 +172,7 @@ public class FileDiscoverer extends Discoverer {
                                             FileMatchMetaData returnData = null;
                                             try {
                                                 returnData = 
-                                                    (FileMatchMetaData)callExtention(new FileMatchMetaData(recursivedir, file), specialFunction,token);
+                                                    (FileMatchMetaData)callExtension(new FileMatchMetaData(recursivedir, file), specialFunction,token);
                                             } catch (InvocationTargetException e) {
                                                 continue;
                                             }
@@ -339,7 +339,7 @@ public class FileDiscoverer extends Discoverer {
         return fileMatches;
     }
 
-    private Object callExtention(final FileMatchMetaData metadata, final String function, final String text)
+    private Object callExtension(final FileMatchMetaData metadata, final String function, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException 
     {

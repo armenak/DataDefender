@@ -37,7 +37,7 @@ public class PropertyCheck {
         "probability_threshold", "english_tokens", "english_sentenses", "names", "models", "directories"
     };
     private static final String[] dataDiscoveryProperties = {
-        "probability_threshold", "english_tokens", "names", "models", "limit", "extentions", "score_calculation",
+        "probability_threshold", "english_tokens", "names", "models", "limit", "extensions", "score_calculation",
         "threshold_count", "threshold_highrisk"
     };
     private static final String[] databaseProperties       = { "vendor", "driver", "username", "password", "url" };

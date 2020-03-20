@@ -75,7 +75,7 @@ public class DatabaseDiscoverer extends Discoverer {
     private static String[]     modelList;
 
     /**
-     * Calls a function defined as an extention
+     * Calls a function defined as an extension
      * @param function
      * @param data
      * @param text
@@ -87,7 +87,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, final ColumnMetaData data, final String text)
+    private Object callExtension(final String function, final ColumnMetaData data, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException {
 
@@ -252,13 +252,13 @@ public class DatabaseDiscoverer extends Discoverer {
         ColumnMatch             specialCaseData;
         final List<ColumnMatch> specialCaseDataList  = new ArrayList();
         boolean                 specialCase          = false;
-        final String            extentionList        = dataDiscoveryProperties.getProperty("extentions");
+        final String            extensionList        = dataDiscoveryProperties.getProperty("extensions");
         String[]                specialCaseFunctions = null;
 
-        log.info("Extention list: " + extentionList);
+        log.info("Extension list: " + extensionList);
         
-        if (StringUtils.isNotBlank(extentionList)) {
-            specialCaseFunctions = extentionList.split(",");
+        if (StringUtils.isNotBlank(extensionList)) {
+            specialCaseFunctions = extensionList.split(",");
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 specialCase = true;
             }
@@ -275,13 +275,13 @@ public class DatabaseDiscoverer extends Discoverer {
             List<ColumnMetaData> fkeys = ListUtils.emptyIfNull(data.getTable().getForeignKeys());
 
             log.debug("Primary keys for table {}: [{}]", () -> tableName, pkeys);
-            if (pkeys.contains(columnName.toLowerCase(Locale.ENGLISH))) {
+            if (pkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
                 log.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
             log.debug("Foreign key(s) for table {}: [{}]", () -> tableName, fkeys);
-            if (fkeys.contains(columnName.toLowerCase(Locale.ENGLISH))) {
+            if (fkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
                 log.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
             }            
@@ -334,7 +334,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                 if ((sentence != null) && !sentence.isEmpty()) {
                                     log.debug("sentence: " + sentence);
                                     log.debug("data: " + data);
-                                    specialCaseData = (ColumnMatch) callExtention(specialCaseFunction, data, sentence);
+                                    specialCaseData = (ColumnMatch) callExtension(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
                                         if (!specialCaseDataList.contains(specialCaseData)) {
                                             log.debug("Adding new special case data: " + specialCaseData.toString());
