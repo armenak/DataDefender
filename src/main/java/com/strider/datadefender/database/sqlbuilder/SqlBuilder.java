@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Log4j2
 @RequiredArgsConstructor
-public abstract class SqlBuilder implements ISqlBuilder {
+public class SqlBuilder implements ISqlBuilder {
 
     protected final DbConfig config;
 
