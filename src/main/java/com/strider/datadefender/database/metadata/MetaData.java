@@ -42,16 +42,78 @@ import lombok.extern.log4j.Log4j2;
  * @author Akira Matsuo
  */
 @Log4j2
-public abstract class MetaData implements IMetaData {
+public class MetaData implements IMetaData {
 
     private final Connection connection;
     protected final DbConfig config;
-    protected String columnType;
-    protected SqlTypeToClass sqlTypeMap = new SqlTypeToClass();
+    protected final SqlTypeToClass sqlTypeMap;
 
-    public MetaData(final DbConfig config, final Connection connection) {
+    public MetaData(DbConfig config, Connection connection) {
+        this(config, connection, new SqlTypeToClass());
+    }
+
+    public MetaData(DbConfig config, Connection connection, SqlTypeToClass sqlTypeMap) {
         this.config = config;
         this.connection = connection;
+        this.sqlTypeMap = sqlTypeMap;
+    }
+
+    /**
+     * Returns a list of metadata information for tables in the current
+     * database/schema.
+     *
+     * @return
+     */
+    @Override
+    public List<TableMetaData> getMetaData() throws SQLException {
+
+        final List<TableMetaData> tables = new ArrayList<>();
+
+        // Getting all tables name
+        final DatabaseMetaData md = connection.getMetaData();
+        log.info("Fetching table names");
+
+        try (ResultSet trs = getTableResultSet(md)) {
+            while (trs.next()) {
+                final String tableName = trs.getString("TABLE_NAME");
+                log.info("Processing table [" + tableName + "]");
+                if (skipTable(tableName)) {
+                    continue;
+                }
+                TableMetaData table = new TableMetaData(config.getSchema(), tableName);
+                addColumnMetaData(md, table);
+                tables.add(table);
+            }
+        }
+
+        return tables;
+    }
+
+    /**
+     * Returns a list of metadata information for columns in the passed
+     * ResultSet.
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    @Override
+    public TableMetaData getMetaDataFor(final ResultSet rs) throws SQLException {
+        TableMetaData table = null;
+        final ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
+            if (table == null) {
+                table = new TableMetaData(rsmd.getSchemaName(i), rsmd.getTableName(i));
+            }
+            table.addColumn(
+                rsmd.getColumnName(i),
+                sqlTypeMap.getTypeFrom(rsmd.getColumnType(i)),
+                rsmd.getColumnDisplaySize(i),
+                false,
+                null
+            );
+        }
+        return table;
     }
 
     /**
@@ -123,64 +185,6 @@ public abstract class MetaData implements IMetaData {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Returns a list of metadata information for tables in the current
-     * database/schema.
-     *
-     * @return
-     */
-    @Override
-    public List<TableMetaData> getMetaData() throws SQLException {
-
-        final List<TableMetaData> tables = new ArrayList<>();
-
-        // Getting all tables name
-        final DatabaseMetaData md = connection.getMetaData();
-        log.info("Fetching table names");
-
-        try (ResultSet trs = getTableResultSet(md)) {
-            while (trs.next()) {
-                final String tableName = trs.getString("TABLE_NAME");
-                log.info("Processing table [" + tableName + "]");
-                if (skipTable(tableName)) {
-                    continue;
-                }
-                TableMetaData table = new TableMetaData(config.getSchema(), tableName);
-                addColumnMetaData(md, table);
-                tables.add(table);
-            }
-        }
-
-        return tables;
-    }
-
-    /**
-     * Returns a list of metadata information for columns in the passed
-     * ResultSet.
-     *
-     * @param rs
-     * @return
-     * @throws SQLException
-     */
-    @Override
-    public TableMetaData getMetaDataFor(final ResultSet rs) throws SQLException {
-        TableMetaData table = null;
-        final ResultSetMetaData rsmd = rs.getMetaData();
-        for (int i = 1; i <= rsmd.getColumnCount(); ++i) {
-            if (table == null) {
-                table = new TableMetaData(rsmd.getSchemaName(i), rsmd.getTableName(i));
-            }
-            table.addColumn(
-                rsmd.getColumnName(i),
-                sqlTypeMap.getTypeFrom(rsmd.getColumnType(i)),
-                rsmd.getColumnDisplaySize(i),
-                false,
-                null
-            );
-        }
-        return table;
     }
 
     /**

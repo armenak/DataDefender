@@ -1,44 +1,22 @@
-/*
- *
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- */
-
-
-
 package com.strider.datadefender.database.metadata;
+
+import com.strider.datadefender.DbConfig;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import java.sql.Types;
 import java.util.List;
-import java.util.Properties;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
-import com.strider.datadefender.database.DatabaseException;
 
 /**
  *
@@ -47,46 +25,68 @@ import com.strider.datadefender.database.DatabaseException;
  * Tests the default implementation of MetaData that's used for Oracle and MSSQL.
  *
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MetaDataTest {
-    final private String schema = "test-schema";
 
-    // private String table = "test-table";
-    final private String     cType          = "test-cType";
-    @SuppressWarnings("serial")
-    final private Properties testProperties = new Properties() {
-        {
-            setProperty("schema", schema);
-        }
-    };
     @Mock
-    private Connection mockConnection;
+    Connection mockConnection;
     @Mock
-    private ResultSet  mockTableRS;
-
-//  @Mock
-//  private ResultSet mockPKRS;
+    DbConfig mockConfig;
     @Mock
-    private ResultSet        mockColumnRS;
+    SqlTypeToClass mockSqlTypeMap;
     @Mock
-    private DatabaseMetaData mockMetaData;
+    ResultSet mockTableRs;
+    @Mock
+    ResultSet mockColumnRs;
+    @Mock
+    DatabaseMetaData mockDbMetaData;
 
-    @Test
-    public void testOverride() throws SQLException {
-        when(mockColumnRS.getString(6)).thenReturn(cType).thenReturn(cType).thenReturn("VARCHAR");
+    @BeforeEach
+    public void setUp() throws Exception {
 
-        TestMetaData metaData = new TestMetaData(testProperties, null);
+        when(mockConfig.getSchema()).thenReturn("such-schema");
+        when(mockConnection.getMetaData()).thenReturn(mockDbMetaData);
 
-        assertEquals("No override", cType, metaData.getColumnType(mockColumnRS));
-        metaData = new TestMetaData(testProperties, "Override-Strings-pls!-type");
-        assertEquals("Override, but not valid string type.", cType, metaData.getColumnType(mockColumnRS));
-        assertEquals("Override, with valid string type.", "String", metaData.getColumnType(mockColumnRS));
+        when(mockDbMetaData.getTables(any(), any(), any(), any())).thenReturn(mockTableRs);
+        when(mockTableRs.next()).thenReturn(Boolean.TRUE).thenReturn(Boolean.FALSE);
+        when(mockTableRs.getString("TABLE_NAME")).thenReturn("such-table");
+
+        when(mockDbMetaData.getColumns(any(), any(), any(), any())).thenReturn(mockColumnRs);
+        when(mockColumnRs.next()).thenReturn(Boolean.TRUE).thenReturn(Boolean.FALSE);
+        when(mockColumnRs.getString("COLUMN_NAME")).thenReturn("such-column");
+        when(mockColumnRs.getInt("COLUMN_SIZE")).thenReturn(1337);
+        when(mockColumnRs.getInt("DATA_TYPE")).thenReturn(Types.CHAR);
+        when(mockSqlTypeMap.getTypeFrom(Types.CHAR)).thenReturn(String.class);
     }
 
-    private class TestMetaData extends MetaData {
-        public TestMetaData(final Properties databaseProperties, final String columnType) {
-            super(databaseProperties, mockConnection);
-            this.columnType = columnType;
-        }
+    @Test
+    public void testGetMetaData() throws Exception {
+
+        MetaData test = new MetaData(mockConfig, mockConnection, mockSqlTypeMap);
+        List<TableMetaData> ret = test.getMetaData();
+
+        verify(mockDbMetaData, times(1)).getTables(isNull(), eq("such-schema"), isNull(), eq(new String[] { "TABLE" }));
+        verify(mockTableRs, times(2)).next();
+        verify(mockDbMetaData, times(1)).getColumns(isNull(), eq("such-schema"), eq("such-table"), isNull());
+        verify(mockColumnRs, times(2)).next();
+        verify(mockColumnRs).getString(eq("COLUMN_NAME"));
+        verify(mockColumnRs).getInt(eq("COLUMN_SIZE"));
+        verify(mockColumnRs).getInt(eq("DATA_TYPE"));
+
+        assertNotNull(ret);
+        assertEquals(1, ret.size());
+        assertNotNull(ret.get(0));
+        assertEquals("such-schema", ret.get(0).getSchemaName());
+        assertEquals("such-table", ret.get(0).getTableName());
+
+        assertNotNull(ret.get(0).getColumns());
+        assertEquals(1, ret.get(0).getColumns().size());
+
+        ColumnMetaData col = ret.get(0).getColumn(0);
+        assertNotNull(col);
+        assertEquals("such-column", col.getColumnName());
+        assertSame(col, ret.get(0).getColumn("such-column"));
+        assertEquals(1337, col.getColumnSize());
+        assertEquals(String.class, col.getColumnType());
     }
 }

@@ -31,6 +31,10 @@ public class MySqlMetaData extends MetaData {
         super(config, connection);
     }
 
+    public MySqlMetaData(DbConfig config, Connection connection, SqlTypeToClass sqlTypeMap) {
+        super(config, connection, sqlTypeMap);
+    }
+
     @Override
     protected ResultSet getTableResultSet(final DatabaseMetaData md) throws SQLException {
         return md.getTables(null, null, "%", new String[] { "TABLE" });
