@@ -93,7 +93,7 @@ public class Function implements IFunction {
 
     /**
      * Looks for a class/method in the passed Function parameter in the form
-     * com.package.Class#methodName, or for historical reasons,
+     * com.package.Class#methodName, or, for historical reasons,
      * com.package.Class.methodName. Using "." for methodName is deprecated
      * however, and will be removed in a future version.
      *
