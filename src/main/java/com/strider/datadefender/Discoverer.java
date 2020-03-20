@@ -13,27 +13,21 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
+import javax.xml.bind.JAXBException;
 
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
-import com.strider.datadefender.requirement.file.Loader;
+import com.strider.datadefender.requirement.file.Generator;
+import java.util.stream.Collectors;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -41,13 +35,25 @@ import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 
+import lombok.Data;
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Holds common logic for Discoverers.
  * @author Akira Matsuo
  */
+@Log4j2
 public abstract class Discoverer {    // implements IDiscoverer {
-    private static final Logger   log = getLogger(Discoverer.class);
-    protected List<ColumnMetaData> matches;
+    
+    @Data
+    public static class ColumnMatch {
+        final private ColumnMetaData column;
+        final private double averageProbability;
+        final private String model;
+        final private List<Probability> probabilityList;
+    }
+
+    protected List<ColumnMatch> matches;
 
     public double calculateAverage(final List<Probability> values) {
         Double sum = 0.0;
@@ -110,11 +116,11 @@ public abstract class Discoverer {    // implements IDiscoverer {
         return new Model(tokenizer, nameFinder, modelName);
     }
 
-    public void createRequirement(final String fileName) throws DataDefenderException {
+    public void createRequirement(final String fileName) throws DataDefenderException, JAXBException {
         if ((matches == null) || matches.isEmpty()) {
             throw new DataDefenderException("No matches to create requirement from!");
         }
 
-        Loader.write(Loader.create(matches), fileName);
+        Generator.write(Generator.create(matches.stream().map((c) -> c.getColumn()).collect(Collectors.toList())), fileName);
     }
 }

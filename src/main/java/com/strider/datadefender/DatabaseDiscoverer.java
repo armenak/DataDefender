@@ -33,32 +33,37 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
 import java.sql.Clob;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import opennlp.tools.util.Span;
 
 import static java.lang.Double.parseDouble;
 import static java.util.regex.Pattern.compile;
+
 import lombok.extern.log4j.Log4j;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -82,7 +87,7 @@ public class DatabaseDiscoverer extends Discoverer {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    private Object callExtention(final String function, final TableMetaData data, final String text)
+    private Object callExtention(final String function, final ColumnMetaData data, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException {
 
@@ -97,13 +102,10 @@ public class DatabaseDiscoverer extends Discoverer {
             final String className  = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
             final Method method     = Class.forName(className)
-                                           .getDeclaredMethod(methodName, new Class[] { TableMetaData.class, String.class });
+                                           .getDeclaredMethod(methodName, new Class[] { ColumnMetaData.class, String.class });
             final SpecialCase         instance    = (SpecialCase) Class.forName(className).newInstance();
-            final Map<String, Object> paramValues = new HashMap<>(2);
-
-            paramValues.put("metadata", data);
-            paramValues.put("text", text);
             value = method.invoke(instance, data, text);
+
         } catch (InstantiationException | ClassNotFoundException ex) {
             log.error(ex.toString());
             log.debug(ex.toString(), ex);
@@ -113,9 +115,9 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<TableMetaData> discover(final IDbFactory factory, 
+    public List<ColumnMatch> discover(final IDbFactory factory,
             final Properties dataDiscoveryProperties, String vendor)
-            throws ParseException, DataDefenderException, IOException {
+            throws ParseException, DataDefenderException, IOException, SQLException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -134,7 +136,7 @@ public class DatabaseDiscoverer extends Discoverer {
         modelList = models.split(",");
         log.info("Model list [" + Arrays.toString(modelList) + "]");
 
-        List<TableMetaData> finalList = new ArrayList<>();
+        List<ColumnMatch> finalList = new ArrayList<>();
 
         for (final String model : modelList) {
             log.info("********************************");
@@ -142,15 +144,14 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("********************************");
 
             final Model modelPerson = createModel(dataDiscoveryProperties, model);
-
-            matches = discoverAgainstSingleModel(factory,
-                                                 dataDiscoveryProperties,
-                                                 modelPerson,
-                                                 probabilityThreshold,vendor);
+            matches = discoverAgainstSingleModel(
+                factory,
+                dataDiscoveryProperties,
+                modelPerson,
+                probabilityThreshold
+            );
             finalList = ListUtils.union(finalList, matches);
         }
-
-        final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
         log.info("List of suspects:");
 
@@ -158,23 +159,24 @@ public class DatabaseDiscoverer extends Discoverer {
         int         highRiskColumns = 0;
         int         rowCount        = 0;
 
-        for (final TableMetaData data : finalList) {
+        for (final ColumnMatch match : finalList) {
 
+            ColumnMetaData column = match.getColumn();
             // Row count
             if (YES.equals(calculate_score)) {
                 log.debug("Counting number of rows ...");
                 rowCount = ReportUtil.rowCount(factory, 
-                               data.getTableName());
+                               column.getTable().getTableName());
             } else {
                 log.debug("Skipping counting number of rows ...");
             }
 
             // Getting 5 sample values
-            final List<String> sampleDataList = ReportUtil.sampleData(factory, data);
+            final List<String> sampleDataList = ReportUtil.sampleData(factory, column);
             // Output
-            log.info("Column                      : " + data.toString());
-            log.info(CommonUtils.fixedLengthString('=', data.toString().length() + 30));
-            log.info("Model                       : " + data.getModel());
+            log.info("Column                      : " + column.toString());
+            log.info(CommonUtils.fixedLengthString('=', column.toString().length() + 30));
+            log.info("Model                       : " + match.getModel());
             log.info("Number of rows in the table : " + rowCount);
 
             if (YES.equals(calculate_score)) {
@@ -234,13 +236,12 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
 
-    private List<ColumnMetaData> discoverAgainstSingleModel(
+    private List<ColumnMatch> discoverAgainstSingleModel(
         final IDbFactory factory,
         final Properties dataDiscoveryProperties,
         final Model model,
-        final double probabilityThreshold,
-        final String vendor
-    ) throws ParseException, DataDefenderException, IOException {
+        final double probabilityThreshold
+    ) throws ParseException, DataDefenderException, IOException, SQLException {
 
         final IMetaData           metaData = factory.fetchMetaData();
         final List<TableMetaData> map      = metaData.getMetaData();
@@ -248,11 +249,11 @@ public class DatabaseDiscoverer extends Discoverer {
         // Start running NLP algorithms for each column and collect percentage
         matches = new ArrayList<>();
 
-        TableMetaData             specialCaseData;
-        final List<TableMetaData> specialCaseDataList  = new ArrayList();
-        boolean                   specialCase          = false;
-        final String              extentionList        = dataDiscoveryProperties.getProperty("extentions");
-        String[]                  specialCaseFunctions = null;
+        ColumnMatch             specialCaseData;
+        final List<ColumnMatch> specialCaseDataList  = new ArrayList();
+        boolean                 specialCase          = false;
+        final String            extentionList        = dataDiscoveryProperties.getProperty("extentions");
+        String[]                specialCaseFunctions = null;
 
         log.info("Extention list: " + extentionList);
         
@@ -266,19 +267,21 @@ public class DatabaseDiscoverer extends Discoverer {
         final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
 
-        for (final TableMetaData data : map) {
-            final String tableName  = data.getTableName();
+        List<ColumnMetaData> cols = map.stream().flatMap((t) -> t.getColumns().stream()).collect(Collectors.toList());
+        for (final ColumnMetaData data : cols) {
+            final String tableName  = data.getTable().getTableName();
             final String columnName = data.getColumnName();
+            List<ColumnMetaData> pkeys = ListUtils.emptyIfNull(data.getTable().getPrimaryKeys());
+            List<ColumnMetaData> fkeys = ListUtils.emptyIfNull(data.getTable().getForeignKeys());
 
-            log.debug("Primary key(s) for table " + tableName + ": "+ data.getPkeys().toString() + "]");
-            
-            if (data.getPkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
+            log.debug("Primary keys for table {}: [{}]", () -> tableName, pkeys);
+            if (pkeys.contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 log.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
-            log.debug("Foreign key(s) for table " + tableName + ": "+ data.getFkeys().toString() + "]");
-            if (data.getFkeys().contains(columnName.toLowerCase(Locale.ENGLISH))) {
+            log.debug("Foreign key(s) for table {}: [{}]", () -> tableName, fkeys);
+            if (fkeys.contains(columnName.toLowerCase(Locale.ENGLISH))) {
                 log.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
             }            
@@ -289,38 +292,35 @@ public class DatabaseDiscoverer extends Discoverer {
 
             final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
 
-            if (!CommonUtils.isEmptyString(tableNamePattern)) {
+            if (StringUtils.isNotBlank(tableNamePattern)) {
                 final Pattern p = compile(tableNamePattern);
-
                 if (!p.matcher(tableName).matches()) {
                     continue;
                 }
             }
             
             final String table = sqlBuilder.prefixSchema(tableName);
-            
             final int    limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
-            
-            final String query = sqlBuilder.buildSelectWithLimit("SELECT " + columnName + 
-                                                                 " FROM "  + table      +
-                                                                 " WHERE " + columnName + " IS NOT NULL ",
-                                                                 limit);
+            final String query = sqlBuilder.buildSelectWithLimit(
+                "SELECT " + columnName + " FROM "  + table + " WHERE "
+                    + columnName + " IS NOT NULL",
+                limit
+            );
 
             log.debug("Executing query against database: " + query);
 
             try (Statement stmt = factory.getConnection().createStatement();
                 ResultSet resultSet = stmt.executeQuery(query);) {
                 while (resultSet.next()) {
-                    if (data.getColumnType().equals("BLOB") || data.getColumnType().equals("GEOMETRY")) {
+                    if (Objects.equals(Blob.class, data.getColumnType())) {
                         continue;
                     }
-
-                    if (model.getName().equals("location") && data.getColumnType().contains("INT")) {
+                    if (model.getName().equals("location") && ClassUtils.isAssignable(data.getColumnType(), Number.class)) {
                         continue;
                     }
 
                     String sentence = "";
-                    if (data.getColumnType().equals("CLOB")) {
+                    if (Objects.equals(Clob.class, data.getColumnType())) {
                         Clob clob = resultSet.getClob(1);
                         InputStream is = clob.getAsciiStream();
                         sentence = IOUtils.toString(is, StandardCharsets.UTF_8.name());
@@ -334,7 +334,7 @@ public class DatabaseDiscoverer extends Discoverer {
                                 if ((sentence != null) && !sentence.isEmpty()) {
                                     log.debug("sentence: " + sentence);
                                     log.debug("data: " + data);
-                                    specialCaseData = (TableMetaData) callExtention(specialCaseFunction, data, sentence);
+                                    specialCaseData = (ColumnMatch) callExtention(specialCaseFunction, data, sentence);
                                     if (specialCaseData != null) {
                                         if (!specialCaseDataList.contains(specialCaseData)) {
                                             log.debug("Adding new special case data: " + specialCaseData.toString());
@@ -353,9 +353,10 @@ public class DatabaseDiscoverer extends Discoverer {
                     if ((sentence != null) &&!sentence.isEmpty()) {
                         String processingValue;
 
-                        if (data.getColumnType().equals("DATE")
-                                || data.getColumnType().equals("TIMESTAMP")
-                                || data.getColumnType().equals("DATETIME")) {
+                        if (Objects.equals(Date.class, data.getColumnType())
+                            || Objects.equals(Timestamp.class, data.getColumnType())
+                            || Objects.equals(Time.class, data.getColumnType())) {
+
                             final DateFormat     originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
                             final DateFormat     targetFormat   = new SimpleDateFormat("MMM d, yy", Locale.ENGLISH);
                             final java.util.Date date           = originalFormat.parse(sentence);
@@ -401,10 +402,12 @@ public class DatabaseDiscoverer extends Discoverer {
             final double averageProbability = calculateAverage(probabilityList);
 
             if (averageProbability >= probabilityThreshold) {
-                data.setAverageProbability(averageProbability);
-                data.setModel(model.getName());
-                data.setProbabilityList(probabilityList);
-                matches.add(data);
+                matches.add(new ColumnMatch(
+                    data,
+                    averageProbability,
+                    model.getName(),
+                    probabilityList)
+                );
             }
         }
 

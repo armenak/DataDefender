@@ -13,30 +13,36 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender;
 
+import com.strider.datadefender.file.metadata.FileMatchMetaData;
+import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.specialcase.SpecialCase;
+import com.strider.datadefender.utils.CommonUtils;
+
+import java.text.DecimalFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import java.text.DecimalFormat;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
-
-import static java.lang.Double.parseDouble;
+import java.sql.SQLException;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -44,30 +50,19 @@ import org.apache.tika.sax.BodyContentHandler;
 
 import org.xml.sax.SAXException;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
-import com.strider.datadefender.functions.Utils;
-import com.strider.datadefender.specialcase.SpecialCase;
-import com.strider.datadefender.utils.CommonUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import opennlp.tools.util.Span;
+
+import lombok.extern.log4j.Log4j2;
+
+import static java.lang.Double.parseDouble;
 
 /**
  *
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class FileDiscoverer extends Discoverer {
-    private static final Logger       log = getLogger(FileDiscoverer.class);
+    
     private static String[]           modelList;
     protected List<FileMatchMetaData> fileMatches;
 

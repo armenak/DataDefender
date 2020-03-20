@@ -256,24 +256,23 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>2.5.1</version>
         </dependency>
-
-        <!--dependency>
+        <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-tools</artifactId>
-            <version>1.9.0</version>
-            <type>jar</type>
+            <version>1.9.2</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
-            <version>1.20</version>
+            <version>1.23</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.21</version>
+            <version>1.23</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jbig2-imageio</artifactId>
             <version>3.0.2</version>

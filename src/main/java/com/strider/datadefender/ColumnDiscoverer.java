@@ -13,18 +13,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.regex.Pattern;
-import java.io.IOException;
 
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
@@ -33,12 +23,21 @@ import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
 
 import static java.util.regex.Pattern.compile;
-import java.util.stream.Collectors;
 
 /**
  * @author Armenak Grigoryan
@@ -60,7 +59,7 @@ public class ColumnDiscoverer extends Discoverer {
         suspList.remove("tables");    // removing 'special' tables property that's not a pattern
 
         final List<Pattern> patterns = suspList.stream().map((s) -> compile(s)).collect(Collectors.toList());
-        matches = list.stream().flatMap((t) -> t.getColumns().stream())
+        List<ColumnMetaData> columns = list.stream().flatMap((t) -> t.getColumns().stream())
             .filter((c) -> patterns.stream().anyMatch((p) -> p.matcher(c.getColumnName().toLowerCase()).matches()))
             .collect(Collectors.toList());
 
@@ -68,8 +67,8 @@ public class ColumnDiscoverer extends Discoverer {
 
         // Report column names
         List<ColumnMetaData> uniqueMatches = null;
-        if ((matches != null) &&!matches.isEmpty()) {
-            uniqueMatches = new ArrayList<>(new LinkedHashSet<>(matches));
+        if (CollectionUtils.isNotEmpty(columns)) {
+            uniqueMatches = new ArrayList<>(new LinkedHashSet<>(columns));
             log.info("-----------------");
             log.info("List of suspects:");
             log.info("-----------------");
