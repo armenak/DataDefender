@@ -60,7 +60,7 @@ public class PhiDetector implements SpecialCase {
      * @param text
      * @return String
      */
-    public static ColumnMatch isPHITerm(final ColumnMetaData data, final String text) {
+    public static ColumnMatch isPhiTerm(final ColumnMetaData data, final String text) {
         if (StringUtils.isNotBlank(text)
             && Objects.equals(String.class, data.getColumnType())
             && phiList.contains(text.trim().toLowerCase(Locale.ENGLISH))) {
