@@ -62,13 +62,13 @@ import opennlp.tools.util.Span;
 import static java.lang.Double.parseDouble;
 import static java.util.regex.Pattern.compile;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 
 /**
  *
  * @author Armenak Grigoryan
  */
-@Log4j
+@Log4j2
 public class DatabaseDiscoverer extends Discoverer {
     private static final String YES = "yes";
     private static String[]     modelList;
@@ -269,13 +269,13 @@ public class DatabaseDiscoverer extends Discoverer {
             List<ColumnMetaData> pkeys = ListUtils.emptyIfNull(data.getTable().getPrimaryKeys());
             List<ColumnMetaData> fkeys = ListUtils.emptyIfNull(data.getTable().getForeignKeys());
 
-            log.debug("Primary keys for table {}: [{}]", () -> tableName, pkeys);
+            log.debug("Primary keys for table {}: [{}]", () -> tableName, () -> pkeys);
             if (pkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
                 log.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
                 continue;
             }
             
-            log.debug("Foreign key(s) for table {}: [{}]", () -> tableName, fkeys);
+            log.debug("Foreign key(s) for table {}: [{}]", () -> tableName, () -> fkeys);
             if (fkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
                 log.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
                 continue;
