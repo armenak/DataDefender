@@ -40,16 +40,24 @@ public class MetaDataTest {
     ResultSet mockColumnRs;
     @Mock
     DatabaseMetaData mockDbMetaData;
+    @Mock
+    ResultSet emptyRs;
 
     @BeforeEach
     public void setUp() throws Exception {
+
+        System.out.println("Setting up...");
 
         when(mockConfig.getSchema()).thenReturn("such-schema");
         when(mockConnection.getMetaData()).thenReturn(mockDbMetaData);
 
         when(mockDbMetaData.getTables(any(), any(), any(), any())).thenReturn(mockTableRs);
-        when(mockTableRs.next()).thenReturn(Boolean.TRUE).thenReturn(Boolean.FALSE);
+        when(mockTableRs.next()).thenReturn(Boolean.TRUE).thenReturn(false);
         when(mockTableRs.getString("TABLE_NAME")).thenReturn("such-table");
+
+        when(mockDbMetaData.getPrimaryKeys(any(), any(), any())).thenReturn(emptyRs);
+        when(mockDbMetaData.getImportedKeys(any(), any(), any())).thenReturn(emptyRs);
+        when(emptyRs.next()).thenReturn(false);
 
         when(mockDbMetaData.getColumns(any(), any(), any(), any())).thenReturn(mockColumnRs);
         when(mockColumnRs.next()).thenReturn(Boolean.TRUE).thenReturn(Boolean.FALSE);
@@ -60,7 +68,7 @@ public class MetaDataTest {
     }
 
     @Test
-    public void testGetMetaData() throws Exception {
+    public void testGetMetaData() throws Throwable {
 
         MetaData test = new MetaData(mockConfig, mockConnection, mockSqlTypeMap);
         List<TableMetaData> ret = test.getMetaData();
@@ -82,7 +90,7 @@ public class MetaDataTest {
         assertNotNull(ret.get(0).getColumns());
         assertEquals(1, ret.get(0).getColumns().size());
 
-        ColumnMetaData col = ret.get(0).getColumn(0);
+        ColumnMetaData col = ret.get(0).getColumn(1);
         assertNotNull(col);
         assertEquals("such-column", col.getColumnName());
         assertSame(col, ret.get(0).getColumn("such-column"));

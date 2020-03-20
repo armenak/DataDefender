@@ -6,7 +6,6 @@
 package com.strider.datadefender.database.sqlbuilder;
 
 import com.strider.datadefender.DbConfig;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +18,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
+@ExtendWith(MockitoExtension.class)
 public class SqlBuilderTest {
 
     @Mock

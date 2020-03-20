@@ -29,7 +29,7 @@ public class UtilsTest {
      * Initializes logger
      */
     private final String FULL_CLASS_NAME    = "com.strider.datadefender.anonymizer.functions.Core";
-    private final String EXPECTED_RESULTS_1 = "com.strider.datadefender.functions.functions";
+    private final String EXPECTED_RESULTS_1 = "com.strider.datadefender.anonymizer.functions";
     private final String EXPECTED_RESULTS_2 = "Core";
 
     @Test
