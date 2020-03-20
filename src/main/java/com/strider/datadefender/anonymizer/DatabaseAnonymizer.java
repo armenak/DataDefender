@@ -26,7 +26,6 @@ import com.strider.datadefender.requirement.Exclude;
 import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
-import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.LikeMatcher;
 
 import java.lang.reflect.InvocationTargetException;
@@ -49,6 +48,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.time.DateUtils;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -382,10 +382,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
             log.debug("type= " + (colValue != null ? colValue.getClass() : "null"));
             if (colValue == null) {
                 updateStmt.setNull(columnIndexes.get(columnName), Types.NULL);
-            } else if (colValue.getClass() == java.sql.Date.class) {
-                updateStmt.setDate(columnIndexes.get(columnName), CommonUtils.stringToDate(colValue.toString(), "dd-MM-yyyy") );
-            } else if (colValue.getClass() == java.lang.Integer.class) {
-                updateStmt.setInt(columnIndexes.get(columnName), (int) colValue);
             } else {
                 updateStmt.setObject(
                     columnIndexes.get(columnName),

@@ -19,7 +19,6 @@ package com.strider.datadefender;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.specialcase.SpecialCase;
-import com.strider.datadefender.utils.CommonUtils;
 
 import java.text.DecimalFormat;
 import java.io.File;
@@ -55,6 +54,8 @@ import opennlp.tools.util.Span;
 import lombok.extern.log4j.Log4j2;
 
 import static java.lang.Double.parseDouble;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -118,7 +119,7 @@ public class FileDiscoverer extends Discoverer {
         }
 
         final String[] directoryList = directories.split(",");        
-        if (!CommonUtils.isEmptyString(extensionList)) {
+        if (StringUtils.isNotBlank(extensionList)) {
             log.info("***** Extension list:" + extensionList);
             specialCaseFunctions = extensionList.split(",");
 
@@ -139,7 +140,7 @@ public class FileDiscoverer extends Discoverer {
                                 final String recursivedir = fich.getParent();
 
                                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
+                                final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                                 log.debug("Extension: " + ext);
 
                                 if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
@@ -272,7 +273,7 @@ public class FileDiscoverer extends Discoverer {
                 final String recursivedir = fich.getParent();
 
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
+                final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                 log.debug("Extension: " + ext);
 
                 if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {

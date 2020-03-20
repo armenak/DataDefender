@@ -17,10 +17,10 @@
  */
 package com.strider.datadefender.report;
 
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
-import com.strider.datadefender.utils.CommonUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +36,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -44,7 +45,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ReportUtil {
     
-    public static int rowCount(final IDbFactory factory, final String tableName) {
+    public static int rowCount(final IDbFactory factory, final String tableName) throws DataDefenderException {
         final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
         
@@ -65,7 +66,7 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDbFactory factory, final ColumnMetaData metaData) throws IOException {
+    public static List<String> sampleData(final IDbFactory factory, final ColumnMetaData metaData) throws IOException, DataDefenderException {
         final ISqlBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";
@@ -96,9 +97,9 @@ public class ReportUtil {
                     tmp = resultSet.getString(1);
                 }
                 
-                if (!CommonUtils.isEmptyString(tmp) && !tmp.equals(" ")) {
+                if (StringUtils.isNotBlank(tmp)) {
                     sampleDataList.add(tmp);
-                    tmp = "";
+                    tmp = null;
                 }
             }
         } catch (SQLException sqle) {

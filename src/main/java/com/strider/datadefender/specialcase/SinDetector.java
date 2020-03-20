@@ -12,55 +12,52 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.specialcase;
 
+import com.strider.datadefender.Discoverer.ColumnMatch;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
-import com.strider.datadefender.utils.CommonUtils;
+import java.util.Objects;
+
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class SinDetector implements SpecialCase {
-    private static final Logger LOG = getLogger(SinDetector.class);
 
-    public static TableMetaData detectSin(final TableMetaData data, final String text) {
+    public static ColumnMatch detectSin(final ColumnMetaData data, final String text) {
         String sinValue = text;
 
-        if (!CommonUtils.isEmptyString(sinValue)
-                && (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")
-                    || data.getColumnType().equals("CHAR"))) {
+        if (
+            StringUtils.isNotBlank(sinValue)
+            && (
+                Objects.equals(String.class, data.getColumnType())
+                || Number.class.isAssignableFrom(data.getColumnType())
+            )
+        ) {
             final BiographicFunctions bf = new BiographicFunctions();
 
-            if (data.getColumnType().equals("VARCHAR")) {
+            if (Objects.equals(String.class, data.getColumnType())) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
 
             if (bf.isValidSIN(sinValue)) {
-                LOG.info("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
-                data.setModel("sin");
-                data.setAverageProbability(1);
-
-                final List<Probability> probabilityList = new ArrayList();
-
-                probabilityList.add(new Probability(sinValue, 1.00));
-                data.setProbabilityList(probabilityList);
-
-                return data;
+                log.info("SIN detected: " + sinValue + " in " + data.getTable().getTableName() + "." + data.getColumnName());
+                return new ColumnMatch(
+                    data,
+                    1,
+                    "sin",
+                    List.of(new Probability(sinValue, 1.00))
+                );
             }
         }
 
@@ -70,18 +67,18 @@ public class SinDetector implements SpecialCase {
     public static FileMatchMetaData detectSin(final FileMatchMetaData metaData, final String text) {
         String sinValue = "";
         
-        if (!CommonUtils.isEmptyString(text)) {
+        if (StringUtils.isNotBlank(text)) {
             sinValue = text;
         }
 
-        LOG.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
+        log.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
         if (isValidSIN(sinValue)) {
-                LOG.info("SIN detected: " + sinValue);
+                log.info("SIN detected: " + sinValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("sin");
                 return metaData;
         } else {
-            LOG.debug("SIN " + sinValue + " is not valid" );
+            log.debug("SIN " + sinValue + " is not valid" );
         }
 
         return null;
@@ -96,7 +93,7 @@ public class SinDetector implements SpecialCase {
         boolean valid = false;
 
         if (sin.length() < 9) {
-            LOG.debug("SIN length is < 9");
+            log.debug("SIN length is < 9");
 
             return valid;
         }
@@ -113,7 +110,7 @@ public class SinDetector implements SpecialCase {
         };
         final List<Integer> sinList    = new ArrayList();
 
-        LOG.debug(sin);
+        log.debug(sin);
 
         for (int i = 0; i < 9; i++) {
             sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));

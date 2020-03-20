@@ -12,11 +12,10 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender.specialcase;
 
+import com.strider.datadefender.Discoverer.ColumnMatch;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,25 +24,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.TableMetaData;
-import com.strider.datadefender.utils.CommonUtils;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import java.util.Objects;
+
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class PHIDetector implements SpecialCase {
-    private static final Logger LOG      = getLogger(PHIDetector.class);
+
     private static final String PHI_FILE = "phi.txt";
     private static List         phiList  = new ArrayList();
 
     static {
         try {
-            LOG.info("*** reading from " + PHI_FILE);
+            log.info("*** reading from " + PHI_FILE);
 
             try (BufferedReader br = new BufferedReader(new FileReader(PHI_FILE))) {
                 for (String line; (line = br.readLine()) != null; ) {
@@ -51,7 +50,7 @@ public class PHIDetector implements SpecialCase {
                 }
             }
         } catch (IOException ioe) {
-            LOG.error(ioe.toString());
+            log.error(ioe.toString());
         }
     }
 
@@ -61,22 +60,19 @@ public class PHIDetector implements SpecialCase {
      * @param text
      * @return String
      */
-    public static TableMetaData isPHITerm(final TableMetaData data, final String text) {
-        if (!CommonUtils.isEmptyString(text)
-                && ((data.getColumnType().equals("VARCHAR") || data.getColumnType().equals("CHAR"))
-                    && phiList.contains(text.trim().toLowerCase(Locale.ENGLISH)))) {
-            LOG.debug("PHI detected: " + text);
-            data.setModel("phi");
-            data.setAverageProbability(100);
-
-            final List<Probability> probabilityList = new ArrayList();
-
-            probabilityList.add(new Probability(text, 1.00));
-            data.setProbabilityList(probabilityList);
-
-            return data;
+    public static ColumnMatch isPHITerm(final ColumnMetaData data, final String text) {
+        if (StringUtils.isNotBlank(text)
+            && Objects.equals(String.class, data.getColumnType())
+            && phiList.contains(text.trim().toLowerCase(Locale.ENGLISH))) {
+            
+            log.debug("PHI detected: " + text);
+            return new ColumnMatch(
+                data,
+                100.0,
+                "phi",
+                List.of(new Probability(text, 1.00))
+            );
         }
-
         return null;
     }
 }

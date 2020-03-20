@@ -1,16 +1,13 @@
-
 /*
-*
-* This is free software; you can redistribute it and/or modify it
-* under the terms of the GNU Lesser General Public License as
-* published by the Free Software Foundation; either version 2.1 of
-* the License, or (at your option) any later version.
-*
-* This software is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-* Lesser General Public License for more details.
-*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  */
 package com.strider.datadefender.utils;
 
@@ -23,19 +20,17 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
 
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
 import com.strider.datadefender.DataDefenderException;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Most of the code is copied from this page: http://www.rgagnon.com/javadetails/java-0288.html
  *
  * Modified by Armenak Grigoryan
  */
+@Log4j2
 public class ApplicationLock {
-    private static final Logger log = getLogger(ApplicationLock.class);
+
     private final String        appName;
     private File                file;
     private FileChannel         channel;

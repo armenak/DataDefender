@@ -19,7 +19,6 @@ package com.strider.datadefender;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.report.ReportUtil;
-import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
@@ -38,6 +37,7 @@ import org.apache.commons.collections.CollectionUtils;
 import lombok.extern.log4j.Log4j2;
 
 import static java.util.regex.Pattern.compile;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Armenak Grigoryan
@@ -86,11 +86,11 @@ public class ColumnDiscoverer extends Discoverer {
 
                 // Output
                 log.info("Column                     : " + entry);
-                log.info(CommonUtils.fixedLengthString('=', entry.toString().length() + 30));
+                log.info(StringUtils.repeat('=', entry.toString().length() + 30));
                 log.info("Number of rows in the table: " + rowCount);
                 log.info("Score                      : " + score.columnScore(rowCount));
                 log.info("Sample data");
-                log.info(CommonUtils.fixedLengthString('-', 11));
+                log.info(StringUtils.repeat('-', 11));
 
                 for (final String sampleData : sampleDataList) {
                     log.info(sampleData);

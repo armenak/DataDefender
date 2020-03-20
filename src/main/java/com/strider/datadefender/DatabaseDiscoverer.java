@@ -25,7 +25,6 @@ import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
-import com.strider.datadefender.utils.CommonUtils;
 import com.strider.datadefender.utils.Score;
 
 import java.io.IOException;
@@ -122,11 +121,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
         // Get the probability threshold from property file
         final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
-        String       calculate_score      = dataDiscoveryProperties.getProperty("score_calculation");
-
-        if (CommonUtils.isEmptyString(calculate_score)) {
-            calculate_score = "false";
-        }
+        String       calculate_score      = dataDiscoveryProperties.getProperty("score_calculation", "false");
 
         log.info("Probability threshold [{}]", probabilityThreshold);
 
@@ -175,7 +170,7 @@ public class DatabaseDiscoverer extends Discoverer {
             final List<String> sampleDataList = ReportUtil.sampleData(factory, column);
             // Output
             log.info("Column                      : " + column.toString());
-            log.info(CommonUtils.fixedLengthString('=', column.toString().length() + 30));
+            log.info(StringUtils.repeat('=', column.toString().length() + 30));
             log.info("Model                       : " + match.getModel());
             log.info("Number of rows in the table : " + rowCount);
 
@@ -186,7 +181,7 @@ public class DatabaseDiscoverer extends Discoverer {
             }
 
             log.info("Sample data");
-            log.info(CommonUtils.fixedLengthString('-', 11));
+            log.info(StringUtils.repeat('-', 11));
             
             sampleDataList.forEach((sampleData) -> {
                 log.info(sampleData);
