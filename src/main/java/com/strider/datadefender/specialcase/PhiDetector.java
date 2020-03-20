@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Armenak Grigoryan
  */
 @Log4j2
-public class PHIDetector implements SpecialCase {
+public class PhiDetector implements SpecialCase {
 
     private static final String PHI_FILE = "phi.txt";
     private static List         phiList  = new ArrayList();

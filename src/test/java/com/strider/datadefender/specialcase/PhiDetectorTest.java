@@ -21,7 +21,7 @@ import com.strider.datadefender.database.metadata.TableMetaData;
  *
  * @author strider
  */
-public class PHIDetectorTest {
+public class PhiDetectorTest {
     private static final String  phi_with_argument    = "depression";
     private static final String  phi_without_argument = "";
     private static List<String>  phiList;
@@ -43,14 +43,14 @@ public class PHIDetectorTest {
         probabilityList.add(new Probability(phi_with_argument, 1.00));
         expResult.setProbabilityList(probabilityList);
 
-        final TableMetaData result = PHIDetector.isPHITerm(metaData, phi_with_argument);
+        final TableMetaData result = PhiDetector.isPHITerm(metaData, phi_with_argument);
 
         assertEquals(result.getModel(), expResult.getModel());
     }
 
     @Test
     public void testIsPHITermWithoutArgument() {
-        final TableMetaData result = PHIDetector.isPHITerm(metaData, phi_without_argument);
+        final TableMetaData result = PhiDetector.isPHITerm(metaData, phi_without_argument);
 
         assertNull(result);
     }

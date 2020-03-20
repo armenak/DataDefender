@@ -74,7 +74,7 @@ public class Bio extends Core {
 
     public String randomEmail(final String domainName) {
         final StringBuilder email = new StringBuilder();
-        email.append(randomString(1,43).trim()).append('@').append(domainName);
+        email.append(randomString(1, 43).trim().toLowerCase()).append('@').append(domainName);
         return email.toString();
     }
 }

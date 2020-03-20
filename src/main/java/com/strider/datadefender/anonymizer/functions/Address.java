@@ -65,18 +65,15 @@ public class Address extends Core {
     }
 
     public String randomCanadianPostalCode() {
-        final Xeger instance = new Xeger("[A-Z][0-9][A-Z] [0-9][A-Z][0-9]");
-        return instance.generate();
+        return randomStringFromPattern("[A-Z][0-9][A-Z] [0-9][A-Z][0-9]");
     }
 
     public String randomUsZipCode() {
-        final Xeger instance = new Xeger("[0-9]{5}");
-        return instance.generate();
+        return randomStringFromPattern("[0-9]{5}");
     }
 
     public String randomUsZipCodeNineDigit() {
-        final Xeger instance = new Xeger("[0-9]{5}-[0-9]{4}");
-        return instance.generate();
+        return randomStringFromPattern("[0-9]{5}-[0-9]{4}");
     }
 
     public String randomCanadianOrUsFiveDigitPostalCode() {

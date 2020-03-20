@@ -44,7 +44,7 @@ public class SinDetectorTest {
 
     @Test
     public void testDetectSinWithoutArgument() {
-        final TableMetaData result = PHIDetector.isPHITerm(metaData, sin_without_argument);
+        final TableMetaData result = PhiDetector.isPHITerm(metaData, sin_without_argument);
 
         assertNull(result);
     }
