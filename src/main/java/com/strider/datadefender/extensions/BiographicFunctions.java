@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014-2016, Armenak Grigoryan, Matthew Eaton, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,12 +12,10 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.extensions;
+
+import com.strider.datadefender.anonymizer.functions.Core;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,18 +25,14 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.anonymizer.functions.CoreFunctions;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Matthew Eaton
  */
-public class BiographicFunctions extends CoreFunctions {
-    private static final Logger log = getLogger(BiographicFunctions.class);
+@Log4j2
+public class BiographicFunctions extends Core {
 
     private static String prependZero(final int num) {
         String dayStr;

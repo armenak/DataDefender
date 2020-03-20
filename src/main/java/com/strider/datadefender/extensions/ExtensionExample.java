@@ -12,23 +12,19 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.extensions;
+
+import com.strider.datadefender.anonymizer.functions.Core;
 
 import static java.lang.Math.random;
 import static java.lang.Math.round;
 import static java.lang.String.valueOf;
 
-import com.strider.datadefender.anonymizer.functions.CoreFunctions;
-
 /**
  * @author Armenak Grigoryan
  */
-public class ExtensionExample extends CoreFunctions {
+public class ExtensionExample extends Core {
 
     /**
      * Generates random 9-digit student number
@@ -38,6 +34,3 @@ public class ExtensionExample extends CoreFunctions {
         return valueOf(round(random() * 100000000));
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
