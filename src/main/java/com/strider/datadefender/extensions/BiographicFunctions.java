@@ -17,13 +17,8 @@ package com.strider.datadefender.extensions;
 
 import com.strider.datadefender.anonymizer.functions.Core;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -33,51 +28,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Log4j2
 public class BiographicFunctions extends Core {
-
-    private static String prependZero(final int num) {
-        String dayStr;
-
-        if (num <= 9) {
-            dayStr = '0' + String.valueOf(num);
-        } else {
-            dayStr = String.valueOf(num);
-        }
-
-        return dayStr;
-    }
-
-    private static int randBetween(final int start, final int end) {
-        return start + (int) Math.round(Math.random() * (end - start));
-    }
-
-    /**
-     * Generates random 9-digit social insurance number
-     * @return String
-     * @throws java.text.ParseException
-     */
-    public java.sql.Date randomBirthDate() throws java.text.ParseException {
-        final GregorianCalendar gc   = new GregorianCalendar();
-        final int               year = randBetween(1900, 2016);
-
-        gc.set(GregorianCalendar.YEAR, year);
-
-        final int dayOfYear = randBetween(1, gc.getActualMaximum(GregorianCalendar.DAY_OF_YEAR));
-
-        gc.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
-
-        final String birthDate = prependZero(gc.get(GregorianCalendar.DAY_OF_MONTH)) + "-"
-                                 + prependZero(gc.get(GregorianCalendar.MONTH) + 1) + "-"
-                                 + gc.get(GregorianCalendar.YEAR);
-
-        log.debug("BirthDate:[" + birthDate + "]");
-
-        final DateFormat    format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
-        final java.sql.Date date   = new java.sql.Date(format.parse(birthDate).getTime());
-
-        log.debug("Generated BirthDate:[" + date.toString() + "]");
-
-        return date;
-    }
 
     /**
      * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
@@ -134,28 +84,4 @@ public class BiographicFunctions extends Core {
 
         return valid;
     }
-
-    /**
-     * Check if String represents a valid sin
-     * @param sin String representing a sin
-     * @return true if valid sin, false if not
-     */
-
-//  public boolean isValidSIN(final String sin) {
-//      if (sin == null || sin.length() != 9 ) {
-//          log.info("isValidSin: Step 0");
-//          return false;
-//      }
-//      int[] sinDigits = new int[sin.length()];
-//      log.info("isValidSin: Step 1");
-//                  
-//      for (int i=0; i<sin.length(); i++) {
-//          sinDigits[i] = Integer.parseInt(sin.substring(i, i+1));
-//      }
-//
-//      return (isValidSIN(sinDigits));
-//  }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
