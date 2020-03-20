@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -72,6 +73,7 @@ public class Core extends RequirementFunctionClass {
             if (iter.hasNext()) {
                 return iter.next();
             }
+            // else shuffle again
         }
 
         final List<String> list = stringLists.get(name);
@@ -95,7 +97,7 @@ public class Core extends RequirementFunctionClass {
      */
     protected String randomStringFromStream(String id, InputStreamSupplier supplier) throws IOException {
         if (!stringLists.containsKey(id)) {
-            log.info("Loading words from " + id);
+            log.info("Loading words from stream {}", id);
             final List<String> values = new ArrayList<>();
             InputStream stream = supplier.getInputStream();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
@@ -121,7 +123,7 @@ public class Core extends RequirementFunctionClass {
      */
     protected String randomStringFromFile(final String file) throws IOException {
         if (!stringLists.containsKey(file)) {
-            log.info("Loading words from " + file);
+            log.info("Loading words from file: {}", file);
             final List<String> values = new ArrayList<>();
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 for (String line; (line = br.readLine()) != null; ) {
@@ -131,6 +133,24 @@ public class Core extends RequirementFunctionClass {
             stringLists.put(file, values);
         }
         return getNextShuffledItemFor(file);
+    }
+
+    /**
+     * Generates a random date between the passed start and end dates, and using
+     * the passed format to parse the dates passed, and to format the return
+     * value.
+     *
+     * @param start
+     * @param end
+     * @param format
+     * @return
+     */
+    public String randomDate(final String start, final String end, final String format) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+        LocalDate ds = LocalDate.parse(start, fmt);
+        LocalDate de = LocalDate.parse(end, fmt);
+        long day = RandomUtils.nextLong(0, de.toEpochDay() - ds.toEpochDay()) + ds.toEpochDay();
+        return LocalDate.ofEpochDay(day).format(fmt);
     }
 
     /**
@@ -147,7 +167,7 @@ public class Core extends RequirementFunctionClass {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDateTime ds = LocalDateTime.parse(start, fmt);
         LocalDateTime de = LocalDateTime.parse(end, fmt);
-        long day =RandomUtils.nextLong(0, de.toEpochSecond(ZoneOffset.UTC) - ds.toEpochSecond(ZoneOffset.UTC)) + ds.toEpochSecond(ZoneOffset.UTC);
+        long day = RandomUtils.nextLong(0, de.toEpochSecond(ZoneOffset.UTC) - ds.toEpochSecond(ZoneOffset.UTC)) + ds.toEpochSecond(ZoneOffset.UTC);
         return LocalDateTime.ofEpochSecond(day, 0, ZoneOffset.UTC).format(fmt);
     }
 
@@ -162,15 +182,14 @@ public class Core extends RequirementFunctionClass {
      */
     public String randomString(final int num, final int length) {
         final StringBuilder randomString = new StringBuilder();
-        for (int i = 0; i < num && randomString.length() < length; i++) {
+        for (int i = 0; i < num && randomString.length() < length; ++i) {
             final int r = RandomUtils.nextInt(0, words.size());
             randomString.append(words.get(r)).append(' ');
         }
-
         if (randomString.length() > length) {
             return randomString.toString().substring(0, length).trim();
         }
-        return randomString.toString();
+        return randomString.toString().trim();
     }
 
     /**
