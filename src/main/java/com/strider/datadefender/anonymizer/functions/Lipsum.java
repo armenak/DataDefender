@@ -15,6 +15,7 @@
  */
 package com.strider.datadefender.anonymizer.functions;
 
+import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
 
 import java.io.InputStreamReader;
@@ -67,7 +68,11 @@ public class Lipsum extends RequirementFunctionClass {
      * @return the generated sentences.
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String sentences(final int min, final int max) throws IOException {
+    public String sentences(
+        @NamedParameter("pattern") int min,
+        @NamedParameter("pattern") int max
+    ) throws IOException {
+
         final List<String> lp = lipsumParagraphs;
         final StringBuilder sb = new StringBuilder();
 
@@ -109,7 +114,7 @@ public class Lipsum extends RequirementFunctionClass {
      * @return the paragraphs
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String paragraphs(final int paragraphs) throws IOException {
+    public String paragraphs(@NamedParameter("paragraphs") int paragraphs) throws IOException {
         final List<String> lp = lipsumParagraphs;
         final StringBuilder sb = new StringBuilder();
         for (int i = 0, start = rand.nextInt(lp.size()); i < paragraphs; ++i, ++start) {
@@ -130,7 +135,7 @@ public class Lipsum extends RequirementFunctionClass {
      * @return the generated lorem ipsum text
      * @throws IOException if an error occurs reading from the lipsum text file
      */
-    public String similar(final String text) throws IOException {
+    public String similar(@NamedParameter("text") String text) throws IOException {
         final String sParas = text.replaceAll("\r\n", "\n");
         final int nParas = StringUtils.countMatches(sParas, "\n");
         if (nParas > 0) {

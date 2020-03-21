@@ -15,8 +15,6 @@
  */
 package com.strider.datadefender.anonymizer.functions;
 
-import com.strider.datadefender.utils.Xeger;
-
 import java.io.IOException;
 
 import org.apache.commons.lang3.RandomUtils;

@@ -15,6 +15,7 @@
  */
 package com.strider.datadefender.anonymizer.functions;
 
+import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
 import com.strider.datadefender.utils.Xeger;
 
@@ -67,7 +68,7 @@ public class Core extends RequirementFunctionClass {
      * @param name
      * @return
      */
-    private String getNextShuffledItemFor(final String name) {
+    private String getNextShuffledItemFor(@NamedParameter("name") String name) {
         if (stringIters.containsKey(name)) {
             final Iterator<String> iter = stringIters.get(name);
             if (iter.hasNext()) {
@@ -121,7 +122,7 @@ public class Core extends RequirementFunctionClass {
      * @return A random string from the file
      * @throws java.io.IOException
      */
-    protected String randomStringFromFile(final String file) throws IOException {
+    protected String randomStringFromFile(String file) throws IOException {
         if (!stringLists.containsKey(file)) {
             log.info("Loading words from file: {}", file);
             final List<String> values = new ArrayList<>();
@@ -145,7 +146,11 @@ public class Core extends RequirementFunctionClass {
      * @param format
      * @return
      */
-    public String randomDate(final String start, final String end, final String format) {
+    public String randomDate(
+        @NamedParameter("start") String start,
+        @NamedParameter("end") String end,
+        @NamedParameter("format") String format
+    ) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDate ds = LocalDate.parse(start, fmt);
         LocalDate de = LocalDate.parse(end, fmt);
@@ -163,7 +168,11 @@ public class Core extends RequirementFunctionClass {
      * @param format
      * @return
      */
-    public String randomDateTime(final String start, final String end, final String format) {
+    public String randomDateTime(
+        @NamedParameter("start") String start,
+        @NamedParameter("end") String end,
+        @NamedParameter("format") String format
+    ) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDateTime ds = LocalDateTime.parse(start, fmt);
         LocalDateTime de = LocalDateTime.parse(end, fmt);
@@ -180,7 +189,7 @@ public class Core extends RequirementFunctionClass {
      * @param length The maximum length of the string
      * @return
      */
-    public String randomString(final int num, final int length) {
+    public String randomString(@NamedParameter("num") int num, @NamedParameter("length") int length) {
         final StringBuilder randomString = new StringBuilder();
         for (int i = 0; i < num && randomString.length() < length; ++i) {
             final int r = RandomUtils.nextInt(0, words.size());
@@ -195,11 +204,11 @@ public class Core extends RequirementFunctionClass {
     /**
      * Generates a String from the passed regex that is guaranteed to match it.
      *
-     * @param regex
+     * @param pattern
      * @return
      */
-    public String randomStringFromPattern(final String regex) {
-        final Xeger instance = new Xeger(regex);
+    public String randomStringFromPattern(@NamedParameter("pattern") String pattern) {
+        final Xeger instance = new Xeger(pattern);
         return instance.generate();
     }
 }

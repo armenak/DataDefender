@@ -15,34 +15,9 @@
  */
 package com.strider.datadefender.anonymizer.functions;
 
-import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
-import com.strider.datadefender.utils.Xeger;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.Scanner;
+import com.strider.datadefender.functions.NamedParameter;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.io.IOException;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -51,8 +26,6 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 public class Bio extends Core {
-
-    private static final Random rand = new Random();
 
     public String randomFirstName() throws IOException {
 		return randomStringFromStream(
@@ -72,7 +45,7 @@ public class Bio extends Core {
         return randomFirstName();
     }
 
-    public String randomEmail(final String domainName) {
+    public String randomEmail(@NamedParameter("domainName") String domainName) {
         final StringBuilder email = new StringBuilder();
         email.append(randomString(1, 43).trim().toLowerCase()).append('@').append(domainName);
         return email.toString();

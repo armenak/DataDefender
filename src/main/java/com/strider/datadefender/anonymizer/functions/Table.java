@@ -15,6 +15,7 @@
  */
 package com.strider.datadefender.anonymizer.functions;
 
+import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.functions.DatabaseAwareRequirementFunctionClass;
 
 import java.sql.Connection;
@@ -141,7 +142,12 @@ public class Table extends DatabaseAwareRequirementFunctionClass {
      * @return the next item
      * @throws SQLException
      */
-    public String randomColumnValue(final String table, final String column, final boolean excludeEmpty) throws SQLException {
+    public String randomColumnValue(
+        @NamedParameter("table") String table,
+        @NamedParameter("column") String column,
+        @NamedParameter("excludeEmpty") boolean excludeEmpty
+    ) throws SQLException {
+        
         final String keyName = table + "." + column;
         final StringBuilder sb = new StringBuilder();
         sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
@@ -170,7 +176,13 @@ public class Table extends DatabaseAwareRequirementFunctionClass {
      * @return
      * @throws SQLException
      */
-    public String mappedColumnShuffle(final String table, final String column, final String value, final boolean excludeEmpty) throws SQLException {
+    public String mappedColumnShuffle(
+        @NamedParameter("table") String table,
+        @NamedParameter("column") String column,
+        @NamedParameter("value") String value,
+        @NamedParameter("excludeEmpty") boolean excludeEmpty
+    ) throws SQLException {
+        
         final String keyName = table + "." + column;
         final StringBuilder sb = new StringBuilder();
         sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));

@@ -15,6 +15,7 @@
  */
 package com.strider.datadefender.requirement;
 
+import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
 
 import java.lang.reflect.InvocationTargetException;
@@ -179,10 +180,13 @@ public class Function implements IFunction {
             int index = -1;
             for (java.lang.reflect.Parameter p : m.getParameters()) {
                 ++index;
-                Argument arg = ((mappedArgs.containsKey(p.getName()))
-                    || (p.isNamePresent() && arguments.get(0).getName() != null)) ?
-                    mappedArgs.get(p.getName())
-                    : arguments.get(index);
+                Argument arg = arguments.get(index);
+                NamedParameter named = p.getAnnotation(NamedParameter.class);
+                if (named != null && mappedArgs.containsKey(named.value())) {
+                    arg = mappedArgs.get(named.value());
+                } else if (mappedArgs.containsKey(p.getName())) {
+                    arg = mappedArgs.get(p.getName());
+                }
                 if (arg == null || !TypeConverter.isConvertible(p.getType(), arg.getType())) {
                     return false;
                 }
