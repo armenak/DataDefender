@@ -75,7 +75,9 @@ public class ReportUtil {
         String            querySample = "";
         String            select      = "SELECT ";
         
-        if (!metaData.getColumnType().equals("CLOB")) {
+        
+        
+        if (!metaData.getColumnType().equals("CLOB") && !factory.getVendorName().equals("mssql")) {
             select = select + "DISTINCT ";
         }
         
