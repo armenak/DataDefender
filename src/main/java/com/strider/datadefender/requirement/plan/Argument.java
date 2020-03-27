@@ -13,12 +13,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
+package com.strider.datadefender.requirement.plan;
 
+import com.strider.datadefender.requirement.ClassAdapter;
+import com.strider.datadefender.requirement.TypeConverter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,6 +35,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * JAXB class that defines argument elements in Requirement.xml file
@@ -43,18 +47,18 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Argument {
 
-    @XmlAttribute(name = "Name")
+    @XmlAttribute
     private String name;
 
-    @XmlAttribute(name = "Type")
     @XmlJavaTypeAdapter(ClassAdapter.class)
-    private Class<?> type;
+    @XmlAttribute
+    private Class<?> type = String.class;
 
-    @XmlAttribute(name = "Value")
     @Getter(AccessLevel.NONE)
+    @XmlAttribute
     private String value;
 
-    @XmlElement(name = "Element")
+    @XmlElement(name = "element")
     private List<ArrayElement> elements;
     
     @Getter(AccessLevel.NONE)
@@ -66,7 +70,7 @@ public class Argument {
      * from the last call) or the value of the column, or the ResultSet at the
      * current row if "Type" is java.sql.ResultSet.
      */
-    @XmlAttribute(name = "IsDynamicValue")
+    @XmlAttribute(name = "pass-current-value")
     private boolean isDynamicValue = false;
 
     public Argument() {
@@ -91,9 +95,12 @@ public class Argument {
         if (value != null) {
             log.debug("Converting value: {} to type: {}", value, type);
             objectValue = TypeConverter.convert(value, type);
-        } else if (elements != null) {
+        } else if (CollectionUtils.isNotEmpty(elements)) {
             List a = new ArrayList(elements.size());
             for (ArrayElement el : elements) {
+                if (el.getValue() == null) {
+                    continue;
+                }
                 a.add(TypeConverter.convert(el.getValue(), type));
             }
             objectValue = a;

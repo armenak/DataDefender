@@ -16,7 +16,7 @@
 package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.functions.NamedParameter;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
+import com.strider.datadefender.requirement.registry.RequirementFunction;
 import com.strider.datadefender.utils.Xeger;
 
 import java.io.InputStreamReader;
@@ -44,7 +44,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Armenak Grigoryan
  */
 @Log4j2
-public class Core extends RequirementFunctionClass {
+public class Core extends RequirementFunction {
 
     private static final Map<String, List<String>> stringLists = new HashMap<>();
     private static final Map<String, Iterator<String>> stringIters = new HashMap<>();

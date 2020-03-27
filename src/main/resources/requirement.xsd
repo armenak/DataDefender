@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="https://armenak.github.io/DataDefender/anonymizer"
+  xmlns="https://armenak.github.io/DataDefender/anonymizer"
+  elementFormDefault="qualified"
+>
+
+  <xs:simpleType name="package-class">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([a-zA-Z_$][a-zA-Z0-9_$]*\.?)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="plan">
+    <xs:sequence>
+      <xs:element ref="function" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="combiner">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:pattern value="([a-zA-Z_$][a-zA-Z0-9_$]*\.?)*(::[a-zA-Z_$][a-zA-Z0-9_$]+)?"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="combiner-glue" type="combiner-glue"/>
+  </xs:complexType>
+  <xs:complexType name="plan-global">
+    <xs:complexContent>
+      <xs:extension base="plan">
+        <xs:attribute name="id" type="xs:NCName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="plan-ref">
+    <xs:attribute name="ref-id" type="xs:QName" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="anonymizer-version" default="2.0">
+    <xs:simpleType>
+      <xs:restriction base="xs:double">
+        <xs:minInclusive value="2.0"/>
+        <xs:maxInclusive value="2.0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="project-version">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9]+\.[0-9]+(\.[0-9]+)?"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="package">
+    <xs:complexType>
+      <xs:attribute name="name" type="package-class" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="combiner-glue">
+    <xs:restriction base="xs:string">
+      <xs:whiteSpace value="preserve"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="element">
+    <xs:complexType>
+      <xs:attribute name="pass-current-value" type="xs:boolean" default="false"/>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="array">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="element" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="argument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="element" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="type" type="package-class" default="java.lang.String"/>
+      <xs:attribute name="pass-current-value" type="xs:boolean" default="false"/>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="function">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="argument" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:pattern value="([a-zA-Z_$][a-zA-Z0-9_$]*\.?)*(#[a-zA-Z_$][a-zA-Z0-9_$]+)?"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="combiner-glue" type="combiner-glue"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="autoresolve-classes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="package" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="column-plans">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="plan" type="plan-global" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="anonymizer">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="anonymizer-version" minOccurs="1"/>
+        <xs:element name="project" type="xs:string"/>
+        <xs:element ref="project-version"/>
+        <xs:element ref="autoresolve-classes"/>
+        <xs:element ref="column-plans"/>
+        <xs:element ref="tables"/>
+      </xs:all>
+    </xs:complexType>
+    <xs:key name="plan">
+      <xs:selector xpath="./column-plans/plan"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:keyref name="plan-ref" refer="plan">
+      <xs:selector xpath="./tables/table/columns/column/plan-ref"/>
+      <xs:field xpath="@ref-id"/>
+    </xs:keyref>
+  </xs:element>
+
+  <xs:element name="tables">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="table" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="table">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="primary-key" minOccurs="0"/>
+        <xs:element name="where" type="xs:string" minOccurs="0"/>
+        <xs:element ref="exclusions" minOccurs="0"/>
+        <xs:element ref="columns"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="primary-key" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="primary-key">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="key" type="xs:string" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="columns">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="column" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="column">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="exclusions" minOccurs="0"/>
+        <xs:choice>
+          <xs:element name="plan" type="plan"/>
+          <xs:element name="plan-ref" type="plan-ref"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="type" type="package-class" default="java.lang.String"/>
+      <xs:attribute name="skip-empty" type="xs:boolean" default="true"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="exclusions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="exclude" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="exclude">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="equals" type="xs:string"/>
+      <xs:attribute name="like" type="xs:string"/>
+      <xs:attribute name="not-equals" type="xs:string"/>
+      <xs:attribute name="not-like" type="xs:string"/>
+      <xs:attribute name="null" type="xs:boolean"/>
+      <xs:attribute name="in" type="xs:string"/>
+      <xs:attribute name="not-in" type="xs:string"/>
+      <xs:attribute name="in-separator" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

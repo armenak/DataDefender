@@ -13,33 +13,20 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
+package com.strider.datadefender.requirement.registry;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import lombok.Data;
-import lombok.extern.log4j.Log4j2;
+import com.strider.datadefender.database.IDbFactory;
 
 /**
- * @author Zaahid Bateson
+ * Configures a member variable IDbFactory in a concrete 'initialize' method.
+ *
+ * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
-@Data
-@Log4j2
-public class ResultSetValue {
+public abstract class DatabaseAwareRequirementFunction extends RequirementFunction {
 
-    private Class type;
-    private String columnName;
+    protected IDbFactory dbFactory;
 
-    public ResultSetValue(Class type, String columnName) {
-        this.type = type;
-        this.columnName = columnName;
-    }
-
-    public Object getValue(ResultSet rs) throws SQLException {
-        if (type == ResultSet.class) {
-            return rs;
-        }
-        return rs.getObject(columnName, type);
+    public final void initialize(IDbFactory dbFactory) {
+        this.dbFactory = dbFactory;
     }
 }

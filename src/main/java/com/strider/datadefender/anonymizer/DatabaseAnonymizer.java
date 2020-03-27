@@ -23,7 +23,6 @@ import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.requirement.Column;
 import com.strider.datadefender.requirement.Exclude;
-import com.strider.datadefender.requirement.Key;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.utils.LikeMatcher;
@@ -74,23 +73,6 @@ public class DatabaseAnonymizer implements IAnonymizer {
     private void fillColumnNames(final Table table, final Collection<String> sColumns) {
         for (final Column column : table.getColumns()) {
             sColumns.add(column.getName());
-        }
-    }
-
-    /**
-     * Adds column names that make up the table's primary key.
-     *
-     * @param table
-     * @return
-     */
-    private void fillPrimaryKeyNamesList(final Table table, final Collection<String> sKeys) {
-        final List<Key> pKeys = table.getPrimaryKeys();
-        if (pKeys != null && pKeys.size() != 0) {
-            for (final Key key : pKeys) {
-                sKeys.add(key.getName());
-            }
-        } else {
-            sKeys.add(table.getPkey());
         }
     }
 
@@ -386,7 +368,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 updateStmt.setObject(
                     columnIndexes.get(columnName),
                     getTruncatedColumnValue(
-                        (String) colValue,
+                        colValue,
                         columnName,
                         tableMetaData
                     )
@@ -424,10 +406,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         // below was created to ensure a reasonable warning message is logged if that happens.
         final Set<String> colNames = new LinkedHashSet<>(tableColumns.size());
         // keyNames is only iterated over, so no need for a hash set
-        final List<String> keyNames = new LinkedList<>();
+        final List<String> keyNames = table.getPrimaryKeyColumnNames();
 
         fillColumnNames(table, colNames);
-        fillPrimaryKeyNamesList(table, keyNames);
 
         // required in this scope for 'catch' block
         PreparedStatement selectStmt = null;
@@ -497,7 +478,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
     @Override
     public void anonymize() throws DataDefenderException, InstantiationException {
-        log.info("Anonymizing data for client " + requirement.getClient() + " Version " + requirement.getVersion());
+        log.info("Anonymizing data for project: {} version: {}", requirement.getProject(), requirement.getVersion());
         for (final Table reqTable : requirement.getFilteredTables(tables)) {
             anonymizeTable(reqTable);
         }

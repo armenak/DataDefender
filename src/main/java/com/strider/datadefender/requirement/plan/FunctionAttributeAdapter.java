@@ -13,20 +13,24 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement.functions;
+package com.strider.datadefender.requirement.plan;
 
-import com.strider.datadefender.database.IDbFactory;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Configures a member variable IDbFactory in a concrete 'initialize' method.
+ * XmlAdapter to get a Function type from a String attribute.
  *
- * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
+ * @author Zaahid Bateson
  */
-public abstract class DatabaseAwareRequirementFunctionClass extends RequirementFunctionClass {
+public class FunctionAttributeAdapter extends XmlAdapter<String, Function> {
 
-    protected IDbFactory dbFactory;
+    @Override
+    public Function unmarshal(String value) throws Exception {
+        return new Function(value, true);
+    }
 
-    public final void initialize(IDbFactory dbFactory) {
-        this.dbFactory = dbFactory;
+    @Override
+    public String marshal(Function f) throws Exception {
+        return f.getFunctionName();
     }
 }

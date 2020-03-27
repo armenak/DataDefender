@@ -19,7 +19,7 @@ package com.strider.datadefender;
 
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Argument;
+import com.strider.datadefender.requirement.plan.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 import com.strider.datadefender.requirement.file.Generator;
@@ -77,7 +77,7 @@ public class DataGenerator implements IGenerator {
         throws DatabaseException {
 
         // Iterate over the requirement and generate data sets
-        log.info("Generating data for Client: {} Version: {}", requirement.getClient(), requirement.getVersion());
+        log.info("Generating data for project: {} version: {}", requirement.getProject(), requirement.getVersion());
 
         for (final Table table : requirement.getTables()) {
             log.info("Table [{}]. Start ...", table.getName());
@@ -85,7 +85,7 @@ public class DataGenerator implements IGenerator {
             // Iterate over columns to generate data set for each column
             for (final Column column : table.getColumns()) {
                 final Argument fileParameter = Generator.getFileParameter(
-                    column.getFunctionList().getFunctions().stream().flatMap((fn) -> fn.getArguments().stream()).collect(Collectors.toList())
+                    column.getResolvedPlan().getFunctions().stream().flatMap((fn) -> fn.getArguments().stream()).collect(Collectors.toList())
                 );
 
                 log.info("Column [{}]. Start...", column.getName());

@@ -27,11 +27,15 @@ import javax.xml.bind.Unmarshaller;
 import static javax.xml.bind.JAXBContext.newInstance;
 
 import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
 import java.lang.reflect.InvocationTargetException;
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.xml.sax.SAXException;
 
 /**
  * Utility class to help handling requirement objects
@@ -45,6 +49,7 @@ public class Loader {
     private final Unmarshaller unmarshaller;
 
     public Loader() throws JAXBException {
+
         jaxbContext = newInstance(Requirement.class);
         unmarshaller = jaxbContext.createUnmarshaller();
     }
@@ -70,23 +75,20 @@ public class Loader {
         InstantiationException,
         IllegalAccessException,
         IllegalArgumentException,
-        InvocationTargetException {
+        InvocationTargetException,
+        SAXException {
 
         Requirement requirement = null;
         log.info("Loading requirement file: {}", requirementFile);
 
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = schemaFactory.newSchema(Loader.class.getClassLoader().getResource("requirement.xsd"));
+
+        unmarshaller.setSchema(schema);
         requirement = (Requirement) unmarshaller.unmarshal(
             new FileInputStream(new File(requirementFile))
         );
-        RequirementFunctionClassRegistry.singleton().register(requirement);
-        if (!VersionUtil.isCompatible(version, requirement.getVersion())) {
-            throw new IllegalArgumentException(String.format(
-                "The Requirement XML file's version: %s, is incompatible with "
-                + " the application's version: %s",
-                requirement.getVersion(),
-                version
-            ));
-        }
+        ClassAndFunctionRegistry.singleton().registerFunctions(requirement);
         return requirement;
     }
 }

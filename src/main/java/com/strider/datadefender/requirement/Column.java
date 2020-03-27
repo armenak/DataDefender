@@ -15,6 +15,8 @@
  */
 package com.strider.datadefender.requirement;
 
+import com.strider.datadefender.requirement.plan.Plan;
+import com.strider.datadefender.requirement.plan.PlanRef;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,21 +49,24 @@ import org.apache.commons.beanutils.ConvertUtils;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Column {
 
-    @XmlAttribute(name = "Name")
+    @XmlAttribute
     private String name;
 
-    @XmlAttribute(name = "IgnoreEmpty")
-    private boolean ignoreEmpty;
+    @XmlAttribute(name = "skip-empty")
+    private boolean ignoreEmpty = true;
 
     @XmlJavaTypeAdapter(ClassAdapter.class)
-    @XmlAttribute(name = "Type")
-    private Class<?> type;
+    @XmlAttribute
+    private Class<?> type = String.class;
 
-    @XmlElement(name = "Functions")
-    private FunctionList functionList;
+    @XmlElement
+    private Plan plan;
 
-    @XmlElementWrapper(name = "Exclusions")
-    @XmlElement(name = "Exclude")
+    @XmlElement(name = "plan-ref")
+    private PlanRef planRef;
+
+    @XmlElementWrapper(name = "exclusions")
+    @XmlElement(name = "exclude")
     private List<Exclude> exclusions;
 
     public Column() {
@@ -88,6 +93,19 @@ public class Column {
     }
 
     /**
+     * Returns the plan used by this column, either the one defined under it,
+     * or the one referenced by planRef.
+     *
+     * @return
+     */
+    public Plan getResolvedPlan() {
+        if (planRef != null) {
+            return planRef.getRef();
+        }
+        return plan;
+    }
+
+    /**
      * Calls all functions defined under Functions in order.
      *
      * @param rs
@@ -103,12 +121,12 @@ public class Column {
         InstantiationException {
 
         Object startingValue = null;
-        Class<?> argType = functionList.getDynamicArgumentType();
+        Class<?> argType = getResolvedPlan().getDynamicArgumentType();
         if (argType != null && ClassUtils.isAssignable(ResultSet.class, argType)) {
             startingValue = rs;
         } else {
             startingValue = rs.getObject(name, type);
         }
-        return ConvertUtils.convert(functionList.invoke(startingValue), type);
+        return ConvertUtils.convert(getResolvedPlan().invoke(startingValue), type);
     }
 }

@@ -23,8 +23,7 @@ import java.util.List;
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.Key;
-import com.strider.datadefender.requirement.Argument;
+import com.strider.datadefender.requirement.plan.Argument;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 

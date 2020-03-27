@@ -79,21 +79,21 @@ public class Exclude {
     /**
      * The column name in the database
      */
-    @XmlAttribute(name = "Name")
+    @XmlAttribute
     private String name;
 
     /**
      * The excluded value if the value should match with an SQL = comparison in
      * the WHERE clause
      */
-    @XmlAttribute(name = "Equals")
+    @XmlAttribute
     private String equals;
 
     /**
      * The excluded value if the value should match with an SQL LIKE comparison
      * in the WHERE clause
      */
-    @XmlAttribute(name = "Like")
+    @XmlAttribute
     private String like;
 
     /**
@@ -104,7 +104,7 @@ public class Exclude {
      * be matched in a series of listed <Exclusions> for the column's value to
      * be anonymized.
      */
-    @XmlAttribute(name = "NotEquals")
+    @XmlAttribute(name = "not-equals")
     private String notEquals;
 
     /**
@@ -115,31 +115,31 @@ public class Exclude {
      * matched in a series of listed <Exclusions> for the column's value to be
      * anonymized.
      */
-    @XmlAttribute(name = "NotLike")
+    @XmlAttribute(name = "not-like")
     private String notLike;
 
     /**
      * The excluded value includes nulls.
      */
-    @XmlAttribute(name = "Null")
+    @XmlAttribute(name = "null")
     private boolean excludeNull;
 
     /**
      * Uses an "IN ()" clause to exclude a large range of values.
      */
-    @XmlAttribute(name = "In")
+    @XmlAttribute(name = "in")
     private String excludeIn;
 
     /**
      * Uses an "NOT IN ()" clause to exclude a large range of values.
      */
-    @XmlAttribute(name = "NotIn")
+    @XmlAttribute(name = "not-in")
     private String excludeNotIn;
 
     /**
      * Separator String for In attribute, defaults to ",".
      */
-    @XmlAttribute(name = "InSeparator")
+    @XmlAttribute(name = "in-separator")
     private String inSeparator = ",";
 
     /**

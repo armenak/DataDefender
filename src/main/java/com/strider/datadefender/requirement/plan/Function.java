@@ -13,10 +13,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
+package com.strider.datadefender.requirement.plan;
 
 import com.strider.datadefender.functions.NamedParameter;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
+import com.strider.datadefender.requirement.TypeConverter;
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -39,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
@@ -49,28 +51,38 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Function implements IFunction {
+public class Function implements Invokable {
 
     @Setter(AccessLevel.NONE)
-    @XmlAttribute(name = "Name")
+    @XmlAttribute(name = "name")
     private String functionName;
 
     private Method function;
 
-    @XmlAttribute(name = "CombinerGlue")
+    @XmlAttribute(name = "combiner-glue")
     private String combinerGlue;
 
     private Object combinerGlueObject;
 
-    @XmlElement(name = "Argument")
+    @XmlElement(name = "argument")
     private List<Argument> arguments;
 
     private boolean isCombinerFunction = false;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private ClassAndFunctionRegistry registry;
+
     public Function() {
+        this(ClassAndFunctionRegistry.singleton());
+    }
+
+    public Function(ClassAndFunctionRegistry registry) {
+        this.registry = registry;
     }
 
     public Function(String functionName, boolean isCombinerFunction) {
+        this();
         this.functionName = functionName;
         this.isCombinerFunction = isCombinerFunction;
     }
@@ -119,13 +131,10 @@ public class Function implements IFunction {
         }
         String cn = functionName.substring(0, index);
         String fn = StringUtils.stripStart(functionName.substring(index), "#.:");
-        if (!cn.contains(".") && Character.isUpperCase(cn.charAt(0))) {
-            cn = "java.lang." + cn;
-        }
         int argCount = CollectionUtils.size(arguments);
 
         log.debug("Looking for function in class {} with name {} and {} parameters", cn, fn, argCount);
-        Class clazz = ClassUtils.getClass(cn);
+        Class<?> clazz = registry.getClassForName(cn);
         List<Method> methods = Arrays.asList(clazz.getMethods());
 
         return methods
@@ -282,7 +291,7 @@ public class Function implements IFunction {
         InstantiationException {
 
         log.debug("Function declaring class: {}", function.getDeclaringClass());
-        RequirementFunctionClassRegistry registry = RequirementFunctionClassRegistry.singleton();
+        ClassAndFunctionRegistry registry = ClassAndFunctionRegistry.singleton();
         Object ob = registry.getFunctionsSingleton(function.getDeclaringClass());
         if (
             ob == null

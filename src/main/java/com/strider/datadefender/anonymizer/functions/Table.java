@@ -16,7 +16,7 @@
 package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.functions.NamedParameter;
-import com.strider.datadefender.requirement.functions.DatabaseAwareRequirementFunctionClass;
+import com.strider.datadefender.requirement.registry.DatabaseAwareRequirementFunction;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -37,7 +37,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Armenak Grigoryan
  */
 @Log4j2
-public class Table extends DatabaseAwareRequirementFunctionClass {
+public class Table extends DatabaseAwareRequirementFunction {
 
     private static final Map<String, List<String>> stringLists = new HashMap<>();
     private static final Map<String, Iterator<String>> stringIters = new HashMap<>();

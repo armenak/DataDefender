@@ -15,27 +15,36 @@
  */
 package com.strider.datadefender.requirement;
 
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * XmlAdapter to get a Class<?> type from a String, and vice-versa.
+ * XmlAdapter to get a Class type from a String, and vice-versa.
  *
  * @author Zaahid Bateson
  */
 public class ClassAdapter extends XmlAdapter<String, Class<?>> {
 
+    private ClassAndFunctionRegistry registry;
+
+    public ClassAdapter() {
+        this(ClassAndFunctionRegistry.singleton());
+    }
+
+    public ClassAdapter(ClassAndFunctionRegistry registry) {
+        this.registry = registry;
+    }
+
     @Override
     public Class<?> unmarshal(String value) throws Exception {
         String t = StringUtils.trimToEmpty(value);
         if (StringUtils.isBlank(t)) {
-            t = "java.lang.String";
-        } else if (!t.contains(".") && Character.isUpperCase(t.charAt(0))) {
-            t = "java.lang." + t;
+            return String.class;
         }
-        return ClassUtils.getClass(t);
+        return registry.getClassForName(value);
     }
 
     @Override

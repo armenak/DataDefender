@@ -16,11 +16,16 @@
  */
 package com.strider.datadefender.requirement;
 
+import com.strider.datadefender.requirement.plan.GlobalPlan;
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
+
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -28,25 +33,64 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * JAXB class that defines elements in Requirement.xml file
  *
  * @author Armenak Grigoryan
  */
-@XmlRootElement(name = "Requirement")
-@XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@Log4j2
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "anonymizer")
 public class Requirement {
 
-    @XmlElement(name = "Client")
-    private String client;
-    @XmlElement(name = "Version")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @Data
+    public static class AutoresolvePackage {
+        @XmlAttribute
+        private String name;
+
+        @Getter(AccessLevel.NONE)
+        @Setter(AccessLevel.NONE)
+        private ClassAndFunctionRegistry registry;
+
+        public AutoresolvePackage() {
+            this(ClassAndFunctionRegistry.singleton());
+        }
+
+        public AutoresolvePackage(ClassAndFunctionRegistry registry) {
+            this.registry = registry;
+        }
+
+        public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+            log.debug("Found autoresolve package: {}", name);
+            registry.registerAutoResolvePackage(name);
+        }
+    }
+
+    @XmlElement
+    private String project;
+
+    @XmlElement(name = "project-version")
     private String version;
-    @XmlElementWrapper(name = "Tables")
-    @XmlElement(name = "Table")
+    
+    @XmlElementWrapper(name = "column-plans")
+    @XmlElement(name = "plan")
+    private List<GlobalPlan> plans;
+
+    @XmlElementWrapper(name = "tables")
+    @XmlElement(name = "table")
     private List<Table> tables;
+
+    @XmlElementWrapper(name = "autoresolve-classes")
+    @XmlElement(name = "package")
+    private List<AutoresolvePackage> autoresolve;
 
     /**
      * Returns a list of Table elements that match entries in the passed filter.

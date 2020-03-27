@@ -19,7 +19,7 @@ import com.strider.datadefender.anonymizer.DatabaseAnonymizer;
 import com.strider.datadefender.anonymizer.IAnonymizer;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClassRegistry;
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
 
 import java.util.concurrent.Callable;
 import java.util.List;
@@ -74,7 +74,7 @@ public class Anonymize implements Callable<Integer> {
         log.info("Limiting to tables: {}", CollectionUtils.isEmpty(tables) ? "<all tables selected>" : StringUtils.join(tables, ", "));
 
         IDbFactory factory = IDbFactory.get(dbConfig);
-        RequirementFunctionClassRegistry.singleton().initialize(factory);
+        ClassAndFunctionRegistry.singleton().initialize(factory);
 
         final IAnonymizer anonymizer = new DatabaseAnonymizer(
             factory,

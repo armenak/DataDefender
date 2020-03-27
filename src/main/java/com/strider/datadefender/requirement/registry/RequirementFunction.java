@@ -13,24 +13,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+package com.strider.datadefender.requirement.registry;
 
 /**
- * XmlAdapter to get a Function type from a String attribute.
+ * Specifies that the class contains functions for use by anonymizer functions.
  *
- * @author Zaahid Bateson
+ * This identifies classes that the anonymizer should try to construct, versus
+ * classes that identify the return type of a column (and methods that operate
+ * on them, for example a function java.lang.String#substring) that should not
+ * be constructed.
+ *
+ * @author Zaahid Bateson <zaahid.bateson@ubc.ca>
  */
-public class FunctionAttributeAdapter extends XmlAdapter<String, Function> {
-
-    @Override
-    public Function unmarshal(String value) throws Exception {
-        return new Function(value, true);
-    }
-
-    @Override
-    public String marshal(Function f) throws Exception {
-        return f.getFunctionName();
-    }
+public abstract class RequirementFunction {
+    
 }

@@ -16,7 +16,7 @@
 package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.functions.NamedParameter;
-import com.strider.datadefender.requirement.functions.RequirementFunctionClass;
+import com.strider.datadefender.requirement.registry.RequirementFunction;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -33,7 +33,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Armenak Grigoryan
  */
 @Log4j2
-public class Lipsum extends RequirementFunctionClass {
+public class Lipsum extends RequirementFunction {
 
     private Random rand = new Random();
     private static final List<String> lipsumParagraphs = new ArrayList<>();

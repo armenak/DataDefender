@@ -13,8 +13,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
+package com.strider.datadefender.requirement.plan;
 
+import com.strider.datadefender.requirement.Column;
+import com.strider.datadefender.requirement.TypeConverter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -26,6 +28,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,18 +46,18 @@ import lombok.Data;
 @Log4j2
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FunctionList implements IFunction {
+public class Plan implements Invokable {
 
     @XmlJavaTypeAdapter(FunctionAttributeAdapter.class)
-    @XmlAttribute(name = "Combiner")
+    @XmlAttribute
     private Function combiner;
 
-    @XmlAttribute(name = "CombinerGlue")
+    @XmlAttribute(name = "combiner-glue")
     private String combinerGlue;
 
     private Object combinerGlueObject;
 
-    @XmlElement(name = "Function")
+    @XmlElement(name = "function")
     private List<Function> functions;
 
     /**
@@ -89,7 +92,7 @@ public class FunctionList implements IFunction {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    private Object invokeCombiner(Object firstArg, Object secondArg)
+    protected Object invokeCombiner(Object firstArg, Object secondArg)
         throws SQLException,
         IllegalAccessException,
         InvocationTargetException,
@@ -148,25 +151,13 @@ public class FunctionList implements IFunction {
         return runningValue;
     }
 
-    /**
-     * Uses functionName and parameters to find the method to associate with
-     * 'Function'.
-     *
-     * @param unmarshaller
-     * @param parent
-     */
-    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent)
+    protected void initialize(Class<?> columnType)
         throws ClassNotFoundException,
         InstantiationException,
         IllegalAccessException,
-        IllegalArgumentException,
         InvocationTargetException {
 
-        if (!(parent instanceof Column)) {
-            return;
-        }
-        final Class<?> columnType = ((Column) parent).getType();
-
+        log.debug("Initializing plan with column type: {}", columnType);
         Method cm = null;
         if (combiner != null) {
             log.debug(
@@ -183,7 +174,7 @@ public class FunctionList implements IFunction {
             }
         }
 
-        for (Function fn : functions) {
+        for (Function fn : CollectionUtils.emptyIfNull(functions)) {
             Method m = fn.initialize(columnType);
             Class<?> rtype = m.getReturnType();
             if (cm != null && !TypeConverter.isConvertible(rtype, cm.getParameterTypes()[0])) {
@@ -196,5 +187,33 @@ public class FunctionList implements IFunction {
                 throw new IllegalArgumentException("Combiner: " + combiner.getFunctionName() + " can't be called for function: " + m.getName());
             }
         }
+    }
+
+    /**
+     * Uses functionName and parameters to find the method to associate with
+     * 'Function'.
+     *
+     * @param unmarshaller
+     * @param parent
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent)
+        throws ClassNotFoundException,
+        InstantiationException,
+        IllegalAccessException,
+        InvocationTargetException {
+
+        log.debug("Unmarshalling plan");
+        log.debug("combiner-glue: {}", combinerGlue);
+        log.debug("Function count: {}", () -> CollectionUtils.size(functions));
+
+        if (!(parent instanceof Column)) {
+            return;
+        }
+        final Class<?> columnType = ((Column) parent).getType();
+        initialize(columnType);
     }
 }

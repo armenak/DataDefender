@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * JAXB class that defines parameter table in Requirement.xml file
@@ -33,20 +34,26 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 public class Table {
-    @XmlAttribute(name = "Name")
+
+    @XmlAttribute
     private String name;
-    @XmlAttribute(name = "Where")
+
+    @XmlAttribute(name = "primary-key")
+    private String primaryKey;
+
+    @XmlElement
     private String where;
-    @XmlAttribute(name = "PKey")
-    private String pkey;
-    @XmlElementWrapper(name = "Columns")
-    @XmlElement(name = "Column")
+
+    @XmlElementWrapper(name = "primary-key")
+    @XmlElement(name = "key")
+    private List<String> primaryKeys;
+
+    @XmlElementWrapper(name = "columns")
+    @XmlElement(name = "column")
     private List<Column> columns;
-    @XmlElementWrapper(name = "PrimaryKey")
-    @XmlElement(name = "Key")
-    private List<Key> primaryKeys;
-    @XmlElementWrapper(name = "Exclusions")
-    @XmlElement(name = "Exclude")
+    
+    @XmlElementWrapper(name = "exclusions")
+    @XmlElement(name = "exclude")
     private List<Exclude> exclusions;
 
     public Table() {
@@ -54,5 +61,12 @@ public class Table {
 
     public Table(String name) {
         this.name = name;
+    }
+
+    public List<String> getPrimaryKeyColumnNames() {
+        if (CollectionUtils.isNotEmpty(primaryKeys)) {
+            return primaryKeys;
+        }
+        return List.of(primaryKey);
     }
 }

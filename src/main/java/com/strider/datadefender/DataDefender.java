@@ -105,7 +105,8 @@ public class DataDefender implements Callable<Integer> {
             try {
                 return loader.load(value, DataDefender.VERSION);
             } catch (FileNotFoundException e) {
-                throw new TypeConversionException("Unable to load requirements file: File not found");
+                log.debug("Error loading requirements file", e);
+                throw new TypeConversionException("Unable to load requirements file: " + e.getMessage());
             } catch (Exception e) {
                 Throwable exc = e;
                 if (StringUtils.isBlank(e.getMessage()) && e.getCause() != null) {

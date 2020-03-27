@@ -13,22 +13,31 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
+package com.strider.datadefender.requirement.plan;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
+import lombok.Data;
 
 /**
- * Defines a single "invoke" method with the hopes to make FunctionList/Function
- * not just chainable but also nestable.
+ * JAXB class defining values for array parameters.
  *
+ * Represents the value of a single array element for a given Parameter.
+ *
+ * @see Parameter.getArrayElements
  * @author Zaahid Bateson
  */
-public interface IFunction {
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+public class ArrayElement {
     /**
-     * Invokes the underlying function with the passed runningValue for dynamic
-     * arguments.
-     *
-     * @param runningValue
-     * @return
-     * @throws Exception
+     * The array element's value
      */
-    Object invoke(Object runningValue) throws Exception;
+    @XmlAttribute
+    private String value;
+
+    @XmlAttribute(name = "pass-current-value")
+    private boolean isDynamicValue = false;
 }

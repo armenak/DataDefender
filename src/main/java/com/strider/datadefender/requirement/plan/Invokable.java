@@ -13,36 +13,22 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-
-import lombok.Data;
+package com.strider.datadefender.requirement.plan;
 
 /**
- * JAXB class defining a Table's key column.
+ * Defines a single "invoke" method with the hopes to make Plan/Function
+ * not just chainable but also nestable.
  *
- * Represents a single key column in a table's primary key - could be part of a
- * set comprising a compound key.
- *
- * @see Table.getKeys
  * @author Zaahid Bateson
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-@Data
-public class Key {
+public interface Invokable {
     /**
-     * The column name in the database
+     * Invokes the underlying function with the passed runningValue for dynamic
+     * arguments.
+     *
+     * @param runningValue
+     * @return
+     * @throws Exception
      */
-    @XmlAttribute(name = "Name")
-    private String name;
-
-    public Key() {
-    }
-
-    public Key(String name) {
-        this.name = name;
-    }
+    Object invoke(Object runningValue) throws Exception;
 }
