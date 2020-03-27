@@ -15,42 +15,38 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.report;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.database.IDBFactory;
-import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.database.sqlbuilder.ISQLBuilder;
-import com.strider.datadefender.utils.CommonUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Clob;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
+
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class ReportUtil {
-    private static final Logger log = getLogger(ReportUtil.class);
-
-    public static int rowCount(final IDBFactory factory, final String tableName) {
-        final ISQLBuilder sqlBuilder = factory.createSQLBuilder();
+    
+    public static int rowCount(final IDbFactory factory, final String tableName) throws DataDefenderException {
+        final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         final String      table      = sqlBuilder.prefixSchema(tableName);
         
         // Getting number of records in the table
@@ -70,8 +66,8 @@ public class ReportUtil {
         return rowCount;
     }
 
-    public static List<String> sampleData(final IDBFactory factory, final MatchMetaData metaData) throws IOException {
-        final ISQLBuilder sqlBuilder  = factory.createSQLBuilder();
+    public static List<String> sampleData(final IDbFactory factory, final ColumnMetaData metaData) throws IOException, DataDefenderException {
+        final ISqlBuilder sqlBuilder  = factory.createSQLBuilder();
         String            querySample = "";
         String            select      = "SELECT ";
         
@@ -81,10 +77,12 @@ public class ReportUtil {
             select = select + "DISTINCT ";
         }
         
-        querySample = sqlBuilder.buildSelectWithLimit(select + metaData.getColumnName() + 
-                                                          " FROM "  + sqlBuilder.prefixSchema(metaData.getTableName()) +
-                                                          " WHERE " + metaData.getColumnName() + " IS NOT NULL",
-                                                          5);     
+        querySample = sqlBuilder.buildSelectWithLimit(
+            select + metaData.getColumnName() + " FROM "
+                + sqlBuilder.prefixSchema(metaData.getTable().getTableName())
+                + " WHERE " + metaData.getColumnName() + " IS NOT NULL",
+            5
+        );
         log.debug("Executing query against database: " + querySample);
 
         final List<String> sampleDataList = new ArrayList<>();
@@ -101,9 +99,9 @@ public class ReportUtil {
                     tmp = resultSet.getString(1);
                 }
                 
-                if (!CommonUtils.isEmptyString(tmp) && !tmp.equals(" ")) {
+                if (StringUtils.isNotBlank(tmp)) {
                     sampleDataList.add(tmp);
-                    tmp = "";
+                    tmp = null;
                 }
             }
         } catch (SQLException sqle) {

@@ -12,134 +12,76 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.specialcase;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
-
+import com.strider.datadefender.Discoverer.ColumnMatch;
 import com.strider.datadefender.Probability;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
-import com.strider.datadefender.utils.CommonUtils;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class SinDetector implements SpecialCase {
-    private static final Logger LOG = getLogger(SinDetector.class);
 
-    public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
+    public static ColumnMatch detectSin(final ColumnMetaData data, final String text) {
         String sinValue = text;
 
-        if (!CommonUtils.isEmptyString(sinValue)
-                && (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")
-                    || data.getColumnType().equals("CHAR"))) {
+        if (
+            StringUtils.isNotBlank(sinValue)
+            && (
+                Objects.equals(String.class, data.getColumnType())
+                || Number.class.isAssignableFrom(data.getColumnType())
+            )
+        ) {
             final BiographicFunctions bf = new BiographicFunctions();
 
-            if (data.getColumnType().equals("VARCHAR")) {
+            if (Objects.equals(String.class, data.getColumnType())) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
 
             if (bf.isValidSIN(sinValue)) {
-                LOG.info("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
-                data.setModel("sin");
-                data.setAverageProbability(1);
-
-                final List<Probability> probabilityList = new ArrayList();
-
-                probabilityList.add(new Probability(sinValue, 1.00));
-                data.setProbabilityList(probabilityList);
-
-                return data;
+                log.info("SIN detected: " + sinValue + " in " + data.getTable().getTableName() + "." + data.getColumnName());
+                return new ColumnMatch(
+                    data,
+                    1,
+                    "sin",
+                    List.of(new Probability(sinValue, 1.00))
+                );
             }
         }
 
         return null;
     }
-    
+
     public static FileMatchMetaData detectSin(final FileMatchMetaData metaData, final String text) {
         String sinValue = "";
-        
-        if (!CommonUtils.isEmptyString(text)) {
+
+        if (StringUtils.isNotBlank(text)) {
             sinValue = text;
         }
 
-        LOG.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
-        if (isValidSIN(sinValue)) {
-                LOG.info("SIN detected: " + sinValue);
+        log.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
+        final BiographicFunctions bf = new BiographicFunctions();
+        if (bf.isValidSIN(sinValue)) {
+                log.info("SIN detected: " + sinValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("sin");
                 return metaData;
         } else {
-            LOG.debug("SIN " + sinValue + " is not valid" );
+            log.debug("SIN " + sinValue + " is not valid" );
         }
 
         return null;
-    }    
-    
-    /**
-     * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
-     * @param sin
-     * @return boolean true, if SIN is valid, otherwise false
-     */
-    private static boolean isValidSIN(final String sin) {
-        boolean valid = false;
-
-        if (sin.length() < 9) {
-            LOG.debug("SIN length is < 9");
-
-            return valid;
-        }
-
-//        if (!sin.matches("[0-9]+")) {
-//            LOG.debug("SIN " + sin + " is not number");
-//
-//            return valid;
-//        }
-
-        final int[]         sinArray   = new int[sin.length()];
-        final int[]         checkArray = {
-            1, 2, 1, 2, 1, 2, 1, 2, 1
-        };
-        final List<Integer> sinList    = new ArrayList();
-
-        LOG.debug(sin);
-
-        for (int i = 0; i < 9; i++) {
-            sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));
-            sinArray[i] = sinArray[i] * checkArray[i];
-        }
-
-        int sum = 0;
-
-        for (int i = 0; i < 9; i++) {
-            final String tmp = String.valueOf(sinArray[i]);
-
-            if (tmp.length() == 1) {
-                sinList.add(Integer.valueOf(tmp));
-                sum += Integer.valueOf(tmp);
-            } else {
-                sinList.add(Integer.valueOf(tmp.substring(0, 1)));
-                sum += Integer.valueOf(tmp.substring(0, 1));
-                sinList.add(Integer.valueOf(tmp.substring(1, 2)));
-                sum += Integer.valueOf(tmp.substring(1, 2));
-            }
-        }
-
-        if ((sum % 10) == 0) {
-            valid = true;
-        }
-
-        return valid;
-    }    
+    }
 }

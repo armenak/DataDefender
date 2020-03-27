@@ -15,9 +15,6 @@
  *
  * Modified by Armenak Grigoryan
  */
-
-
-
 package com.strider.datadefender.utils;
 
 import java.util.List;
@@ -29,8 +26,9 @@ import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 
 /**
- * An object that will generate text from a regular expression. In a way, it's the opposite of a regular expression
- * matcher: an instance of this class will produce text that is guaranteed to match the regular expression passed in.
+ * An object that will generate text from a regular expression. In a way, it's
+ * the opposite of a regular expression matcher: an instance of this class will
+ * produce text that is guaranteed to match the regular expression passed in.
  */
 public class Xeger {
     private final Automaton automaton;

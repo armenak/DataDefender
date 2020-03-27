@@ -12,57 +12,47 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender.specialcase;
 
-import org.apache.log4j.Logger;
-import static org.apache.log4j.Logger.getLogger;
+import com.strider.datadefender.Discoverer.ColumnMatch;
+import org.apache.commons.validator.routines.EmailValidator;
 
-import org.apache.commons.validator.EmailValidator;
+import com.strider.datadefender.database.metadata.TableMetaData;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 
-import com.strider.datadefender.utils.CommonUtils;
-import com.strider.datadefender.database.metadata.MatchMetaData;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class EmailDetector implements SpecialCase {
-    private static final Logger LOG = getLogger(EmailDetector.class);
-    
-    public static MatchMetaData detectEmail(final MatchMetaData metaData, final String text) {
-        String emailValue = "";
-        
-        if (!CommonUtils.isEmptyString(text)) {
-            emailValue = text;
-        }
 
-        if (isValidEmail(emailValue)) {
-                LOG.debug("Email detected: " + emailValue);
-                metaData.setAverageProbability(1.0);
-                metaData.setModel("email");
-                return metaData;
+    public static ColumnMatch detectEmail(final ColumnMetaData metaData, final String text) {
+        if (StringUtils.isNotBlank(text) && isValidEmail(text)) {
+                log.debug("Email detected: " + text);
+                return new ColumnMatch(metaData, 1.0, "email", null);
         } else {
-            LOG.debug("Email " + emailValue + " is not valid" );
+            log.debug("Email " + text + " is not a valid email");
         }
 
         return null;
     }    
     
     /**
-     * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
      * @param email Email address
-     * @return boolean true, if SIN is valid, otherwise false
+     * @return true if email is valid, otherwise false
      */
     private static boolean isValidEmail(final String email) {
-        
-	EmailValidator eValidator = EmailValidator.getInstance();
-	if(eValidator.isValid(email)){
-            LOG.debug("*************** Email " + email + " is valid");
+
+        EmailValidator eValidator = EmailValidator.getInstance();
+        if (eValidator.isValid(email)) {
+            log.debug("*************** Email " + email + " is valid");
             return true;
-	}else{
+        } else {
             return false;
-	}        
-    }    
+        }
+    }
 }

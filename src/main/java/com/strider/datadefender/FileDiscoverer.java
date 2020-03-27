@@ -13,30 +13,35 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
 package com.strider.datadefender;
 
+import com.strider.datadefender.file.metadata.FileMatchMetaData;
+import com.strider.datadefender.functions.Utils;
+import com.strider.datadefender.specialcase.SpecialCase;
+
+import java.text.DecimalFormat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import java.text.DecimalFormat;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
-
-import static java.lang.Double.parseDouble;
+import java.sql.SQLException;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
@@ -44,36 +49,27 @@ import org.apache.tika.sax.BodyContentHandler;
 
 import org.xml.sax.SAXException;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
-import com.strider.datadefender.functions.Utils;
-import com.strider.datadefender.specialcase.SpecialCase;
-import com.strider.datadefender.utils.CommonUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import opennlp.tools.util.Span;
+
+import lombok.extern.log4j.Log4j2;
+
+import static java.lang.Double.parseDouble;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author Armenak Grigoryan
  */
+@Log4j2
 public class FileDiscoverer extends Discoverer {
-    private static final Logger       log = getLogger(FileDiscoverer.class);
+    
     private static String[]           modelList;
     protected List<FileMatchMetaData> fileMatches;
 
     @SuppressWarnings("unchecked")
     public List<FileMatchMetaData> discover(final Properties fileDiscoveryProperties)
-            throws FileDiscoveryException, DatabaseDiscoveryException, IOException, SAXException, TikaException {
+            throws FileDiscoveryException, DataDefenderException, IOException, SAXException, TikaException {
         log.info("Data discovery in process");
 
         // Get the probability threshold from property file
@@ -103,7 +99,7 @@ public class FileDiscoverer extends Discoverer {
         // Special case
         String[] specialCaseFunctions = null;
         boolean specialCase = false;
-        final String extentionList = fileDiscoveryProperties.getProperty("extentions");
+        final String extensionList = fileDiscoveryProperties.getProperty("extensions");
         
         final String directories   = fileDiscoveryProperties.getProperty("directories");
         final String   exclusions    = fileDiscoveryProperties.getProperty("exclusions");
@@ -119,13 +115,13 @@ public class FileDiscoverer extends Discoverer {
         if ((directories == null) || directories.equals("")) {
             log.error("directories property is empty in firediscovery.properties file");
 
-            throw new DatabaseDiscoveryException("directories property is empty in firediscovery.properties file");
+            throw new DataDefenderException("directories property is empty in firediscovery.properties file");
         }
 
         final String[] directoryList = directories.split(",");        
-        if (!CommonUtils.isEmptyString(extentionList)) {
-            log.info("***** Extension list:" + extentionList);
-            specialCaseFunctions = extentionList.split(",");
+        if (StringUtils.isNotBlank(extensionList)) {
+            log.info("***** Extension list:" + extensionList);
+            specialCaseFunctions = extensionList.split(",");
 
             if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
                 File              node;
@@ -144,7 +140,7 @@ public class FileDiscoverer extends Discoverer {
                                 final String recursivedir = fich.getParent();
 
                                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
+                                final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                                 log.debug("Extension: " + ext);
 
                                 if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
@@ -177,7 +173,7 @@ public class FileDiscoverer extends Discoverer {
                                             FileMatchMetaData returnData = null;
                                             try {
                                                 returnData = 
-                                                    (FileMatchMetaData)callExtention(new FileMatchMetaData(recursivedir, file), specialFunction,token);
+                                                    (FileMatchMetaData)callExtension(new FileMatchMetaData(recursivedir, file), specialFunction,token);
                                             } catch (InvocationTargetException e) {
                                                 continue;
                                             }
@@ -237,7 +233,7 @@ public class FileDiscoverer extends Discoverer {
 
     private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties,
                                                                final Model model, final double probabilityThreshold)
-            throws DatabaseDiscoveryException, IOException, SAXException, TikaException {
+            throws DataDefenderException, IOException, SAXException, TikaException {
 
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
@@ -249,7 +245,7 @@ public class FileDiscoverer extends Discoverer {
         if ((directories == null) || directories.equals("")) {
             log.error("directories property is empty in firediscovery.properties file");
 
-            throw new DatabaseDiscoveryException("directories property is empty in firediscovery.properties file");
+            throw new DataDefenderException("directories property is empty in firediscovery.properties file");
         }
 
         final String[] directoryList = directories.split(",");
@@ -277,7 +273,7 @@ public class FileDiscoverer extends Discoverer {
                 final String recursivedir = fich.getParent();
 
                 log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                final String ext = CommonUtils.getFileExtension(fich).toLowerCase(Locale.ENGLISH);
+                final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                 log.debug("Extension: " + ext);
 
                 if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
@@ -344,7 +340,7 @@ public class FileDiscoverer extends Discoverer {
         return fileMatches;
     }
 
-    private Object callExtention(final FileMatchMetaData metadata, final String function, final String text)
+    private Object callExtension(final FileMatchMetaData metadata, final String function, final String text)
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException 
     {

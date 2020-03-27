@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,32 +12,22 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.utils;
 
-import org.apache.log4j.Logger;
-
-import org.junit.Test;
-
-import static org.apache.log4j.Logger.getLogger;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
  * @author Zaahid Bateson
  */
-public class LikeMatcherTest extends TestCase {
-    private static final Logger log         = getLogger(LikeMatcherTest.class);
+public class LikeMatcherTest {
     private static final String TEST_NAME_1 = "ZaahiD";
 
     @Test
     public void testMatchingAtBeginning() {
-        log.debug("Testing match begginning of string");
+        System.out.println("Testing match begginning of string");
 
         final LikeMatcher matcher = new LikeMatcher("%hid");
 
@@ -51,7 +40,7 @@ public class LikeMatcherTest extends TestCase {
 
     @Test
     public void testMatchingAtEnd() {
-        log.debug("Testing match at end of string");
+        System.out.println("Testing match at end of string");
 
         final LikeMatcher matcher = new LikeMatcher("za%");
 
@@ -64,7 +53,7 @@ public class LikeMatcherTest extends TestCase {
 
     @Test
     public void testMixedMatcher() {
-        log.debug("Testing match with a mix of '%', '?', and '_'");
+        System.out.println("Testing match with a mix of '%', '?', and '_'");
 
         final LikeMatcher matcher = new LikeMatcher("%Z_?h?d%");
 
@@ -78,7 +67,7 @@ public class LikeMatcherTest extends TestCase {
 
     @Test
     public void testMultiMatcher() {
-        log.debug("Testing match with multiple %'s");
+        System.out.println("Testing match with multiple %'s");
 
         final LikeMatcher matcher = new LikeMatcher("Z%h%d");
 
@@ -91,7 +80,7 @@ public class LikeMatcherTest extends TestCase {
 
     @Test
     public void testSingleCharMatcher() {
-        log.debug("Testing match with '?' and '_'");
+        System.out.println("Testing match with '?' and '_'");
 
         final LikeMatcher matcher = new LikeMatcher("Z_?h?d");
 

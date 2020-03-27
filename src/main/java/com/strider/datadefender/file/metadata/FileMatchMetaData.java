@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,11 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.file.metadata;
 
 /**
@@ -61,12 +56,9 @@ public class FileMatchMetaData {
     public void setModel(final String model) {
         this.model = model;
     }
-    
+
     @Override
     public String toString() {
         return this.directory + "." + this.fileName;
-    }    
+    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

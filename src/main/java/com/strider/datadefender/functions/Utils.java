@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -13,34 +12,22 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
  */
-
-
-
 package com.strider.datadefender.functions;
 
-import static java.lang.Integer.parseInt;
-
-import org.apache.log4j.Logger;
-
-import static org.apache.log4j.Logger.getLogger;
+import lombok.extern.log4j.Log4j2;
 
 /**
  *
- * @authors Armenak Grigoryan
+ * @author Armenak Grigoryan
  */
+@Log4j2
 public class Utils {
 
     /**
      * The string used to separator package and class name
      */
     public static final String SEPARATOR = ".";
-
-    /**
-     * Initializes logger
-     */
-    private static final Logger log = getLogger(Utils.class);
 
     /**
      * Returns fully specified class name.
@@ -67,24 +54,6 @@ public class Utils {
     }
 
     /**
-     * Determines whether the string represents integer
-     *
-     * @param str String that should represent integer
-     * @return true if the string is integer, false otherwise
-     */
-    public static boolean isInteger(final String str) {
-        try {
-            parseInt(str);
-
-            return true;
-        } catch (NumberFormatException nfe) {
-            log.error(nfe.toString());
-        }
-
-        return false;
-    }
-
-    /**
      * Returns the method name.
      *
      * @param fullMethodName Fully specified method name.
@@ -107,6 +76,3 @@ public class Utils {
         return "";
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
