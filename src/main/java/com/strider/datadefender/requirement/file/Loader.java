@@ -82,7 +82,7 @@ public class Loader {
         log.info("Loading requirement file: {}", requirementFile);
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = schemaFactory.newSchema(Loader.class.getClassLoader().getResource("requirement.xsd"));
+        Schema schema = schemaFactory.newSchema(Loader.class.getResource("requirement.xsd"));
 
         unmarshaller.setSchema(schema);
         requirement = (Requirement) unmarshaller.unmarshal(

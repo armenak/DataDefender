@@ -30,35 +30,35 @@ public class Address extends Core {
     public String randomCountry() throws IOException {
         return randomStringFromStream(
             "resource:countries.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("countries.txt")
+            () -> Lipsum.class.getResourceAsStream("countries.txt")
         );
     }
 
     public String randomCity() throws IOException {
         return randomStringFromStream(
             "resource:cities.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("cities.txt")
+            () -> Lipsum.class.getResourceAsStream("cities.txt")
         );
     }
 
     public String randomStreet() throws IOException {
         return randomStringFromStream(
             "resource:streets.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("streets.txt")
+            () -> Lipsum.class.getResourceAsStream("streets.txt")
         );
     }
 
     public String randomProvinceState()  throws IOException {
         return randomStringFromStream(
             "resource:provinces_states.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("provinces_states.txt")
+            () -> Lipsum.class.getResourceAsStream("provinces_states.txt")
         );
     }
 
     public String randomProvinceStateCode()  throws IOException {
         return randomStringFromStream(
             "resource:provinces_states_codes.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("provinces_states_codes.txt")
+            () -> Lipsum.class.getResourceAsStream("provinces_states_codes.txt")
         );
     }
 

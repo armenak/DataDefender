@@ -39,7 +39,7 @@ public class Lipsum extends RequirementFunction {
     private static final List<String> lipsumParagraphs = new ArrayList<>();
 
     static {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(Lipsum.class.getClassLoader().getResourceAsStream("lipsum.txt")));
+        final BufferedReader br = new BufferedReader(new InputStreamReader(Lipsum.class.getResourceAsStream("lipsum.txt")));
         final StringBuilder sb = new StringBuilder();
         try {
             for (String line; (line = br.readLine()) != null; ) {

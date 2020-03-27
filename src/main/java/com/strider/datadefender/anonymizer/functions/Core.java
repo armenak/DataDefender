@@ -55,7 +55,7 @@ public class Core extends RequirementFunction {
     }
 
     static {
-        try (Scanner scanner = new Scanner(Core.class.getClassLoader().getResourceAsStream("dictionary.txt"))) {
+        try (Scanner scanner = new Scanner(Core.class.getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext()) {
                 words.add(scanner.next());
             }

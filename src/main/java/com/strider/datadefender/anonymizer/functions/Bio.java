@@ -30,14 +30,14 @@ public class Bio extends Core {
     public String randomFirstName() throws IOException {
 		return randomStringFromStream(
             "resource:first_names.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("first_names.txt")
+            () -> Lipsum.class.getResourceAsStream("first_names.txt")
         );
     }
 
     public String randomLastName() throws IOException {
         return randomStringFromStream(
             "resource:last_names.txt",
-            () -> Lipsum.class.getClassLoader().getResourceAsStream("last_names.txt")
+            () -> Lipsum.class.getResourceAsStream("last_names.txt")
         );
     }
 
