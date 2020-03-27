@@ -47,6 +47,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
 import lombok.RequiredArgsConstructor;
+import me.tongfei.progressbar.ProgressBar;
 
 /**
  * Entry point for RDBMS data anonymizer
@@ -122,11 +123,13 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final List<String> params = new LinkedList<>();
         // final StringBuilder query = new StringBuilder("SELECT DISTINCT ");
         final StringBuilder query = new StringBuilder("SELECT ");
-        query.append(StringUtils.join(keys, ", ")).
-              append(", ").
-              append(StringUtils.join(columns, ", ")).
-              append(" FROM ").
-              append(table.getName());
+        if (CollectionUtils.isNotEmpty(keys)) {
+            query.append(StringUtils.join(keys, ", ")).append(", ");
+        }
+        query
+            .append(StringUtils.join(columns, ", "))
+            .append(" FROM ")
+            .append(table.getName());
 
         if (!StringUtils.isBlank(table.getWhere())) {
             query.append(" WHERE (").append(table.getWhere());
@@ -410,12 +413,22 @@ public class DatabaseAnonymizer implements IAnonymizer {
         fillColumnNames(table, colNames);
 
         // required in this scope for 'catch' block
+        PreparedStatement countQuery = null;
         PreparedStatement selectStmt = null;
         PreparedStatement updateStmt = null;
         ResultSet rs = null;
         final Connection updateCon = dbFactory.getUpdateConnection();
 
         try {
+
+            countQuery = getSelectQueryStatement(dbFactory, table, null, List.of("COUNT(*)"));
+            rs = countQuery.executeQuery();
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+            rs.close();
+
             selectStmt = getSelectQueryStatement(dbFactory, table, keyNames, colNames);
             rs = selectStmt.executeQuery();
 
@@ -427,16 +440,20 @@ public class DatabaseAnonymizer implements IAnonymizer {
             int batchCounter = 0;
             int rowCount = 0;
 
-            while (rs.next()) {
-                anonymizeRow(updateStmt, tableColumns, keyNames, rs, tableMetaData);
-                batchCounter++;
-                if (batchCounter == batchSize) {
-                    updateStmt.executeBatch();
-                    updateCon.commit();
-                    batchCounter = 0;
+            try (ProgressBar pb = new ProgressBar("Anonymizing table " + table.getName() + "...", total)) {
+                while (rs.next()) {
+                    anonymizeRow(updateStmt, tableColumns, keyNames, rs, tableMetaData);
+                    batchCounter++;
+                    if (batchCounter == batchSize) {
+                        updateStmt.executeBatch();
+                        updateCon.commit();
+                        batchCounter = 0;
+                    }
+                    pb.step();
+                    rowCount++;
                 }
-                rowCount++;
             }
+
             log.debug("Rows processed: " + rowCount);
 
             updateStmt.executeBatch();
@@ -457,6 +474,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
             throw new DatabaseException("Exception anonymizing table", ex);
         } finally {
             try {
+                if (countQuery != null) {
+                    countQuery.close();
+                }
                 if (selectStmt != null) {
                     selectStmt.close();
                 }
