@@ -15,23 +15,20 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender;
+package com.strider.datadefender.extractor;
 
 import com.strider.datadefender.database.DatabaseException;
-import com.strider.datadefender.database.IDbFactory;
-import com.strider.datadefender.requirement.Requirement;
 
 /**
  * Defines contract for all generators
  * @author Matthew Eaton
  */
-public interface IGenerator {
+public interface IExtractor {
 
     /**
-     * Generate data
-     * @param databaseProperties Database property file name and path
-     * @param Requirement requirement file
+     * Extracts data from table columns and generates files
+     *
      * @throws DatabaseException
      */
-    void generate(IDbFactory dbFactory, Requirement requirement) throws DatabaseException;
+    void extract() throws DatabaseException;
 }

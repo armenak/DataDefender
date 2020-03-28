@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +64,7 @@ import lombok.extern.log4j.Log4j2;
         HelpCommand.class,
         //FileDiscoverer.class,
         Anonymize.class,
-        //DataGenerator.class,
+        Extract.class,
         //ColumnDiscoverer.class
     }
 )
