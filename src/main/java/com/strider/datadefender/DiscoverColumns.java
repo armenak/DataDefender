@@ -44,7 +44,7 @@ public class DiscoverColumns implements Callable<Integer> {
     @ParentCommand
     private Discover discover;
 
-    @Option(names = { "--column-patterns" }, description = "List of regex patterns to match column names", required = true)
+    @Option(names = { "--column-pattern" }, description = "Regex pattern(s) to match column names", required = true)
     private List<Pattern> patterns;
 
     @Override
