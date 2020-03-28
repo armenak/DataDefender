@@ -59,9 +59,9 @@ public class DbConfig {
     @Option(names = { "--skip-empty-tables-metadata" }, description = "Skips generating metadata for empty tables", required = false, defaultValue = "true")
     private boolean skipEmptyTables;
 
-    @Option(names = { "--include-table-patterns-metadata" }, description = "List of regex patterns matching table names to include for metadata analysis", required = false)
+    @Option(names = { "--include-table-pattern-metadata" }, description = "Pattern(s) matching table names to include for metadata analysis", required = false)
     private List<Pattern> includeTablePatterns;
-    @Option(names = { "--exclude-table-patterns-metadata" }, description = "List of regex patterns matching table names to exclude for metadata analysis", required = false)
+    @Option(names = { "--exclude-table-pattern-metadata" }, description = "Pattern(s) matching table names to exclude for metadata analysis", required = false)
     private List<Pattern> excludeTablePatterns;
 
     private String url;
