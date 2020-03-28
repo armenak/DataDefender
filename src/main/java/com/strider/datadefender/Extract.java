@@ -49,9 +49,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Extract implements Callable<Integer> {
 
-    @ParentCommand
-    private DataDefender dataDefender;
-
     @Spec
     private CommandSpec spec;
 

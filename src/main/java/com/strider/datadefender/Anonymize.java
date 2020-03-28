@@ -31,7 +31,6 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
-import picocli.CommandLine.ParentCommand;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -48,9 +47,6 @@ import lombok.extern.log4j.Log4j2;
 )
 @Log4j2
 public class Anonymize implements Callable<Integer> {
-
-    @ParentCommand
-    private DataDefender dataDefender;
 
     @Option(names = { "-r", "--requirement-file" }, paramLabel = "<requirementFile>", description = "Requirement XML file", required = true)
     private Requirement requirement;
