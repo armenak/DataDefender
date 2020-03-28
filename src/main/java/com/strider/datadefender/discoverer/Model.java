@@ -18,7 +18,7 @@
 
 
 
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.tokenize.Tokenizer;

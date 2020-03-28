@@ -15,7 +15,7 @@
  */
 package com.strider.datadefender.specialcase;
 
-import com.strider.datadefender.Discoverer.ColumnMatch;
+import com.strider.datadefender.discoverer.Discoverer.ColumnMatch;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import com.strider.datadefender.Probability;
+import com.strider.datadefender.discoverer.Probability;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import java.util.Objects;
 

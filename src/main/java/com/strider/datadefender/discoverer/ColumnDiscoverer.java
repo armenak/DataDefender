@@ -14,8 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
 import com.strider.datadefender.report.ReportUtil;
@@ -28,16 +29,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
-
-import static java.util.regex.Pattern.compile;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Armenak Grigoryan
@@ -45,20 +43,20 @@ import org.apache.commons.lang3.StringUtils;
 @Log4j2
 public class ColumnDiscoverer extends Discoverer {
 
-    public List<ColumnMetaData> discover(final IDbFactory factory,
-            final Properties columnProperties, String vendor)
-            throws DataDefenderException, IOException, SQLException {
+    private IDbFactory factory;
+    private List<Pattern> patterns;
+
+    public ColumnDiscoverer(IDbFactory factory, List<Pattern> patterns) {
+        this.factory = factory;
+        this.patterns = patterns;
+    }
+
+    public List<ColumnMetaData> discover() throws DataDefenderException, IOException, SQLException {
         log.info("Column discovery in process");
 
         final IMetaData metaData = factory.fetchMetaData();
         final List<TableMetaData> list = metaData.getMetaData();
 
-        // Converting HashMap keys into ArrayList
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        final List<String> suspList = new ArrayList(columnProperties.keySet());
-        suspList.remove("tables");    // removing 'special' tables property that's not a pattern
-
-        final List<Pattern> patterns = suspList.stream().map((s) -> compile(s)).collect(Collectors.toList());
         List<ColumnMetaData> columns = list.stream().flatMap((t) -> t.getColumns().stream())
             .filter((c) -> patterns.stream().anyMatch((p) -> p.matcher(c.getColumnName().toLowerCase()).matches()))
             .collect(Collectors.toList());

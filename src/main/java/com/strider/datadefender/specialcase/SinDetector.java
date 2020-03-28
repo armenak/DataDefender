@@ -15,8 +15,8 @@
  */
 package com.strider.datadefender.specialcase;
 
-import com.strider.datadefender.Discoverer.ColumnMatch;
-import com.strider.datadefender.Probability;
+import com.strider.datadefender.discoverer.Discoverer.ColumnMatch;
+import com.strider.datadefender.discoverer.Probability;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;

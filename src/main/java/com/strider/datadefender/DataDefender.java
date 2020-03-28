@@ -52,6 +52,9 @@ import lombok.extern.log4j.Log4j2;
  * This class will parse and analyze the parameters and execute appropriate
  * service.
  *
+ * TODO(ZB): Look into setting up command mixins for debug/verbosity so they
+ * don't have to appear before subcommands [https://picocli.info/#_mixins]
+ *
  * @author Zaahid Bateson
  */
 @Command(
@@ -62,10 +65,9 @@ import lombok.extern.log4j.Log4j2;
     synopsisSubcommandLabel = "COMMAND",
     subcommands = {
         HelpCommand.class,
-        //FileDiscoverer.class,
         Anonymize.class,
         Extract.class,
-        //ColumnDiscoverer.class
+        Discover.class
     }
 )
 @Log4j2

@@ -14,8 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.specialcase.SpecialCase;

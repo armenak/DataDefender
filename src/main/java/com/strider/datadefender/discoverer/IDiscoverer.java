@@ -18,7 +18,7 @@
 
 
 
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
 import com.strider.datadefender.anonymizer.DatabaseAnonymizerException;
 

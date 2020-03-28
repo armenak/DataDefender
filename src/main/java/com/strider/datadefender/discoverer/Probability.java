@@ -16,7 +16,7 @@
  *
  */
 
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
 import java.util.Comparator;
 

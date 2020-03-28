@@ -18,7 +18,7 @@
 
 
 
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
 /**
  * Application-level exception

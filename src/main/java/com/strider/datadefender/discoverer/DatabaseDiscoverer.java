@@ -15,8 +15,9 @@
  * Lesser General Public License for more details.
  *
  */
-package com.strider.datadefender;
+package com.strider.datadefender.discoverer;
 
+import com.strider.datadefender.DataDefenderException;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
