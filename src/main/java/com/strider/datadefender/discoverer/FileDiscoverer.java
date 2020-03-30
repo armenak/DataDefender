@@ -17,6 +17,7 @@
 package com.strider.datadefender.discoverer;
 
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.ModelDiscoveryConfig;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.functions.Utils;
 import com.strider.datadefender.specialcase.SpecialCase;
@@ -55,6 +56,7 @@ import opennlp.tools.util.Span;
 import lombok.extern.log4j.Log4j2;
 
 import static java.lang.Double.parseDouble;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -64,145 +66,121 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Log4j2
 public class FileDiscoverer extends Discoverer {
-    
-    private static String[]           modelList;
+
+    protected final List<File> directories;
     protected List<FileMatchMetaData> fileMatches;
+    protected List<String> excludeExtensions;
 
-    @SuppressWarnings("unchecked")
-    public List<FileMatchMetaData> discover(final Properties fileDiscoveryProperties)
-            throws FileDiscoveryException, DataDefenderException, IOException, SAXException, TikaException {
-        log.info("Data discovery in process");
+    public FileDiscoverer(ModelDiscoveryConfig config, List<File> directories, List<String> excludeExtensions) throws IOException {
+        super(config);
+        this.directories = directories;
+        this.excludeExtensions = excludeExtensions;
+    }
 
-        // Get the probability threshold from property file
-        final double probabilityThreshold = parseDouble(fileDiscoveryProperties.getProperty("probability_threshold"));
-
-        log.info("Probability threshold [" + probabilityThreshold + "]");
-
-        // Get list of models used in data discovery
-        final String models = fileDiscoveryProperties.getProperty("models");
-
-        modelList = models.split(",");
-        log.info("Model list [" + Arrays.toString(modelList) + "]");
+    public List<FileMatchMetaData> discover()
+        throws FileDiscoveryException,
+        DataDefenderException,
+        IOException,
+        SAXException,
+        TikaException {
 
         List<FileMatchMetaData> finalList = new ArrayList<>();
 
-        for (final String model : modelList) {
+        for (final String sm : CollectionUtils.emptyIfNull(config.getModels())) {
             log.info("********************************");
-            log.info("Processing model " + model);
+            log.info("Processing model " + sm);
             log.info("********************************");
 
-            final Model modelPerson = createModel(fileDiscoveryProperties, model);
+            final Model model = createModel(sm);
+            fileMatches = discoverAgainstSingleModel(model);
+            finalList = ListUtils.union(finalList, matches);
+        }
+        for (final File fm : CollectionUtils.emptyIfNull(config.getFileModels())) {
+            log.info("********************************");
+            log.info("Processing model " + fm);
+            log.info("********************************");
 
-            fileMatches = discoverAgainstSingleModel(fileDiscoveryProperties, modelPerson, probabilityThreshold);
-            finalList   = ListUtils.union(finalList, fileMatches);
+            final Model model = createModel(fm);
+            fileMatches = discoverAgainstSingleModel(model);
+            finalList = ListUtils.union(finalList, matches);
         }
 
         // Special case
-        String[] specialCaseFunctions = null;
-        boolean specialCase = false;
-        final String extensionList = fileDiscoveryProperties.getProperty("extensions");
+        List<String> specialCaseFunctions = config.getExtensions();
+        boolean specialCase = CollectionUtils.isNotEmpty(specialCaseFunctions);
         
-        final String directories   = fileDiscoveryProperties.getProperty("directories");
-        final String   exclusions    = fileDiscoveryProperties.getProperty("exclusions");
-        String exclusionList[] = null;
-        if ((exclusions == null) || exclusions.equals("")) {
-            log.info("exclusions property is empty in firediscovery.properties file");
-        } else {
-            exclusionList = exclusions.split(",");
-            log.info("File types not considered for analysis: " + exclusions);
-        }
-        log.info("Directories to analyze: " + directories);
+        if (specialCase) {
+            Metadata          metadata;
+            try {
+                log.info("**************" + specialCaseFunctions.toString());
+                for (String fn : CollectionUtils.emptyIfNull(specialCaseFunctions)) {
+                    for (final File node : directories) {
+                        final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
-        if ((directories == null) || directories.equals("")) {
-            log.error("directories property is empty in firediscovery.properties file");
+                        for (final File fich : files) {
+                            final String file         = fich.getName();
+                            final String recursivedir = fich.getParent();
 
-            throw new DataDefenderException("directories property is empty in firediscovery.properties file");
-        }
+                            log.info("Analyzing [" + fich.getCanonicalPath() + "]");
+                            final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
+                            log.debug("Extension: " + ext);
 
-        final String[] directoryList = directories.split(",");        
-        if (StringUtils.isNotBlank(extensionList)) {
-            log.info("***** Extension list:" + extensionList);
-            specialCaseFunctions = extensionList.split(",");
-
-            if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
-                File              node;
-                Metadata          metadata;
-                
-                try {
-                    log.info("**************" + specialCaseFunctions.toString());
-                    for (int j = 0; j < specialCaseFunctions.length; j++) {
-                        for (final String directory : directoryList) {
-                            
-                            node = new File(directory);
-                            final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
-                            
-                            for (final File fich : files) {
-                                final String file         = fich.getName();
-                                final String recursivedir = fich.getParent();
-
-                                log.info("Analyzing [" + fich.getCanonicalPath() + "]");
-                                final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
-                                log.debug("Extension: " + ext);
-
-                                if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
-                                    log.info("Ignoring type " + ext);
-                                    continue;
-                                }
-
-                                final BodyContentHandler handler = new BodyContentHandler(-1);
-                                final AutoDetectParser   parser  = new AutoDetectParser();
-
-                                metadata = new Metadata();
-
-                                String handlerString = "";
-                                try {
-                                    final InputStream stream = new FileInputStream(fich.getCanonicalPath());
-                                    log.debug("Loading data into the stream");
-                                    if (stream != null) {
-                                        parser.parse(stream, handler, metadata);
-                                        handlerString = handler.toString().replaceAll("( )+", " ").replaceAll("[\\t\\n\\r]+"," ");
-                                        
-                                        String[] tokens = handlerString.split(" ");
-                                        
-                                        for (int t=0; t<tokens.length; t++) {
-                                            String token = tokens[t];
-                                            if (token.trim().length() < 1) {
-                                                continue;
-                                            }
-                                            String specialFunction  = specialCaseFunctions[j];
-                                            log.info(specialFunction);
-                                            FileMatchMetaData returnData = null;
-                                            try {
-                                                returnData = 
-                                                    (FileMatchMetaData)callExtension(new FileMatchMetaData(recursivedir, file), specialFunction,token);
-                                            } catch (InvocationTargetException e) {
-                                                continue;
-                                            }
-                                            if (returnData != null) {
-                                                returnData.setModel("sin");
-                                                returnData.setAverageProbability(1.0);
-                                                List<FileMatchMetaData> specialFileMatches = new ArrayList();
-                                                specialFileMatches.add(returnData);
-                                                
-                                                finalList   = ListUtils.union(finalList, specialFileMatches);
-                                            }
-                                            log.debug(tokens[t]);                                            
-                                        }
-                                        
-
-                                    }
-                                } catch (IOException e) {
-                                    log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
-                                }
-                                log.info("Finish processing " + fich.getCanonicalPath());
+                            if (CollectionUtils.containsAny(excludeExtensions, ext)) {
+                                log.info("Ignoring type " + ext);
+                                continue;
                             }
-                            log.info("Finish speclai case " + specialCaseFunctions[j]);
+
+                            final BodyContentHandler handler = new BodyContentHandler(-1);
+                            final AutoDetectParser   parser  = new AutoDetectParser();
+
+                            metadata = new Metadata();
+
+                            String handlerString = "";
+                            try (final InputStream stream = new FileInputStream(fich.getCanonicalPath())) {
+                                
+                                log.debug("Loading data into the stream");
+                                if (stream != null) {
+                                    parser.parse(stream, handler, metadata);
+                                    handlerString = handler.toString().replaceAll("( )+", " ").replaceAll("[\\t\\n\\r]+"," ");
+
+                                    String[] tokens = handlerString.split(" ");
+
+                                    for (int t=0; t<tokens.length; t++) {
+                                        String token = tokens[t];
+                                        if (token.trim().length() < 1) {
+                                            continue;
+                                        }
+                                        log.info(fn);
+                                        FileMatchMetaData returnData = null;
+                                        try {
+                                            returnData = 
+                                                (FileMatchMetaData)callExtension(new FileMatchMetaData(recursivedir, file), fn, token);
+                                        } catch (InvocationTargetException e) {
+                                            continue;
+                                        }
+                                        if (returnData != null) {
+                                            returnData.setModel("sin");
+                                            returnData.setAverageProbability(1.0);
+                                            List<FileMatchMetaData> specialFileMatches = new ArrayList();
+                                            specialFileMatches.add(returnData);
+
+                                            finalList   = ListUtils.union(finalList, specialFileMatches);
+                                        }
+                                        log.debug(tokens[t]);                                            
+                                    }
+
+
+                                }
+                            } catch (IOException e) {
+                                log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
+                            }
+                            log.info("Finish processing " + fich.getCanonicalPath());
                         }
                     }
-                } catch (IOException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | 
-                        SecurityException | SQLException | TikaException | SAXException e) {
-                    log.error(e.toString());
                 }
+            } catch (IOException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | 
+                    SecurityException | SQLException | TikaException | SAXException e) {
+                log.error(e.toString());
             }
         }
 
@@ -232,40 +210,20 @@ public class FileDiscoverer extends Discoverer {
         return Collections.unmodifiableList(fileMatches);
     }
 
-    private List<FileMatchMetaData> discoverAgainstSingleModel(final Properties fileDiscoveryProperties,
-                                                               final Model model, final double probabilityThreshold)
-            throws DataDefenderException, IOException, SAXException, TikaException {
+    private List<FileMatchMetaData> discoverAgainstSingleModel(final Model model)
+        throws DataDefenderException,
+        IOException,
+        SAXException,
+        TikaException {
 
         // Start running NLP algorithms for each column and collect percentage
         fileMatches = new ArrayList<>();
 
-        final String directories   = fileDiscoveryProperties.getProperty("directories");
-
-        log.info("Directories to analyze: " + directories);
-
-        if ((directories == null) || directories.equals("")) {
-            log.error("directories property is empty in firediscovery.properties file");
-
-            throw new DataDefenderException("directories property is empty in firediscovery.properties file");
-        }
-
-        final String[] directoryList = directories.split(",");
-        String[]       exclusionList = null;
-        final String   exclusions    = fileDiscoveryProperties.getProperty("exclusions");
-
-        if ((exclusions == null) || exclusions.equals("")) {
-            log.info("exclusions property is empty in firediscovery.properties file");
-        } else {
-            exclusionList = exclusions.split(",");
-            log.info("File types not considered for analysis: " + exclusions);
-        }
+        log.info("Directories to analyze: {}", StringUtils.join(directories, ","));
 
         // Let's iterate over directories
-        File              node;
         Metadata          metadata;
-
-        for (final String directory : directoryList) {
-            node = new File(directory);
+        for (final File node : directories) {
 
             final List<File> files = (List<File>) FileUtils.listFiles(node, null, true);
 
@@ -277,7 +235,7 @@ public class FileDiscoverer extends Discoverer {
                 final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                 log.debug("Extension: " + ext);
 
-                if ((exclusionList != null) && Arrays.asList(exclusionList).contains(ext)) {
+                if (CollectionUtils.containsAny(excludeExtensions, ext)) {
                     log.info("Ignoring type " + ext);
                     continue;
                 }
@@ -300,9 +258,7 @@ public class FileDiscoverer extends Discoverer {
                     log.info("Unable to read " + fich.getCanonicalPath() + ".Ignoring...");
                 }
 
-                fileMatches = getMatchedFiles(model, probabilityThreshold, 
-                        handler.toString(), file, recursivedir);
-                
+                fileMatches = getMatchedFiles(model, handler.toString(), file, recursivedir);
             }
         }
 
@@ -310,10 +266,8 @@ public class FileDiscoverer extends Discoverer {
     }
     
     
-    protected List<FileMatchMetaData> getMatchedFiles(final Model model, 
-            final double probabilityThreshold, String handler, 
-            String file, String recursivedir) {
-        
+    protected List<FileMatchMetaData> getMatchedFiles(final Model model, String handler, String file, String recursivedir) {
+
         final String   tokens[]    = model.getTokenizer().tokenize(handler);
         final Span     nameSpans[] = model.getNameFinder().find(tokens);
         final double[] spanProbs   = model.getNameFinder().probs(nameSpans);
@@ -330,7 +284,7 @@ public class FileDiscoverer extends Discoverer {
 
         final double averageProbability = calculateAverage(probabilityList);
 
-        if (averageProbability >= probabilityThreshold) {
+        if (averageProbability >= config.getProbabilityThreshold()) {
             final FileMatchMetaData result = new FileMatchMetaData(recursivedir, file);
 
             result.setAverageProbability(averageProbability);

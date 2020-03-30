@@ -41,7 +41,7 @@ import lombok.extern.log4j.Log4j2;
  * @author Armenak Grigoryan
  */
 @Log4j2
-public class ColumnDiscoverer extends Discoverer {
+public class ColumnDiscoverer {
 
     private IDbFactory factory;
     private List<Pattern> patterns;

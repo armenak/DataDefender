@@ -15,16 +15,33 @@
  */
 package com.strider.datadefender;
 
+import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.discoverer.DatabaseDiscoverer;
+import com.strider.datadefender.discoverer.Discoverer;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+import lombok.Getter;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
-import picocli.CommandLine.RunAll;
-import picocli.CommandLine.Spec;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * "discover" picocli subcommand, configures and executes the data discoverer.
@@ -34,14 +51,48 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "data",
     version = "2.0",
+    mixinStandardHelpOptions = true,
     description = "Run data discovery utility"
 )
 @Log4j2
 public class DiscoverData implements Callable<Integer> {
 
+    static {
+        System.setProperty("AVAILABLE-MODELS", StringUtils.join(
+            Discoverer.BUILT_IN_MODELS.keySet().stream().sorted().collect(Collectors.toList()),
+            ", "
+        ));
+    }
+
+    @ParentCommand
+    private Discover discover;
+
+    @ArgGroup(exclusive = false, multiplicity = "1")
+    private ModelDiscoveryConfig modelDiscoveryConfig;
+
     @Override
     public Integer call() throws Exception {
+
+        DbConfig dbConfig = discover.getDbConfig();
+
+        System.out.println("");
         System.out.println("Starting data discovery");
+        log.info("Datasource URL: {}, vendor: {}, schema: {}", dbConfig.getUrl(), dbConfig.getVendor(), dbConfig.getSchema());
+        log.info("Username: {}, Password provided: {}", dbConfig.getUsername(), (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
+        log.info("Probability threshold: {}", modelDiscoveryConfig.getProbabilityThreshold());
+        log.info("Calculate score: {}", (modelDiscoveryConfig.getCalculateScore()) ? "yes" : "no");
+        log.info("Threshold count: {}", modelDiscoveryConfig.getThresholdCount());
+        log.info("Threshold high-risk count: {}", modelDiscoveryConfig.getThresholdHighRisk());
+        log.info("Limit: {}", modelDiscoveryConfig.getLimit());
+        log.info("Built-in models: {}", StringUtils.join(modelDiscoveryConfig.getModels(), ", "));
+        log.info("Custom models: {}", StringUtils.join(modelDiscoveryConfig.getFileModels(), ", "));
+        log.info("Custom token model: {}", modelDiscoveryConfig.getTokenModel());
+        log.info("Extensions: {}", StringUtils.join(modelDiscoveryConfig.getExtensions(), ", "));
+
+        IDbFactory factory = IDbFactory.get(dbConfig);
+        DatabaseDiscoverer dd = new DatabaseDiscoverer(modelDiscoveryConfig, factory);
+        dd.discover();
+
         return 0;
     }
 }

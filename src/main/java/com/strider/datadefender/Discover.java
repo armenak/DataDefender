@@ -15,13 +15,14 @@
  */
 package com.strider.datadefender;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.ParseResult;
 import picocli.CommandLine.Spec;
 
 import lombok.extern.log4j.Log4j2;
@@ -39,6 +40,7 @@ import lombok.Getter;
     name = "discover",
     version = "2.0",
     description = "Run data discovery utility",
+    mixinStandardHelpOptions = true,
     subcommands = {
         DiscoverColumns.class,
         DiscoverData.class,

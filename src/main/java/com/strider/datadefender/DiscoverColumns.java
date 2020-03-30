@@ -36,6 +36,7 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "columns",
     version = "2.0",
+    mixinStandardHelpOptions = true,
     description = "Run column discovery utility"
 )
 @Log4j2

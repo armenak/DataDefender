@@ -29,7 +29,6 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
-import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
 import lombok.extern.log4j.Log4j2;

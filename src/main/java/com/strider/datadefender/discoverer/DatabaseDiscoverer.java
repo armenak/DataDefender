@@ -18,6 +18,7 @@
 package com.strider.datadefender.discoverer;
 
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.ModelDiscoveryConfig;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
 import com.strider.datadefender.database.metadata.TableMetaData;
@@ -28,6 +29,7 @@ import com.strider.datadefender.report.ReportUtil;
 import com.strider.datadefender.specialcase.SpecialCase;
 import com.strider.datadefender.utils.Score;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -45,12 +47,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Properties;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
@@ -60,10 +59,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import opennlp.tools.util.Span;
 
-import static java.lang.Double.parseDouble;
-import static java.util.regex.Pattern.compile;
-
 import lombok.extern.log4j.Log4j2;
+import me.tongfei.progressbar.ProgressBar;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  *
@@ -71,8 +69,13 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 public class DatabaseDiscoverer extends Discoverer {
-    private static final String YES = "yes";
-    private static String[]     modelList;
+
+    protected final IDbFactory factory;
+
+    public DatabaseDiscoverer(ModelDiscoveryConfig config, IDbFactory factory) throws IOException {
+        super(config);
+        this.factory = factory;
+    }
 
     /**
      * Calls a function defined as an extension
@@ -115,38 +118,40 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ColumnMatch> discover(final IDbFactory factory,
-            final Properties dataDiscoveryProperties, String vendor)
-            throws ParseException, DataDefenderException, IOException, SQLException {
-        log.info("Data discovery in process");
-
-        // Get the probability threshold from property file
-        final double probabilityThreshold = parseDouble(dataDiscoveryProperties.getProperty("probability_threshold"));
-        String       calculate_score      = dataDiscoveryProperties.getProperty("score_calculation", "false");
-
-        log.info("Probability threshold [{}]", probabilityThreshold);
-
-        // Get list of models used in data discovery
-        final String models = dataDiscoveryProperties.getProperty("models");
-
-        modelList = models.split(",");
-        log.info("Model list [" + Arrays.toString(modelList) + "]");
+    public List<ColumnMatch> discover()
+        throws ParseException,
+        DataDefenderException,
+        IOException,
+        SQLException {
 
         List<ColumnMatch> finalList = new ArrayList<>();
 
-        for (final String model : modelList) {
-            log.info("********************************");
-            log.info("Processing model " + model);
-            log.info("********************************");
+        try (ProgressBar pb = new ProgressBar(
+            "Discovering against models...",
+            CollectionUtils.size(config.getModels()) + CollectionUtils.size(config.getFileModels())
+        )) {
+            for (final String sm : CollectionUtils.emptyIfNull(config.getModels())) {
+                log.info("********************************");
+                log.info("Processing model " + sm);
+                log.info("********************************");
+                pb.setExtraMessage(sm);
 
-            final Model modelPerson = createModel(dataDiscoveryProperties, model);
-            matches = discoverAgainstSingleModel(
-                factory,
-                dataDiscoveryProperties,
-                modelPerson,
-                probabilityThreshold
-            );
-            finalList = ListUtils.union(finalList, matches);
+                final Model model = createModel(sm);
+                matches = discoverAgainstSingleModel(model);
+                finalList = ListUtils.union(finalList, matches);
+                pb.step();
+            }
+            for (final File fm : CollectionUtils.emptyIfNull(config.getFileModels())) {
+                log.info("********************************");
+                log.info("Processing model " + fm);
+                log.info("********************************");
+                pb.setExtraMessage(fm.getName());
+
+                final Model model = createModel(fm);
+                matches = discoverAgainstSingleModel(model);
+                finalList = ListUtils.union(finalList, matches);
+                pb.step();
+            }
         }
 
         log.info("List of suspects:");
@@ -159,7 +164,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             ColumnMetaData column = match.getColumn();
             // Row count
-            if (YES.equals(calculate_score)) {
+            if (config.getCalculateScore()) {
                 log.debug("Counting number of rows ...");
                 rowCount = ReportUtil.rowCount(factory, 
                                column.getTable().getTableName());
@@ -175,7 +180,7 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("Model                       : " + match.getModel());
             log.info("Number of rows in the table : " + rowCount);
 
-            if (YES.equals(calculate_score)) {
+            if (config.getCalculateScore()) {
                 log.info("Score                       : " + score.columnScore(rowCount));
             } else {
                 log.info("Score                       : N/A");
@@ -191,38 +196,44 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("");
 
             // Score calculation is evaluated with score_calculation parameter
-            if (YES.equals(calculate_score) && score.columnScore(rowCount).equals("High")) {
+            if (config.getCalculateScore() && score.columnScore(rowCount).equals("High")) {
                 highRiskColumns++;
             }
         }
 
         // Only applicable when parameter table_rowcount=yes otherwise score calculation should not be done
-        if (YES.equals(calculate_score)) {
+        if (config.getCalculateScore()) {
             log.info("Overall score: " + score.dataStoreScore());
             log.info("");
 
             if ((finalList != null) && (finalList.size() > 0)) {
                 log.info("============================================");
 
-                final int threshold_count = Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_count"));
-
-                if (finalList.size() > threshold_count) {
-                    log.info("Number of PI [" + finalList.size() + "] columns is higher than defined threashold ["
-                             + threshold_count + "]");
+                if (finalList.size() > config.getThresholdCount()) {
+                    log.info(
+                        "Number of PI [{}] columns is higher than defined threashold [{}]",
+                        finalList.size(),
+                        config.getThresholdCount()
+                    );
                 } else {
-                    log.info("Number of PI [" + finalList.size()
-                             + "] columns is lower or equal than defined threashold [" + threshold_count + "]");
+                    log.info(
+                        "Number of PI [{}] columns is lower than or equal to defined threashold [{}]",
+                        finalList.size(),
+                        config.getThresholdCount()
+                    );
                 }
-
-                final int threshold_highrisk =
-                    Integer.valueOf(dataDiscoveryProperties.getProperty("threshold_highrisk"));
-
-                if (highRiskColumns > threshold_highrisk) {
-                    log.info("Number of High risk PI [" + highRiskColumns
-                             + "] columns is higher than defined threashold [" + threshold_highrisk + "]");
+                if (highRiskColumns > config.getThresholdHighRisk()) {
+                    log.info(
+                        "Number of High risk PI [{}] columns is higher than defined threashold [{}]",
+                        highRiskColumns,
+                        config.getThresholdHighRisk()
+                    );
                 } else {
-                    log.info("Number of High risk PI [" + highRiskColumns
-                             + "] columns is lower or equal than defined threashold [" + threshold_highrisk + "]");
+                    log.info(
+                        "Number of High risk PI [{}] columns is lower than or equal to defined threashold [{}]",
+                        highRiskColumns,
+                        config.getThresholdHighRisk()
+                    );
                 }
             }
         } else {
@@ -232,12 +243,11 @@ public class DatabaseDiscoverer extends Discoverer {
         return matches;
     }
 
-    private List<ColumnMatch> discoverAgainstSingleModel(
-        final IDbFactory factory,
-        final Properties dataDiscoveryProperties,
-        final Model model,
-        final double probabilityThreshold
-    ) throws ParseException, DataDefenderException, IOException, SQLException {
+    private List<ColumnMatch> discoverAgainstSingleModel(final Model model)
+        throws ParseException,
+        DataDefenderException,
+        IOException,
+        SQLException {
 
         final IMetaData           metaData = factory.fetchMetaData();
         final List<TableMetaData> map      = metaData.getMetaData();
@@ -247,18 +257,10 @@ public class DatabaseDiscoverer extends Discoverer {
 
         ColumnMatch             specialCaseData;
         final List<ColumnMatch> specialCaseDataList  = new ArrayList();
-        boolean                 specialCase          = false;
-        final String            extensionList        = dataDiscoveryProperties.getProperty("extensions");
-        String[]                specialCaseFunctions = null;
+        List<String>            specialCaseFunctions = config.getExtensions();
+        boolean                 specialCase          = CollectionUtils.isNotEmpty(specialCaseFunctions);
 
-        log.info("Extension list: " + extensionList);
-        
-        if (StringUtils.isNotBlank(extensionList)) {
-            specialCaseFunctions = extensionList.split(",");
-            if ((specialCaseFunctions != null) && (specialCaseFunctions.length > 0)) {
-                specialCase = true;
-            }
-        }
+        log.info("Extension list: {}", specialCaseFunctions);
 
         final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
@@ -286,21 +288,11 @@ public class DatabaseDiscoverer extends Discoverer {
             probabilityList = new ArrayList<>();
             log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
-            final String tableNamePattern = dataDiscoveryProperties.getProperty("table_name_pattern");
-
-            if (StringUtils.isNotBlank(tableNamePattern)) {
-                final Pattern p = compile(tableNamePattern);
-                if (!p.matcher(tableName).matches()) {
-                    continue;
-                }
-            }
-            
             final String table = sqlBuilder.prefixSchema(tableName);
-            final int    limit = Integer.parseInt(dataDiscoveryProperties.getProperty("limit"));
             final String query = sqlBuilder.buildSelectWithLimit(
                 "SELECT " + columnName + " FROM "  + table + " WHERE "
                     + columnName + " IS NOT NULL",
-                limit
+                config.getLimit()
             );
 
             log.debug("Executing query against database: " + query);
@@ -397,7 +389,7 @@ public class DatabaseDiscoverer extends Discoverer {
 
             final double averageProbability = calculateAverage(probabilityList);
 
-            if (averageProbability >= probabilityThreshold) {
+            if (averageProbability >= config.getProbabilityThreshold()) {
                 matches.add(new ColumnMatch(
                     data,
                     averageProbability,

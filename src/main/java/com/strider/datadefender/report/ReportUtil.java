@@ -50,7 +50,7 @@ public class ReportUtil {
         final String      table      = sqlBuilder.prefixSchema(tableName);
         
         // Getting number of records in the table
-        final String queryCount = "SELECT count(*) " + " FROM " + table;
+        final String queryCount = "SELECT count(*) FROM " + table;
         log.debug("Executing query against database: " + queryCount);
 
         int rowCount = 0;

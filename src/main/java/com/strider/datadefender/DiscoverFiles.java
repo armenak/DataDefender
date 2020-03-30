@@ -15,16 +15,22 @@
  */
 package com.strider.datadefender;
 
+import com.strider.datadefender.discoverer.FileDiscoverer;
+import java.io.File;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.RunAll;
 import picocli.CommandLine.Spec;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+
 
 /**
  * "discover" picocli subcommand, configures and executes the data discoverer.
@@ -34,14 +40,43 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "files",
     version = "2.0",
+    mixinStandardHelpOptions = true,
     description = "Run file discovery utility"
 )
 @Log4j2
 public class DiscoverFiles implements Callable<Integer> {
 
+    @ArgGroup(exclusive = false, multiplicity = "1")
+    private ModelDiscoveryConfig modelDiscoveryConfig;
+
+    @Option(names = { "-d", "--directory" }, description = "Adds a directory to list of directories to be scanned", required = true)
+    private List<File> directories;
+
+    @Option(names = { "-x", "--exclude-extension" }, description = "Adds an extension to exclude from data discovery", required = true)
+    private List<String> excludeExtensions;
+
+    @ParentCommand
+    private Discover discover;
+
     @Override
     public Integer call() throws Exception {
-        System.out.println("Starting data discovery");
+        System.out.println("");
+        System.out.println("Starting file discovery");
+        log.info("Probability threshold: {}", modelDiscoveryConfig.getProbabilityThreshold());
+        log.info("Calculate score: {}", (modelDiscoveryConfig.getCalculateScore()) ? "yes" : "no");
+        log.info("Threshold count: {}", modelDiscoveryConfig.getThresholdCount());
+        log.info("Threshold high-risk count: {}", modelDiscoveryConfig.getThresholdHighRisk());
+        log.info("Limit: {}", modelDiscoveryConfig.getLimit());
+        log.info("Built-in models: {}", StringUtils.join(modelDiscoveryConfig.getModels(), ", "));
+        log.info("Custom models: {}", StringUtils.join(modelDiscoveryConfig.getFileModels(), ", "));
+        log.info("Custom token model: {}", modelDiscoveryConfig.getTokenModel());
+        log.info("Extensions: {}", StringUtils.join(modelDiscoveryConfig.getExtensions(), ", "));
+        log.info("Directories: {}", StringUtils.join(directories, ", "));
+        log.info("File types not considered for analysis: {}", excludeExtensions);
+
+        FileDiscoverer fd = new FileDiscoverer(modelDiscoveryConfig, directories, excludeExtensions);
+        fd.discover();
+
         return 0;
     }
 }
