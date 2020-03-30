@@ -43,6 +43,7 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "anonymize",
     version = "2.0",
+    mixinStandardHelpOptions = true,
     description = "Run anonymization utility"
 )
 @Log4j2

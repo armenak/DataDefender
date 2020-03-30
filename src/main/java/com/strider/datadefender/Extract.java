@@ -42,6 +42,7 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "extract",
     version = "2.0",
+    mixinStandardHelpOptions = true,
     description = "Run data extraction utility -- generates files out of table "
         + "columns with the name 'table_columnName.txt' for each column "
         + "requested."
