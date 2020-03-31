@@ -13,6 +13,7 @@ Table of content
 - [Build from source](#build-from-source)
 - [Contributing](#contributing)
 - [How to run](#how-to-run-data)
+- [Using argument files](#using-argument-files)
 - [File Discovery](#file-discovery)
 - [Column Discovery](#column-discovery)
 - [Data Discovery](#data-discovery)
@@ -80,6 +81,23 @@ Commands:
 ```
 
 The toolkit can be run in anonymizer mode, data extraction mode (extract), and three different discovery modes (file, column, and database discovery).
+
+Using argument files
+----------
+DataDefender is using [picocli](https://picocli.info) as its framework for processing command-line input.  The framework allows using argument files to set argument values when running the tool.  The argument file contains a list of arguments to pass (more than one can be used), and when invoking DataDefender, the argument file can be specified with an "@".  For example:
+
+File: database.config
+```
+--url=jdbc:mariadb://localhost:3306/database?zeroDateTimeBehavior=convertToNull
+--password
+--user=root
+```
+
+Running with database.config:
+```
+datadefender @database.config
+```
+
 
 File Discovery
 --------------
