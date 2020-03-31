@@ -71,13 +71,25 @@ public class Argument {
      * current row if "Type" is java.sql.ResultSet.
      */
     @XmlAttribute(name = "pass-current-value")
-    private boolean isDynamicValue = false;
+    private Boolean isDynamicValue;
 
     public Argument() {
     }
 
     public Argument(Class<?> type) {
         this.type = type;
+    }
+
+    public Argument(String name, Class<?> type, String value) {
+        this(type);
+        this.name = name;
+        this.value = value;
+    }
+
+    public Argument(String name, Class<?> type, boolean isDynamicValue) {
+        this(type);
+        this.name = name;
+        this.isDynamicValue = isDynamicValue;
     }
 
     /**

@@ -69,7 +69,7 @@ public class Plan implements Invokable {
     public Class<?> getDynamicArgumentType() {
         if (CollectionUtils.size(functions) > 0) {
             return functions.get(0).getArguments().stream()
-                .filter((a) -> a.isDynamicValue())
+                .filter((a) -> a.getIsDynamicValue())
                 .map((a) -> a.getType())
                 .findFirst()
                 .orElse(null);

@@ -54,6 +54,13 @@ public class ClassAndFunctionRegistry {
     }
 
     /**
+     * Clears any set auto resolve packages on the singleton instance.
+     */
+    public void clearAutoResolvePackages() {
+        autoResolvePackages.clear();
+    }
+
+    /**
      * Registers the passed package name as auto-resolvable, so classes under it
      * don't need to be fully qualified.
      *
@@ -89,6 +96,21 @@ public class ClassAndFunctionRegistry {
             }
         }
         return ClassUtils.forName(className);
+    }
+
+    /**
+     * If the passed Class's package is defined in an autoresolved package, the
+     * shortened name of the class is returned without the package name.
+     *
+     * @param className
+     * @return
+     */
+    public String getNameForClass(Class<?> clazz) {
+
+        if (autoResolvePackages.contains(clazz.getPackageName())) {
+            return clazz.getCanonicalName().replace(clazz.getPackageName() + ".", "");
+        }
+        return clazz.getCanonicalName();
     }
 
     public void registerFunctions(Requirement requirements)

@@ -64,6 +64,18 @@ public class Requirement {
             this(ClassAndFunctionRegistry.singleton());
         }
 
+        public AutoresolvePackage(String name) {
+            this();
+            this.name = name;
+        }
+
+        public AutoresolvePackage(String name, boolean register) {
+            this(name);
+            if (register) {
+                registry.registerAutoResolvePackage(name);
+            }
+        }
+
         public AutoresolvePackage(ClassAndFunctionRegistry registry) {
             this.registry = registry;
         }
@@ -82,7 +94,11 @@ public class Requirement {
 
     @XmlElement(name = "project-version")
     private String version;
-    
+
+    @XmlElementWrapper(name = "autoresolve-classes")
+    @XmlElement(name = "package")
+    private List<AutoresolvePackage> autoresolve;
+
     @XmlElementWrapper(name = "column-plans")
     @XmlElement(name = "plan")
     private List<GlobalPlan> plans;
@@ -90,10 +106,6 @@ public class Requirement {
     @XmlElementWrapper(name = "tables")
     @XmlElement(name = "table")
     private List<Table> tables;
-
-    @XmlElementWrapper(name = "autoresolve-classes")
-    @XmlElement(name = "package")
-    private List<AutoresolvePackage> autoresolve;
 
     /**
      * Returns a list of Table elements that match entries in the passed filter.

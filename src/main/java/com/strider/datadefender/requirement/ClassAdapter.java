@@ -49,6 +49,6 @@ public class ClassAdapter extends XmlAdapter<String, Class<?>> {
 
     @Override
     public String marshal(Class<?> bt) throws Exception {
-        return ClassUtils.getCanonicalName(bt);
+        return registry.getNameForClass(bt);
     }
 }
