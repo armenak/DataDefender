@@ -15,12 +15,18 @@
  */
 package com.strider.datadefender;
 
+import com.strider.datadefender.discoverer.Discoverer;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine.Option;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Database configuration options for picocli.
@@ -28,13 +34,19 @@ import lombok.Getter;
  * @author Zaahid Bateson
  */
 @Getter
+@Log4j2
 public class ModelDiscoveryConfig {
+
+    static {
+        System.setProperty("AVAILABLE-MODELS", StringUtils.join(
+            Discoverer.BUILT_IN_MODELS.keySet().stream().sorted().collect(Collectors.toList()),
+            ", "
+        ));
+    }
 
     @Option(names = { "-l", "--limit" }, description = "Limit discovery to a set number of rows in a table", defaultValue = "1000")
     private Integer limit;
 
-    @Option(names = { "-m", "--model" }, description = "Adds a built-in configured opennlp TokenizerME model for data discovery. "
-                + "Available models are: ${AVAILABLE-MODELS}")
     private List<String> models;
 
     @Option(names = { "-e", "--extension" }, description = "Adds a call to an extension method "
@@ -59,4 +71,19 @@ public class ModelDiscoveryConfig {
 
     @Option(names = { "--threshold-high" }, description = "Reports if number of high risk columns found are greater than the defined threshold", defaultValue = "3")
     private Integer thresholdHighRisk;
+
+    @Option(names = { "-m", "--model" }, description = "Adds a built-in configured opennlp TokenizerME model for data discovery. "
+                + "Available models are: ${AVAILABLE-MODELS}")
+    public void setModels(List<String> models) {
+        Optional<String> unmatched = models.stream().filter((m) -> !Discoverer.BUILT_IN_MODELS.containsKey(m)).findFirst();
+        if (unmatched.isPresent()) {
+            log.error(
+                "A built-in model with the name \"{}\" does not exist. Please specify one of: {}",
+                unmatched.get(),
+                System.getProperty("AVAILABLE-MODELS")
+            );
+            throw new IllegalArgumentException("Unmatched built-in model.");
+        }
+        this.models = models;
+    }
 }
