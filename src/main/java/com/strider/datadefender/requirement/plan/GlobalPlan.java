@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlID;
 
 import lombok.extern.log4j.Log4j2;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -35,12 +36,17 @@ import org.apache.commons.collections4.CollectionUtils;
 @Log4j2
 @Getter
 @Setter
+@NoArgsConstructor
 @XmlAccessorType(XmlAccessType.NONE)
 public class GlobalPlan extends Plan {
 
     @XmlID
     @XmlAttribute
     private String id;
+
+    public GlobalPlan(String id) {
+        this.id = id;
+    }
 
     /**
      * Uses functionName and parameters to find the method to associate with

@@ -24,6 +24,8 @@ import com.strider.datadefender.requirement.plan.Plan;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Requirement.AutoresolvePackage;
 import com.strider.datadefender.requirement.Table;
+import com.strider.datadefender.requirement.plan.GlobalPlan;
+import com.strider.datadefender.requirement.plan.PlanRef;
 import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
 
 import java.io.File;
@@ -57,31 +59,47 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Generator {
 
-    // Hard-coded default params for now.
-    private static void setDefaultFunction(final String table, final Column column) {
-        final Plan p = new Plan();
-        Function fn;
-        if (Objects.equals(column.getType(), Date.class)) {
-            fn = new Function("Core#randomDate", false);
-            fn.setArguments(List.of(
+    private static Map<String, GlobalPlan> plans = Map.of(
+        "lipsum-similar", createGlobalPlan(
+            "lipsum-similar",
+            new Function("Lipsum#similar", false),
+            List.of(new Argument("text", String.class, true))
+        ),
+        "core-date", createGlobalPlan(
+            "core-date",
+            new Function("Core#randomDate", false),
+            List.of(
                 new Argument("start", String.class, "1970-01-01"),
                 new Argument("end", String.class, "2005-01-01"),
                 new Argument("format", String.class, "yyyy-MM-dd")
-            ));
-        } else if (Objects.equals(column.getType(), Timestamp.class)) {
-            fn = new Function("Core#randomDateTime", false);
-            fn.setArguments(List.of(
+            )
+        ),
+        "core-date-time", createGlobalPlan(
+            "core-date-time",
+            new Function("Core#randomDateTime", false),
+            List.of(
                 new Argument("start", String.class, "2010-01-01 00:00:00"),
                 new Argument("end", String.class, "2020-04-01 00:00:00"),
                 new Argument("format", String.class, "yyyy-MM-dd HH:mm:ss")
-            ));
-        } else {
-            fn = new Function("Lipsum#similar", false);
-            fn.setArguments(List.of(new Argument("text", String.class, true)));
-        }
+            )
+        )
+    );
 
-        p.setFunctions(List.of(fn));
-        column.setPlan(p);
+    private static GlobalPlan createGlobalPlan(String name, Function fn, List<Argument> arguments) {
+        GlobalPlan plan = new GlobalPlan(name);
+        fn.setArguments(arguments);
+        plan.setFunctions(List.of(fn));
+        return plan;
+    }
+
+    private static void setDefaultFunction(final String table, final Column column) {
+        if (Objects.equals(column.getType(), Date.class)) {
+            column.setPlanRef(new PlanRef(plans.get("core-date")));
+        } else if (Objects.equals(column.getType(), Timestamp.class)) {
+            column.setPlanRef(new PlanRef(plans.get("core-date-time")));
+        } else {
+            column.setPlanRef(new PlanRef(plans.get("lipsum-similar")));
+        }
     }
 
     /**
@@ -123,6 +141,7 @@ public class Generator {
         }
 
         final Requirement req = new Requirement();
+        req.setPlans(List.copyOf(plans.values()));
         ClassAndFunctionRegistry.singleton().clearAutoResolvePackages();
         req.setAutoresolve(List.of(
             new AutoresolvePackage("java.lang", true),

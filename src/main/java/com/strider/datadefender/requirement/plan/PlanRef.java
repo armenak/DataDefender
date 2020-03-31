@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlIDREF;
 
 import lombok.extern.log4j.Log4j2;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -33,12 +34,17 @@ import lombok.Data;
  */
 @Log4j2
 @Data
+@NoArgsConstructor
 @XmlAccessorType(XmlAccessType.NONE)
 public class PlanRef {
 
     @XmlIDREF
     @XmlAttribute(name = "ref-id")
     private GlobalPlan ref;
+
+    public PlanRef(GlobalPlan ref) {
+        this.ref = ref;
+    }
 
     /**
      * Uses functionName and parameters to find the method to associate with
