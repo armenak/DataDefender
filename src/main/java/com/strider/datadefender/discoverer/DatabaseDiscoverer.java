@@ -127,14 +127,14 @@ public class DatabaseDiscoverer extends Discoverer {
         List<ColumnMatch> finalList = new ArrayList<>();
 
         try (ProgressBar pb = new ProgressBar(
-            "Discovering against models...",
+            "Discovering by model...",
             CollectionUtils.size(config.getModels()) + CollectionUtils.size(config.getFileModels())
         )) {
             for (final String sm : CollectionUtils.emptyIfNull(config.getModels())) {
                 log.info("********************************");
                 log.info("Processing model " + sm);
                 log.info("********************************");
-                pb.setExtraMessage(sm);
+                pb.setExtraMessage("Model: " + sm);
 
                 final Model model = createModel(sm);
                 matches = discoverAgainstSingleModel(model);
@@ -145,7 +145,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 log.info("********************************");
                 log.info("Processing model " + fm);
                 log.info("********************************");
-                pb.setExtraMessage(fm.getName());
+                pb.setExtraMessage("Model: " + fm.getName());
 
                 final Model model = createModel(fm);
                 matches = discoverAgainstSingleModel(model);
@@ -265,137 +265,149 @@ public class DatabaseDiscoverer extends Discoverer {
         final ISqlBuilder sqlBuilder = factory.createSQLBuilder();
         List<Probability> probabilityList;
 
-        List<ColumnMetaData> cols = map.stream().flatMap((t) -> t.getColumns().stream()).collect(Collectors.toList());
-        for (final ColumnMetaData data : cols) {
-            final String tableName  = data.getTable().getTableName();
-            final String columnName = data.getColumnName();
-            List<ColumnMetaData> pkeys = ListUtils.emptyIfNull(data.getTable().getPrimaryKeys());
-            List<ColumnMetaData> fkeys = ListUtils.emptyIfNull(data.getTable().getForeignKeys());
+        for (final TableMetaData table : map) {
 
-            log.debug("Primary keys for table {}: [{}]", () -> tableName, () -> pkeys);
-            if (pkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
-                log.debug("Column [" + columnName + "] is Primary Key. Skipping this column.");
-                continue;
+            final String tableName  = table.getTableName();
+            final String prefixed = sqlBuilder.prefixSchema(tableName);
+            final String cntQuery = "SELECT COUNT(*) FROM " + prefixed;
+
+            int numRows = config.getLimit();
+            try (
+                Statement stmt = factory.getConnection().createStatement();
+                ResultSet rs = stmt.executeQuery(cntQuery)
+            ) {
+                rs.next();
+                numRows = Math.min(numRows, rs.getInt(1));
+            } catch (SQLException e) {
             }
-            
-            log.debug("Foreign key(s) for table {}: [{}]", () -> tableName, () -> fkeys);
-            if (fkeys.stream().anyMatch((c) -> StringUtils.equalsIgnoreCase(c.getColumnName(), columnName))) {
-                log.debug("Column [" + columnName + "] is Foreign Key. Skipping this column.");
-                continue;
-            }            
-            
-            log.debug("Column type: [" + data.getColumnType() + "]");
-            probabilityList = new ArrayList<>();
-            log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
-            final String table = sqlBuilder.prefixSchema(tableName);
-            final String query = sqlBuilder.buildSelectWithLimit(
-                "SELECT " + columnName + " FROM "  + table + " WHERE "
-                    + columnName + " IS NOT NULL",
-                config.getLimit()
-            );
+            List<ColumnMetaData> cols = table.getColumns().stream()
+                .filter((c) -> !c.isForeignKey() && !c.isPrimaryKey())
+                .collect(Collectors.toList());
 
-            log.debug("Executing query against database: " + query);
+            int numSteps = numRows * cols.size();
+            try (ProgressBar pb = new ProgressBar(model.getName() + " in " + tableName, numSteps)) {
+                for (final ColumnMetaData data : cols) {
+                    
+                    final String columnName = data.getColumnName();
+                    pb.setExtraMessage(columnName);
 
-            try (Statement stmt = factory.getConnection().createStatement();
-                ResultSet resultSet = stmt.executeQuery(query);) {
-                while (resultSet.next()) {
-                    if (Objects.equals(Blob.class, data.getColumnType())) {
-                        continue;
-                    }
-                    if (model.getName().equals("location") && ClassUtils.isAssignable(data.getColumnType(), Number.class)) {
-                        continue;
-                    }
+                    log.debug("Column type: [" + data.getColumnType() + "]");
+                    probabilityList = new ArrayList<>();
+                    log.info("Analyzing column [" + tableName + "].[" + columnName + "]");
 
-                    String sentence = "";
-                    if (Objects.equals(Clob.class, data.getColumnType())) {
-                        Clob clob = resultSet.getClob(1);
-                        InputStream is = clob.getAsciiStream();
-                        sentence = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-                    } else {
-                        sentence = resultSet.getString(1);
-                    }
-                    log.debug(sentence);
-                    if (specialCaseFunctions != null && specialCase) {
-                        try {
-                            for (String specialCaseFunction : specialCaseFunctions) {
-                                if ((sentence != null) && !sentence.isEmpty()) {
-                                    log.debug("sentence: " + sentence);
-                                    log.debug("data: " + data);
-                                    specialCaseData = (ColumnMatch) callExtension(specialCaseFunction, data, sentence);
-                                    if (specialCaseData != null) {
-                                        if (!specialCaseDataList.contains(specialCaseData)) {
-                                            log.debug("Adding new special case data: " + specialCaseData.toString());
-                                            specialCaseDataList.add(specialCaseData);
+                    final String query = sqlBuilder.buildSelectWithLimit(
+                        "SELECT " + columnName + " FROM "  + prefixed + " WHERE "
+                            + columnName + " IS NOT NULL",
+                        config.getLimit()
+                    );
+
+                    log.debug("Executing query against database: " + query);
+                    try (
+                        Statement stmt = factory.getConnection().createStatement();
+                        ResultSet resultSet = stmt.executeQuery(query)
+                    ) {
+                        while (resultSet.next()) {
+                            pb.step();
+                            if (Objects.equals(Blob.class, data.getColumnType())) {
+                                continue;
+                            }
+                            if (model.getName().equals("location") && ClassUtils.isAssignable(data.getColumnType(), Number.class)) {
+                                continue;
+                            }
+
+                            String sentence = "";
+                            if (Objects.equals(Clob.class, data.getColumnType())) {
+                                Clob clob = resultSet.getClob(1);
+                                InputStream is = clob.getAsciiStream();
+                                sentence = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+                            } else {
+                                sentence = resultSet.getString(1);
+                            }
+                            log.debug(sentence);
+                            if (specialCaseFunctions != null && specialCase) {
+                                try {
+                                    for (String specialCaseFunction : specialCaseFunctions) {
+                                        if ((sentence != null) && !sentence.isEmpty()) {
+                                            log.debug("sentence: " + sentence);
+                                            log.debug("data: " + data);
+                                            specialCaseData = (ColumnMatch) callExtension(specialCaseFunction, data, sentence);
+                                            if (specialCaseData != null) {
+                                                if (!specialCaseDataList.contains(specialCaseData)) {
+                                                    log.debug("Adding new special case data: " + specialCaseData.toString());
+                                                    specialCaseDataList.add(specialCaseData);
+                                                }
+                                            } else {
+                                                log.debug("No special case data found");
+                                            }
                                         }
-                                    } else {
-                                        log.debug("No special case data found");
                                     }
+                                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                                    log.error(e.toString());
                                 }
                             }
-                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                            log.error(e.toString());
-                        }
-                    }
-                    
-                    if ((sentence != null) &&!sentence.isEmpty()) {
-                        String processingValue;
 
-                        if (Objects.equals(Date.class, data.getColumnType())
-                            || Objects.equals(Timestamp.class, data.getColumnType())
-                            || Objects.equals(Time.class, data.getColumnType())) {
+                            if ((sentence != null) &&!sentence.isEmpty()) {
+                                String processingValue;
 
-                            final DateFormat     originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
-                            final DateFormat     targetFormat   = new SimpleDateFormat("MMM d, yy", Locale.ENGLISH);
-                            final java.util.Date date           = originalFormat.parse(sentence);
+                                if (Objects.equals(Date.class, data.getColumnType())
+                                    || Objects.equals(Timestamp.class, data.getColumnType())
+                                    || Objects.equals(Time.class, data.getColumnType())) {
 
-                            processingValue = targetFormat.format(date);
-                        } else {
-                            processingValue = sentence;
-                        }
+                                    final DateFormat     originalFormat = new SimpleDateFormat(sentence, Locale.ENGLISH);
+                                    final DateFormat     targetFormat   = new SimpleDateFormat("MMM d, yy", Locale.ENGLISH);
+                                    final java.util.Date date           = originalFormat.parse(sentence);
 
-                        // LOG.debug(sentence);
-                        // Convert sentence into tokens
-                        final String tokens[] = model.getTokenizer().tokenize(processingValue);
+                                    processingValue = targetFormat.format(date);
+                                } else {
+                                    processingValue = sentence;
+                                }
 
-                        // Find names
-                        final Span nameSpans[] = model.getNameFinder().find(tokens);
+                                // LOG.debug(sentence);
+                                // Convert sentence into tokens
+                                final String tokens[] = model.getTokenizer().tokenize(processingValue);
 
-                        // find probabilities for names
-                        final double[] spanProbs = model.getNameFinder().probs(nameSpans);
+                                // Find names
+                                final Span nameSpans[] = model.getNameFinder().find(tokens);
 
-                        // Collect top X tokens with highest probability
-                        // display names
-                        for (int i = 0; i < nameSpans.length; i++) {
-                            final String span = nameSpans[i].toString();
+                                // find probabilities for names
+                                final double[] spanProbs = model.getNameFinder().probs(nameSpans);
 
-                            if (span.length() > 2) {
-                                log.debug("Span: " + span);
-                                log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
-                                log.debug("Probability is: " + spanProbs[i]);
-                                probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                                // Collect top X tokens with highest probability
+                                // display names
+                                for (int i = 0; i < nameSpans.length; i++) {
+                                    final String span = nameSpans[i].toString();
+
+                                    if (span.length() > 2) {
+                                        log.debug("Span: " + span);
+                                        log.debug("Covered text is: " + tokens[nameSpans[i].getStart()]);
+                                        log.debug("Probability is: " + spanProbs[i]);
+                                        probabilityList.add(new Probability(tokens[nameSpans[i].getStart()], spanProbs[i]));
+                                    }
+                                }
+
+                                // From OpenNLP documentation:
+                                // After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators.
+                                // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents.
+                                model.getNameFinder().clearAdaptiveData();
                             }
                         }
+                    } catch (SQLException sqle) {
+                        log.error(sqle.toString());
+                    }
 
-                        // From OpenNLP documentation:
-                        // After every document clearAdaptiveData must be called to clear the adaptive data in the feature generators.
-                        // Not calling clearAdaptiveData can lead to a sharp drop in the detection rate after a few documents.
-                        model.getNameFinder().clearAdaptiveData();
+                    final double averageProbability = calculateAverage(probabilityList);
+
+                    if (averageProbability >= config.getProbabilityThreshold()) {
+                        matches.add(new ColumnMatch(
+                            data,
+                            averageProbability,
+                            model.getName(),
+                            probabilityList)
+                        );
                     }
                 }
-            } catch (SQLException sqle) {
-                log.error(sqle.toString());
-            }
-
-            final double averageProbability = calculateAverage(probabilityList);
-
-            if (averageProbability >= config.getProbabilityThreshold()) {
-                matches.add(new ColumnMatch(
-                    data,
-                    averageProbability,
-                    model.getName(),
-                    probabilityList)
-                );
+                pb.stepTo(numSteps);
             }
         }
 

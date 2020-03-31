@@ -52,8 +52,7 @@ public abstract class Discoverer {
         "money", "en-ner-money.bin",
         "organization", "en-ner-organization.bin",
         "person", "en-ner-person.bin",
-        "time", "en-ner-time.bin",
-        "sentences", "en-sent.bin"
+        "time", "en-ner-time.bin"
     );
     
     @Data
