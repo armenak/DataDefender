@@ -37,13 +37,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class ModelDiscoveryConfig {
 
-    static {
-        System.setProperty("AVAILABLE-MODELS", StringUtils.join(
-            Discoverer.BUILT_IN_MODELS.keySet().stream().sorted().collect(Collectors.toList()),
-            ", "
-        ));
-    }
-
     @Option(names = { "-l", "--limit" }, description = "Limit discovery to a set number of rows in a table", defaultValue = "1000")
     private Integer limit;
 

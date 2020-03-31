@@ -15,12 +15,14 @@
  */
 package com.strider.datadefender;
 
+import com.strider.datadefender.discoverer.Discoverer;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.file.Loader;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,6 +64,14 @@ import lombok.extern.log4j.Log4j2;
 )
 @Log4j2
 public class DataDefender implements Callable<Integer> {
+
+    // initializing system property used by ModelDiscoveryConfig option parameter help
+    static {
+        System.setProperty("AVAILABLE-MODELS", StringUtils.join(
+            Discoverer.BUILT_IN_MODELS.keySet().stream().sorted().collect(Collectors.toList()),
+            ", "
+        ));
+    }
 
     @Mixin
     private LogLevelConfig logLevels;
