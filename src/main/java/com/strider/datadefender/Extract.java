@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
@@ -40,7 +41,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Command(
     name = "extract",
-    version = "2.0",
+    version = "1.0",
     mixinStandardHelpOptions = true,
     description = "Run data extraction utility -- generates files out of table "
         + "columns with the name 'table_columnName.txt' for each column "
@@ -49,11 +50,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Extract implements Callable<Integer> {
 
+    @Mixin
+    private LogLevelConfig logLevels;
+
+    @ArgGroup(exclusive = false, multiplicity = "1", heading = "Database connection settings%n")
+    private DbConfig dbConfig;
+
     @Spec
     private CommandSpec spec;
-
-    @ArgGroup(exclusive = false, multiplicity = "1")
-    private DbConfig dbConfig;
 
     private List<String> tableColumns;
 

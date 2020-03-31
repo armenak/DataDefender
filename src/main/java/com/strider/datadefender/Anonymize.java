@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Parameters;
 
 import lombok.extern.log4j.Log4j2;
@@ -42,12 +43,15 @@ import lombok.extern.log4j.Log4j2;
  */
 @Command(
     name = "anonymize",
-    version = "2.0",
+    version = "1.0",
     mixinStandardHelpOptions = true,
     description = "Run anonymization utility"
 )
 @Log4j2
 public class Anonymize implements Callable<Integer> {
+
+    @Mixin
+    private LogLevelConfig logLevels;
 
     @Option(names = { "-r", "--requirement-file" }, paramLabel = "<requirementFile>", description = "Requirement XML file", required = true)
     private Requirement requirement;
@@ -55,7 +59,7 @@ public class Anonymize implements Callable<Integer> {
     @Option(names = { "-b", "--batch-size" }, description = "Number of update queries to batch together", defaultValue = "1000")
     private Integer batchSize;
 
-    @ArgGroup(exclusive = false, multiplicity = "1")
+    @ArgGroup(exclusive = false, multiplicity = "1", heading = "Database connection settings%n")
     private DbConfig dbConfig;
 
     @Parameters(paramLabel = "tables", description = "Limit anonymization to specified tables")

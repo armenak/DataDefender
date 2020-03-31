@@ -27,12 +27,14 @@ import java.util.stream.Collectors;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 
 import lombok.extern.log4j.Log4j2;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * "discover" picocli subcommand, configures and executes the data discoverer.
@@ -44,7 +46,7 @@ import lombok.Getter;
  */
 @Command(
     name = "discover",
-    version = "2.0",
+    version = "1.0",
     description = "Run data discovery utility",
     mixinStandardHelpOptions = true,
     subcommands = {
@@ -57,11 +59,16 @@ import lombok.Getter;
 @Log4j2
 public class Discover implements Callable<Integer> {
 
-    @ArgGroup(exclusive = false, multiplicity = "0..1")
+    @Mixin
+    private LogLevelConfig logLevels;
+
     @Getter
+    @Setter
+    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
     private DbConfig dbConfig;
 
     @Option(names = { "-o", "--output" }, description = "Generate a requirements xml file and write it out to the specified file")
+    @Setter
     private File outputFile;
 
     @Spec

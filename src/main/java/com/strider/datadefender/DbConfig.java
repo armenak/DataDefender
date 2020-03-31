@@ -47,21 +47,21 @@ public class DbConfig {
 
     private Vendor vendor;
 
-    @Option(names = { "-u", "--user" }, description = "The username to connect with", required = false)
+    @Option(names = { "-u", "--user" }, description = "The username to connect with")
     private String username;
     
-    @Option(names = { "-p", "--password" }, description = "The password to connect with", required = false, arity = "0..1", interactive = true)
+    @Option(names = { "-p", "--password" }, description = "The password to connect with", arity = "0..1", interactive = true)
     private String password;
 
-    @Option(names = { "--schema" }, description = "The schema to connect to", required = false)
+    @Option(names = { "--schema" }, description = "The schema to connect to")
     private String schema;
 
-    @Option(names = { "--skip-empty-tables-metadata" }, description = "Skips generating metadata for empty tables", required = false, defaultValue = "true")
+    @Option(names = { "--skip-empty-tables-metadata" }, description = "Skips generating metadata for empty tables", defaultValue = "true")
     private boolean skipEmptyTables;
 
-    @Option(names = { "--include-table-pattern-metadata" }, description = "Pattern(s) matching table names to include for metadata analysis", required = false)
+    @Option(names = { "--include-table-pattern-metadata" }, description = "Pattern(s) matching table names to include for metadata analysis")
     private List<Pattern> includeTablePatterns;
-    @Option(names = { "--exclude-table-pattern-metadata" }, description = "Pattern(s) matching table names to exclude for metadata analysis", required = false)
+    @Option(names = { "--exclude-table-pattern-metadata" }, description = "Pattern(s) matching table names to exclude for metadata analysis")
     private List<Pattern> excludeTablePatterns;
 
     private String url;
@@ -69,8 +69,7 @@ public class DbConfig {
     @Option(
         names = { "--vendor" },
         description = "Database vendor, available options are: h2, mysql, mariadb, postgresql, sqlserver, oracle. "
-            + "If not specified, vendor will attempt to be extracted from the datasource url for a jdbc scheme.",
-        required = false
+            + "If not specified, vendor will attempt to be extracted from the datasource url for a jdbc scheme."
     )
     public void setVendor(String vendor) {
         String c = vendor.trim().toLowerCase();
@@ -83,7 +82,7 @@ public class DbConfig {
         this.vendor = VENDOR_MAP.get(c);
     }
 
-    @Option(names = { "--url" }, description = "The datasource URL", required = true)
+    @Option(names = { "--url" }, description = "The datasource URL")
     public void setUrl(String url) {
         Pattern p = Pattern.compile("\\s*jdbc:([^:]+):.*");
         if (vendor == null) {

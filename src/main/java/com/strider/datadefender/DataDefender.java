@@ -20,25 +20,15 @@ import com.strider.datadefender.requirement.file.Loader;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.AppenderRef;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
-import picocli.CommandLine.Option;
 import picocli.CommandLine.IParameterExceptionHandler;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.TypeConversionException;
@@ -60,7 +50,7 @@ import lombok.extern.log4j.Log4j2;
 @Command(
     name = "datadefender",
     mixinStandardHelpOptions = true,
-    version = DataDefender.VERSION,
+    version = "2.0",
     description = "Data detection and anonymization tool",
     synopsisSubcommandLabel = "COMMAND",
     subcommands = {
@@ -73,7 +63,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DataDefender implements Callable<Integer> {
 
-    public static final String VERSION = "2.0.0";
+    @Mixin
+    private LogLevelConfig logLevels;
 
     /**
      * Copied from picocli documentation, presents a shorter "Usage" help when
@@ -104,7 +95,7 @@ public class DataDefender implements Callable<Integer> {
         public Requirement convert(String value) throws Exception {
             Loader loader = new Loader();
             try {
-                return loader.load(value, DataDefender.VERSION);
+                return loader.load(value);
             } catch (FileNotFoundException e) {
                 log.debug("Error loading requirements file", e);
                 throw new TypeConversionException("Unable to load requirements file: " + e.getMessage());
@@ -115,29 +106,6 @@ public class DataDefender implements Callable<Integer> {
                 }
                 log.debug("Error loading requirements.", exc);
                 throw new TypeConversionException("Unable to load requirements file: " + exc.getMessage());
-            }
-        }
-    }
-
-    @Option(names = "--debug", description = "enable debug logging")
-    public void setDebug(boolean debug) {
-        System.out.println("DEBUG logging turned on. DEBUG level messages only "
-            + "appear in the log file by default.");
-        Configurator.setRootLevel(Level.DEBUG);
-        log.warn("Private/sensitive data that should be anonymized will be "
-            + "logged to configured debug output streams.");
-    }
-
-    @Option(names = { "-v", "--verbose" }, description = "enable more verbose output")
-    public void setVerbose(boolean verbose) {
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        LoggerConfig conf = ctx.getLogger("com.strider.datadefender").get();
-        Map<String, Appender> appenders = conf.getAppenders();
-        List<AppenderRef> refs = conf.getAppenderRefs();
-        for (AppenderRef ref : refs) {
-            if (ref.getLevel().isMoreSpecificThan(Level.INFO)) {
-                conf.removeAppender(ref.getRef());
-                conf.addAppender(appenders.get(ref.getRef()), Level.INFO, null);
             }
         }
     }

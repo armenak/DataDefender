@@ -68,7 +68,7 @@ public class Loader {
      * @throws java.lang.IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public Requirement load(final String requirementFile, final String version) throws
+    public Requirement load(final String requirementFile) throws
         FileNotFoundException,
         JAXBException,
         NoSuchMethodException,

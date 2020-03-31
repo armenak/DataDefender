@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 
@@ -36,14 +37,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Command(
     name = "files",
-    version = "2.0",
+    version = "1.0",
     mixinStandardHelpOptions = true,
     description = "Run file discovery utility"
 )
 @Log4j2
 public class DiscoverFiles implements Callable<Integer> {
 
-    @ArgGroup(exclusive = false, multiplicity = "1")
+    @Mixin
+    private LogLevelConfig logLevels;
+
+    @ArgGroup(exclusive = false, multiplicity = "1", heading = "Model discovery settings%n")
     private ModelDiscoveryConfig modelDiscoveryConfig;
 
     @Option(names = { "-d", "--directory" }, description = "Adds a directory to list of directories to be scanned", required = true)
@@ -59,6 +63,8 @@ public class DiscoverFiles implements Callable<Integer> {
     public Integer call() throws Exception {
         System.out.println("");
         System.out.println("Starting file discovery");
+        log.warn("Discovery writes personal data to log files.");
+
         log.info("Probability threshold: {}", modelDiscoveryConfig.getProbabilityThreshold());
         log.info("Calculate score: {}", (modelDiscoveryConfig.getCalculateScore()) ? "yes" : "no");
         log.info("Threshold count: {}", modelDiscoveryConfig.getThresholdCount());

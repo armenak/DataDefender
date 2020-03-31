@@ -18,30 +18,20 @@ package com.strider.datadefender;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.discoverer.DatabaseDiscoverer;
-import com.strider.datadefender.discoverer.Discoverer;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import lombok.Getter;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -52,19 +42,18 @@ import lombok.extern.log4j.Log4j2;
  */
 @Command(
     name = "data",
-    version = "2.0",
+    version = "1.0",
     mixinStandardHelpOptions = true,
     description = "Run data discovery utility"
 )
 @Log4j2
 public class DiscoverData implements Callable<Integer>, IRequirementCommand {
 
-    static {
-        System.setProperty("AVAILABLE-MODELS", StringUtils.join(
-            Discoverer.BUILT_IN_MODELS.keySet().stream().sorted().collect(Collectors.toList()),
-            ", "
-        ));
-    }
+    @Mixin
+    private LogLevelConfig logLevels;
+
+    @ArgGroup(exclusive = false, multiplicity = "1", heading = "Model discovery settings%n")
+    private ModelDiscoveryConfig modelDiscoveryConfig;
 
     @ParentCommand
     private Discover discover;
@@ -72,10 +61,17 @@ public class DiscoverData implements Callable<Integer>, IRequirementCommand {
     @Spec
     private CommandSpec spec;
 
-    @ArgGroup(exclusive = false, multiplicity = "1")
-    private ModelDiscoveryConfig modelDiscoveryConfig;
-
     private List<ColumnMetaData> results;
+
+    @Option(names = { "-o", "--output" }, description = "Generate a requirements xml file and write it out to the specified file")
+    public void setOutputFile(File f) {
+        discover.setOutputFile(f);
+    }
+
+    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
+    public void setDbConfig(DbConfig dbConfig) {
+        discover.setDbConfig(dbConfig);
+    }
 
     @Override
     public Integer call() throws Exception {
@@ -84,6 +80,8 @@ public class DiscoverData implements Callable<Integer>, IRequirementCommand {
 
         System.out.println("");
         System.out.println("Starting data discovery");
+        log.warn("Discovery writes personal data to log files.");
+
         log.info("Datasource URL: {}, vendor: {}, schema: {}", dbConfig.getUrl(), dbConfig.getVendor(), dbConfig.getSchema());
         log.info("Username: {}, Password provided: {}", dbConfig.getUsername(), (StringUtils.isNotBlank(dbConfig.getPassword()) ? "yes" : "no"));
         log.info("Probability threshold: {}", modelDiscoveryConfig.getProbabilityThreshold());
