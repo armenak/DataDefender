@@ -30,49 +30,6 @@
 
   <url>https://github.com/armenak/DataDefender</url>
 
-  <repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <layout>default</layout>
-      <url>https://repo.maven.apache.org/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <profiles>
-    <profile>
-      <id>column-discovery</id>
-      <properties>
-        <execAppName>discover</execAppName>
-        <execAppFlag>-c</execAppFlag>
-      </properties>
-    </profile>
-    <profile>
-      <id>data-discovery</id>
-      <properties>
-        <execAppName>discover</execAppName>
-        <execAppFlag>-d</execAppFlag>
-      </properties>
-    </profile>
-    <profile>
-      <id>anonymize</id>
-      <properties>
-        <execAppName>anonymize</execAppName>
-        <execAppFlag/>
-      </properties>
-    </profile>
-    <profile>
-      <id>generate</id>
-      <properties>
-        <execAppName>generate</execAppName>
-        <execAppFlag/>
-      </properties>
-    </profile>
-  </profiles>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sonar.projectKey>DD</sonar.projectKey>
@@ -140,29 +97,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <executable>java</executable>
-          <arguments>
-            <argument>-classpath</argument>
-            <classpath/>
-            <argument>com.strider.datadefender.DataDefender</argument>
-            <argument>${execAppName}</argument>
-            <argument>${execAppFlag}</argument>
-          </arguments>
-          <workingDirectory>${execAppDir}</workingDirectory>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
