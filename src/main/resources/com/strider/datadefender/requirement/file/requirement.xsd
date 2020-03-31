@@ -120,11 +120,11 @@
   <xs:element name="anonymizer">
     <xs:complexType>
       <xs:all>
-        <xs:element ref="anonymizer-version" minOccurs="1"/>
+        <xs:element ref="anonymizer-version"/>
         <xs:element name="project" type="xs:string"/>
         <xs:element ref="project-version"/>
-        <xs:element ref="autoresolve-classes"/>
-        <xs:element ref="column-plans"/>
+        <xs:element ref="autoresolve-classes" minOccurs="0"/>
+        <xs:element ref="column-plans" minOccurs="0"/>
         <xs:element ref="tables"/>
       </xs:all>
     </xs:complexType>

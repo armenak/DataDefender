@@ -33,7 +33,7 @@ import lombok.Data;
  */
 @Log4j2
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class PlanRef {
 
     @XmlIDREF

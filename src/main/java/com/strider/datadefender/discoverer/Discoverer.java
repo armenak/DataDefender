@@ -120,12 +120,4 @@ public abstract class Discoverer {
             return createModelFrom(new TokenNameFinderModel(stream), modelName);
         }
     }
-
-    public void createRequirement(final String fileName) throws DataDefenderException, JAXBException {
-        if ((matches == null) || matches.isEmpty()) {
-            throw new DataDefenderException("No matches to create requirement from!");
-        }
-
-        Generator.write(Generator.create(matches.stream().map((c) -> c.getColumn()).collect(Collectors.toList())), fileName);
-    }
 }

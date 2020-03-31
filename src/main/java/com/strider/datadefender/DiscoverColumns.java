@@ -16,14 +16,18 @@
 package com.strider.datadefender;
 
 import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.discoverer.ColumnDiscoverer;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.Spec;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -40,13 +44,18 @@ import lombok.extern.log4j.Log4j2;
     description = "Run column discovery utility"
 )
 @Log4j2
-public class DiscoverColumns implements Callable<Integer> {
+public class DiscoverColumns implements Callable<Integer>, IRequirementCommand {
+
+    @Option(names = { "--column-pattern" }, description = "Regex pattern(s) to match column names", required = true)
+    private List<Pattern> patterns;
 
     @ParentCommand
     private Discover discover;
 
-    @Option(names = { "--column-pattern" }, description = "Regex pattern(s) to match column names", required = true)
-    private List<Pattern> patterns;
+    @Spec
+    private CommandSpec spec;
+
+    private List<ColumnMetaData> results;
 
     @Override
     public Integer call() throws Exception {
@@ -56,13 +65,20 @@ public class DiscoverColumns implements Callable<Integer> {
         ColumnDiscoverer discoverer = new ColumnDiscoverer(factory, patterns);
 
         try {
-            discoverer.discover();
+            results = discoverer.discover();
         } catch (Exception e) {
             log.error(e.getMessage());
             log.debug("Exception occurred during anonymization", e);
             return 1;
         }
 
+        discover.afterSubcommand();
+
         return 0;
+    }
+
+    @Override
+    public List<ColumnMetaData> getColumnMetaData() {
+        return results;
     }
 }

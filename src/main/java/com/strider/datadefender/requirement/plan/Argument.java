@@ -42,7 +42,7 @@ import org.apache.commons.collections.CollectionUtils;
  *
  * @author Armenak Grigoryan
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @Data
 @Log4j2
 public class Argument {

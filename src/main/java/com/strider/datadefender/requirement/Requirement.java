@@ -46,11 +46,11 @@ import lombok.extern.log4j.Log4j2;
  */
 @Data
 @Log4j2
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "anonymizer")
 public class Requirement {
 
-    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlAccessorType(XmlAccessType.NONE)
     @Data
     public static class AutoresolvePackage {
         @XmlAttribute
@@ -73,6 +73,9 @@ public class Requirement {
             registry.registerAutoResolvePackage(name);
         }
     }
+
+    @XmlElement(name = "anonymizer-version")
+    private double anonymizerVersion = 2.0d;
 
     @XmlElement
     private String project;

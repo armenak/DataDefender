@@ -46,7 +46,7 @@ import org.apache.commons.beanutils.ConvertUtils;
  */
 @Log4j2
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class Column {
 
     @XmlAttribute

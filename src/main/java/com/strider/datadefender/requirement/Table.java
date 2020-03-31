@@ -31,7 +31,7 @@ import org.apache.commons.collections4.CollectionUtils;
  *
  * @author Armenak Grigoryan
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @Data
 public class Table {
 

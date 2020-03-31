@@ -29,7 +29,7 @@ import lombok.Data;
  * @see Parameter.getArrayElements
  * @author Zaahid Bateson
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @Data
 public class ArrayElement {
     /**

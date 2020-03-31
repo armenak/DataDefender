@@ -19,11 +19,6 @@ package com.strider.datadefender.extractor;
 
 import com.strider.datadefender.DbConfig;
 import com.strider.datadefender.database.DatabaseException;
-import com.strider.datadefender.requirement.Column;
-import com.strider.datadefender.requirement.plan.Argument;
-import com.strider.datadefender.requirement.Requirement;
-import com.strider.datadefender.requirement.Table;
-import com.strider.datadefender.requirement.file.Generator;
 import com.strider.datadefender.database.IDbFactory;
 
 import java.io.BufferedWriter;
@@ -34,8 +29,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 

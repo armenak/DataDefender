@@ -45,7 +45,7 @@ import lombok.Data;
  */
 @Log4j2
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class Plan implements Invokable {
 
     @XmlJavaTypeAdapter(FunctionAttributeAdapter.class)

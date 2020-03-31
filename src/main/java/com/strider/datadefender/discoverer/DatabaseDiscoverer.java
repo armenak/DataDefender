@@ -118,7 +118,7 @@ public class DatabaseDiscoverer extends Discoverer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ColumnMatch> discover()
+    public List<ColumnMetaData> discover()
         throws ParseException,
         DataDefenderException,
         IOException,
@@ -240,7 +240,7 @@ public class DatabaseDiscoverer extends Discoverer {
             log.info("Overall score: N/A");
         }
 
-        return matches;
+        return matches.stream().map((c) -> c.getColumn()).collect(Collectors.toList());
     }
 
     private List<ColumnMatch> discoverAgainstSingleModel(final Model model)

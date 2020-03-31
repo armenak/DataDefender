@@ -50,7 +50,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class Function implements Invokable {
 
     @Setter(AccessLevel.NONE)

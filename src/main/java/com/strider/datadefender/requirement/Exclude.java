@@ -60,7 +60,7 @@ import lombok.NoArgsConstructor;
  * @see Column::getExclusions
  * @author Zaahid Bateson
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @NoArgsConstructor
 @Data
 public class Exclude {

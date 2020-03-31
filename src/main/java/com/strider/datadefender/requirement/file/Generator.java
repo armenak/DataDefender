@@ -15,23 +15,6 @@
  */
 package com.strider.datadefender.requirement.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-import static javax.xml.bind.JAXBContext.newInstance;
-
 import com.strider.datadefender.database.DatabaseException;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.requirement.Column;
@@ -41,9 +24,26 @@ import com.strider.datadefender.requirement.plan.Plan;
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.Table;
 
-import lombok.extern.log4j.Log4j2;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xml.sax.SAXException;
+
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Utility class to help handling requirement objects
@@ -72,7 +72,7 @@ public class Generator {
      * @param matches
      * @return
      */
-    public static Requirement create(final List<ColumnMetaData> matches) {
+    public static Requirement create(final Collection<ColumnMetaData> matches) {
 
         final Map<String, List<Column>> columns = new HashMap<>();
         final Map<String, Table> tables  = new HashMap<>();
@@ -110,22 +110,26 @@ public class Generator {
         // hopefully order of tables doesn't matter
         req.setTables(List.copyOf(tables.values()));
 
+        log.debug(req);
+
         return req;
     }
 
     /**
      * Write requirement to file.
      * @param requirement
-     * @param fileName
+     * @param outFile
      * @throws DatabaseException
      */
-    public static void write(final Requirement requirement, final String fileName) throws DatabaseException, JAXBException {
-        log.info("Requirement.write() to file: " + fileName);
+    public static void write(final Requirement requirement, final File outFile) throws DatabaseException, JAXBException, SAXException {
+        log.info("Requirement.write() to file: " + outFile.getName());
 
-        final File outFile = new File(fileName);
-        final JAXBContext jc = newInstance(Requirement.class);
+        final JAXBContext jc = JAXBContext.newInstance(Requirement.class);
         final Marshaller  marshaller = jc.createMarshaller();
+        final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = schemaFactory.newSchema(Generator.class.getResource("requirement.xsd"));
 
+        marshaller.setSchema(schema);
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         marshaller.marshal(requirement, outFile);
     }

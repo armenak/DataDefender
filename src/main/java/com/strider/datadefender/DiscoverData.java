@@ -16,6 +16,7 @@
 package com.strider.datadefender;
 
 import com.strider.datadefender.database.IDbFactory;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.discoverer.DatabaseDiscoverer;
 import com.strider.datadefender.discoverer.Discoverer;
 import java.io.BufferedReader;
@@ -35,13 +36,14 @@ import lombok.Getter;
 
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.Spec;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * "discover" picocli subcommand, configures and executes the data discoverer.
@@ -55,7 +57,7 @@ import org.apache.commons.collections4.CollectionUtils;
     description = "Run data discovery utility"
 )
 @Log4j2
-public class DiscoverData implements Callable<Integer> {
+public class DiscoverData implements Callable<Integer>, IRequirementCommand {
 
     static {
         System.setProperty("AVAILABLE-MODELS", StringUtils.join(
@@ -67,8 +69,13 @@ public class DiscoverData implements Callable<Integer> {
     @ParentCommand
     private Discover discover;
 
+    @Spec
+    private CommandSpec spec;
+
     @ArgGroup(exclusive = false, multiplicity = "1")
     private ModelDiscoveryConfig modelDiscoveryConfig;
+
+    private List<ColumnMetaData> results;
 
     @Override
     public Integer call() throws Exception {
@@ -91,8 +98,14 @@ public class DiscoverData implements Callable<Integer> {
 
         IDbFactory factory = IDbFactory.get(dbConfig);
         DatabaseDiscoverer dd = new DatabaseDiscoverer(modelDiscoveryConfig, factory);
-        dd.discover();
+        results = dd.discover();
 
+        discover.afterSubcommand();
         return 0;
+    }
+
+    @Override
+    public List<ColumnMetaData> getColumnMetaData() {
+        return results;
     }
 }

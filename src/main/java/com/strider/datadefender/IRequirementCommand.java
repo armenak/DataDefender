@@ -13,24 +13,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package com.strider.datadefender.requirement.plan;
+package com.strider.datadefender;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
+import java.util.List;
 
 /**
- * XmlAdapter to get a Function type from a String attribute.
  *
  * @author Zaahid Bateson
  */
-public class FunctionAttributeAdapter extends XmlAdapter<String, Function> {
-
-    @Override
-    public Function unmarshal(String value) throws Exception {
-        return new Function(value, true);
-    }
-
-    @Override
-    public String marshal(Function f) throws Exception {
-        return (f != null) ? f.getFunctionName() : null;
-    }
+public interface IRequirementCommand {
+    List<ColumnMetaData> getColumnMetaData();
 }

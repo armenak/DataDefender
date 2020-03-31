@@ -35,7 +35,7 @@ import org.apache.commons.collections4.CollectionUtils;
 @Log4j2
 @Getter
 @Setter
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class GlobalPlan extends Plan {
 
     @XmlID
