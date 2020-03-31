@@ -16,21 +16,17 @@ Table of content
 - [File Discovery](#file-discovery)
 - [Column Discovery](#column-discovery)
 - [Data Discovery](#data-discovery)
-- [Data Generator](#data-generator)
+- [Data Extractor](#data-extractor)
 - [Anonymizer](#anonymizer)
 - [Using 3rd-Party JDBC Drivers with Maven](#using-3rd-party-jdbc-drivers-with-maven)
-- [Using Maven to execute Anonymizer](#using-maven-to-execute-anonymizer)
-	- [Prerequisites](#prerequisites-1)
-	- [Configuration](#configuration)
-	- [Execution](#execution)
 - [Features and issues](#features-and-issues)
 - [Code quality](#code-quality)
 
 Purpose
 -------
-While performing the application development, testing, or maintenance, it is important to operate in the environment that is as close to the production environment as possible when it comes to amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated. 
+While performing application development, testing, or maintenance, it is important to operate in an environment that is as close to the production environment as possible when it comes to the amount of data and close-to-real content. At the same time it is important to ensure that data privacy policies are not violated.
 
-Database and file discovery identifies and analyzes data risks. Data anonymization allows to anonymize the sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure. 
+Database, column, and file discovery identify and analyze data risks and report on potentially identifiable and personal information stored. And the database anonymization process anonymizes sensitive data and transfer information between organizations, while reducing the risk of unintended disclosure.
 
 The complete source code is available, so you can inspect it and perform security audits if necessary.
 
@@ -47,14 +43,14 @@ Features
 
 Prerequisites
 ----------------
-1. JDK 1.8+
+1. JDK 11+
 2. Maven 3+
 
 Build from source
 -----------------
 1. Download ZIP file and unzip in a directory of your choice, or clone repo
 2. cd {dir}/DataDefender/
-3. mvn install
+3. mvn package
 4. DataDefender.jar will be located in "target" directory {dir}/DataDefender/target/
 
 Contributing
@@ -63,140 +59,332 @@ We encourage you to contribute to DataDefender! Please check out the [Contributi
 
 How to run
 ----------
-The toolkit is implemented as a command line program. To run it first build the application as above (mvn install). This
-will generate an executeable jar file in the "target" directory. Once this has been done you can get help by typing:
+The toolkit is implemented as a command line program. To run it first build the application as above (mvn package). This will generate an executable jar file in the "target" directory. For your convenience executable 'sh' and 'bat' files are created as well.  You may need to adjust permissions for the executable shell script (chmod +x datadefender). Once this has been done you can get help by running 'datadefender' or 'datadefender.bat' in your shell/command prompt:
 
-    java -jar DataDefender.jar --help
-    
-The toolkit can be run in anonymizer mode, and three different discovery modes (file, column, and database discovery). For column and database discovery modes you need to provide
-the database property file which defines which database to connect to and how to connect. The location of this property file it passed in using the -P or --data switch.
+``` datadefender help ```
 
-All modes support an optional list of tables at the end to use for either discover, or anonymization of a specific table or list of tables.
+```
+Usage: datadefender [-hvV] [--debug] COMMAND
+Data detection and anonymization tool
+      --debug     enable debug logging
+  -h, --help      Show this help message and exit.
+  -v, --verbose   enable more verbose output
+  -V, --version   Print version information and exit.
+Commands:
+  help       Displays help information about the specified command
+  anonymize  Run anonymization utility
+  extract    Run data extraction utility -- generates files out of table
+               columns with the name 'table_columnName.txt' for each column
+               requested.
+  discover   Run data discovery utility
+```
+
+The toolkit can be run in anonymizer mode, data extraction mode (extract), and three different discovery modes (file, column, and database discovery).
 
 File Discovery
 --------------
-File discovery will attempt to find a sensitive personal information in binary and text files located on the file system.
 
-Sample project can be found here: https://github.com/armenak/DataDefender/tree/master/sample_projects/file_discovery
+``` datadefender discover files ```
 
-In order to run File Discovery, please use filediscovery.properties file created in the sample project and adjust it for your needs. Specifically, probability threshold and the directory where files that needs to be scanned will need to be modified.
+```
+Usage: datadefender discover files ([-l=<limit>] [-e=<extensions>]
+                                   [-e=<extensions>]...
+                                   [--model-file=<fileModels>]
+                                   [--model-file=<fileModels>]...
+                                   [--token-model=<tokenModel>]
+                                   [--probability-threshold=<probabilityThreshold>]
+                                   [--[no-]score-calculation]
+                                   [--threshold-count=<thresholdCount>]
+                                   [--threshold-high=<thresholdHighRisk>]
+                                   [-m=<models>] [-m=<models>]...) [-hvV]
+                                   [--debug] -d=<directories>
+                                   [-d=<directories>]... -x=<excludeExtensions>
+                                   [-x=<excludeExtensions>]...
+Run file discovery utility
+  -d, --directory=<directories>
+                         Adds a directory to list of directories to be scanned
+      --debug            enable debug logging
+  -h, --help             Show this help message and exit.
+  -v, --verbose          enable more verbose output
+  -V, --version          Print version information and exit.
+  -x, --exclude-extension=<excludeExtensions>
+                         Adds an extension to exclude from data discovery
+Model discovery settings
+  -e, --extension=<extensions>
+                         Adds a call to an extension method (e.g. com.strider.
+                           datadefender.specialcase.SinDetector.detectSin)
+  -l, --limit=<limit>    Limit discovery to a set number of rows in a table
+  -m, --model=<models>   Adds a built-in configured opennlp TokenizerME model
+                           for data discovery. Available models are: date,
+                           location, money, organization, person, time
+      --model-file=<fileModels>
+                         Adds a custom made opennlp TokenizerME file for data
+                           discovery.
+      --[no-]score-calculation
+                         If set, includes a column score
+      --probability-threshold=<probabilityThreshold>
+                         Minimum NLP match score to return results for
+      --threshold-count=<thresholdCount>
+                         Reports if number of rows found are greater than the
+                           defined threshold
+      --threshold-high=<thresholdHighRisk>
+                         Reports if number of high risk columns found are
+                           greater than the defined threshold
+      --token-model=<tokenModel>
+                         Override the default built-in token model (English
+                           tokens, en-token.bin) with a custom token file for
+                           use by opennlp's TokenizerModel
+
+```
+
+File discovery will attempt to find sensitive personal information in binary and text files located on the file system.
+
+Sample project can be found here: [sample_projects/file_discovery](sample_projects/file_discovery)
 
 Column Discovery
 ----------------
-In this mode the tool attempts to query your database and identified columns that should be anonymized based on their names.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered. To run in this mode type the following:
 
-    java -jar DataDefender.jar database-discovery -c --data <db.properties> --column-discovery <columndiscovery.properties> [-r -R <requirement_output_file>]
-    
-Where:
-    <db.properties>              - Path and file name of the file containing database connection properties 
-                                   (see src/main/resources/db.properties for an example)
+``` datadefender discover columns ```
 
-    <columndiscovery.properties> - Path and file name of the file containing column discovery properties
-                                   (see src/main/resources/columndiscovery.properties for an example)
-    <requirement_output_file>    - Optional name of sample requirement file to be created (-r must also be specified)
-    
+```
+Usage: datadefender discover columns [[-u=<username>] [-p[=<password>]]
+                                     [--schema=<schema>]
+                                     [--skip-empty-tables-metadata]
+                                     [--include-table-pattern-metadata=<includeTablePatterns>]
+                                     [--include-table-pattern-metadata=<includeTablePatterns>]...
+                                     [--exclude-table-pattern-metadata=<excludeTablePatterns>]
+                                     [--exclude-table-pattern-metadata=<excludeTablePatterns>]...
+                                     [--vendor=<vendor>]
+                                     [--url=<url>]] [-hvV] [--debug]
+                                     [-o=<outputFile>]
+                                     --column-pattern=<patterns>
+                                     [--column-pattern=<patterns>]...
+Run column discovery utility
+      --column-pattern=<patterns>
+                          Regex pattern(s) to match column names
+      --debug             enable debug logging
+  -h, --help              Show this help message and exit.
+  -o, --output=<outputFile>
+                          Generate a requirements xml file and write it out to
+                            the specified file
+  -v, --verbose           enable more verbose output
+  -V, --version           Print version information and exit.
+Database connection settings
+      --exclude-table-pattern-metadata=<excludeTablePatterns>
+                          Pattern(s) matching table names to exclude for
+                            metadata analysis
+      --include-table-pattern-metadata=<includeTablePatterns>
+                          Pattern(s) matching table names to include for
+                            metadata analysis
+  -p, --password[=<password>]
+                          The password to connect with
+      --schema=<schema>   The schema to connect to
+      --skip-empty-tables-metadata
+                          Skips generating metadata for empty tables
+  -u, --user=<username>   The username to connect with
+      --url=<url>         The datasource URL
+      --vendor=<vendor>   Database vendor, available options are: h2, mysql,
+                            mariadb, postgresql, sqlserver, oracle. If not
+                            specified, vendor will attempt to be extracted from
+                            the datasource url for a jdbc scheme.
+```
+
+In this mode the tool attempts to query your database and identified columns that should be anonymized based on their names.  When -o is provided a sample requirements file (which can be modified and used for the anonymizer stage) will be created based on the columns discovered.
+
+Note that column and data discovery can be combined.  The generated requirements file will combine both results.
 
 Data Discovery
 ------------------
-To run the tool in Data Discovery mode, pass '-d' to discover.  DA will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability_threshold specified in datadiscovery.properties file.  When -r is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered by the DA.
 
-    java -jar DataDefender.jar database-discovery -d --data <db.properties> --data-discovery <datadiscovery.properties> [-r -R <requirement_output_file>]
+``` datadefender discover data ```
 
-Where:
-    <db.properties>            - Path and file name of the file containing database connection properties 
-                                (see src/main/resources/db.properties for an example)
+```
+Usage: datadefender discover data ([-l=<limit>] [-e=<extensions>]
+                                  [-e=<extensions>]...
+                                  [--model-file=<fileModels>]
+                                  [--model-file=<fileModels>]...
+                                  [--token-model=<tokenModel>]
+                                  [--probability-threshold=<probabilityThreshold
+                                  >] [--[no-]score-calculation]
+                                  [--threshold-count=<thresholdCount>]
+                                  [--threshold-high=<thresholdHighRisk>]
+                                  [-m=<models>] [-m=<models>]...)
+                                  [[-u=<username>] [-p[=<password>]]
+                                  [--schema=<schema>]
+                                  [--skip-empty-tables-metadata]
+                                  [--include-table-pattern-metadata=<includeTablePatterns>]
+                                  [--include-table-pattern-metadata=<includeTablePatterns>]...
+                                  [--exclude-table-pattern-metadata=<excludeTablePatterns>]
+                                  [--exclude-table-pattern-metadata=<excludeTablePatterns>]...
+                                  [--vendor=<vendor>]
+                                  [--url=<url>]] [-hvV] [--debug]
+                                  [-o=<outputFile>]
+Run data discovery utility
+      --debug             enable debug logging
+  -h, --help              Show this help message and exit.
+  -o, --output=<outputFile>
+                          Generate a requirements xml file and write it out to
+                            the specified file
+  -v, --verbose           enable more verbose output
+  -V, --version           Print version information and exit.
+Model discovery settings
+  -e, --extension=<extensions>
+                          Adds a call to an extension method (e.g. com.strider.
+                            datadefender.specialcase.SinDetector.detectSin)
+  -l, --limit=<limit>     Limit discovery to a set number of rows in a table
+  -m, --model=<models>    Adds a built-in configured opennlp TokenizerME model
+                            for data discovery. Available models are: date,
+                            location, money, organization, person, time
+      --model-file=<fileModels>
+                          Adds a custom made opennlp TokenizerME file for data
+                            discovery.
+      --[no-]score-calculation
+                          If set, includes a column score
+      --probability-threshold=<probabilityThreshold>
+                          Minimum NLP match score to return results for
+      --threshold-count=<thresholdCount>
+                          Reports if number of rows found are greater than the
+                            defined threshold
+      --threshold-high=<thresholdHighRisk>
+                          Reports if number of high risk columns found are
+                            greater than the defined threshold
+      --token-model=<tokenModel>
+                          Override the default built-in token model (English
+                            tokens, en-token.bin) with a custom token file for
+                            use by opennlp's TokenizerModel
+Database connection settings
+      --exclude-table-pattern-metadata=<excludeTablePatterns>
+                          Pattern(s) matching table names to exclude for
+                            metadata analysis
+      --include-table-pattern-metadata=<includeTablePatterns>
+                          Pattern(s) matching table names to include for
+                            metadata analysis
+  -p, --password[=<password>]
+                          The password to connect with
+      --schema=<schema>   The schema to connect to
+      --skip-empty-tables-metadata
+                          Skips generating metadata for empty tables
+  -u, --user=<username>   The username to connect with
+      --url=<url>         The datasource URL
+      --vendor=<vendor>   Database vendor, available options are: h2, mysql,
+                            mariadb, postgresql, sqlserver, oracle. If not
+                            specified, vendor will attempt to be extracted from
+                            the datasource url for a jdbc scheme.
+```
 
-    <datadiscovery.properties> - Path and file name of the file containing data discovery properties
-                                (see src/main/resources/datadiscovery.properties for an example)
-    <requirement_output_file>  - Optional name of sample requirement file to be created (-r must also be specified)
+In data discovery mode, the tool will perform an NLP scan of data in the database and return columns that have a match score greater than the value of probability-threshold.  When -o is provided a sample requirements file (which can be modified and used the anonymizer stage) will be created based on the columns discovered.
 
-Data Generator
+Note that column and data discovery can be combined.  The generated requirements file will combine both results.
+
+Data Extractor
 ------------------
-The Data Generator is used to load table data into text files.  The text files are useful to modify and then feed into the annoymizer as input data.  The requirements file specified in the anonymizer-properties file define that tables and columns that will be processed.
-    java -jar DataDefender.jar generate --data <db.properties> --anonymizer-properties <anonymizer.properties>
 
-Where:
-    <db.properties>             - Path and file name of the file containing database connection properties 
-                                (see src/main/resources/db.properties for an example)
-    <anonymizer.properties>     - Path and file name of the file containing anonymizer properties
-                             (see src/main/resources/anonymizer.properties for an example)
+``` datadefender extract ```
+
+```
+Usage: datadefender extract ([-u=<username>] [-p[=<password>]]
+                            [--schema=<schema>] [--skip-empty-tables-metadata]
+                            [--include-table-pattern-metadata=<includeTablePatterns>]
+                            [--include-table-pattern-metadata=<includeTablePatterns>]...
+                            [--exclude-table-pattern-metadata=<excludeTablePatterns>]
+                            [--exclude-table-pattern-metadata=<excludeTablePatterns>]...
+                            [--vendor=<vendor>] [--url=<url>]) [-hvV]
+                            [--debug] [columns...]
+Run data extraction utility -- generates files out of table columns with the
+name 'table_columnName.txt' for each column requested.
+      [columns...]        Generate data for the specified table.columName(s)
+      --debug             enable debug logging
+  -h, --help              Show this help message and exit.
+  -v, --verbose           enable more verbose output
+  -V, --version           Print version information and exit.
+Database connection settings
+      --exclude-table-pattern-metadata=<excludeTablePatterns>
+                          Pattern(s) matching table names to exclude for
+                            metadata analysis
+      --include-table-pattern-metadata=<includeTablePatterns>
+                          Pattern(s) matching table names to include for
+                            metadata analysis
+  -p, --password[=<password>]
+                          The password to connect with
+      --schema=<schema>   The schema to connect to
+      --skip-empty-tables-metadata
+                          Skips generating metadata for empty tables
+  -u, --user=<username>   The username to connect with
+      --url=<url>         The datasource URL
+      --vendor=<vendor>   Database vendor, available options are: h2, mysql,
+                            mariadb, postgresql, sqlserver, oracle. If not
+                            specified, vendor will attempt to be extracted from
+                            the datasource url for a jdbc scheme.
+```
+
+The Data Extractor is used to load table data into text files.  The text files are useful to modify and then feed into the annoymizer as input data.
 
 Anonymizer
 ------------------
-In this mode, DA will anonymize the data in the database based on the requirements file specified in the anonymizer.properties file.  The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to src/main/resources/Requirement.xml.
 
-    java -jar DataDefender.jar anonymize --data <db.properties> --anonymizer-properties <anonymizer.properties>
+``` datadefender anonymize ```
 
-Where:
-    <db.properties>         - Path and file name of the file containing database connection properties 
-                             (see src/main/resources/db.properties for an example)
+```
+Usage: datadefender anonymize ([-u=<username>] [-p[=<password>]]
+                              [--schema=<schema>]
+                              [--skip-empty-tables-metadata]
+                              [--include-table-pattern-metadata=<includeTablePatterns>]
+                              [--include-table-pattern-metadata=<includeTablePatterns>]...
+                              [--exclude-table-pattern-metadata=<excludeTablePatterns>]
+                              [--exclude-table-pattern-metadata=<excludeTablePatterns>]...
+                              [--vendor=<vendor>] [--url=<url>])
+                              [-hvV] [--debug] [-b=<batchSize>]
+                              -r=<requirementFile> [tables...]
+Run anonymization utility
+      [tables...]         Limit anonymization to specified tables
+  -b, --batch-size=<batchSize>
+                          Number of update queries to batch together
+      --debug             enable debug logging
+  -h, --help              Show this help message and exit.
+  -r, --requirement-file=<requirementFile>
+                          Requirement XML file
+  -v, --verbose           enable more verbose output
+  -V, --version           Print version information and exit.
+Database connection settings
+      --exclude-table-pattern-metadata=<excludeTablePatterns>
+                          Pattern(s) matching table names to exclude for
+                            metadata analysis
+      --include-table-pattern-metadata=<includeTablePatterns>
+                          Pattern(s) matching table names to include for
+                            metadata analysis
+  -p, --password[=<password>]
+                          The password to connect with
+      --schema=<schema>   The schema to connect to
+      --skip-empty-tables-metadata
+                          Skips generating metadata for empty tables
+  -u, --user=<username>   The username to connect with
+      --url=<url>         The datasource URL
+      --vendor=<vendor>   Database vendor, available options are: h2, mysql,
+                            mariadb, postgresql, sqlserver, oracle. If not
+                            specified, vendor will attempt to be extracted from
+                            the datasource url for a jdbc scheme.
+```
 
-    <anonymizer.properties> - Path and file name of the file containing anonymizer properties
-                             (see src/main/resources/anonymizer.properties for an example)
 
-To run the anonymizer on specific tables, the table names can be passed at the end:
-
-    java -jar DataDefender.jar anonymize -P db.properties -A anonymizer.properties myTable1 myTable2
-
-This would run the anonymizer for tables defined in the requirements XML file with the name myTable1 or myTable2 only.  Any other tables defined in the requirements would be ignored.
-
+In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
 
 Using 3rd-Party JDBC Drivers with Maven
 ------------------
-Unfortunately, not all JDBC drivers are downloadable via a publicly available maven repostitory and must be downloaded individually.  For example:
+Unfortunately, not all JDBC drivers are downloadable via a publicly available maven repository and must be downloaded individually.  For example:
 
 - http://www.oracle.com/technetwork/apps-tech/jdbc-112010-090769.html
 - http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774
 
 In order to use these drivers via maven you can add the driver jar to your private maven repository if you have one or install locally:
 
-<ol>
-<li>download package</li>
-<li>unzip/extract jdbc jar file from package</li>
-<li>add driver to your local maven repository by executing:  
-<pre>
-mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar
-</pre>
-</li> 
-<li>add dependency to pom.xml:
-<pre>
-    &lt;dependency&gt;
-        &lt;groupId&gt;${groupId}&lt;/groupId&gt;
-        &lt;artifactId&gt;${artifactId}&lt;/artifactId&gt;
-        &lt;version&gt;${version}&lt;/version&gt;
-    &lt;/dependency&gt;
-</pre>
-</li>
-</ol>
+  * download package
+  * unzip/extract jdbc jar file from package
+  * add driver to your local maven repository by executing:
+    ``` mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar ```
+  * or add it to the classpath when executing datadefender, e.g. java -cp${path-to-jdbc-driver} -jar DataDefender.jar
 
-
-Using Maven to execute Anonymizer
-------------------
-
-The pom.xml has also been configured to allow easy execution of the Anonymizer suite of programs from the command line. This option allows you to quickly run any of the programs after you make changes to the code, for example. Most of the configurable options are supported via Maven, but please read on for the details.
-
-<h3>Prerequisites</h3>
-
-Ensure that:
-- The required database driver has been installed and configured for Maven (refer to 3rd party JDBC section if necessary).
-- 'mvn clean compile' or even better 'mvn clean test' has been run successfully
-- Necessary property files (db.properties, and at least one of: columndiscovery|datadiscovery|anonymizer.properties) have been configured and placed under ${execAppDir} (defaults to ${basedir}/exec-app/ directory).
-
-<h3>Configuration</h3>
-
-- ${execAppDir} can be overridden via the command line (ie; -DexecAppDir=blah...) to set the Anonymizer working directory (and also the relative directory where the properties files should be placed).  *Note: the log directory will also be created under ${execAppDir}
-- Maven doesn't handle dynamic behaviour very well (such as a variable # of tables names given on the command line); therefore, in order to restrict applications to certain tables, space-deliminted table names must be provided via the optional 'tables' property in the appropriate application properties file (columndiscovery|datadiscovery|anonymizer.properites).
-
-<h3>Execution</h3>
-
-A maven profile has been configured for each application, here are the Maven commands to run for the following programs:
-- data generator: mvn exec:exec -P generate
-- column discovery: mvn exec:exec -P column-discovery
-- data discovery: mvn exec:exec -P data-discovery
-- anonymizer: mvn exec:exec -P anonymize
-
-<h3>Features and issues</h3>
+### Features and issues
 Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
 
-<h3>Code quality</h3>
+### Code quality
 Two amazing tools - Empear http://empear.com/ and SonarQube http://www.sonarqube.org/ help contributors of DataDefender maintain decent quality of code. Many thanks to their creators!
