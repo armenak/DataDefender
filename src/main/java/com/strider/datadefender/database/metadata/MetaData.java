@@ -207,11 +207,12 @@ public class MetaData implements IMetaData {
      */
     private int getNumberOfRows(final String table) {
         int rowNum = 0;
-        try (Statement stmt = connection.createStatement();) {
-            try (ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + table);) {
-                rs.next();
-                rowNum = rs.getInt(1);
-            }
+        try (
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT count(*) FROM " + table)
+        ) {
+            rs.next();
+            rowNum = rs.getInt(1);
         } catch (SQLException sqle) {
             log.error(sqle.toString());
         }
