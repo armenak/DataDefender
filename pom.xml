@@ -186,6 +186,12 @@
         <version>2.22.2</version>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/run-scripts</directory>
+        <targetPath>${project.build.directory}</targetPath>
+      </resource>
+    </resources>
   </build>
 
   <dependencies>
