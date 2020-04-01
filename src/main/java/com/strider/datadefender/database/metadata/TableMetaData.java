@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Holds metadata for a table.
@@ -32,11 +33,13 @@ import lombok.Setter;
  * @author Armenak Grigoryan
  */
 @Data
+@Log4j2
 public class TableMetaData implements Comparable<TableMetaData> {
 
     @Data
     public class ColumnMetaData implements Comparable<ColumnMetaData> {
 
+        private final int columnIndex;
         private final String columnName;
         private final Class  columnType;
         private final int columnSize;
@@ -47,7 +50,7 @@ public class TableMetaData implements Comparable<TableMetaData> {
         @Override
         public int compareTo(ColumnMetaData t) {
             return Comparator
-                .comparing(ColumnMetaData::getColumnName)
+                .comparing(ColumnMetaData::getColumnIndex)
                 .compare(this, t);
         }
 
@@ -87,6 +90,7 @@ public class TableMetaData implements Comparable<TableMetaData> {
     /**
      * Adds a ColumnMetaData to the list of columns.
      *
+     * @param columnIndex
      * @param columnName
      * @param columnType
      * @param columnSize
@@ -94,6 +98,7 @@ public class TableMetaData implements Comparable<TableMetaData> {
      * @param foreignKeyReference
      */
     public void addColumn(
+        int columnIndex,
         String columnName,
         Class columnType,
         int columnSize,
@@ -101,6 +106,7 @@ public class TableMetaData implements Comparable<TableMetaData> {
         String foreignKeyReference
     ) {
         columns.add(new ColumnMetaData(
+            columnIndex,
             columnName,
             columnType,
             columnSize,
@@ -137,8 +143,7 @@ public class TableMetaData implements Comparable<TableMetaData> {
     @Override
     public int compareTo(TableMetaData t) {
         return Comparator
-            .comparing(TableMetaData::getSchemaName)
-            .thenComparing(TableMetaData::getTableName)
+            .comparing(TableMetaData::getCanonicalTableName)
             .compare(this, t);
     }
 

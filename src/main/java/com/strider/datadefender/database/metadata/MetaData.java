@@ -106,6 +106,7 @@ public class MetaData implements IMetaData {
                 table = new TableMetaData(rsmd.getSchemaName(i), rsmd.getTableName(i));
             }
             table.addColumn(
+                i,
                 rsmd.getColumnName(i),
                 sqlTypeMap.getTypeFrom(rsmd.getColumnType(i)),
                 rsmd.getColumnDisplaySize(i),
@@ -352,12 +353,14 @@ public class MetaData implements IMetaData {
         final Map<String, String> fKeys = getForeignKeysMap(md, table.getTableName());
 
         try (ResultSet crs = getColumnResultSet(md, table.getTableName())) {
+            int index = 1;
             while (crs.next()) {
                 String columnName = getColumnName(crs);
                 boolean isPrimaryKey = pKeys.contains(columnName.toLowerCase(Locale.ENGLISH));
                 String foreignKey = fKeys.get(columnName.toLowerCase(Locale.ENGLISH));
                 log.debug("Found metadata for column {} in table {}", columnName, table);
-                table.addColumn(columnName, getColumnType(crs), getColumnSize(crs), isPrimaryKey, foreignKey);
+                table.addColumn(index, columnName, getColumnType(crs), getColumnSize(crs), isPrimaryKey, foreignKey);
+                ++index;
             }
         }
     }
