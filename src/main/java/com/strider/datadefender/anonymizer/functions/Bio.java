@@ -20,6 +20,7 @@ import com.strider.datadefender.functions.NamedParameter;
 import java.io.IOException;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.RandomUtils;
 
 /**
  * @author Armenak Grigoryan
@@ -45,9 +46,20 @@ public class Bio extends Core {
         return randomFirstName();
     }
 
+    public String randomUser(@NamedParameter("maxCharacters") int maxChars, @NamedParameter("numDigits") int numDigits) {
+        int maxWords = (int) Math.ceil(maxChars / 10d);
+        int numWords = (maxWords > 1) ? RandomUtils.nextInt(1, maxWords + 1) : 1;
+        String user = randomString(numWords, maxChars).toLowerCase().replaceAll("[^a-z0-9 ]", "").replace(" ", "_");
+        String digits = (numDigits > 0) ? Integer.toString(RandomUtils.nextInt(0, (int) Math.pow(10, numDigits))) : "";
+        return user + ("0".repeat(numDigits) + digits).substring(digits.length());
+    }
+
     public String randomEmail(@NamedParameter("domainName") String domainName) {
-        final StringBuilder email = new StringBuilder();
-        email.append(randomString(1, 43).trim().toLowerCase()).append('@').append(domainName);
-        return email.toString();
+        return randomEmail(domainName, 20, RandomUtils.nextInt(0, 2));
+    }
+
+    public String randomEmail(@NamedParameter("domainName") String domainName, @NamedParameter("maxUserCharacters") int maxUserChars, @NamedParameter("numDigits") int numDigits) {
+        String user = randomUser(maxUserChars, numDigits).replace("_", ".");
+        return user + "@" + domainName;
     }
 }
