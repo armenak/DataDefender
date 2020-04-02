@@ -56,8 +56,8 @@ public class DbConfig {
     @Option(names = { "--schema" }, description = "The schema to connect to")
     private String schema;
 
-    @Option(names = { "--skip-empty-tables-metadata" }, description = "Skips generating metadata for empty tables", defaultValue = "true")
-    private boolean skipEmptyTables;
+    @Option(names = { "--no-skip-empty-tables-metadata" }, description = "Include generating metadata for empty tables (defaults to skipping)", defaultValue = "true", negatable = true)
+    private boolean skipEmptyTables = true;
 
     @Option(names = { "--include-table-pattern-metadata" }, description = "Pattern(s) matching table names to include for metadata analysis")
     private List<Pattern> includeTablePatterns;
