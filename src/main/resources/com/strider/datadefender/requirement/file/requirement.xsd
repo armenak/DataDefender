@@ -35,6 +35,24 @@
     <xs:attribute name="ref-id" type="xs:QName" use="required"/>
   </xs:complexType>
 
+  <xs:complexType name="exclude">
+    <xs:attribute name="equals" type="xs:string"/>
+    <xs:attribute name="like" type="xs:string"/>
+    <xs:attribute name="not-equals" type="xs:string"/>
+    <xs:attribute name="not-like" type="xs:string"/>
+    <xs:attribute name="null" type="xs:boolean"/>
+    <xs:attribute name="in" type="xs:string"/>
+    <xs:attribute name="not-in" type="xs:string"/>
+    <xs:attribute name="in-separator" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="exclude-table">
+    <xs:complexContent>
+      <xs:extension base="exclude">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
   <xs:element name="anonymizer-version" default="2.0">
     <xs:simpleType>
       <xs:restriction base="xs:double">
@@ -150,7 +168,13 @@
       <xs:sequence>
         <xs:element ref="primary-key" minOccurs="0"/>
         <xs:element name="where" type="xs:string" minOccurs="0"/>
-        <xs:element ref="exclusions" minOccurs="0"/>
+        <xs:element name="exclusions" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="exclude" type="exclude-table" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element ref="columns"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="required"/>
@@ -175,7 +199,13 @@
   <xs:element name="column">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="exclusions" minOccurs="0"/>
+        <xs:element name="exclusions" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="exclude" type="exclude" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:choice>
           <xs:element name="plan" type="plan"/>
           <xs:element name="plan-ref" type="plan-ref"/>
@@ -184,27 +214,6 @@
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="type" type="package-class" default="java.lang.String"/>
       <xs:attribute name="skip-empty" type="xs:boolean" default="true"/>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:element name="exclusions">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="exclude" maxOccurs="unbounded"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="exclude">
-    <xs:complexType>
-      <xs:attribute name="name" type="xs:string" use="required"/>
-      <xs:attribute name="equals" type="xs:string"/>
-      <xs:attribute name="like" type="xs:string"/>
-      <xs:attribute name="not-equals" type="xs:string"/>
-      <xs:attribute name="not-like" type="xs:string"/>
-      <xs:attribute name="null" type="xs:boolean"/>
-      <xs:attribute name="in" type="xs:string"/>
-      <xs:attribute name="not-in" type="xs:string"/>
-      <xs:attribute name="in-separator" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 
