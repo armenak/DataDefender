@@ -52,6 +52,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import me.tongfei.progressbar.ProgressBar;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -60,8 +63,6 @@ import org.apache.commons.lang3.StringUtils;
 import opennlp.tools.util.Span;
 
 import lombok.extern.log4j.Log4j2;
-import me.tongfei.progressbar.ProgressBar;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  *
@@ -94,19 +95,20 @@ public class DatabaseDiscoverer extends Discoverer {
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException {
 
-        if (!StringUtils.isBlank(function)) {
-            log.warn("Function {} is not defined", function);
+        if (StringUtils.isBlank(function)) {
             return null;
         }
 
         Object value = null;
 
         try {
-            final String className  = Utils.getClassName(function);
+            final String className = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
-            final Method method     = Class.forName(className)
-                                           .getDeclaredMethod(methodName, new Class[] { ColumnMetaData.class, String.class });
-            final SpecialCase         instance    = (SpecialCase) Class.forName(className).newInstance();
+            final Method method = Class.forName(className).getDeclaredMethod(
+                methodName,
+                new Class[] { ColumnMetaData.class, String.class }
+            );
+            final SpecialCase instance = (SpecialCase) Class.forName(className).getConstructor().newInstance();
             value = method.invoke(instance, data, text);
 
         } catch (InstantiationException | ClassNotFoundException ex) {

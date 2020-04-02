@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,11 +37,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.sql.SQLException;
 
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -54,11 +55,6 @@ import org.xml.sax.SAXException;
 import opennlp.tools.util.Span;
 
 import lombok.extern.log4j.Log4j2;
-
-import static java.lang.Double.parseDouble;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -93,7 +89,7 @@ public class FileDiscoverer extends Discoverer {
 
             final Model model = createModel(sm);
             fileMatches = discoverAgainstSingleModel(model);
-            finalList = ListUtils.union(finalList, matches);
+            finalList = ListUtils.union(finalList, fileMatches);
         }
         for (final File fm : CollectionUtils.emptyIfNull(config.getFileModels())) {
             log.info("********************************");
@@ -102,7 +98,7 @@ public class FileDiscoverer extends Discoverer {
 
             final Model model = createModel(fm);
             fileMatches = discoverAgainstSingleModel(model);
-            finalList = ListUtils.union(finalList, matches);
+            finalList = ListUtils.union(finalList, fileMatches);
         }
 
         // Special case
@@ -299,19 +295,20 @@ public class FileDiscoverer extends Discoverer {
             throws SQLException, NoSuchMethodException, SecurityException, IllegalAccessException,
                    IllegalArgumentException, InvocationTargetException 
     {
-        if ((function == null) || function.equals("")) {
-            log.warn("Function " + function + " is not defined");
+        if (StringUtils.isBlank(function)) {
             return null;
         }
 
         Object value = null;
 
         try {
-            final String className  = Utils.getClassName(function);
+            final String className = Utils.getClassName(function);
             final String methodName = Utils.getMethodName(function);
-            final Method method     = Class.forName(className)
-                                           .getMethod(methodName, new Class[] { FileMatchMetaData.class, String.class });
-            final SpecialCase         instance    = (SpecialCase) Class.forName(className).newInstance();
+            final Method method = Class.forName(className).getMethod(
+                methodName,
+                new Class[] { FileMatchMetaData.class, String.class }
+            );
+            final SpecialCase instance = (SpecialCase) Class.forName(className).getConstructor().newInstance();
             final Map<String, Object> paramValues = new HashMap<>(2);
 
             paramValues.put("metadata", metadata);
