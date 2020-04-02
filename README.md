@@ -489,8 +489,6 @@ A new format and features for the requirements xml file.  See the [sample_projec
 
 CoreFunctions has been split into a few different classes, and its package has been moved.  See the new classes here: [src/main/java/com/strider/datadefender/anonymizer/functions](src/main/java/com/strider/datadefender/anonymizer/functions).  Some functions have been removed entirely, for example randomInt, because apache commons can be used instead with RandomUtils.nextInt.
 
-Referencing functions from the xml file now takes the form ClassName#method rather than ClassName.method to be more in-line with java's standards for naming.
-
 ## Features and issues
 Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
 
