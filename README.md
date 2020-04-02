@@ -21,7 +21,7 @@ Table of content
 - [Data Discovery](#data-discovery)
 - [Data Extractor](#data-extractor)
 - [Anonymizer](#anonymizer)
-- [Upgrading to 2.0](#upgrading-to-2.0)
+- [Upgrading to 2.0](#upgrading-to-20)
 - [Features and issues](#features-and-issues)
 - [Code quality](#code-quality)
 
