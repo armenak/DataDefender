@@ -197,7 +197,7 @@ Column Discovery
 ```
 Usage: datadefender discover columns [[-u=<username>] [-p[=<password>]]
                                      [--schema=<schema>]
-                                     [--skip-empty-tables-metadata]
+                                     [--[no-]skip-empty-tables-metadata]
                                      [--include-table-pattern-metadata=<includeTablePatterns>]
                                      [--include-table-pattern-metadata=<includeTablePatterns>]...
                                      [--exclude-table-pattern-metadata=<excludeTablePatterns>]
@@ -227,8 +227,9 @@ Database connection settings
   -p, --password[=<password>]
                           The password to connect with
       --schema=<schema>   The schema to connect to
-      --skip-empty-tables-metadata
-                          Skips generating metadata for empty tables
+      --[no-]skip-empty-tables-metadata
+                          Include generating metadata for empty tables
+                            (defaults to skipping)
   -u, --user=<username>   The username to connect with
       --url=<url>         The datasource URL
       --vendor=<vendor>   Database vendor, available options are: h2, mysql,
@@ -259,7 +260,7 @@ Usage: datadefender discover data ([-l=<limit>] [-e=<extensions>]
                                   [-m=<models>] [-m=<models>]...)
                                   [[-u=<username>] [-p[=<password>]]
                                   [--schema=<schema>]
-                                  [--skip-empty-tables-metadata]
+                                  [--[no-]skip-empty-tables-metadata]
                                   [--include-table-pattern-metadata=<includeTablePatterns>]
                                   [--include-table-pattern-metadata=<includeTablePatterns>]...
                                   [--exclude-table-pattern-metadata=<excludeTablePatterns>]
@@ -310,8 +311,9 @@ Database connection settings
   -p, --password[=<password>]
                           The password to connect with
       --schema=<schema>   The schema to connect to
-      --skip-empty-tables-metadata
-                          Skips generating metadata for empty tables
+      --[no-]skip-empty-tables-metadata
+                          Include generating metadata for empty tables
+                            (defaults to skipping)
   -u, --user=<username>   The username to connect with
       --url=<url>         The datasource URL
       --vendor=<vendor>   Database vendor, available options are: h2, mysql,
@@ -331,7 +333,7 @@ Data Extractor
 
 ```
 Usage: datadefender extract ([-u=<username>] [-p[=<password>]]
-                            [--schema=<schema>] [--skip-empty-tables-metadata]
+                            [--schema=<schema>] [--[no-]skip-empty-tables-metadata]
                             [--include-table-pattern-metadata=<includeTablePatterns>]
                             [--include-table-pattern-metadata=<includeTablePatterns>]...
                             [--exclude-table-pattern-metadata=<excludeTablePatterns>]
@@ -355,8 +357,9 @@ Database connection settings
   -p, --password[=<password>]
                           The password to connect with
       --schema=<schema>   The schema to connect to
-      --skip-empty-tables-metadata
-                          Skips generating metadata for empty tables
+      --[no-]skip-empty-tables-metadata
+                          Include generating metadata for empty tables
+                            (defaults to skipping)
   -u, --user=<username>   The username to connect with
       --url=<url>         The datasource URL
       --vendor=<vendor>   Database vendor, available options are: h2, mysql,
@@ -375,7 +378,7 @@ Anonymizer
 ```
 Usage: datadefender anonymize ([-u=<username>] [-p[=<password>]]
                               [--schema=<schema>]
-                              [--skip-empty-tables-metadata]
+                              [--[no-]skip-empty-tables-metadata]
                               [--include-table-pattern-metadata=<includeTablePatterns>]
                               [--include-table-pattern-metadata=<includeTablePatterns>]...
                               [--exclude-table-pattern-metadata=<excludeTablePatterns>]
@@ -403,8 +406,9 @@ Database connection settings
   -p, --password[=<password>]
                           The password to connect with
       --schema=<schema>   The schema to connect to
-      --skip-empty-tables-metadata
-                          Skips generating metadata for empty tables
+      --[no-]skip-empty-tables-metadata
+                          Include generating metadata for empty tables
+                            (defaults to skipping)
   -u, --user=<username>   The username to connect with
       --url=<url>         The datasource URL
       --vendor=<vendor>   Database vendor, available options are: h2, mysql,
@@ -412,7 +416,6 @@ Database connection settings
                             specified, vendor will attempt to be extracted from
                             the datasource url for a jdbc scheme.
 ```
-
 
 In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
 
