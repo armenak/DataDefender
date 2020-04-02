@@ -11,6 +11,8 @@ Table of content
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Build from source](#build-from-source)
+- [Including JDBC Drivers](#including-jdbc-drivers)
+- [Extensions](#extensions)
 - [Contributing](#contributing)
 - [How to run](#how-to-run-data)
 - [Using argument files](#using-argument-files)
@@ -53,6 +55,34 @@ Build from source
 2. cd {dir}/DataDefender/
 3. mvn package
 4. DataDefender.jar will be located in "target" directory {dir}/DataDefender/target/
+
+Including JDBC Drivers
+-----------------
+JDBC drivers are included as optional dependencies included in profiles that can be activated with additional parameters to maven by setting the jdbc.driver property.  Valid options are:
+
+- mariadb
+- mysql
+- sqlite
+- sqlserver
+- postgresql
+- oracle (requires configuring the oracle repository, which requires a user account.  See https://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010)
+- all
+- all-with-oracle
+
+Example builds:
+
+```
+mvn package -Djdbc.driver=mysql
+mvn package -Djdbc.driver=all-with-oracle
+```
+
+Alternatively, the JDBC drivers can be included as jar files in the extensions folder.
+
+Extensions
+------------
+Additional jar files/classes can be added under an 'extensions' folder in the current directory.  The default 'datadefender' scripts copied to the target directory adds classes/jar files under 'extensions' to the classpath.
+
+See [sample_projects/anonymizer/]([sample_projects/anonymizer/) for an example.
 
 Contributing
 ------------
@@ -385,21 +415,6 @@ Database connection settings
 
 
 In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
-
-Using 3rd-Party JDBC Drivers with Maven
-------------------
-Unfortunately, not all JDBC drivers are downloadable via a publicly available maven repository and must be downloaded individually.  For example:
-
-- http://www.oracle.com/technetwork/apps-tech/jdbc-112010-090769.html
-- http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774
-
-In order to use these drivers via maven you can add the driver jar to your private maven repository if you have one or install locally:
-
-  * download package
-  * unzip/extract jdbc jar file from package
-  * add driver to your local maven repository by executing:
-    ``` mvn install:install-file -Dfile=${path to jdbc driver jar file} -DgroupId=${groupId} -DartifactId=${artifactId} -Dversion=${version} -Dpackaging=jar ```
-  * or add it to the classpath when executing datadefender, e.g. java -cp${path-to-jdbc-driver} -jar DataDefender.jar
 
 ### Features and issues
 Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
