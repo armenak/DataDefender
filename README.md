@@ -485,7 +485,20 @@ Please review the help associated with each command as there are small differenc
 #### Anonymization
 There are a couple of changes affecting anonymization (in addition to [database configuration](#database-configuration)):
 
-A new format and features for the requirements xml file.  See the [sample_project]([sample_projects/anonymizer/) for an example new format, and also the xml schema file [requirement.xsd]([src/main/resources/com/strider/datadefender/requirement/file/requirement.xsd).
+A new format and features for the requirements xml file.  See the [sample_project]([sample_projects/anonymizer/) for an example new format, and also the xml schema file [requirement.xsd]([src/main/resources/com/strider/datadefender/requirement/file/requirement.xsd).  Some of the high-level changes are:
+
+- Elements are now all lower-case, dash-separated.  ```<Column>``` becomes ```<column>```, ```NotLike``` becomes ```not-like```, e.g. ```<exclude name="col" not-like="example"/>```.
+- The top-level element is now ```<anonymizer xmlns="https://armenak.github.io/DataDefender/anonymizer">``` not ```<Requirement>```
+- Below the top-level element, ```<anonymizer-version>2.0</anonymizer-version>``` is now required, and must match the version in the xsd included in the jar file.  This will be updated as changes to the anonymizer happen that require new versions, so the correct version must be used on a requirement.xml file.
+- ```<Client>client name</Client>``` becomes ```<project>project name</project>```
+- ```<Version>``` becomes ```<project-version>``` for requirement file versioning.
+- ```<Column>``` ```IgnoreEmpty``` has been renamed to ```skip-empty``` and it's now "true" by default.
+- ```<Column>``` ```PKey``` attribute has been renamed to ```primary-key```
+- ```<Column>``` ```Where``` attribute is now an element ```<where>``` under ```<column>```.
+- ```<PrimaryKey>``` is now called ```<primary-key>```.
+- ```<column>``` must have a ```<plan>``` or ```<plan-ref>``` below it.  One or more ```<function>``` elements can exist below a ```<plan>``` (used to be ```<Function>``` under ```<Column>```).
+- The ```<function>``` element now has ```name``` and ```type``` (to optionally specify return type) attributes.  The ```name``` attribute refers to the fully-qualified name of the function (unless it's part of a class in a package defined under the top-level ```<autoresolve-classes>```, whereas before, the content of the ```<Function>``` tag specified the name of the function.
+- ```<Parameters><Parameter>``` no longer exists, instead ```<argument>``` tags specify an argument to be passed to a function.  The ```<argument>``` tag exists directly under ```<function>```.  A new attribute of the ```<argument>``` tag, ```pass-current-value``` passes the running value as the specified argument to the function.  The running value for the first function in a series of functions is the columns value.  Afterwords, it's the returned value from the call to the previous function.
 
 CoreFunctions has been split into a few different classes, and its package has been moved.  See the new classes here: [src/main/java/com/strider/datadefender/anonymizer/functions](src/main/java/com/strider/datadefender/anonymizer/functions).  Some functions have been removed entirely, for example randomInt, because apache commons can be used instead with RandomUtils.nextInt.
 
