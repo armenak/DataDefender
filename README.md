@@ -62,7 +62,6 @@ JDBC drivers are included as optional dependencies included in maven profiles th
 
 - mariadb
 - mysql
-- sqlite
 - sqlserver
 - postgresql
 - oracle (requires configuring the oracle repository, which requires a user account.  See https://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010)
@@ -80,6 +79,8 @@ mvn package -P oracle -Djdbc-drivers-all
 ```
 
 Alternatively, the JDBC drivers can be included as jar files in the extensions folder.
+
+Note: sqlite-jdbc is included always for file discovery.
 
 Extensions
 ------------
@@ -479,14 +480,16 @@ Becomes the following in 2.0:
 --exclude-extension=exe
 ```
 
-Please review the help associated with each command as there are small differences (for example, there's no need to specify en-token.bin, it's the default if --token-model isn't provided with a custom file.  It's also not necessary to provide the files, they've been bundled in the jar file.  You can provide custom opennlp modes with --model-file.
+Please review the help associated with each command as there are small differences (for example, there's no need to specify en-token.bin, it's the default if --token-model isn't provided with a custom file.  It's also not necessary to provide the files, they've been bundled in the jar file.  You can provide custom opennlp models with --model-file.
 
 #### Anonymization
-There are a couple of changes affecting anonymization (in addition to [Database configuration](#database-configuration)):
+There are a couple of changes affecting anonymization (in addition to [database configuration](#database-configuration)):
 
 A new format and features for the requirements xml file.  See the [sample_project]([sample_projects/anonymizer/) for an example new format, and also the xml schema file [requirement.xsd]([src/main/resources/com/strider/datadefender/requirement/file/requirement.xsd).
 
 CoreFunctions has been split into a few different classes, and its package has been moved.  See the new classes here: [src/main/java/com/strider/datadefender/anonymizer/functions](src/main/java/com/strider/datadefender/anonymizer/functions).  Some functions have been removed entirely, for example randomInt, because apache commons can be used instead with RandomUtils.nextInt.
+
+Referencing functions from the xml file now takes the form ClassName#method rather than ClassName.method to be more in-line with java's standards for naming.
 
 ## Features and issues
 Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
