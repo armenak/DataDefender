@@ -108,9 +108,8 @@ public class Function implements Invokable {
 
     /**
      * Looks for a class/method in the passed Function parameter in the form
-     * com.package.Class#methodName, or, for historical reasons,
-     * com.package.Class.methodName. Using "." for methodName is deprecated
-     * however, and will be removed in a future version.
+     * com.package.Class#methodName, com.package.Class.methodName, or
+     * com.package.Class::methodName.
      *
      * @return
      * @throws ClassNotFoundException
@@ -124,13 +123,7 @@ public class Function implements Invokable {
                 "Function element is empty or incomplete: " + functionName
             );
         }
-        if (functionName.charAt(index) == '.') {
-            log.warn(
-                "Using '.' as a method separator for a function is deprecated. "
-                + "Please use \"#\" instead: {}",
-                functionName
-            );
-        }
+
         String cn = functionName.substring(0, index);
         String fn = StringUtils.stripStart(functionName.substring(index), "#.:");
         int argCount = CollectionUtils.size(arguments);
