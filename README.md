@@ -21,7 +21,7 @@ Table of content
 - [Data Discovery](#data-discovery)
 - [Data Extractor](#data-extractor)
 - [Anonymizer](#anonymizer)
-- [Using 3rd-Party JDBC Drivers with Maven](#using-3rd-party-jdbc-drivers-with-maven)
+- [Upgrading to 2.0](#upgrading-to-2.0)
 - [Features and issues](#features-and-issues)
 - [Code quality](#code-quality)
 
@@ -422,8 +422,74 @@ Database connection settings
 
 In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
 
-### Features and issues
+Upgrading to 2.0
+----------------
+
+#### Database configuration
+Database configuration has been moved from a properties file to command line arguments.  The command line arguments can be bundled in files for easy configuration, see [Using argument files](#using-argument-files) for more information.
+
+The configuration options remain the same except:
+
+ - 'vendor' is not required, datadefender will try to determine that from the provided jdbc connection url.  It's still provided as an option (which would allow using other jdbc drivers/urls and specifying a vendor to use for datadefender's queries, operations, etc...)
+ - There's no need to specify a driver
+
+Example change:
+
+1.0 file:
+```
+vendor=mysql
+driver=com.mysql.jdbc.Driver
+username=root
+password=mypassword
+url=jdbc:mysql://localhost:3306/test
+```
+
+2.0 file:
+```
+--username=root
+--password
+--url=jdbc:mysql://localhost:3306/test
+```
+
+(Leaving password without a value will cause the utility to prompt for a value interactively).
+
+Please review the command line help in the app itself, or in the readme under command headings for database configuration details.
+
+#### Column, data, and file discovery
+The main difference is the move from properties files to picocli argument configuration.  The easiest way to do that is use your existing properties file, and rename the property portion of each line to the corresponding argument.  For example:
+
+1.0 properties file for file discovery:
+```
+probability_threshold=0.5
+english_tokens=en-token.bin
+person=en-ner-person.bin
+location=en-ner-location.bin
+models=person,location,organization
+directories=/path/to/directory,/path/to/other/directory
+exclusions=jar,exe
+```
+
+Becomes the following in 2.0:
+```
+-m location
+-m person
+--directory=/path/to/directory
+--directory=/path/to/other/directory
+--exclude-extension=jar
+--exclude-extension=exe
+```
+
+Please review the help associated with each command as there are small differences (for example, there's no need to specify en-token.bin, it's the default if --token-model isn't provided with a custom file.  It's also not necessary to provide the files, they've been bundled in the jar file.  You can provide custom opennlp modes with --model-file.
+
+#### Anonymization
+There are a couple of changes affecting anonymization (in addition to [Database configuration](#database-configuration)):
+
+A new format and features for the requirements xml file.  See the [sample_project]([sample_projects/anonymizer/) for an example new format, and also the xml schema file [requirement.xsd]([src/main/resources/com/strider/datadefender/requirement/file/requirement.xsd).
+
+CoreFunctions has been split into a few different classes, and its package has been moved.  See the new classes here: [src/main/java/com/strider/datadefender/anonymizer/functions](src/main/java/com/strider/datadefender/anonymizer/functions).  Some functions have been removed entirely, for example randomInt, because apache commons can be used instead with RandomUtils.nextInt.
+
+## Features and issues
 Please report issues or ask for future requests here: https://github.com/armenak/DataDefender/issues
 
-### Code quality
+## Code quality
 Two amazing tools - Empear http://empear.com/ and SonarQube http://www.sonarqube.org/ help contributors of DataDefender maintain decent quality of code. Many thanks to their creators!
