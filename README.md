@@ -58,7 +58,7 @@ Build from source
 
 Including JDBC Drivers
 -----------------
-JDBC drivers are included as optional dependencies included in profiles that can be activated with additional parameters to maven by setting the jdbc.driver property.  Valid options are:
+JDBC drivers are included as optional dependencies included in maven profiles that can be activated.  Valid options are:
 
 - mariadb
 - mysql
@@ -66,14 +66,17 @@ JDBC drivers are included as optional dependencies included in profiles that can
 - sqlserver
 - postgresql
 - oracle (requires configuring the oracle repository, which requires a user account.  See https://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010)
-- all
-- all-with-oracle
+
+In addition, a property to activate all but the oracle driver is available as well for convenience:
+
+- jdbc-drivers-all
 
 Example builds:
 
 ```
-mvn package -Djdbc.driver=mysql
-mvn package -Djdbc.driver=all-with-oracle
+mvn package -P mariadb,mysql
+mvn package -Djdbc-drivers-all
+mvn package -P oracle -Djdbc-drivers-all
 ```
 
 Alternatively, the JDBC drivers can be included as jar files in the extensions folder.
