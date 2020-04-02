@@ -360,6 +360,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
                 continue;
             }
 
+            log.debug("Invoking column plan for {}", columnName);
             anonymized.add(columnName);
             final Object colValue = column.invokeFunctionChain(row);
             log.debug("colValue = " + colValue);

@@ -38,6 +38,11 @@ import lombok.extern.log4j.Log4j2;
 public class TypeConverter {
 
     private static Map<Integer, Integer> cachedConversionWeight = new HashMap<>();
+    private static final List<Class<?>> primitiveOrder = List.of(
+        double.class, Double.class, float.class, Float.class, long.class, Long.class,
+        int.class, Integer.class, short.class, Short.class, byte.class, Byte.class,
+        boolean.class, Boolean.class, char.class, Character.class
+    );
 
     private TypeConverter() {
     }
@@ -57,6 +62,37 @@ public class TypeConverter {
             return true;
         }
         return (getConvertibleConstructor(from, to) != null);
+    }
+
+    private static int getConversionScore(Class<?> from, Class<?> to) {
+        if (from.equals(to)) {
+            return Integer.MAX_VALUE;
+        } else if (ClassUtils.isAssignable(from, to)) {
+            return Integer.MAX_VALUE - 1;
+        } else if (String.class.equals(to)) {
+            return Integer.MAX_VALUE - 2;
+        } else if (ClassUtils.isPrimitiveOrWrapper(to) && String.class.isAssignableFrom(from)) {
+            return Integer.MAX_VALUE - 3 - primitiveOrder.indexOf(to);
+        }
+        List<Class<?>> ordered = buildOrderedListForType(to);
+        if (ordered.contains(from)) {
+            return Integer.MAX_VALUE - 100 - ordered.indexOf(from);
+        }
+        int ind = 0;
+        for (Class<?> conv : ordered) {
+            ++ind;
+            if (isConvertible(conv, to)) {
+                return Integer.MAX_VALUE - 200 - ind;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+    public static int compareConversion(Class<?> from, Class<?> firstTo, Class<?> secondTo) {
+        if (firstTo.equals(secondTo)) {
+            return 0;
+        }
+        return getConversionScore(from, secondTo) - getConversionScore(from, firstTo);
     }
 
     /**
@@ -125,11 +161,7 @@ public class TypeConverter {
             list.add(from.isPrimitive() ? ClassUtils.primitiveToWrapper(from) : ClassUtils.wrapperToPrimitive(from));
         }
         if (String.class.equals(from)) {
-            list.addAll(List.of(
-                double.class, Double.class, float.class, Float.class, long.class, Long.class,
-                int.class, Integer.class, short.class, Short.class, byte.class, Byte.class,
-                boolean.class, Boolean.class, char.class, Character.class
-            ));
+            list.addAll(primitiveOrder);
         } else {
             list.add(String.class);
         }

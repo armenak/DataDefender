@@ -68,8 +68,9 @@ public class Plan implements Invokable {
      */
     public Class<?> getDynamicArgumentType() {
         if (CollectionUtils.size(functions) > 0) {
-            return functions.get(0).getArguments().stream()
-                .filter((a) -> a.getIsDynamicValue())
+            return CollectionUtils.emptyIfNull(functions.get(0).getArguments())
+                .stream()
+                .filter((a) -> Objects.equals(Boolean.TRUE, a.getIsDynamicValue()))
                 .map((a) -> a.getType())
                 .findFirst()
                 .orElse(null);
@@ -127,7 +128,7 @@ public class Plan implements Invokable {
         boolean isFirst = true;
         Object glue = null;
         for (Function fn : functions) {
-            log.debug("Invoking function: {}", fn.getFunctionName());
+            log.debug("Invoking function: {}", fn.getFunction());
             Object returnValue = fn.invoke(runningValue);
             if (combiner != null && !isFirst) {
                 final Object gl = glue;
@@ -206,13 +207,14 @@ public class Plan implements Invokable {
         IllegalAccessException,
         InvocationTargetException {
 
-        log.debug("Unmarshalling plan");
-        log.debug("combiner-glue: {}", combinerGlue);
-        log.debug("Function count: {}", () -> CollectionUtils.size(functions));
-
         if (!(parent instanceof Column)) {
             return;
         }
+
+        log.debug("Unmarshalling plan for column {}", ((Column) parent).getName());
+        log.debug("combiner-glue: {}", combinerGlue);
+        log.debug("Function count: {}", () -> CollectionUtils.size(functions));
+
         final Class<?> columnType = ((Column) parent).getType();
         initialize(columnType);
     }

@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -136,7 +135,7 @@ public class Argument {
         IllegalArgumentException,
         InvocationTargetException {
         
-        if (isDynamicValue && value == null && elements == null) {
+        if (Objects.equals(Boolean.TRUE, isDynamicValue) && value == null && elements == null) {
             log.debug("Using dynamic value for attribute");
             if (!type.isInstance(lastValue)) {
                 log.debug("Converting dynamic attribute value: {} to type: {}", lastValue, type);

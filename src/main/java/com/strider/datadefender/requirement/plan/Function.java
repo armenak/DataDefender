@@ -18,6 +18,7 @@ package com.strider.datadefender.requirement.plan;
 import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.TypeConverter;
 import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
+import com.strider.datadefender.requirement.registry.RequirementFunction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -201,6 +203,25 @@ public class Function implements Invokable {
                 }
             }
             return true;
+        }).sorted((a, b) -> {
+            int score = 0;
+            java.lang.reflect.Parameter[] aps = a.getParameters();
+            java.lang.reflect.Parameter[] bps = b.getParameters();
+            log.debug("Sorting method: {}", a.getName());
+            for (int i = 0; i < aps.length; ++i) {
+                Argument arg = arguments.get(i);
+                NamedParameter named = aps[i].getAnnotation(NamedParameter.class);
+                if (named != null && mappedArgs.containsKey(named.value())) {
+                    arg = mappedArgs.get(named.value());
+                } else if (mappedArgs.containsKey(aps[i].getName())) {
+                    arg = mappedArgs.get(aps[i].getName());
+                }
+                int s = TypeConverter.compareConversion(arg.getType(), aps[i].getType(), bps[i].getType());
+                log.debug("Comparing arguments for sorting: {} with: {} and: {}, result: {}", arg.getType(), aps[i].getType(), bps[i].getType(), s);
+                score += s;
+            }
+            log.debug("Score between {}, {}: {}", a, b, score);
+            return score;
         }).findFirst().orElse(null);
     }
 
@@ -220,7 +241,7 @@ public class Function implements Invokable {
                 return false;
             }
             int index = -1;
-            if (!isStatic) {
+            if (!isStatic && !RequirementFunction.class.isAssignableFrom(m.getDeclaringClass())) {
                 ++index;
                 if (!TypeConverter.isConvertible(arguments.get(index).getType(), m.getDeclaringClass())) {
                     return false;
@@ -256,7 +277,8 @@ public class Function implements Invokable {
         log.debug(
             "Found method candidates: {}",
             () -> CollectionUtils.emptyIfNull(candidates).stream()
-                .map((m) -> m.getName()).collect(Collectors.toList())
+                .map((m) -> m.getName() + " " + m.getParameterCount())
+                .collect(Collectors.toList())
         );
         if (!isCombinerFunction) {
             function = findCandidateFunction(candidates);
@@ -264,7 +286,7 @@ public class Function implements Invokable {
             function = findCombinerCandidateFunction(candidates);
         }
 
-        log.debug("Function references method: {}", () -> (function == null) ? "null" : function.getName());
+        log.debug("Function references method: {}", () -> (function == null) ? "null" : function);
         // could try and sort returned functions if more than one based on
         // "best selection" for argument/parameter types
         if (function == null) {
@@ -291,12 +313,14 @@ public class Function implements Invokable {
         InstantiationException {
 
         log.debug("Function declaring class: {}", function.getDeclaringClass());
+        log.debug("Function: {}", function);
         ClassAndFunctionRegistry registry = ClassAndFunctionRegistry.singleton();
         Object ob = registry.getFunctionsSingleton(function.getDeclaringClass());
         if (
             ob == null
             && lastValue != null
             && !Modifier.isStatic(function.getModifiers())
+            && !RequirementFunction.class.isAssignableFrom(function.getDeclaringClass())
             && TypeConverter.isConvertible(lastValue.getClass(), function.getDeclaringClass())
         ) {
             ob = TypeConverter.convert(lastValue, function.getDeclaringClass());
@@ -311,10 +335,14 @@ public class Function implements Invokable {
         int index = -1;
         for (java.lang.reflect.Parameter p : parameters) {
             ++index;
-            Argument arg = ((mappedArgs.containsKey(p.getName()))
-                    || (p.isNamePresent() && arguments.get(0).getName() != null)) ?
-                    mappedArgs.get(p.getName())
-                    : arguments.get(index);
+            log.debug("Looking for argument {} in {} or {} in {}", p.getName(), mappedArgs, index, arguments);
+            Argument arg = arguments.get(index);
+            NamedParameter named = p.getAnnotation(NamedParameter.class);
+            if (named != null && mappedArgs.containsKey(named.value())) {
+                arg = mappedArgs.get(named.value());
+            } else if (mappedArgs.containsKey(p.getName())) {
+                arg = mappedArgs.get(p.getName());
+            }
             fnArguments.add(TypeConverter.convert(
                 arg.getValue(lastValue),
                 p.getType()
