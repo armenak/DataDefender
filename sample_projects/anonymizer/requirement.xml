@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<anonymizer xmlns="https://armenak.github.io/DataDefender/anonymizer">
+
+  <anonymizer-version>2.0</anonymizer-version>
+  <project>Sample Project</project>
+  <project-version>1.0</project-version>
+
+  <!--
+    Types defined below as return types, column types or function argument
+    types will be looked up under autoresolve classes in the order they
+    appear here.  Having java.lang defined here, means later on you can
+    refer to a type as "String" rather than its full name, similar to how an
+    import works in a java file, but always by package.
+
+    Classes not found here will continue looking in the classpath, so a
+    class file under extensions (for example EmployeeNumber) will still be
+    loaded even if not found in a package defined here (see plan with id
+    employee-number under column-plans below).
+  -->
+  <autoresolve-classes>
+    <package name="java.lang"/>
+    <package name="org.apache.commons.lang3"/>
+    <package name="com.strider.datadefender.anonymizer.functions"/>
+  </autoresolve-classes>
+
+  <!--
+    Reusable plans that can be applied to any number of table columns under
+    the <tables> section below.
+  -->
+  <column-plans>
+    <plan id="lipsum-similar">
+      <function name="Lipsum#similar">
+        <argument name="text" type="String" pass-current-value="true"/>
+      </function>
+    </plan>
+    <plan id="employee-number">
+      <function name="EmployeeNumber#randomNumber" />
+    </plan>
+    <plan id="address" combiner="String::concat" combiner-glue="&#13;&#10;">
+      <function combiner-glue=" " name="RandomUtils#nextInt">
+        <argument type="int" value="11"/>
+        <argument type="int" value="5599"/>
+      </function>
+      <function name="Address#randomStreet"/>
+      <function combiner-glue=", " name="Address#randomCity"/>
+      <function name="Address#randomProvinceStateCode"/>
+      <function name="Address#randomCanadianOrUsFiveOrNineDigitPostalCode"/>
+      <function name="Address#randomCountry"/>
+    </plan>
+    <plan id="example-array">
+      <function name="Class#acceptsArray">
+        <argument type="int">
+          <element value="1"/>
+          <element value="2"/>
+          <element pass-current-value="true"/>
+        </argument>
+      </function>
+    </plan>
+  </column-plans>
+
+  <!--
+    Specify tables/columns to anonymize.  Note that a table can be specified
+    more than once, each with different parameters (for instance one or more
+    could have a <where></where> clause or different exclusions, etc...
+  -->
+  <tables>
+    <table name="employees" primary-key="id">
+      <columns>
+        <column name="first_name" skip-empty="false">
+          <plan>
+            <function name="Bio#randomFirstName" />
+          </plan>
+        </column>
+        <column name="middle_name">
+          <plan>
+            <function name="Bio#randomFirstName" />
+          </plan>
+        </column>
+        <column name="preferred_name">
+          <plan>
+            <function name="Bio#randomFirstName" />
+          </plan>
+        </column>
+        <column name="last_name">
+          <plan>
+            <function name="Bio#randomLastName" />
+          </plan>
+        </column>
+        <column name="gender">
+          <plan>
+            <function name="Core#randomStringFromPattern">
+              <argument name="pattern" value="M|F|Z|N|O"/>
+            </function>
+          </plan>
+        </column>
+        <column name="birth_date">
+          <plan>
+            <function name="Core#randomDate">
+              <argument name="start" type="String" value="1970-01-01"/>
+              <argument name="end" type="String" value="2005-01-01"/>
+              <argument name="format" type="String" value="yyyy-MM-dd"/>
+            </function>
+          </plan>
+        </column>
+        <column name="employee_number">
+          <plan-ref ref-id="employee-number"/>
+        </column>
+        <column name="address">
+          <plan-ref ref-id="address"/>
+        </column>
+        <column name="email">
+          <!-- excludes only this column if it's value matches -->
+          <exclusions>
+            <exclude equals="zbateson@example.com"/>
+          </exclusions>
+          <plan>
+            <function name="Bio#randomEmail">
+              <argument name="domainName" value="unreal.mydomain.com"/>
+            </function>
+          </plan>
+        </column>
+        <column name="hr-notes">
+          <plan-ref ref-id="lipsum-similar"/>
+        </column>
+      </columns>
+    </table>
+    <table name="users" primary-key="id">
+      <!-- excludes the entire row if an 'exclude' matches. For the row
+         with a username equal to zbateson, neither username nor password
+         will be changed -->
+      <exclusions>
+        <exclude name="username" in="zbateson,armenak"/>
+        <exclude name="email" equals="another@example.com"/>
+      </exclusions>
+      <columns>
+        <column name="username">
+          <plan>
+            <function name="Bio#randomUser" />
+          </plan>
+        </column>
+        <column name="password">
+          <plan>
+            <function name="String#valueOf">
+              <argument value="ae2b1fca515949e5d54fb22b8ed95575"/>
+            </function>
+          </plan>
+        </column>
+      </columns>
+    </table>
+    <table name="forms-fields">
+      <!-- updates happen using the specified primary key(s) in the generated where clause of the update query -->
+      <primary-key>
+        <key>formname</key>
+        <key>fieldname</key>
+      </primary-key>
+      <where>fieldname = 'email-recipients' OR fieldname = 'email-cc-recipients'</where>
+      <columns>
+        <column name="fieldvalue">
+          <plan>
+            <function name="Bio#randomEmail">
+              <argument name="domainName" value="unreal.ubc.ca"/>
+            </function>
+          </plan>
+        </column>
+      </columns>
+    </table>
+    <table name="forms-fields">
+      <primary-key>
+        <key>formname</key>
+        <key>fieldname</key>
+      </primary-key>
+      <where>fieldname = 'comments'</where>
+      <!-- you can still have exclusions separately from the where clause -->
+      <exclusions>
+        <exclude name="formname" equals="specialform"/>
+        <exclude name="formname" in="otherspecialform,thirdspecialform"/>
+        <exclude name="formname" in="fourth|fifth" in-separator="|" />
+      </exclusions>
+      <columns>
+        <column name="fieldvalue">
+          <plan-ref ref-id="lipsum-similar"/>
+        </column>
+      </columns>
+    </table>
+  </tables>
+</anonymizer>

@@ -31,7 +31,7 @@
                     </Parameters>
                 </Column>
                 <Column Name="column5" ReturnType="String">
-                    <Function>com.strider.datadefender.extensions.ExtentionExample.randomStudentNumber</Function>
+                    <Function>com.strider.datadefender.extensions.ExtensionExample.randomStudentNumber</Function>
                 </Column>                
                 
             </Columns>

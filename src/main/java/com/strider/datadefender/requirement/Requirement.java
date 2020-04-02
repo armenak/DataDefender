@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -15,82 +14,124 @@
  * Lesser General Public License for more details.
  *
  */
-
-
-
 package com.strider.datadefender.requirement;
 
-import java.util.ArrayList;
+import com.strider.datadefender.requirement.plan.GlobalPlan;
+import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
+
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.xml.bind.Unmarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import static java.util.Collections.unmodifiableList;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * JAXB class that defines elements in Requirement.xml file
  *
  * @author Armenak Grigoryan
  */
-@XmlRootElement(name = "Requirement")
-@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@Log4j2
+@XmlAccessorType(XmlAccessType.NONE)
+@XmlRootElement(name = "anonymizer")
 public class Requirement {
-    @XmlElement(name = "Client")
-    private String      client;
-    @XmlElement(name = "Version")
-    private String      version;
-    @XmlElementWrapper(name = "Tables")
-    @XmlElement(name = "Table")
+
+    @XmlAccessorType(XmlAccessType.NONE)
+    @Data
+    public static class AutoresolvePackage {
+        @XmlAttribute
+        private String name;
+
+        @Getter(AccessLevel.NONE)
+        @Setter(AccessLevel.NONE)
+        private ClassAndFunctionRegistry registry;
+
+        public AutoresolvePackage() {
+            this(ClassAndFunctionRegistry.singleton());
+        }
+
+        public AutoresolvePackage(String name) {
+            this();
+            this.name = name;
+        }
+
+        public AutoresolvePackage(String name, boolean register) {
+            this(name);
+            if (register) {
+                registry.registerAutoResolvePackage(name);
+            }
+        }
+
+        public AutoresolvePackage(ClassAndFunctionRegistry registry) {
+            this.registry = registry;
+        }
+
+        public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+            log.debug("Found autoresolve package: {}", name);
+            registry.registerAutoResolvePackage(name);
+        }
+    }
+
+    @XmlElement(name = "anonymizer-version")
+    private double anonymizerVersion = 2.0d;
+
+    @XmlElement
+    private String project;
+
+    @XmlElement(name = "project-version")
+    private String version;
+
+    @XmlElementWrapper(name = "autoresolve-classes")
+    @XmlElement(name = "package")
+    private List<AutoresolvePackage> autoresolve;
+
+    @XmlElementWrapper(name = "column-plans")
+    @XmlElement(name = "plan")
+    private List<GlobalPlan> plans;
+
+    @XmlElementWrapper(name = "tables")
+    @XmlElement(name = "table")
     private List<Table> tables;
 
     /**
-     * Getter method for client attribute
-     * @return String
+     * Returns a list of Table elements that match entries in the passed filter.
+     *
+     * Attempts to filter out differences with schema, so 'schema.tablename'
+     * matches 'tablename'.
+     *
+     * @param tables
+     * @return
      */
-    public String getClient() {
-        return this.client;
-    }
-
-    // Setter methods
-    public void setClient(final String client) {
-        this.client = client;
-    }
-
-    /**
-     * Getter method for tables attribute
-     * @return List
-     */
-    public List<Table> getTables() {
-        List<Table> tableList = null;
-
-        if (this.tables != null) {
-            tableList = new ArrayList();
-            tableList = unmodifiableList(this.tables);
+    public List<Table> getFilteredTables(List<String> filter) {
+        if (CollectionUtils.isEmpty(filter)) {
+            return tables;
         }
-
-        return tableList;
-    }
-
-    public void setTables(final List<Table> tables) {
-        this.tables = tables;
-    }
-
-    /**
-     * Getter method for version attribute
-     * @return String
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    public void setVersion(final String version) {
-        this.version = version;
+        return tables.stream().filter((req) ->
+            filter.stream().anyMatch((s) -> {
+                String r = req.getName();
+                if (s.equalsIgnoreCase(r)) {
+                    return true;
+                } else if (s.contains(".") && !r.contains(".")) {
+                    return StringUtils.endsWithIgnoreCase(s, "." + r);
+                } else if (r.contains(".") && !s.contains(".")) {
+                    return StringUtils.endsWithIgnoreCase(r, "." + s);
+                }
+                return false;
+            })
+        ).collect(Collectors.toList());
     }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com
