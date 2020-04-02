@@ -53,7 +53,7 @@ public class DiscoverFiles implements Callable<Integer> {
     @Option(names = { "-d", "--directory" }, description = "Adds a directory to list of directories to be scanned", required = true)
     private List<File> directories;
 
-    @Option(names = { "-x", "--exclude-extension" }, description = "Adds an extension to exclude from data discovery", required = true)
+    @Option(names = { "-x", "--exclude-extension" }, description = "Adds an extension to exclude from data discovery")
     private List<String> excludeExtensions;
 
     @ParentCommand

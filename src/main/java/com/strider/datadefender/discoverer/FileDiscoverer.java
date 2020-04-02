@@ -121,7 +121,7 @@ public class FileDiscoverer extends Discoverer {
                             final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                             log.debug("Extension: " + ext);
 
-                            if (CollectionUtils.containsAny(excludeExtensions, ext)) {
+                            if (CollectionUtils.emptyIfNull(excludeExtensions).contains(ext)) {
                                 log.info("Ignoring type " + ext);
                                 continue;
                             }
@@ -231,7 +231,7 @@ public class FileDiscoverer extends Discoverer {
                 final String ext = FilenameUtils.getExtension(fich.getName()).toLowerCase(Locale.ENGLISH);
                 log.debug("Extension: " + ext);
 
-                if (CollectionUtils.containsAny(excludeExtensions, ext)) {
+                if (CollectionUtils.emptyIfNull(excludeExtensions).contains(ext)) {
                     log.info("Ignoring type " + ext);
                     continue;
                 }
