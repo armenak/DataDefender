@@ -41,6 +41,8 @@ import org.apache.commons.lang3.RandomUtils;
 import lombok.extern.log4j.Log4j2;
 
 /**
+ * Core set of helpers for data anonymization.
+ *
  * @author Armenak Grigoryan
  */
 @Log4j2

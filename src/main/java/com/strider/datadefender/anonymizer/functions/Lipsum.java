@@ -30,6 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.extern.log4j.Log4j2;
 
 /**
+ * Helpers for generating text using Lorem Ipsum...
+ *
  * @author Armenak Grigoryan
  */
 @Log4j2

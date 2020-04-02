@@ -22,6 +22,8 @@ import org.apache.commons.lang3.RandomUtils;
 import lombok.extern.log4j.Log4j2;
 
 /**
+ * Built-in anonymization helper functions for address field anonymization.
+ *
  * @author Armenak Grigoryan
  */
 @Log4j2

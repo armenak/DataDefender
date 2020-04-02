@@ -34,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.extern.log4j.Log4j2;
 
 /**
+ * Helper anonymization using table data (shuffle records, etc...).
+ *
  * @author Armenak Grigoryan
  */
 @Log4j2
