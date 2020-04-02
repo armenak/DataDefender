@@ -74,7 +74,11 @@ public class DiscoverData implements Callable<Integer>, IRequirementCommand {
     @Override
     public Integer call() throws Exception {
 
-        DbConfig dbConfig = discover.getDbConfig();
+        if (dbConfig == null) {
+            dbConfig = discover.getDbConfig();
+        } else {
+            discover.setDbConfig(dbConfig);
+        }
 
         System.out.println("");
         System.out.println("Starting data discovery");
