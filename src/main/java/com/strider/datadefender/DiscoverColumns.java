@@ -58,6 +58,9 @@ public class DiscoverColumns implements Callable<Integer>, IRequirementCommand {
     @Option(names = { "--column-pattern" }, description = "Regex pattern(s) to match column names", required = true)
     private List<Pattern> patterns;
 
+    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
+    private DbConfig dbConfig;
+
     @ParentCommand
     private Discover discover;
 
@@ -71,15 +74,14 @@ public class DiscoverColumns implements Callable<Integer>, IRequirementCommand {
         discover.setOutputFile(f);
     }
 
-    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
-    public void setDbConfig(DbConfig dbConfig) {
-        discover.setDbConfig(dbConfig);
-    }
-
     @Override
     public Integer call() throws Exception {
 
-        DbConfig dbConfig = discover.getDbConfig();
+        if (dbConfig == null) {
+            dbConfig = discover.getDbConfig();
+        } else {
+            discover.setDbConfig(dbConfig);
+        }
 
         System.out.println("Starting column discovery");
         log.warn("Discovery writes personal data to log files.");

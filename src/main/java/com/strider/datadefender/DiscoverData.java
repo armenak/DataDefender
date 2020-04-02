@@ -55,6 +55,9 @@ public class DiscoverData implements Callable<Integer>, IRequirementCommand {
     @ArgGroup(exclusive = false, multiplicity = "1", heading = "Model discovery settings%n")
     private ModelDiscoveryConfig modelDiscoveryConfig;
 
+    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
+    private DbConfig dbConfig;
+
     @ParentCommand
     private Discover discover;
 
@@ -66,11 +69,6 @@ public class DiscoverData implements Callable<Integer>, IRequirementCommand {
     @Option(names = { "-o", "--output" }, description = "Generate a requirements xml file and write it out to the specified file")
     public void setOutputFile(File f) {
         discover.setOutputFile(f);
-    }
-
-    @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")
-    public void setDbConfig(DbConfig dbConfig) {
-        discover.setDbConfig(dbConfig);
     }
 
     @Override
