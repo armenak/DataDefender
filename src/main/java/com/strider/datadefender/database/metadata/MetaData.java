@@ -136,7 +136,7 @@ public abstract class MetaData implements IMetaData {
                             continue;
                         }
                     }
-
+                    
                     if (excludeTablesList.isEmpty() && includeTablesList.size() > 0) {
                         log.info("Include table list: " + includeTablesList.toString());
                         List matchingList = CommonUtils.getMatchingStrings(includeTablesList, tableName.toUpperCase(Locale.ENGLISH));
@@ -148,9 +148,11 @@ public abstract class MetaData implements IMetaData {
                     }                    
                     
                     String schemaTableName = null;
-
-                    if ((schemaName != null) &&!schemaName.equals("")) {
+                    
+                    if (!CommonUtils.isEmptyString(schemaName)) {
                         schemaTableName = schemaName + "." + tableName;
+                    } else {
+                        schemaTableName = tableName;
                     }
 
                     if (((skipEmptyTables != null) && skipEmptyTables.equals("true"))
@@ -166,8 +168,6 @@ public abstract class MetaData implements IMetaData {
                     try (ResultSet pkRS = getPKRS(md, tableName)) {
                         while (pkRS.next()) {
                             final String pkey = pkRS.getString(4);
-
-                            log.debug("PK: " + pkey);
                             pKeys.add(pkey.toLowerCase(Locale.ENGLISH));
                         }
                     }
@@ -179,7 +179,7 @@ public abstract class MetaData implements IMetaData {
                         while (pkRS.next()) {
                             final String fKey = pkRS.getString(4);
 
-                            log.debug("PK: " + fKey);
+                            log.info("PK: " + fKey);
                             fKeys.add(fKey.toLowerCase(Locale.ENGLISH));
                         }
                     }                    
