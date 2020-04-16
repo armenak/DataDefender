@@ -15,8 +15,6 @@
  *
  */
 
-
-
 package com.strider.datadefender.specialcase;
 
 import java.util.ArrayList;
@@ -28,8 +26,6 @@ import static org.apache.log4j.Logger.getLogger;
 
 import com.strider.datadefender.Probability;
 import com.strider.datadefender.database.metadata.MatchMetaData;
-import com.strider.datadefender.extensions.BiographicFunctions;
-import com.strider.datadefender.file.metadata.FileMatchMetaData;
 import com.strider.datadefender.utils.CommonUtils;
 
 /**
@@ -39,18 +35,20 @@ public class SinDetector implements SpecialCase {
     private static final Logger LOG = getLogger(SinDetector.class);
 
     public static MatchMetaData detectSin(final MatchMetaData data, final String text) {
-        String sinValue = text;
-
-        if (!CommonUtils.isEmptyString(sinValue)
-                && (data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")
+        String sinValue = "";
+        
+        if (!CommonUtils.isEmptyString(text)) {
+            sinValue = text;
+        }        
+        
+        if ((data.getColumnType().equals("INT") || data.getColumnType().equals("VARCHAR")
                     || data.getColumnType().equals("CHAR"))) {
-            final BiographicFunctions bf = new BiographicFunctions();
 
             if (data.getColumnType().equals("VARCHAR")) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
 
-            if (bf.isValidSIN(sinValue)) {
+            if (isValidSIN(sinValue)) {
                 LOG.info("SIN detected: " + sinValue + " in " + data.getTableName() + "." + data.getColumnName());
                 data.setModel("sin");
                 data.setAverageProbability(1);
@@ -67,54 +65,28 @@ public class SinDetector implements SpecialCase {
         return null;
     }
     
-    public static FileMatchMetaData detectSin(final FileMatchMetaData metaData, final String text) {
-        String sinValue = "";
-        
-        if (!CommonUtils.isEmptyString(text)) {
-            sinValue = text;
-        }
-
-        LOG.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
-        if (isValidSIN(sinValue)) {
-                LOG.info("SIN detected: " + sinValue);
-                metaData.setAverageProbability(1.0);
-                metaData.setModel("sin");
-                return metaData;
-        } else {
-            LOG.debug("SIN " + sinValue + " is not valid" );
-        }
-
-        return null;
-    }    
-    
     /**
      * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
      * @param sin
      * @return boolean true, if SIN is valid, otherwise false
      */
     private static boolean isValidSIN(final String sin) {
-        boolean valid = false;
 
-        if (sin.length() < 9) {
-            LOG.debug("SIN length is < 9");
-
-            return valid;
+        if ((sin.length() != 9)) {
+            LOG.debug("SIN length is != 9");
+            return false;
         }
 
-//        if (!sin.matches("[0-9]+")) {
-//            LOG.debug("SIN " + sin + " is not number");
-//
-//            return valid;
-//        }
+        if (!sin.matches("[0-9]+")) {
+            LOG.debug("SIN " + sin + " is not number");
+            return false;
+        }
 
         final int[]         sinArray   = new int[sin.length()];
         final int[]         checkArray = {
             1, 2, 1, 2, 1, 2, 1, 2, 1
         };
         final List<Integer> sinList    = new ArrayList();
-
-        LOG.debug(sin);
-
         for (int i = 0; i < 9; i++) {
             sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));
             sinArray[i] = sinArray[i] * checkArray[i];
@@ -137,9 +109,9 @@ public class SinDetector implements SpecialCase {
         }
 
         if ((sum % 10) == 0) {
-            valid = true;
+            return true;
         }
-
-        return valid;
+        
+        return false;
     }    
 }
