@@ -64,9 +64,9 @@ JDBC drivers are included as optional dependencies included in maven profiles th
 - mysql
 - sqlserver
 - postgresql
-- oracle (requires configuring the oracle repository, which requires a user account.  See https://docs.oracle.com/middleware/1213/core/MAVEN/config_maven_repo.htm#MAVEN9010)
+- oracle
 
-In addition, a property to activate all but the oracle driver is available as well for convenience:
+In addition, a property to activate all drivers is available as well for convenience:
 
 - jdbc-drivers-all
 
@@ -75,7 +75,7 @@ Example builds:
 ```
 mvn package -P mariadb,mysql
 mvn package -Djdbc-drivers-all
-mvn package -P oracle -Djdbc-drivers-all
+mvn package -P oracle
 ```
 
 Alternatively, the JDBC drivers can be included as jar files in the extensions folder.
