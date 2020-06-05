@@ -1,7 +1,5 @@
 language: java
-jdk:
-  - openjdk
 script: "mvn test"
-dist: Bionic
+dist: bionic
 after_success:
   - bash <(curl -s https://codecov.io/bash)
