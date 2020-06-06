@@ -153,15 +153,14 @@
         <version>3.7.0.1746</version>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
+        <groupId>org.openclover</groupId>
+        <artifactId>clover-maven-plugin</artifactId>
+        <version>4.4.1</version>
         <configuration>
-          <formats>
-            <format>html</format>
-            <format>xml</format>
-          </formats>
-          <check/>
+          <generatePdf>false</generatePdf>
+          <generateXml>true</generateXml>
+          <generateHtml>false</generateHtml>
+          <generateJson>false</generateJson>
         </configuration>
       </plugin>
       <plugin>
@@ -416,17 +415,6 @@
         <version>3.0.0</version>
         <configuration>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <formats>
-            <format>html</format>
-            <format>xml</format>
-          </formats>
         </configuration>
       </plugin>
     </plugins>
