@@ -25,14 +25,15 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.ThreadContext;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.HelpCommand;
 import picocli.CommandLine.IParameterExceptionHandler;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.ScopeType;
 import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
 
@@ -44,15 +45,12 @@ import lombok.extern.log4j.Log4j2;
  * This class will parse and analyze the parameters and execute appropriate
  * service.
  *
- * TODO(ZB): Look into setting up command mixins for debug/verbosity so they
- * don't have to appear before subcommands [https://picocli.info/#_mixins]
- *
  * @author Zaahid Bateson
  */
 @Command(
     name = "datadefender",
     mixinStandardHelpOptions = true,
-    version = "2.0",
+    version = "2.0.1",
     description = "Data detection and anonymization tool",
     synopsisSubcommandLabel = "COMMAND",
     subcommands = {
@@ -73,8 +71,24 @@ public class DataDefender implements Callable<Integer> {
         ));
     }
 
-    @Mixin
-    private LogLevelConfig logLevels;
+    @CommandLine.Option(names = "--debug", description = "Enable debug logging in log file", scope = ScopeType.INHERIT)
+    public void setDebug(boolean debug) {
+        System.out.println("DEBUG file logging turned on.");
+        ThreadContext.put("file-level", "debug");
+        log.warn("Private/sensitive data that should be anonymized will be "
+            + "logged to configured debug output streams.");
+    }
+
+    @CommandLine.Option(names = { "-v", "--verbose" }, description = "Enable more verbose console output, specify two -v for console debug logging", scope = ScopeType.INHERIT)
+    public void setVerbose(boolean[] verbosity) {
+        if (verbosity.length < 2) {
+            ThreadContext.put("console-level", "info");
+        } else {
+            ThreadContext.put("console-level", "debug");
+            log.warn("Private/sensitive data that should be anonymized will be "
+                + "logged to the console in this mode.");
+        }
+    }
 
     /**
      * Copied from picocli documentation, presents a shorter "Usage" help when
@@ -127,6 +141,10 @@ public class DataDefender implements Callable<Integer> {
     }
 
     public static void main(String... args) throws Exception {
+
+        ThreadContext.put("console-level", "");
+        ThreadContext.put("file-level", "");
+
         CommandLine cmd = new CommandLine(new DataDefender())
             .registerConverter(Requirement.class, new RequirementConverter())
             .setParameterExceptionHandler(new ShortErrorMessageHandler());

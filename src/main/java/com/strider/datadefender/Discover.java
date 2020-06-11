@@ -59,9 +59,6 @@ import lombok.Setter;
 @Log4j2
 public class Discover implements Callable<Integer> {
 
-    @Mixin
-    private LogLevelConfig logLevels;
-
     @Getter
     @Setter
     @ArgGroup(exclusive = false, multiplicity = "0..1", heading = "Database connection settings%n")

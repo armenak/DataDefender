@@ -49,9 +49,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class DiscoverData implements Callable<Integer>, IRequirementCommand {
 
-    @Mixin
-    private LogLevelConfig logLevels;
-
     @ArgGroup(exclusive = false, multiplicity = "1", heading = "Model discovery settings%n")
     private ModelDiscoveryConfig modelDiscoveryConfig;
 

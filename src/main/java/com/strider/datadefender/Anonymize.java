@@ -50,9 +50,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Anonymize implements Callable<Integer> {
 
-    @Mixin
-    private LogLevelConfig logLevels;
-
     @Option(names = { "-r", "--requirement-file" }, paramLabel = "<requirementFile>", description = "Requirement XML file", required = true)
     private Requirement requirement;
 

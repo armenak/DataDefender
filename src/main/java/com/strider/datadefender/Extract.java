@@ -50,9 +50,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Extract implements Callable<Integer> {
 
-    @Mixin
-    private LogLevelConfig logLevels;
-
     @ArgGroup(exclusive = false, multiplicity = "1", heading = "Database connection settings%n")
     private DbConfig dbConfig;
 

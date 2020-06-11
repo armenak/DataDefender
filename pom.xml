@@ -181,13 +181,13 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.13.2</version>
+      <version>2.13.3</version>
     </dependency>
     <dependency>
       <!-- other dependencies may want to log with slf4j -->
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.13.2</version>
+      <version>2.13.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

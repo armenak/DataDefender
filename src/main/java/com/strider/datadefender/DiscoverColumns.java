@@ -50,9 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 @Log4j2
 public class DiscoverColumns implements Callable<Integer>, IRequirementCommand {
 
-    @Mixin
-    private LogLevelConfig logLevels;
-
     private File outputFile;
 
     @Option(names = { "--column-pattern" }, description = "Regex pattern(s) to match column names", required = true)
