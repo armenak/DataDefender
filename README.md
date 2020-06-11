@@ -102,9 +102,10 @@ The toolkit is implemented as a command line program. To run it first build the 
 ```
 Usage: datadefender [-hvV] [--debug] COMMAND
 Data detection and anonymization tool
-      --debug     enable debug logging
+      --debug     Enable debug logging in log file
   -h, --help      Show this help message and exit.
-  -v, --verbose   enable more verbose output
+  -v, --verbose   Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version   Print version information and exit.
 Commands:
   help       Displays help information about the specified command
@@ -156,9 +157,10 @@ Usage: datadefender discover files ([-l=<limit>] [-e=<extensions>]
 Run file discovery utility
   -d, --directory=<directories>
                          Adds a directory to list of directories to be scanned
-      --debug            enable debug logging
+      --debug            Enable debug logging in log file
   -h, --help             Show this help message and exit.
-  -v, --verbose          enable more verbose output
+  -v, --verbose          Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version          Print version information and exit.
   -x, --exclude-extension=<excludeExtensions>
                          Adds an extension to exclude from data discovery
@@ -215,12 +217,13 @@ Usage: datadefender discover columns [[-u=<username>] [-p[=<password>]]
 Run column discovery utility
       --column-pattern=<patterns>
                           Regex pattern(s) to match column names
-      --debug             enable debug logging
+      --debug             Enable debug logging in log file
   -h, --help              Show this help message and exit.
   -o, --output=<outputFile>
                           Generate a requirements xml file and write it out to
                             the specified file
-  -v, --verbose           enable more verbose output
+  -v, --verbose           Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version           Print version information and exit.
 Database connection settings
       --exclude-table-pattern-metadata=<excludeTablePatterns>
@@ -274,12 +277,13 @@ Usage: datadefender discover data ([-l=<limit>] [-e=<extensions>]
                                   [--url=<url>]] [-hvV] [--debug]
                                   [-o=<outputFile>]
 Run data discovery utility
-      --debug             enable debug logging
+      --debug             Enable debug logging in log file
   -h, --help              Show this help message and exit.
   -o, --output=<outputFile>
                           Generate a requirements xml file and write it out to
                             the specified file
-  -v, --verbose           enable more verbose output
+  -v, --verbose           Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version           Print version information and exit.
 Model discovery settings
   -e, --extension=<extensions>
@@ -348,9 +352,10 @@ Usage: datadefender extract ([-u=<username>] [-p[=<password>]]
 Run data extraction utility -- generates files out of table columns with the
 name 'table_columnName.txt' for each column requested.
       [columns...]        Generate data for the specified table.columName(s)
-      --debug             enable debug logging
+      --debug             Enable debug logging in log file
   -h, --help              Show this help message and exit.
-  -v, --verbose           enable more verbose output
+  -v, --verbose           Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version           Print version information and exit.
 Database connection settings
       --exclude-table-pattern-metadata=<excludeTablePatterns>
@@ -395,11 +400,12 @@ Run anonymization utility
       [tables...]         Limit anonymization to specified tables
   -b, --batch-size=<batchSize>
                           Number of update queries to batch together
-      --debug             enable debug logging
+      --debug             Enable debug logging in log file
   -h, --help              Show this help message and exit.
   -r, --requirement-file=<requirementFile>
                           Requirement XML file
-  -v, --verbose           enable more verbose output
+  -v, --verbose           Enable more verbose console output, specify two -v
+                            for console debug logging
   -V, --version           Print version information and exit.
 Database connection settings
       --exclude-table-pattern-metadata=<excludeTablePatterns>
