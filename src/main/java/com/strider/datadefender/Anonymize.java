@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Parameters;
 
 import lombok.extern.log4j.Log4j2;
