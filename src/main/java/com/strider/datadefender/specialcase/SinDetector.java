@@ -20,13 +20,14 @@ import com.strider.datadefender.discoverer.Probability;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.extensions.BiographicFunctions;
 import com.strider.datadefender.file.metadata.FileMatchMetaData;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.log4j.Log4j2;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.extern.log4j.Log4j2;
 
 /**
  * @author Armenak Grigoryan
@@ -35,6 +36,7 @@ import lombok.extern.log4j.Log4j2;
 public class SinDetector implements SpecialCase {
 
     public static ColumnMatch detectSin(final ColumnMetaData data, final String text) {
+        
         String sinValue = text;
 
         if (
@@ -50,7 +52,7 @@ public class SinDetector implements SpecialCase {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
 
-            if (bf.isValidSIN(sinValue)) {
+            if (isValidSIN(sinValue)) {
                 log.info("SIN detected: " + sinValue + " in " + data.getTable().getTableName() + "." + data.getColumnName());
                 return new ColumnMatch(
                     data,
@@ -73,7 +75,7 @@ public class SinDetector implements SpecialCase {
 
         log.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
         final BiographicFunctions bf = new BiographicFunctions();
-        if (bf.isValidSIN(sinValue)) {
+        if (isValidSIN(sinValue)) {
                 log.info("SIN detected: " + sinValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("sin");
@@ -84,4 +86,54 @@ public class SinDetector implements SpecialCase {
 
         return null;
     }
+    
+ /**
+     * Algorithm is taken from https://en.wikipedia.org/wiki/Social_Insurance_Number
+     * @param sin
+     * @return boolean true, if SIN is valid, otherwise false
+     */
+    private static boolean isValidSIN(final String sin) {
+
+        if ((sin.length() != 9)) {
+            log.debug("SIN length is != 9");
+            return false;
+        }
+
+        if (!sin.matches("[0-9]+")) {
+            log.debug("SIN " + sin + " is not number");
+            return false;
+        }
+
+        final int[]         sinArray   = new int[sin.length()];
+        final int[]         checkArray = {
+            1, 2, 1, 2, 1, 2, 1, 2, 1
+        };
+        final List<Integer> sinList    = new ArrayList();
+        for (int i = 0; i < 9; i++) {
+            sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));
+            sinArray[i] = sinArray[i] * checkArray[i];
+        }
+
+        int sum = 0;
+
+        for (int i = 0; i < 9; i++) {
+            final String tmp = String.valueOf(sinArray[i]);
+
+            if (tmp.length() == 1) {
+                sinList.add(Integer.valueOf(tmp));
+                sum += Integer.valueOf(tmp);
+            } else {
+                sinList.add(Integer.valueOf(tmp.substring(0, 1)));
+                sum += Integer.valueOf(tmp.substring(0, 1));
+                sinList.add(Integer.valueOf(tmp.substring(1, 2)));
+                sum += Integer.valueOf(tmp.substring(1, 2));
+            }
+        }
+
+        if ((sum % 10) == 0) {
+            return true;
+        }
+        
+        return false;
+    }        
 }
