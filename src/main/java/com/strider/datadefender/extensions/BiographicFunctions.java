@@ -55,8 +55,6 @@ public class BiographicFunctions extends Core {
         };
         final List<Integer> sinList    = new ArrayList();
 
-        log.info(sin);
-
         for (int i = 0; i < 9; i++) {
             sinArray[i] = Integer.valueOf(sin.substring(i, i + 1));
             sinArray[i] = sinArray[i] * checkArray[i];
