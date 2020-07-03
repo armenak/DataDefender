@@ -108,7 +108,7 @@ public class SinDetector implements SpecialCase {
         }
 
         if (sin.startsWith("0")) {
-            log.info("SIN " + sin + " starts with zero and it is not valid");
+            log.debug("SIN " + sin + " starts with zero and it is not valid");
             return false;
         }        
         
