@@ -46,8 +46,6 @@ public class SinDetector implements SpecialCase {
                 || Number.class.isAssignableFrom(data.getColumnType())
             )
         ) {
-            final BiographicFunctions bf = new BiographicFunctions();
-
             if (Objects.equals(String.class, data.getColumnType())) {
                 sinValue = sinValue.replaceAll("\\D+", "");
             }
@@ -92,8 +90,13 @@ public class SinDetector implements SpecialCase {
      * @param sin
      * @return boolean true, if SIN is valid, otherwise false
      */
-    private static boolean isValidSIN(final String sin) {
+    private static boolean isValidSIN(final String sinNumber) {
+        String sin = sinNumber;
 
+        if (sin != null) {
+            sin = sin.replaceAll(" ", "").replace("-", "").replace(".", "");
+        }        
+        
         if ((sin.length() != 9)) {
             log.debug("SIN length is != 9");
             return false;
@@ -104,6 +107,11 @@ public class SinDetector implements SpecialCase {
             return false;
         }
 
+        if (sin.startsWith("0")) {
+            log.info("SIN " + sin + " starts with zero and it is not valid");
+            return false;
+        }        
+        
         final int[]         sinArray   = new int[sin.length()];
         final int[]         checkArray = {
             1, 2, 1, 2, 1, 2, 1, 2, 1
