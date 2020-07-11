@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2020, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -54,7 +54,7 @@ public class ModelDiscoveryConfig {
     private Double probabilityThreshold;
 
     @Option(names = { "--no-score-calculation" }, description = "If set, includes a column score", negatable = true)
-    private Boolean calculateScore = false;
+    private Boolean calculateScore = true;
 
     @Option(names = { "--threshold-count" }, description = "Reports if number of rows found are greater than the defined threshold", defaultValue = "6")
     private Integer thresholdCount;
