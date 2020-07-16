@@ -22,6 +22,7 @@ Table of content
 - [Data Discovery](#data-discovery)
 - [Data Extractor](#data-extractor)
 - [Anonymizer](#anonymizer)
+- [Logging (and database logging)](#logging)
 - [Upgrading to 2.0](#upgrading-to-20)
 - [Features and issues](#features-and-issues)
 - [Code quality](#code-quality)
@@ -39,11 +40,11 @@ This implementation of Data Discovery program is using [Apache OpenNLP](https://
 Features
 --------
 1. Identifies sensitive personal data.
-2. Creates plan (XML document) to define what columns and how should be anonymized.
+2. Creates plan (XML document) to define what columns should be anonymized and how.
 3. Anonymizes the data.
 4. Platform-independent.
-5. Supports Oracle,MS SQL Server,MySQL, and PostgreSQL. Work in progress for DB2.
-6. This tool can help you on GDPR.
+5. Supports Oracle, MariaDB/MySQL, MS SQL Server, and PostgreSQL. Work in progress for DB2.
+6. This tool can help you be GDPR-compliant.
 
 Prerequisites
 ----------------
@@ -79,13 +80,13 @@ mvn package -Djdbc-drivers-all
 mvn package -P oracle
 ```
 
-Alternatively, the JDBC drivers can be included as jar files in the extensions folder.
+Alternatively, the JDBC drivers can be included as jar files in a 'lib' folder under your project folder (where the jar and scripts are copied to).
 
 Note: sqlite-jdbc is included always for file discovery.
 
 Extensions
 ------------
-Additional jar files/classes can be added under an 'extensions' folder in the current directory.  The default 'datadefender' scripts copied to the target directory adds classes/jar files under 'extensions' to the classpath.
+Additional jar files/classes can be added under an 'extensions' directory in the current working directory.  The default 'datadefender' scripts copied to the target directory adds classes/jar files under 'extensions' to the classpath.  The 'extensions' directory is meant to house extensions for a project, for example additional anonymization or discovery routines, etc... additional libraries required may be included more appropriately in a 'lib' directory.
 
 See [sample_projects/anonymizer/]([sample_projects/anonymizer/) for an example.
 
@@ -429,6 +430,37 @@ Database connection settings
 ```
 
 In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
+
+Logging
+----------------
+
+DataDefender uses log4j2 to log output.  The default configuration logs output to both the console at a WARN level, and to a file at INFO level.  The default levels can be made more verbose by running with ``` --debug ``` or ``` -v/--verbose ```.  ``` -v ``` can be chained to log DEBUG level to console:
+
+``` datadefender -vv --debug ```
+
+would log at 'debug' level to both console and file.
+
+The default file logged to is 'logs/datadefender.log'.  Each new run of DataDefender creates a new log file, and rolls the previous log file to a dated file in the format:
+
+'logs/datadefender-%d{yy-MM-dd-hh-mm-ss}.log'
+
+To change the default loggers and format, creating a log4j2 configuration file (log4j2(.properties|.json|.xml) in the project's directory will override the default properties file.  Please refer to the default file to build off of if desired: [src/main/resources/log4j2.properties](src/main/resources/log4j2.properties).  Note the use of a ThresholdFilter in the default version, and the default logLevel of "all".  The ThresholdFilters are how DataDefender controls the log levels based on command-line options.  Setting the loglevel to something more specific, e.g. 'info', and/or not setting up the ThresholdFilters accordingly, will cause the command-line options to not work.
+
+#### Database logging
+Log4j2 includes a "JdbcAppender" that can be used to configure database logging.  For convenience, the additional required lib can be compiled into the DataDefender jar file by running maven with the following profile:
+
+``` mvn package -P database-logging ```
+
+Don't forget to include any additional drivers needed (in this case, both for logging and for DataDefender's operations):
+
+``` mvn package -P database-logging,mariadb,oracle ```
+
+The 'database-logging' maven profile will include org.apache.commons.commons-dbcp2 in the final shaded jar.  Otherwise, the commons-dbcp2.jar file could also be manually downloaded and copied to the 'lib' directory underneath the project's directory.
+
+For log4j2 JdbcAppender configuration, please refer to the log4j2 documentation: [https://logging.apache.org/log4j/2.0/manual/appenders.html#JDBCAppender](https://logging.apache.org/log4j/2.0/manual/appenders.html#JDBCAppender).
+
+Additionally, a sample with database logging configured is available here: [sample_projects/database-logging](sample_projects/database-logging) with an example log4j2.properties file defined under it.
+
 
 Upgrading to 2.0
 ----------------

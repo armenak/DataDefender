@@ -1,1 +1,1 @@
-java -cp "extensions/*;extensions;DataDefender.jar" com.strider.datadefender.DataDefender %*
+java -cp ".;extensions/*;extensions;lib;DataDefender.jar" com.strider.datadefender.DataDefender %*

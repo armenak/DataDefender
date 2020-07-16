@@ -331,6 +331,16 @@
 
   <profiles>
     <profile>
+      <id>database-logging</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-dbcp2</artifactId>
+          <version>2.7.0</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>mariadb</id>
       <activation>
         <property>
