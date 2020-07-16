@@ -447,7 +447,7 @@ The default file logged to is 'logs/datadefender.log'.  Each new run of DataDefe
 To change the default loggers and format, creating a log4j2 configuration file (log4j2(.properties|.json|.xml) in the project's directory will override the default properties file.  Please refer to the default file to build off of if desired: [src/main/resources/log4j2.properties](src/main/resources/log4j2.properties).  Note the use of a ThresholdFilter in the default version, and the default logLevel of "all".  The ThresholdFilters are how DataDefender controls the log levels based on command-line options.  Setting the loglevel to something more specific, e.g. 'info', and/or not setting up the ThresholdFilters accordingly, will cause the command-line options to not work.
 
 #### Database logging
-Log4j2 includes a "JdbcAppender" that can be used to configure database logging.  For convenience, the additional required lib can be compiled into the DataDefender jar file by running maven with the following profile:
+Log4j2 includes a "JdbcAppender" that can be used to configure database logging.  For convenience, the additional required lib can be included the DataDefender jar file by running maven with the following profile:
 
 ``` mvn package -P database-logging ```
 
