@@ -124,7 +124,7 @@ public class Core extends RequirementFunction {
      * @return A random string from the file
      * @throws java.io.IOException
      */
-    protected String randomStringFromFile(String file) throws IOException {
+    public String randomStringFromFile(String file) throws IOException {
         if (!stringLists.containsKey(file)) {
             log.info("Loading words from file: {}", file);
             final List<String> values = new ArrayList<>();
