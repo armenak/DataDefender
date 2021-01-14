@@ -1,0 +1,4 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+java -cp ".:$(ls ${DIR}/DataDefender-*shaded.jar)" com.strider.datadefender.DataDefender "$@"
+

@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  datadefender:
+    container_name: datadefender
+    build:
+      context: .
