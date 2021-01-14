@@ -1,4 +1,4 @@
 .PHONY: docker-build 
 docker-build:
-	docker-compose build
+	docker-compose -p datadefender build
 
