@@ -51,7 +51,7 @@ public class SinDetector implements SpecialCase {
             }
 
             if (isValidSIN(sinValue)) {
-                log.info("SIN detected: " + sinValue + " in " + data.getTable().getTableName() + "." + data.getColumnName());
+                //log.info("SIN detected: " + sinValue + " in " + data.getTable().getTableName() + "." + data.getColumnName());
                 return new ColumnMatch(
                     data,
                     1,
@@ -74,7 +74,7 @@ public class SinDetector implements SpecialCase {
         log.debug("Trying to find SIN in file " + metaData.getFileName() + " : " + sinValue);
         final BiographicFunctions bf = new BiographicFunctions();
         if (isValidSIN(sinValue)) {
-                log.info("SIN detected: " + sinValue);
+                //log.info("SIN detected: " + sinValue);
                 metaData.setAverageProbability(1.0);
                 metaData.setModel("sin");
                 return metaData;
