@@ -16,6 +16,7 @@
 package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.functions.NamedParameter;
+import com.strider.datadefender.utils.Encoder;
 
 import java.io.IOException;
 
@@ -30,6 +31,15 @@ import org.apache.commons.lang3.RandomUtils;
 @Log4j2
 public class Bio extends Core {
 
+    public String randomFirstName(final String firstName) 
+    throws Exception {
+        
+        final Encoder encoder = new Encoder();
+        String detFirstName = encoder.encode(firstName);
+        
+        return detFirstName;
+    }
+    
     public String randomFirstName() throws IOException {
 		return randomStringFromStream(
             "resource:first_names.txt",

@@ -89,12 +89,11 @@ public class Core extends RequirementFunction {
 
     /**
      * Generates a list of random strings from a list of strings (new-
-     * line separated) in a file.
-     *
-     * The function randomizes the collection, exhausting all possible values
+     * line separated) in a file.The function randomizes the collection, exhausting all possible values
      * before re-shuffling and re-using items.
-     *
-     * @param stream
+
+     * @param id
+     * @param supplier
      * @return A random string from the stream
      * @throws IOException
      */

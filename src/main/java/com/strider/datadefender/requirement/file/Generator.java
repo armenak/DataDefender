@@ -80,7 +80,12 @@ public class Generator {
                 new Argument("end", String.class, "2020-04-01 00:00:00"),
                 new Argument("format", String.class, "yyyy-MM-dd HH:mm:ss")
             )
-        )
+        ),
+        "core-date-string", createGlobalPlan(
+            "core-date-string",
+            new Function("Core#randomString", false),
+            List.of(new Argument("text", String.class, true))
+        )        
     );
 
     private static GlobalPlan createGlobalPlan(String name, Function fn, List<Argument> arguments) {

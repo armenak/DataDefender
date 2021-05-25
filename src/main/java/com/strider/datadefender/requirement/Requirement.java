@@ -109,11 +109,9 @@ public class Requirement {
 
     /**
      * Returns a list of Table elements that match entries in the passed filter.
+     * Attempts to filter out differences with schema, so 'schema.tablename'  matches 'tablename'.
      *
-     * Attempts to filter out differences with schema, so 'schema.tablename'
-     * matches 'tablename'.
-     *
-     * @param tables
+     * @param filter
      * @return
      */
     public List<Table> getFilteredTables(List<String> filter) {
