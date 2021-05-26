@@ -40,12 +40,12 @@ public class Bio extends Core {
         return detFirstName;
     }
     
-    public String randomFirstName() throws IOException {
-		return randomStringFromStream(
-            "resource:first_names.txt",
-            () -> Lipsum.class.getResourceAsStream("first_names.txt")
-        );
-    }
+//    public String randomFirstName() throws IOException {
+//		return randomStringFromStream(
+//            "resource:first_names.txt",
+//            () -> Lipsum.class.getResourceAsStream("first_names.txt")
+//        );
+//    }
 
     public String randomLastName() throws IOException {
         return randomStringFromStream(
@@ -54,9 +54,9 @@ public class Bio extends Core {
         );
     }
 
-    public String randomMiddleName(final String file) throws IOException {
-        return randomFirstName();
-    }
+//    public String randomMiddleName(final String file) throws IOException {
+//        return randomFirstName();
+//    }
 
     /**
      * Creates a random username with up to 10 characters and between 0 and 2

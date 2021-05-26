@@ -15,15 +15,8 @@
  */
 package com.strider.datadefender.utils;
 
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class implements determenistic data anonymization 
@@ -34,50 +27,78 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Encoder {
     
-    static final String salt = "paXwBqVDN6KJEG7u4JNaEEcMnJMEdqM3";
+    private static final String[][] nameArr = {
+            {"A", "B"},
+            {"B", "C"},
+            {"C", "D"},            
+            {"D", "E"},                        
+            {"E", "F"},                                    
+            {"F", "G"},  
+            {"G", "H"},                                    
+            {"H", "I"},                                    
+            {"I", "J"},                                    
+            {"J", "K"},                                    
+            {"K", "L"},                                    
+            {"L", "M"},                                    
+            {"M", "N"},                                    
+            {"N", "O"},                                    
+            {"O", "P"},                                    
+            {"P", "Q"},                                    
+            {"Q", "R"},                                    
+            {"R", "S"},                                    
+            {"S", "T"},                                    
+            {"T", "U"},                                    
+            {"U", "V"},                                    
+            {"V", "W"},                                    
+            {"W", "X"},                                    
+            {"X", "Y"},                                    
+            {"Y", "Z"},                                    
+            {"Z", "A"}                                    
+        };
+        
     
-    public String encode(String data) {
-        Key key = new SecretKeySpec(salt.getBytes(), "AES");
-        byte[] encryptedData = null;
-        
-        try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            encryptedData = cipher.doFinal(data.getBytes());        
-        } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | 
-                 BadPaddingException | NoSuchPaddingException ex) {
-            log.error("Problem encrypting data", ex);
-        }
-        
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i< encryptedData.length; i++) {
-            char c = (char) encryptedData[i];
-            sb.append(c);
-        }
-        
-        return sb.toString();
-        
-    }
-    
-    public String decode(byte[] data) {
-        Key key = new SecretKeySpec(salt.getBytes(), "AES");
-        
-        StringBuilder sb = new StringBuilder();
-        try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            
-            byte[] decryptedData = cipher.doFinal(data);        
-            for (int i=0; i<decryptedData.length; i++) {
-                char c = (char) decryptedData[i];
-                sb.append(c);
+    public static String encode(String originalValue) {
+
+        char[] cData = originalValue.toCharArray();
+
+        StringBuilder newValue = new StringBuilder();
+        for (char c: cData) {
+            for (int i = 0; i<nameArr.length; i++) {
+                String nameChar = Character.toString(c);
+                String nameArrChar = nameArr[i][0];
+                if (nameChar.toLowerCase().equals(nameArrChar.toLowerCase())) {
+                    if (StringUtils.isAllLowerCase(nameChar)) {
+                        newValue.append(nameArr[i][1].toLowerCase());
+                    } else {
+                        newValue.append(nameArr[i][1]);
+                    }
+                }
             }
-        } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | 
-                 BadPaddingException | NoSuchPaddingException ex) {
-            log.error("Problem encrypting data", ex);
         }
-        
-        return sb.toString();
+
+        return newValue.toString();
     }
+    
+    public static String decode(String encodedValue) {
+
+        char[] cData = encodedValue.toCharArray();
+        
+        StringBuilder newValue = new StringBuilder();
+        for (char c: cData) {
+            for (int i = 0; i<nameArr.length; i++) {
+                String nameChar = Character.toString(c);
+                String nameArrChar = nameArr[i][1];
+                if (nameChar.toLowerCase().equals(nameArrChar.toLowerCase())) {
+                    if (StringUtils.isAllLowerCase(nameChar)) {
+                        newValue.append(nameArr[i][0].toLowerCase());
+                    } else {
+                        newValue.append(nameArr[i][0]);
+                    }
+                }
+            }
+        }
+
+        return newValue.toString();
+    }    
     
 }
