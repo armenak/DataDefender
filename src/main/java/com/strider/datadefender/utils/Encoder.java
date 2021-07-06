@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Armenak Grigoryan, and individual contributors as indicated
+ * Copyright 2014-2021, Armenak Grigoryan, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -15,8 +15,21 @@
  */
 package com.strider.datadefender.utils;
 
+import java.io.UnsupportedEncodingException;
+
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Base64;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class implements determenistic data anonymization 
@@ -27,78 +40,59 @@ import org.apache.commons.lang3.StringUtils;
 @Log4j2
 public final class Encoder {
     
-    private static final String[][] nameArr = {
-            {"A", "B"},
-            {"B", "C"},
-            {"C", "D"},            
-            {"D", "E"},                        
-            {"E", "F"},                                    
-            {"F", "G"},  
-            {"G", "H"},                                    
-            {"H", "I"},                                    
-            {"I", "J"},                                    
-            {"J", "K"},                                    
-            {"K", "L"},                                    
-            {"L", "M"},                                    
-            {"M", "N"},                                    
-            {"N", "O"},                                    
-            {"O", "P"},                                    
-            {"P", "Q"},                                    
-            {"Q", "R"},                                    
-            {"R", "S"},                                    
-            {"S", "T"},                                    
-            {"T", "U"},                                    
-            {"U", "V"},                                    
-            {"V", "W"},                                    
-            {"W", "X"},                                    
-            {"X", "Y"},                                    
-            {"Y", "Z"},                                    
-            {"Z", "A"}                                    
-        };
-        
+    private static SecretKeySpec secretKey;
+    private static byte[] key;
     
-    public static String encode(String originalValue) {
-
-        char[] cData = originalValue.toCharArray();
-
-        StringBuilder newValue = new StringBuilder();
-        for (char c: cData) {
-            for (int i = 0; i<nameArr.length; i++) {
-                String nameChar = Character.toString(c);
-                String nameArrChar = nameArr[i][0];
-                if (nameChar.toLowerCase().equals(nameArrChar.toLowerCase())) {
-                    if (StringUtils.isAllLowerCase(nameChar)) {
-                        newValue.append(nameArr[i][1].toLowerCase());
-                    } else {
-                        newValue.append(nameArr[i][1]);
-                    }
-                }
-            }
-        }
-
-        return newValue.toString();
+    /**
+     * Empty constructor 
+     */
+    public Encoder() {
     }
     
-    public static String decode(String encodedValue) {
-
-        char[] cData = encodedValue.toCharArray();
+    public static void setKey(String myKey) {
+        MessageDigest sha = null;
         
-        StringBuilder newValue = new StringBuilder();
-        for (char c: cData) {
-            for (int i = 0; i<nameArr.length; i++) {
-                String nameChar = Character.toString(c);
-                String nameArrChar = nameArr[i][1];
-                if (nameChar.toLowerCase().equals(nameArrChar.toLowerCase())) {
-                    if (StringUtils.isAllLowerCase(nameChar)) {
-                        newValue.append(nameArr[i][0].toLowerCase());
-                    } else {
-                        newValue.append(nameArr[i][0]);
-                    }
-                }
-            }
+        try {
+            key = myKey.getBytes("UTF-8");
+            sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16); 
+            secretKey = new SecretKeySpec(key, "AES");
+        } 
+        catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            log.debug(e);
         }
-
-        return newValue.toString();
     }    
+    
+    
+    public String encrypt(String strToEncrypt, String secret) {
+        
+      try {
+            setKey(secret);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException | InvalidKeyException | NoSuchAlgorithmException | 
+                 BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+            log.error("Error while encrypting: " + e.toString());
+        }
+      
+        return null;
+
+    }        
+
+ 
+    public String decrypt(String strToDecrypt, String secret) {
+        try {
+            setKey(secret);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+        } catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | 
+                 IllegalBlockSizeException | NoSuchPaddingException e) {
+            log.error("Error while decrypting: " + e.toString());
+        }
+        return null;
+    }
     
 }

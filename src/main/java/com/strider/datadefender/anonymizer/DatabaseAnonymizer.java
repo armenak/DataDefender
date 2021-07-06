@@ -344,6 +344,9 @@ public class DatabaseAnonymizer implements IAnonymizer {
         final Map<String, Integer> columnIndexes = new HashMap<>(tableColumns.size());
         final Set<String> anonymized = new HashSet<>(tableColumns.size());
 
+        
+        log.debug("Temporary debug line: before Column loop  ");
+        
         for (final Column column : tableColumns) {
             final String columnName = column.getName();
             if (anonymized.contains(columnName)) {

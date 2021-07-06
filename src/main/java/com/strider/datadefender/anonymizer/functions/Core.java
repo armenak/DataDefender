@@ -50,12 +50,16 @@ public class Core extends RequirementFunction {
 
     private static final Map<String, List<String>> stringLists = new HashMap<>();
     private static final Map<String, Iterator<String>> stringIters = new HashMap<>();
-    private static final List<String> words = new ArrayList<>();
-
+    private static final  List<String> words = new ArrayList<>();
+    private static String hash = null;
+    
     public static interface InputStreamSupplier {
         public InputStream getInputStream() throws IOException;
     }
 
+    /**
+     * Static block for loading words from dictionary
+     */
     static {
         try (Scanner scanner = new Scanner(Core.class.getResourceAsStream("dictionary.txt"))) {
             while (scanner.hasNext()) {
@@ -63,12 +67,23 @@ public class Core extends RequirementFunction {
             }
         }
     }
+    
+    /**
+     * Static block to load hash string for "salting" the encryption
+     */
+    static {
+        try (Scanner scanner = new Scanner(Core.class.getResourceAsStream("hash.txt"))) {
+            if (scanner.hasNext()) {
+                hash = scanner.next();
+            }
+        }
+    }    
 
     /**
      * Returns the next shuffled item from the named collection.
      *
-     * @param name
-     * @return
+     * @param String name
+     * @return String
      */
     private String getNextShuffledItemFor(@NamedParameter("name") String name) {
         if (stringIters.containsKey(name)) {
@@ -211,5 +226,9 @@ public class Core extends RequirementFunction {
     public String randomStringFromPattern(@NamedParameter("pattern") String pattern) {
         final Xeger instance = new Xeger(pattern);
         return instance.generate();
+    }
+    
+    public String getHash() {
+        return hash;
     }
 }

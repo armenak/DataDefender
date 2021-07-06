@@ -21,8 +21,10 @@ import com.strider.datadefender.requirement.file.Loader;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.ThreadContext;
@@ -38,6 +40,7 @@ import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
 
 import lombok.extern.log4j.Log4j2;
+import org.xml.sax.SAXException;
 
 /**
  * Entry point to Data Defender.
@@ -123,7 +126,7 @@ public class DataDefender implements Callable<Integer> {
             } catch (FileNotFoundException e) {
                 log.debug("Error loading requirements file", e);
                 throw new TypeConversionException("Unable to load requirements file: " + e.getMessage());
-            } catch (Exception e) {
+            } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | InvocationTargetException | JAXBException | SAXException e) {
                 Throwable exc = e;
                 if (StringUtils.isBlank(e.getMessage()) && e.getCause() != null) {
                     exc = e.getCause();

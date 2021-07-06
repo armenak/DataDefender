@@ -31,21 +31,22 @@ import org.apache.commons.lang3.RandomUtils;
 @Log4j2
 public class Bio extends Core {
 
-    public String randomFirstName(final String firstName) 
-    throws Exception {
+    public String randomFirstName(@NamedParameter("fistName") String firstName) {
         
-        final Encoder encoder = new Encoder();
-        String detFirstName = encoder.encode(firstName);
+        log.debug("Executing function randomFirstNameD");
+        String detFirstName = new Encoder().encrypt(firstName, this.getHash());
+        log.debug("detFirstName = " + detFirstName);
+        log.debug("detFirstName.length() = " + detFirstName.length());
         
-        return detFirstName;
+        return detFirstName;        
     }
     
-//    public String randomFirstName() throws IOException {
-//		return randomStringFromStream(
-//            "resource:first_names.txt",
-//            () -> Lipsum.class.getResourceAsStream("first_names.txt")
-//        );
-//    }
+    public String randomFirstName() throws IOException {
+		return randomStringFromStream(
+            "resource:first_names.txt",
+            () -> Lipsum.class.getResourceAsStream("first_names.txt")
+        );
+    }
 
     public String randomLastName() throws IOException {
         return randomStringFromStream(
@@ -54,9 +55,20 @@ public class Bio extends Core {
         );
     }
 
-//    public String randomMiddleName(final String file) throws IOException {
-//        return randomFirstName();
-//    }
+    public String randomLastName(@NamedParameter("lastName") String lastName) {
+        
+        log.debug("Executing function randomLastNameD");
+        String detLastName = new Encoder().encrypt(lastName, this.getHash());
+        log.debug("detLastName = " + detLastName);
+        log.debug("detLastName.length() = " + detLastName.length());
+        
+        return detLastName;        
+    }
+    
+    
+    public String randomMiddleName(final String file) throws IOException {
+        return randomFirstName();
+    }
 
     /**
      * Creates a random username with up to 10 characters and between 0 and 2
