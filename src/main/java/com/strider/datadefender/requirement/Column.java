@@ -108,11 +108,12 @@ public class Column {
     /**
      * Calls all functions defined under Functions in order.
      *
-     * @param rs
+     * @param rs ResultSet
      * @return
      * @throws SQLException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
+     * @throws java.lang.InstantiationException
      */
     public Object invokeFunctionChain(ResultSet rs)
         throws SQLException,

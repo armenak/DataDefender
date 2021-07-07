@@ -130,6 +130,8 @@ public class Plan implements Invokable {
         for (Function fn : functions) {
             log.debug("Invoking function: {}", fn.getFunction());
             Object returnValue = fn.invoke(runningValue);
+            log.debug("runningValue = " + runningValue);
+            log.debug("returnValue = " + returnValue);
             if (combiner != null && !isFirst) {
                 final Object gl = glue;
                 log.debug(

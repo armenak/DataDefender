@@ -1,5 +1,6 @@
 package com.strider.datadefender.anonymizer.functions;
 
+import com.strider.datadefender.utils.Encoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
@@ -100,5 +101,18 @@ public class BioTest {
             assertTrue(m.group(2).length() == numDigits);
             assertEquals("domain.com", m.group(3));
         }
+    }
+    
+    @Test
+    public void testRandomFirstName() {
+        final Bio bio = new Bio();
+        
+        final String encryptedValue = bio.randomFirstName("Armenak Grigoryan");
+        log.debug("Encrypted value: " + encryptedValue);
+        
+        final String decryptedValue = new Encoder().decrypt(encryptedValue, bio.getHash());
+        log.debug("Decrypted value: " + decryptedValue);
+        
+        assertEquals("Armenak Grigoryan", decryptedValue);
     }
 }

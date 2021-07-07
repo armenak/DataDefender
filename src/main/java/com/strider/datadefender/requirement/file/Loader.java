@@ -67,6 +67,7 @@ public class Loader {
      * @throws java.lang.InstantiationException
      * @throws java.lang.IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
+     * @throws org.xml.sax.SAXException
      */
     public Requirement load(final String requirementFile) throws
         FileNotFoundException,

@@ -16,6 +16,7 @@
 package com.strider.datadefender.anonymizer.functions;
 
 import com.strider.datadefender.functions.NamedParameter;
+import com.strider.datadefender.utils.Encoder;
 
 import java.io.IOException;
 
@@ -30,6 +31,16 @@ import org.apache.commons.lang3.RandomUtils;
 @Log4j2
 public class Bio extends Core {
 
+    public String randomFirstName(@NamedParameter("fistName") String firstName) {
+        
+        log.debug("Executing function randomFirstNameD");
+        String detFirstName = new Encoder().encrypt(firstName, this.getHash());
+        log.debug("detFirstName = " + detFirstName);
+        log.debug("detFirstName.length() = " + detFirstName.length());
+        
+        return detFirstName;        
+    }
+    
     public String randomFirstName() throws IOException {
 		return randomStringFromStream(
             "resource:first_names.txt",
@@ -44,6 +55,17 @@ public class Bio extends Core {
         );
     }
 
+    public String randomLastName(@NamedParameter("lastName") String lastName) {
+        
+        log.debug("Executing function randomLastNameD");
+        String detLastName = new Encoder().encrypt(lastName, this.getHash());
+        log.debug("detLastName = " + detLastName);
+        log.debug("detLastName.length() = " + detLastName.length());
+        
+        return detLastName;        
+    }
+    
+    
     public String randomMiddleName(final String file) throws IOException {
         return randomFirstName();
     }
