@@ -65,6 +65,15 @@ public class Bio extends Core {
         return detLastName;        
     }
     
+    public String randomReversibleValue(@NamedParameter("value") String value) {
+        
+        log.debug("Executing function randomReversibleString");
+        String destValue = new Encoder().encrypt(value, this.getHash());
+        log.debug("destValue = " + destValue);
+        log.debug("destValue.length() = " + destValue.length());
+        
+        return destValue;        
+    }    
     
     public String randomMiddleName(final String file) throws IOException {
         return randomFirstName();

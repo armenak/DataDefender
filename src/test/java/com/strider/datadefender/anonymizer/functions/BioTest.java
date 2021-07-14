@@ -115,4 +115,17 @@ public class BioTest {
         
         assertEquals("Armenak Grigoryan", decryptedValue);
     }
+    
+    @Test
+    public void testRandomReversibleString() {
+        final Bio bio = new Bio();
+        
+        final String encryptedValue = bio.randomReversibleValue("Software Developer");
+        log.debug("Encrypted value: " + encryptedValue);
+        
+        final String decryptedValue = new Encoder().decrypt(encryptedValue, bio.getHash());
+        log.debug("Decrypted value: " + decryptedValue);
+        
+        assertEquals("Software Developer", decryptedValue);
+    }    
 }
