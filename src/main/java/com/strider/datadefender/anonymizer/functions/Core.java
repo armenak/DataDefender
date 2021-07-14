@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -228,7 +229,29 @@ public class Core extends RequirementFunction {
         return instance.generate();
     }
     
+    public String randomIpAddress() {
+        
+        StringBuilder ipAddress = new StringBuilder();
+        Random r = new Random();
+        
+        ipAddress.append(Integer.toString(r.nextInt(256))).
+                append(".").
+                append(Integer.toString(r.nextInt(256))).
+                append(".").
+                append(r.nextInt(256)).
+                append(".").
+                append(r.nextInt(256));
+        
+        
+        return ipAddress.toString();
+    }
+    
+
+    
+    
     public String getHash() {
         return hash;
     }
+    
+    
 }

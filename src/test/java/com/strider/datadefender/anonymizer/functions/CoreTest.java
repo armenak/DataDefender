@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Zaahid Bateson
  */
+@Log4j2
 public class CoreTest {
 
     @Test
@@ -73,12 +75,12 @@ public class CoreTest {
         final String dateStart = "1910-01-01";
         final String dateEnd = "1930-01-01";
         final String format = "yyyy-MM-dd";
-        System.out.println("Testing random date generation between 1910-01-01 and 1930-01-01");
+        log.info("Testing random date generation between 1910-01-01 and 1930-01-01");
 
         String rand = test.randomDate(dateStart, dateEnd, format);
         assertNotNull(rand);
         assertFalse(rand.isEmpty());
-        System.out.println("Generated random date: " + rand);
+        log.info("Generated random date: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDate ds = LocalDate.parse(dateStart, fmt);
@@ -96,12 +98,12 @@ public class CoreTest {
         final String dateStart = "1980-01-01 00:00:00";
         final String dateEnd = "2020-01-01 12:22:33";
         final String format = "yyyy-MM-dd HH:mm:ss";
-        System.out.println("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
+        log.info("Testing random date/time generation between 1980-01-01 00:00:00 and 2020-01-01 12:22:33");
 
         String rand = test.randomDateTime(dateStart, dateEnd, format);
         assertNotNull(rand);
         assertFalse(rand.isEmpty());
-        System.out.println("Generated random date/time: " + rand);
+        log.info("Generated random date/time: " + rand);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
         LocalDateTime ds = LocalDateTime.parse(dateStart, fmt);
@@ -136,11 +138,22 @@ public class CoreTest {
 
     @Test
     public void testRandomStringFromPattern() {
-        System.out.println("randomStringFromPattern");
+        log.info("randomStringFromPattern");
         String regex = "[0-9]{3}-[A-Za-z]{3}-[0-9]{3}";
         Core test = new Core();
         String result = test.randomStringFromPattern(regex);
         assertNotNull(result);
         assertTrue(result.matches(regex));
+    }
+    
+    @Test
+    public void testRandomIpAddress() {
+        log.info("Testing randomIpAddress method");
+        
+        String regex = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!$)|$)){4}$";
+        Core testCore = new Core();
+        String randomIpAddress = testCore.randomIpAddress();
+        assertNotNull(randomIpAddress);
+        assertTrue(randomIpAddress.matches(regex));
     }
 }
