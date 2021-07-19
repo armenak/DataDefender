@@ -156,4 +156,13 @@ public class CoreTest {
         assertNotNull(randomIpAddress);
         assertTrue(randomIpAddress.matches(regex));
     }
+    
+    @Test
+    public void testRandomGeoLocation() {
+        log.info("Testing randomGeoLocation method");
+        
+        String randomLocation = new Core().randomGeoLocation();
+        log.info("Random location: " + randomLocation);
+        assertNotNull(randomLocation);
+    }        
 }

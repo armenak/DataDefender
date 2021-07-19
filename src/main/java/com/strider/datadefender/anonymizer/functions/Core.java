@@ -246,8 +246,10 @@ public class Core extends RequirementFunction {
         return ipAddress.toString();
     }
     
-
-    
+    public String randomGeoLocation() {
+        double val = new Random().nextDouble();
+        return Double.toString(val);
+    }    
     
     public String getHash() {
         return hash;
