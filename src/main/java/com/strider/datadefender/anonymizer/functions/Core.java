@@ -21,6 +21,7 @@ import com.strider.datadefender.utils.Xeger;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,10 +74,14 @@ public class Core extends RequirementFunction {
      * Static block to load hash string for "salting" the encryption
      */
     static {
-        try (Scanner scanner = new Scanner(Core.class.getResourceAsStream("hash.txt"))) {
-            if (scanner.hasNext()) {
-                hash = scanner.next();
-            }
+        String file = System.getProperty("user.dir") + "/hash.txt";
+        File f = new File(file);
+        try {        
+            BufferedReader reader = new BufferedReader(new FileReader(f));
+            hash = reader.readLine();
+            reader.close();            
+        } catch (IOException ex) {
+            log.error("Problem finding file hash.txt", ex);
         }
     }    
 

@@ -29,6 +29,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.strider.datadefender.anonymizer.functions.Bio;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 /**
  *
@@ -36,8 +39,24 @@ import com.strider.datadefender.anonymizer.functions.Bio;
  */
 @Log4j2
 public class EncoderTest {
+
+    private static String hash = null;
     
-    private static final String SALT = "NpeGvnRjtNF89umufr95sCTau";
+    /**
+     * Static block to load hash string for "salting" the encryption
+     */
+    static {
+        String file = System.getProperty("user.dir") + "/hash.txt";
+        File f = new File(file);
+        try {        
+            BufferedReader reader = new BufferedReader(new FileReader(f));
+            hash = reader.readLine();
+            reader.close();            
+        } catch (IOException ex) {
+            log.error("Problem finding file hash.txt", ex);
+        }
+    }        
+    
     
     public EncoderTest() {
     }
@@ -70,7 +89,7 @@ public class EncoderTest {
         String encryptedValue = new Bio().randomFirstName(originalValue);
         log.debug("Encrypted value=" + encryptedValue);
         
-        String decryptedValue = new Encoder().decrypt(encryptedValue, SALT);
+        String decryptedValue = new Encoder().decrypt(encryptedValue, hash);
         log.debug("Decrypted value=" + decryptedValue);
         
         assertEquals(originalValue, decryptedValue);
