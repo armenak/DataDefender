@@ -128,4 +128,17 @@ public class BioTest {
         
         assertEquals("Software Developer", decryptedValue);
     }    
+    
+    @Test
+    public void testRandomNumber() {
+        final int min = 1;
+        final int max = 99999999;
+        final Bio bio = new Bio();
+        
+        final int result = bio.randomNumber(min, max);
+        
+        log.debug("Generated random number is: " + result);
+        assertTrue(result <= max);
+        
+    }
 }

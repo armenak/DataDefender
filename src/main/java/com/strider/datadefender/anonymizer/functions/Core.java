@@ -260,5 +260,9 @@ public class Core extends RequirementFunction {
         return hash;
     }
     
+    public int randomNumber(@NamedParameter("min") int min, @NamedParameter("max") int max) {
+        return (int) (Math.random()*(max-min)) + min;
+    }
+    
     
 }
