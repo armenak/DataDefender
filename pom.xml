@@ -182,13 +182,13 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.17.0</version>
+      <version>2.17.1</version>
     </dependency>
     <dependency>
       <!-- other dependencies may want to log with slf4j -->
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.17.0</version>
+      <version>2.17.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -279,7 +279,7 @@
     <dependency>
       <groupId>org.apache.tika</groupId>
       <artifactId>tika-parsers</artifactId>
-      <version>1.25</version>
+      <version>2.0.0</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.activation</groupId>
