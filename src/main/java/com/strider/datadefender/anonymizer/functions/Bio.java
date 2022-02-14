@@ -136,4 +136,21 @@ public class Bio extends Core {
         String user = randomUser(maxUserCharacters, numDigits).replace("_", ".");
         return user + "@" + domainName;
     }
+    
+    /**
+     * Creates an email with a user part up to 20 characters long, and between
+     * 0 and 2 digits following, followed by an '@' character, and the provided
+     * domainName.
+     *
+     * @param domainName
+     * @return
+     */
+    public String randomEncryptedEmail(@NamedParameter("email") String email) {
+        log.debug("Executing function randomEncryptedEmail");
+        String detEmail = new Encoder().encrypt(email, this.getHash());
+        log.debug("detEmail = " + detEmail);
+        log.debug("detEmail.length() = " + detEmail.length());
+        
+        return detEmail;
+    }    
 }
