@@ -40,6 +40,7 @@ import picocli.CommandLine.TypeConversionException;
 import picocli.CommandLine.UnmatchedArgumentException;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -60,7 +61,8 @@ import org.xml.sax.SAXException;
         HelpCommand.class,
         Anonymize.class,
         Extract.class,
-        Discover.class
+        Discover.class,
+        TestRequirement.class
     }
 )
 @Log4j2
@@ -124,15 +126,11 @@ public class DataDefender implements Callable<Integer> {
             try {
                 return loader.load(value);
             } catch (FileNotFoundException e) {
-                log.debug("Error loading requirements file", e);
+                log.info("Error loading requirements file", e);
                 throw new TypeConversionException("Unable to load requirements file: " + e.getMessage());
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | InvocationTargetException | JAXBException | SAXException e) {
-                Throwable exc = e;
-                if (StringUtils.isBlank(e.getMessage()) && e.getCause() != null) {
-                    exc = e.getCause();
-                }
-                log.debug("Error loading requirements.", exc);
-                throw new TypeConversionException("Unable to load requirements file: " + exc.getMessage());
+                log.info("Error loading requirements.", e);
+                throw new TypeConversionException("Unable to load requirements file: " + ExceptionUtils.getRootCauseMessage(e));
             }
         }
     }

@@ -52,6 +52,7 @@ public class Loader {
 
         jaxbContext = newInstance(Requirement.class);
         unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setEventHandler(new JaxbValidationEventHandler());
     }
 
     /**

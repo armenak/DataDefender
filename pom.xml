@@ -4,7 +4,7 @@
 
   <groupId>com.strider.datadefender</groupId>
   <artifactId>DataDefender</artifactId>
-  <version>2.0.1</version>
+  <version>2.0.2</version>
   <packaging>jar</packaging>
   <description>Data detection and anonymization tool</description>
 

@@ -22,6 +22,7 @@ Table of content
 - [Data Discovery](#data-discovery)
 - [Data Extractor](#data-extractor)
 - [Anonymizer](#anonymizer)
+- [Requirement Tester](#requirement-tester)
 - [Logging (and database logging)](#logging)
 - [Upgrading to 2.0](#upgrading-to-20)
 - [Features and issues](#features-and-issues)
@@ -92,7 +93,7 @@ See [sample_projects/anonymizer/]([sample_projects/anonymizer/) for an example.
 
 Contributing
 ------------
-We encourage you to contribute to DataDefender! Please check out the [Contribution guidelines for this project](CONTRIBUTING.md). 
+We encourage you to contribute to DataDefender! Please check out the [Contribution guidelines for this project](CONTRIBUTING.md).
 
 How to run
 ----------
@@ -115,6 +116,8 @@ Commands:
                columns with the name 'table_columnName.txt' for each column
                requested.
   discover   Run data discovery utility
+  test-requirement  Loads the requirement file without attempting to anonymize
+                      or process anything to check for syntax issues
 ```
 
 The toolkit can be run in anonymizer mode, data extraction mode (extract), and three different discovery modes (file, column, and database discovery).
@@ -430,6 +433,26 @@ Database connection settings
 ```
 
 In this mode, data anonymization is performed on the database based on the requirements file. The requirements file is an XML-formatted file describing which tables and columns should be anonymized, and how.  For an example, refer to [sample_projects/anonymizer/requirement.xml](sample_projects/anonymizer/requirement.xml).
+
+Requirement Tester
+------------------
+
+``` datadefender test-requirement ```
+
+```
+Usage: datadefender test-requirement [-hVv] [--debug] -r=<requirementFile>
+Loads the requirement file without attempting to anonymize or process anything
+to check for syntax issues
+      --debug     Enable debug logging in log file
+  -h, --help      Show this help message and exit.
+  -r, --requirement-file=<requirementFile>
+                  Requirement XML file
+  -v, --verbose   Enable more verbose console output, specify two -v for
+                    console debug logging
+  -V, --version   Print version information and exit.
+```
+
+In this mode the requirements file is tested for validation by attempting to load it.  If a validation error occurs, a message is printed and datadefender is stopped.  If it succeeds, a success message is printed.
 
 Logging
 ----------------
