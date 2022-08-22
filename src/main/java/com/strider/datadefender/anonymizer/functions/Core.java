@@ -81,7 +81,8 @@ public class Core extends RequirementFunction {
             hash = reader.readLine();
             reader.close();            
         } catch (IOException ex) {
-            log.error("Problem finding file hash.txt", ex);
+            log.warn("hash.txt doesn't exist or cannot be read from, encryption functions will not be setup correctly if used.  Please enable debug logging to see more info about this message.");
+            log.debug("Erorr reading from hash.txt", ex);
         }
     }    
 
@@ -257,12 +258,14 @@ public class Core extends RequirementFunction {
     }    
     
     public String getHash() {
+        if (hash == null) {
+            log.error("getHash() called but hash.txt was not provided.");
+            throw new IllegalStateException("Hash not initialized");
+        }
         return hash;
     }
     
     public int randomNumber(@NamedParameter("min") int min, @NamedParameter("max") int max) {
         return (int) (Math.random()*(max-min)) + min;
     }
-    
-    
 }
