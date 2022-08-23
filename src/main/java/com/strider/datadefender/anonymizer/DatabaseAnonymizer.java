@@ -185,10 +185,12 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
                 if (neq != null) {
                     query.append(separator).append(col).append(" = ?");
+                    params.add(neq);
                     separator = " OR ";
                 }
                 if (nlk != null && nlk.length() != 0) {
                     query.append(separator).append(col).append(" LIKE ?");
+                    params.add(nlk);
                     separator = " OR ";
                 }
                 if (CollectionUtils.isNotEmpty(nin)) {
@@ -219,7 +221,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
         }
 
         log.debug("Querying for: " + query.toString());
-        if (params.size() > 0) {
+        if (!params.isEmpty()) {
             log.debug("\t - with parameters: " + StringUtils.join(params, ','));
         }
 
