@@ -18,6 +18,7 @@
 package com.strider.datadefender.report;
 
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.TableMetaData.ColumnMetaData;
 import com.strider.datadefender.database.sqlbuilder.ISqlBuilder;
@@ -71,16 +72,17 @@ public class ReportUtil {
         String            querySample = "";
         String            select      = "SELECT ";
         
-        
+        String columnName = sqlBuilder.getVendor() == Vendor.POSTGRESQL ? "\"" + metaData.getColumnName() + "\""
+                : metaData.getColumnName();
         
         if (!metaData.getColumnType().equals("CLOB") && !factory.getVendorName().equals("mssql")) {
             select = select + "DISTINCT ";
         }
         
         querySample = sqlBuilder.buildSelectWithLimit(
-            select + metaData.getColumnName() + " FROM "
+            select + columnName + " FROM "
                 + sqlBuilder.prefixSchema(metaData.getTable().getTableName())
-                + " WHERE " + metaData.getColumnName() + " IS NOT NULL",
+                + " WHERE " + columnName + " IS NOT NULL",
             5
         );
         log.debug("Executing query against database: " + querySample);
