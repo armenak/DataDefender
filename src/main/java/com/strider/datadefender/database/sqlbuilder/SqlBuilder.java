@@ -16,6 +16,7 @@
 package com.strider.datadefender.database.sqlbuilder;
 
 import com.strider.datadefender.DbConfig;
+import com.strider.datadefender.DbConfig.Vendor;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,8 +61,21 @@ public class SqlBuilder implements ISqlBuilder {
     public String prefixSchema(final String tableName) {
         final String schema = config.getSchema();
         if (StringUtils.isNotBlank(schema)) {
-            return schema + "." + tableName;
+            if(config.getVendor() == Vendor.POSTGRESQL) {
+                return schema + "." + "\"" + tableName + "\"";
+            }else {
+                return schema + "." + tableName;
+            }
         }
         return tableName;
+    }
+    
+    /**
+     * Method to get DB Vendor
+     * @return
+     */
+    @Override
+    public Vendor getVendor() {
+        return config.getVendor();
     }
 }

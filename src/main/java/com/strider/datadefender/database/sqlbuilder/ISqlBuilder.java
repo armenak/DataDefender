@@ -15,6 +15,8 @@
  */
 package com.strider.datadefender.database.sqlbuilder;
 
+import com.strider.datadefender.DbConfig.Vendor;
+
 /**
  * Interface for all classes implementing SQL builder.
  *
@@ -38,6 +40,12 @@ public interface ISqlBuilder {
      * @return
      */
     String prefixSchema(String tableName);
+
+    /**
+     * Method to get DB Vendor
+     * @return
+     */
+    Vendor getVendor();
 }
 
 

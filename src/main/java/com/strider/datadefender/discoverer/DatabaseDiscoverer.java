@@ -18,6 +18,7 @@
 package com.strider.datadefender.discoverer;
 
 import com.strider.datadefender.DataDefenderException;
+import com.strider.datadefender.DbConfig.Vendor;
 import com.strider.datadefender.ModelDiscoveryConfig;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.database.metadata.IMetaData;
@@ -281,6 +282,7 @@ public class DatabaseDiscoverer extends Discoverer {
                 rs.next();
                 numRows = Math.min(numRows, rs.getInt(1));
             } catch (SQLException e) {
+                log.error(e.toString());
             }
 
             List<ColumnMetaData> cols = table.getColumns().stream()
@@ -291,7 +293,7 @@ public class DatabaseDiscoverer extends Discoverer {
             try (ProgressBar pb = new ProgressBar(model.getName() + " in " + tableName, numSteps)) {
                 for (final ColumnMetaData data : cols) {
                     
-                    final String columnName = data.getColumnName();
+                    final String columnName = sqlBuilder.getVendor() == Vendor.POSTGRESQL ? "\"" + data.getColumnName() + "\"" : data.getColumnName();
                     pb.setExtraMessage(columnName);
 
                     log.debug("Column type: [" + data.getColumnType() + "]");

@@ -38,6 +38,7 @@ public class SqlTypeToClass {
             case Types.NCHAR:
             case Types.NVARCHAR:
             case Types.LONGNVARCHAR:
+            case Types.OTHER:
                 return String.class;
             case Types.BINARY:
             case Types.VARBINARY:
