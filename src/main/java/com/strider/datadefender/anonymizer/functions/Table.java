@@ -18,10 +18,12 @@ package com.strider.datadefender.anonymizer.functions;
 import com.strider.datadefender.functions.NamedParameter;
 import com.strider.datadefender.requirement.registry.DatabaseAwareRequirementFunction;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +47,8 @@ public class Table extends DatabaseAwareRequirementFunction {
     private static final Map<String, List<String>> stringLists = new HashMap<>();
     private static final Map<String, Iterator<String>> stringIters = new HashMap<>();
     private static final Map<String, Map<String, String>> predictableShuffle = new HashMap<>();
+    private static final Map<String, Map<String, String>> predictableLipsumShuffle = new HashMap<>();
+    private static final Lipsum lipsum = new Lipsum();
 
     /**
      * Returns the next shuffled item from the named collection.
@@ -94,9 +99,47 @@ public class Table extends DatabaseAwareRequirementFunction {
 
         final Map<String, String> map = predictableShuffle.get(name);
         if (!map.containsKey(value)) {
-            final String[] vals = map.values().toArray(new String[map.size()]);
-            final int index = (int) Math.abs((long) value.hashCode()) % vals.length;
-            return vals[index];
+            final Collection<String> vals = map.values();
+            final int index = (int) Math.abs((long) value.hashCode()) % vals.size();
+            return IterableUtils.get(vals, index);
+        }
+        return map.get(value);
+    }
+    
+    /**
+     * Sets up a map, mapping a list of values to a list of anonymized shuffled
+     * values.
+     *
+     * If the value is not mapped, the function guarantees returning the same
+     * randomized value for a given column value - however it does not guarantee
+     * that more than one column value do not have the same randomized value.
+     *
+     * @param params
+     * @return
+     */
+    private String getPredictableShuffledLipsumSimilarValueFor(final String name, final String value) throws IOException {
+        if (!predictableShuffle.containsKey(name)) {
+            final List<String> list = stringLists.get(name);
+            final List<String> shuffled = new ArrayList<>();
+            for (String v: list) {
+                shuffled.add(lipsum.similar(v));
+            }
+            Collections.shuffle(shuffled);
+
+            final Map<String, String> smap = new HashMap<>();
+            final Iterator<String> lit = list.iterator();
+            final Iterator<String> sit = shuffled.iterator();
+            while (lit.hasNext()) {
+                smap.put(lit.next(), sit.next());
+            }
+            predictableShuffle.put(name, smap);
+        }
+
+        final Map<String, String> map = predictableShuffle.get(name);
+        if (!map.containsKey(value)) {
+            final Collection<String> vals = map.values();
+            final int index = (int) Math.abs((long) value.hashCode()) % vals.size();
+            return IterableUtils.get(vals, index);
         }
         return map.get(value);
     }
@@ -197,5 +240,41 @@ public class Table extends DatabaseAwareRequirementFunction {
         }
         generateStringListFromDb(keyName, sb.toString());
         return getPredictableShuffledValueFor(keyName + sb.toString().hashCode(), value);
+    }
+    
+    /**
+     * Returns a 'predictable', anonymzied shuffled value based on the passed 
+     * value which is guaranteed to return the same random, anonymized value for
+     * the same column value.
+     *
+     * Note that columns may have repeated values even if they are different,
+     * the anonymization is not guaranteed to be unique.
+     *
+     * @param table
+     * @param column
+     * @param value
+     * @param excludeEmpty
+     * @return
+     * @throws SQLException, IOException
+     */
+    public String mappedLipsumSimilarColumnShuffle(
+        @NamedParameter("table") String table,
+        @NamedParameter("column") String column,
+        @NamedParameter("value") String value,
+        @NamedParameter("excludeEmpty") boolean excludeEmpty
+    ) throws SQLException, IOException {
+        
+        final String keyName = table + "." + column;
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("SELECT DISTINCT %s FROM %s", column, table));
+        if (excludeEmpty) {
+            if (StringUtils.equalsIgnoreCase("oracle", dbFactory.getVendorName())) {
+                sb.append(String.format(" WHERE %s IS NOT NULL", column, column));
+            } else {
+                sb.append(String.format(" WHERE %s IS NOT NULL AND %s <> ''", column, column));
+            }
+        }
+        generateStringListFromDb(keyName, sb.toString());
+        return getPredictableShuffledLipsumSimilarValueFor(keyName + sb.toString().hashCode(), value);
     }
 }
