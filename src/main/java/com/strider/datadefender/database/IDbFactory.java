@@ -161,7 +161,7 @@ public interface IDbFactory extends ICloseableNoException {
      */
     public static IDbFactory get(final DbConfig config) throws DataDefenderException {
 
-        if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.H2) {
+        if (config.getVendor() == Vendor.MYSQL || config.getVendor() == Vendor.MARIADB || config.getVendor() == Vendor.H2) {
             DbFactory factory = getFactoryWith(config, DbConnection.class, MySqlMetaData.class, SqlBuilder.class);
             // create separate connection for updates
             factory.updateConnection = factory.createConnection();
