@@ -15,7 +15,7 @@
  */
 package com.strider.datadefender.requirement.plan;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * XmlAdapter to get a Function type from a String attribute.

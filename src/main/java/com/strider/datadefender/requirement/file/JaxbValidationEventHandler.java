@@ -21,9 +21,9 @@ package com.strider.datadefender.requirement.file;
 
 import org.w3c.dom.Node;
 
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import javax.xml.bind.ValidationEventLocator;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.ValidationEventLocator;
 import java.net.URL;
 import java.util.Map;
 

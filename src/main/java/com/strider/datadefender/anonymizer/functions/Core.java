@@ -39,6 +39,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -126,6 +127,9 @@ public class Core extends RequirementFunction {
             InputStream stream = supplier.getInputStream();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
                 for (String line; (line = br.readLine()) != null; ) {
+                    if (StringUtils.isBlank(line)) {
+                        continue;
+                    }
                     values.add(line);
                 }
             }

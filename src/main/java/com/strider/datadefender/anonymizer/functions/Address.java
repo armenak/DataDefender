@@ -30,10 +30,12 @@ import lombok.extern.log4j.Log4j2;
 public class Address extends Core {
 
     public String randomCountry() throws IOException {
-        return randomStringFromStream(
+        String ret = randomStringFromStream(
             "resource:countries.txt",
             () -> Lipsum.class.getResourceAsStream("countries.txt")
         );
+        log.info("Country: {}", ret);
+        return ret;
     }
 
     public String randomCity() throws IOException {

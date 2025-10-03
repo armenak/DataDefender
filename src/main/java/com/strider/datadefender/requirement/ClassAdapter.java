@@ -16,7 +16,7 @@
 package com.strider.datadefender.requirement;
 
 import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;

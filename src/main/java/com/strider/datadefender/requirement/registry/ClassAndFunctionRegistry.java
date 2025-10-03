@@ -15,7 +15,6 @@
  */
 package com.strider.datadefender.requirement.registry;
 
-import com.mchange.v1.lang.ClassUtils;
 import com.strider.datadefender.database.IDbFactory;
 import com.strider.datadefender.requirement.Requirement;
 
@@ -33,6 +32,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ClassUtils;
 
 /**
  * Very basic registry for classes that need to be instantiated for use by
@@ -85,7 +85,7 @@ public class ClassAndFunctionRegistry {
         if (!className.contains(".") && Character.isUpperCase(className.charAt(0))) {
             for (String pkg : autoResolvePackages) {
                 try {
-                    Class<?> c = ClassUtils.forName(pkg + "." + className);
+                    Class<?> c = ClassUtils.getClass(pkg + "." + className);
                     if (Modifier.isPublic(c.getModifiers())) {
                         log.debug("{} class autoresolved to {}", () -> className, () -> pkg + "." + className);
                         return c;
@@ -95,7 +95,7 @@ public class ClassAndFunctionRegistry {
                 }
             }
         }
-        return ClassUtils.forName(className);
+        return ClassUtils.getClass(className);
     }
 
     /**
