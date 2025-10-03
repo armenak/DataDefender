@@ -386,7 +386,7 @@ public class DatabaseAnonymizer implements IAnonymizer {
 
         int whereIndex = fieldIndex;
         for (final String key : keyNames) {
-            updateStmt.setString(++whereIndex, row.getString(key));
+            updateStmt.setObject(++whereIndex, row.getObject(key));
         }
 
         updateStmt.addBatch();
