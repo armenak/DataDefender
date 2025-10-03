@@ -21,10 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import static javax.xml.bind.JAXBContext.newInstance;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import static jakarta.xml.bind.JAXBContext.newInstance;
 
 import com.strider.datadefender.requirement.Requirement;
 import com.strider.datadefender.requirement.registry.ClassAndFunctionRegistry;
@@ -62,7 +62,7 @@ public class Loader {
      * @param requirementFile Requirement filename and path
      * @param version required version
      * @return Requirement object loaded based on file
-     * @throws javax.xml.bind.JAXBException
+     * @throws jakarta.xml.bind.JAXBException
      * @throws java.io.FileNotFoundException
      * @throws java.lang.NoSuchMethodException
      * @throws java.lang.InstantiationException
